@@ -2770,7 +2770,7 @@ get_flag_of_cci_prepare (ODBC_STATEMENT * stmt)
 
   if (IS_UPDATABLE (stmt->attr_cursor_type))
     {
-      cci_set_holdability(stmt->conn->connhd, 0);
+      //cci_set_holdability(stmt->conn->connhd, 0);
       return (CCI_PREPARE_INCLUDE_OID|CCI_PREPARE_UPDATABLE);
     }
 

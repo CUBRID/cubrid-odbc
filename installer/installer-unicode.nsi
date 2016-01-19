@@ -121,7 +121,7 @@ Function WriteRegeDit32
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "Driver" "$INSTDIR\cubrid_odbc32.dll"
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "Setup" "$INSTDIR\cubrid_odbc32.dll"
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "APILevel" "2"
-		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "DriverODBCVer" "10.0.0(32)"
+		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "DriverODBCVer" "8.4.4(32)"
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "ConnectFunctions" "YYN"
 		
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "CreateDSN" "CUBRID Driver 32"
@@ -137,7 +137,7 @@ Function WriteRegeDit64
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "Setup" "$INSTDIR\cubrid_odbc64.dll"
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "Setup" "$INSTDIR\cubrid_odbc64.dll"
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "APILevel" "2"
-		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "DriverODBCVer" "10.0.0(64)"
+		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "DriverODBCVer" "8.4.4(64)"
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "ConnectFunctions" "YYN"
 
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver Unicode" "CreateDSN" "CUBRID Driver 64"
