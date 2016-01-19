@@ -104,8 +104,6 @@ typedef struct tagCOLUMN_DATA
   char *current_pt;
   int remain_length;
   short prev_return_status;
-  UNI_CCI_A_TYPE lob;
-  int offset;
 } COLUMN_DATA;
 
 typedef struct tagREVISED_SQL

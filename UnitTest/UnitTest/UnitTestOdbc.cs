@@ -72,45 +72,21 @@ namespace UnitTest
             //
             // TODO: Add test logic	here
             //
-            return;
-            TestCases.case_invalid_db();
-            TestCases.case_select();        
+            TestCases.case_select();
+            TestCases.case_transaction();
+            TestCases.case_connInfo();
             TestCases.case_dataset();
             TestCases.case_datatable();
-            TestCases.case_GetInt16_OverBound_Min();
-            TestCases.case_GetInt16_OverBound_Max();         
-        }
-        [TestMethod]
-        public void PropertyCaseMethod()
-        {
-            return;
-            TestCases.case_connInfo();
             TestCases.case_GetDataTypeName();
+            TestCases.case_GetInt16_OverBound_Min();
+            TestCases.case_GetInt16_OverBound_Max();
         }
         [TestMethod]
-        public void InterfaceCaseMethod()
-        {
-            //TestCases.Test_bulk_operation();
-            //TestCases.Test_SetStmtAttr();
-            //TestCases.Test_GetStmtAttr();
-            //return;
-            //TestCases.Test_GetConnectAttr();
-            //TestCases.Test_SetConnectAttr();           
-            //TestCases.Test_GetDiagField();
-            //TestCases.Test_GetDescField();
-            //TestCases.Test_GetData();
-            TestCases.case_odbc_get_info();
-        }
-        [TestMethod]
-        public void InitCaseMethod()
+        public void CommandCaseMethod()
         {
             //
             // TODO: Add test logic	here
             //
-            return;
-            TestCases.Test_Connect();
-            TestCases.Test_Various_DataTypes();
-            TestCases.Test_Various_DataTypes2();
             TestCases.Test_Command_ColumnProperties();
         }
         [TestMethod]
@@ -119,11 +95,8 @@ namespace UnitTest
             //
             // TODO: Add test logic	here
             //
-            //return;
             TestCases.Test_Transaction();
-            TestCases.Test_Transaction_Rollback();
             TestCases.Test_Transaction_Parameters();
-            TestCases.Test_Transaction_Level();
         }
 
     }

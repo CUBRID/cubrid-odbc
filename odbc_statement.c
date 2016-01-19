@@ -2564,7 +2564,6 @@ free_column_data (COLUMN_DATA * data, int option)
       data->column_no = 0;
       data->remain_length = 0;
       data->prev_return_status = -1;
-      data->offset = 0;
       break;
 
     case FREE_ALL:

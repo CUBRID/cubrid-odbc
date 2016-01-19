@@ -3894,7 +3894,7 @@ PRIVATE int
 sql_execute (int cci_connection, int *cci_request,
 	     char *sql_statment, char *param_list[], int param_num, T_CCI_ERROR *error)
 {
-  int cci_retval = 0;
+  int cci_retval;
   int i;
 
   if (((*cci_request) = cci_prepare (cci_connection, sql_statment,

@@ -5,15 +5,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7DA479AF-23BA-456A-A5C7-6AA6406D01B6}"
 	ProjectSection(SolutionItems) = preProject
-		TestRunConfig.testrunconfig = TestRunConfig.testrunconfig
-		UnitTest1.vsmdi = UnitTest1.vsmdi
+		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
+		UnitTest.vsmdi = UnitTest.vsmdi
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cubrid_odbc", "..\cubrid_odbc.vcproj", "{37E00A2E-BBC5-4736-90D9-A1B4271759BB}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = UnitTest1.vsmdi
+		CategoryFile = UnitTest.vsmdi
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
