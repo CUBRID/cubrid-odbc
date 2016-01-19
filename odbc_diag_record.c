@@ -414,11 +414,11 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
 		     SQLPOINTER diag_info_ptr,
 		     SQLSMALLINT buffer_length, SQLLEN *string_length_ptr)
 {
-  ODBC_ENV *env=NULL;
-  ODBC_DIAG_RECORD *record=NULL;
+  ODBC_ENV *env;
+  ODBC_DIAG_RECORD *record;
 
-  RETCODE status = ODBC_SUCCESS, rc=-1;
-  char *pt=NULL;
+  RETCODE status = ODBC_SUCCESS, rc;
+  char *pt;
   char empty_str[1] = "";
 
   env = (ODBC_ENV *) handle;
@@ -436,7 +436,6 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
     {
       switch (diag_identifier)
 	{
-    /*
 	case SQL_DIAG_CURSOR_ROW_COUNT:
 	case SQL_DIAG_ROW_COUNT:
 	  if (diag_info_ptr != NULL)
@@ -448,7 +447,12 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
 	      *string_length_ptr = sizeof (long);
 	    }
 	  break;
-    */
+
+	case SQL_DIAG_DYNAMIC_FUNCTION:
+	case SQL_DIAG_DYNAMIC_FUNCTION_CODE:
+	  /* Yet not implemented */
+	  return ODBC_ERROR;
+
 	case SQL_DIAG_NUMBER:
 	  if (diag_info_ptr != NULL)
 	    *(long *) diag_info_ptr = env->diag->rec_number;
@@ -509,14 +513,7 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
 	  break;
 
 	case SQL_DIAG_CONNECTION_NAME:	/* yet not implemeted */
-	  if (diag_info_ptr && buffer_length > 0)
-	  {
-		*((char *) diag_info_ptr) = '\0';
-		*string_length_ptr=0;
-		return ODBC_SUCCESS;
-	  }
-	  else
-		return SQL_SUCCESS_WITH_INFO;
+	  return ODBC_NO_DATA;
 
 	case SQL_DIAG_MESSAGE_TEXT:
 	  {

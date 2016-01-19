@@ -42,7 +42,7 @@
 
 #define		SMALL_BUF_SIZE			256
 
-static const char *CUBRID_DRIVER_ODBC_VER = "03.52";
+static const char *CUBRID_DRIVER_ODBC_VER = "03.51";
 static const char *CUBRID_DRIVER_VER = "01.01.0000";
 static const char *CUBRID_DRIVER_NAME = "cubrid_odbc.dll";
 static const char *CUBRID_DBMS_NAME = "CUBRID";
@@ -121,14 +121,13 @@ static ODBC_FUNCTIONS_SUPPORT_INFO functions_support_info_set[] = {
   {SQL_API_SQLPROCEDURECOLUMNS, SQL_TRUE},
   {SQL_API_SQLPROCEDURES, SQL_TRUE},
   {SQL_API_SQLTABLEPRIVILEGES, SQL_TRUE},
-  {SQL_API_SQLPARAMOPTIONS, SQL_TRUE},
-  {SQL_API_SQLTRANSACT, SQL_TRUE},
+
   /* not support */
   {SQL_API_SQLCOLUMNPRIVILEGES, SQL_FALSE},
 
   /* support by ODBC manager */
   {SQL_API_SQLBROWSECONNECT, SQL_FALSE},
-  {SQL_API_SQLDESCRIBEPARAM, SQL_TRUE},
+  {SQL_API_SQLDESCRIBEPARAM, SQL_FALSE},
 };
 
 PRIVATE int get_server_setting (ODBC_CONNECTION * conn);
@@ -190,17 +189,7 @@ odbc_alloc_connection (ODBC_ENV * env, ODBC_CONNECTION ** connptr)
   conn->env = env;
   conn->next = env->conn;
   env->conn = conn;
-  conn->attr_connect.altHosts = NULL;
-  conn->attr_connect.rcTime = NULL;
-  conn->attr_connect.loadBalance = NULL;
-  conn->attr_connect.query_timeout = NULL;
-  conn->attr_connect.disconnect_on_query_timeout = NULL;
-  conn->attr_connect.logFile = NULL;
-  conn->attr_connect.logBaseDir = NULL;
-  conn->attr_connect.logSlowQueries = NULL;
-  conn->attr_connect.slowQueryThresholdMillis = NULL;
-  conn->attr_connect.logTraceApi = NULL;
-  conn->attr_connect.logTraceNetwork = NULL;
+
   *connptr = conn;
 
   return ODBC_SUCCESS;
@@ -440,11 +429,11 @@ odbc_set_connect_attr (ODBC_CONNECTION * conn,
       /*Yet not implemented */
       odbc_set_diag (conn->diag, "HYC00", 0, NULL);
       goto error;
-      /*
+
       NC_FREE (conn->attr_translate_lib);
       conn->attr_translate_lib = UT_MAKE_STRING (valueptr, stringlength);
       break;
-      */
+
     case SQL_ATTR_TRANSLATE_OPTION:
       /* HYC00 */
       /*Yet not implemented */
@@ -491,7 +480,7 @@ error:
 ************************************************************************/
 PUBLIC RETCODE
 odbc_get_connect_attr (ODBC_CONNECTION * conn,
-		       SQLINTEGER attribute, 
+		       SQLINTEGER attribute,
 		       SQLPOINTER value_ptr,
 		       SQLINTEGER buffer_length,
 		       SQLINTEGER * string_length_ptr)
@@ -576,17 +565,14 @@ odbc_get_connect_attr (ODBC_CONNECTION * conn,
 
       /* CHECK : test */
       rc =
-          str_value_assign (conn->db_name, value_ptr, buffer_length,
+	str_value_assign (conn->data_source, value_ptr, buffer_length,
 			  &tmp_length);
-	  if(string_length_ptr != NULL)
-	   {
-         *string_length_ptr = (SQLINTEGER) tmp_length;
-	   }
+      *string_length_ptr = (SQLINTEGER) tmp_length;
 
       if (rc == ODBC_SUCCESS_WITH_INFO)
-	   {
-         odbc_set_diag (conn->diag, "01004", 0, NULL);
-	   }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
       /* HYC00 */
@@ -613,13 +599,13 @@ odbc_get_connect_attr (ODBC_CONNECTION * conn,
       /* Yet not implemented */
       odbc_set_diag (conn->diag, "HYC00", 0, NULL);
       goto error;
-/*
+
       if (value_ptr != NULL)
 	*((unsigned long *) value_ptr) = conn->attr_login_timeout;
 
       if (string_length_ptr != NULL)
 	*string_length_ptr = sizeof (unsigned long);
-*/
+
       break;
 
     case SQL_ATTR_METADATA_ID:
@@ -684,8 +670,7 @@ odbc_get_connect_attr (ODBC_CONNECTION * conn,
       rc =
 	str_value_assign (conn->attr_tracefile, value_ptr, buffer_length,
 			  &tmp_length);
-	  if (string_length_ptr != NULL)
-        *string_length_ptr = (SQLINTEGER) tmp_length;
+      *string_length_ptr = (SQLINTEGER) tmp_length;
 
       if (rc == ODBC_SUCCESS_WITH_INFO)
 	{
@@ -770,19 +755,14 @@ odbc_connect_new (ODBC_CONNECTION * conn,
 		  const char *db_name,
 		  const char *user,
 		  const char *password,
-		  const char *server, 
-		  int port, 
-		  int fetch_size,
-		  const char *charset,
-		  const char* conn_str)
+		  const char *server, int port, int fetch_size,
+		  const char *charset)
 {
   int connhd;
   RETCODE rc;
   int cci_rc;
   T_CCI_ERROR cci_err_buf;
   char *pt;
-  char connect_url[BUF_SIZE*4] = {0};
-  char connect_url_attr[BUF_SIZE*4] = {0};
 
   NA_FREE (conn->data_source);
   NA_FREE (conn->db_name);
@@ -791,28 +771,20 @@ odbc_connect_new (ODBC_CONNECTION * conn,
   NA_FREE (conn->server);
   NA_FREE (conn->charset);
 
-  strncpy (connect_url, "cci:CUBRID:", sizeof(connect_url));
   pt = data_source == NULL ? "" : data_source;
   conn->data_source = UT_MAKE_STRING (pt, -1);
-  
-  pt = server == NULL ? "" : server;
-  conn->server = UT_MAKE_STRING (pt, -1);
-  strcat (connect_url, conn->server);
-  strcat (connect_url, ":");
-  
-  itoa (port, connect_url + strlen (connect_url), 10);
-  strcat (connect_url,":");
-  
+
   pt = db_name == NULL ? "" : db_name;
   conn->db_name = UT_MAKE_STRING (pt, -1);
-  strcat (connect_url, conn->db_name);
-  strcat (connect_url, ":::");
 
   pt = user == NULL ? "" : user;
   conn->user = UT_MAKE_STRING (pt, -1);
 
   pt = password == NULL ? "" : password;
   conn->password = UT_MAKE_STRING (pt, -1);
+
+  pt = server == NULL ? "" : server;
+  conn->server = UT_MAKE_STRING (pt, -1);
 
   pt = charset == NULL ? "" : charset;
   conn->charset = UT_MAKE_STRING (pt, -1);
@@ -826,34 +798,24 @@ odbc_connect_new (ODBC_CONNECTION * conn,
       conn->fetch_size = fetch_size;
     }
 
-  get_connect_attr (&(conn->attr_connect), conn_str, connect_url_attr);
-  if (connect_url_attr[0] != '\0')
-    {
-      strcat (connect_url, "?");
-      strcat (connect_url, connect_url_attr);
-    }
-  connhd = cci_connect_with_url_ex (
-              connect_url, conn->user, conn->password, &cci_err_buf);
+  connhd = cci_connect (conn->server, conn->port, conn->db_name,
+			conn->user, conn->password);
 
   if (connhd < 0)
-  {
-	  odbc_set_diag_by_cci (conn->diag, connhd, &cci_err_buf);
-	  goto error;
-  }
+    goto error;
+
   // CCI auto-commit mode has little problem in async mode, 
   // ODBC has own auto-commit mechanism, we should turn off CCI auto-commit mode
   rc = cci_set_autocommit(connhd, CCI_AUTOCOMMIT_FALSE);
   ERROR_GOTO (rc, error);
 
   conn->connhd = connhd;
-   
-#ifndef CUBRID_ODBC_UNICODE
+
   if (conn->charset[0] != '\0')
     {
-      rc = cci_set_charset(connhd, conn->charset);
-	  ERROR_GOTO (rc, error);
+      cci_set_charset(connhd, conn->charset);
     }
-#endif
+
   rc = get_db_version (conn);
   ERROR_GOTO (rc, error);
 
@@ -892,7 +854,7 @@ error:
 PUBLIC RETCODE
 odbc_disconnect (ODBC_CONNECTION * conn)
 {
-  int cci_rc = 0;
+  int cci_rc;
   T_CCI_ERROR cci_err_buf;
   ODBC_STATEMENT *stmt;
   ODBC_STATEMENT *del_stmt;
@@ -1979,7 +1941,7 @@ odbc_get_info (ODBC_CONNECTION * conn,
     case SQL_MAX_CONCURRENT_ACTIVITIES:
       /* CHECK : Unknown */
       if (info_value_ptr != NULL)
-	*(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 1;
 
       if (string_length_ptr != NULL)
 	*string_length_ptr = sizeof (unsigned short);
@@ -2271,7 +2233,7 @@ odbc_get_info (ODBC_CONNECTION * conn,
 	}
       else
 	{
-	  strcpy (buf, "CUBRID");
+	  strcpy (buf, conn->server);
 	}
       rc =
 	str_value_assign (buf, info_value_ptr, buffer_length,
@@ -2802,15 +2764,6 @@ get_server_setting (ODBC_CONNECTION * conn)
     buf[0] = '\0';
   conn->fetch_size = atoi (buf);
 
-
-  // Get fetch charset
-  rcn =
-    SQLGetPrivateProfileString ("CUBRID", KEYWORD_CHARSET, "", buf,
-				sizeof (buf), "ODBC.INI");
-  if (rcn == 0)
-    buf[0] = '\0';
-  conn->charset = (char*)atoi (buf);
-
   return 0;
 }
 
@@ -2839,11 +2792,11 @@ set_isolation_level (ODBC_CONNECTION * conn)
       isolation_level = TRAN_REP_CLASS_REP_INSTANCE;
       break;
     case SQL_TXN_READ_COMMITTED:
-      isolation_level = TRAN_REP_CLASS_COMMIT_INSTANCE;
+      isolation_level = TRAN_COMMIT_CLASS_COMMIT_INSTANCE;
       break;
     case SQL_TXN_READ_UNCOMMITTED:
-      odbc_set_diag_by_cci (conn->diag, CCI_ER_NOT_IMPLEMENTED, NULL);
-      return ODBC_ERROR;
+      isolation_level = TRAN_COMMIT_CLASS_UNCOMMIT_INSTANCE;
+      break;
     default:			// serializable
       isolation_level = TRAN_REP_CLASS_REP_INSTANCE;
       break;
@@ -2889,9 +2842,8 @@ get_db_version (ODBC_CONNECTION * conn)
 
   if (cci_rc < 0)
     {
-      //odbc_set_diag_by_cci (conn->diag, cci_rc, &error);
-      //return ODBC_ERROR;
-	  conn->max_string_length=1073741823;
+      odbc_set_diag_by_cci (conn->diag, cci_rc, &error);
+      return ODBC_ERROR;
     }
 
   return ODBC_SUCCESS;

@@ -44,8 +44,7 @@
 #define			SQL_C_UNI_OBJECT		SQL_UNI_OBJECT
 #define			SQL_UNI_SET				32
 #define			SQL_C_UNI_SET			SQL_UNI_SET
-#define			SQL_BLOB                (SQL_BIT-100)
-#define			SQL_CLOB                (SQL_BIT-101)
+
 
 #define		IS_STRING_TYPE(value)		( (value) == SQL_CHAR || (value) == SQL_VARCHAR || \
 											(value) == SQL_LONGVARCHAR )
@@ -62,8 +61,6 @@ typedef union tagUNI_CCI_A_TYPE
   T_CCI_BIT bit;
   T_CCI_SET set;
   T_CCI_DATE date;
-  T_CCI_BLOB blob;
-  T_CCI_CLOB clob;
 } UNI_CCI_A_TYPE;
 
 
@@ -142,7 +139,7 @@ PUBLIC SQLLEN cci_value_to_odbc (void *c_value, short concise_type,
 				 short precision, short scale,
 				 SQLLEN buffer_length,
 				 UNI_CCI_A_TYPE * cci_value,
-				 T_CCI_A_TYPE a_type,int* error_code);
+				 T_CCI_A_TYPE a_type);
 PUBLIC VALUE_CONTAINER *create_value_container ();
 PUBLIC void clear_value_container (VALUE_CONTAINER * value);
 PUBLIC void free_value_container (VALUE_CONTAINER * value);

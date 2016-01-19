@@ -277,7 +277,7 @@ bc_multiply (n1, n2, prod, scale)
       *pvptr-- = sum % BASE;
       sum = sum / BASE;
     }
-  *pvptr-- = (char)sum;
+  *pvptr-- = sum;
 
   /* Assign to prod and clean up the number. */
   free_num (prod);
@@ -486,7 +486,7 @@ bc_divide (n1, n2, quot, scale)
   if (is_zero (qval))
     qval->n_sign = PLUS;
   _rm_leading_zeros (qval);
-  //free_num (quot);
+  free_num (quot);
   *quot = qval;
 
   /* Clean up temporary storage. */
@@ -530,7 +530,7 @@ bc_divmod (num1, num2, quot, rem, scale)
 
   if (quot)
     {
-      //free_num (quot);
+      free_num (quot);
       *quot = quotient;
     }
 
