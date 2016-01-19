@@ -77,14 +77,4 @@ PUBLIC RETCODE fetch_tuple (int req_handle, ODBC_DIAG * diag,
 PUBLIC RETCODE get_data (ODBC_STATEMENT * stmt, short row_index,
                          short col_index);
 
-PUBLIC RETCODE
-lob_value_assign (
-                   ODBC_STATEMENT * stmt,
-                   UNI_CCI_A_TYPE lob,
-                   SQLSMALLINT type,
-                   char *out_buf, 
-                   SQLLEN out_buf_len, 
-                   SQLLEN * val_len_ptr
-                   );
-
 #endif /* ! __ODBC_RESULT_HEADER */

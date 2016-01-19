@@ -436,7 +436,6 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
     {
       switch (diag_identifier)
 	{
-    /*
 	case SQL_DIAG_CURSOR_ROW_COUNT:
 	case SQL_DIAG_ROW_COUNT:
 	  if (diag_info_ptr != NULL)
@@ -448,7 +447,12 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
 	      *string_length_ptr = sizeof (long);
 	    }
 	  break;
-    */
+
+	case SQL_DIAG_DYNAMIC_FUNCTION:
+	case SQL_DIAG_DYNAMIC_FUNCTION_CODE:
+	  /* Yet not implemented */
+	  return ODBC_ERROR;
+
 	case SQL_DIAG_NUMBER:
 	  if (diag_info_ptr != NULL)
 	    *(long *) diag_info_ptr = env->diag->rec_number;

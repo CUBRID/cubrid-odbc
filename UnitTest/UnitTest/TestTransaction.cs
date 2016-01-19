@@ -67,56 +67,7 @@ namespace UnitTest
             Assert.IsTrue(tablesCount == 0);
         }
     }
-    public static void Test_Transaction_Rollback()
-    {
-        OdbcCommand command = new OdbcCommand();
-        OdbcTransaction transaction = null;
 
-        // Set the Connection to the new OdbcConnection.
-        command.Connection = conn;
-
-        // Open the connection and execute the transaction.
-        try
-        {
-            Console.WriteLine("connection.Database:" + conn.Database);
-
-            ExecuteSQL("drop table if exists t;", conn);
-            ExecuteSQL("create table t(dt bit);", conn);
-
-            // Start a local transaction
-            transaction = conn.BeginTransaction();
-
-            // Assign transaction object for a pending local transaction.
-            command.Connection = conn;
-            command.Transaction = transaction;
-
-            // Execute the commands.
-            command.CommandText = "Insert into t (dt) VALUES (B'1')";
-            command.ExecuteNonQuery();
-            System.Console.WriteLine("Insert 1");
-            // output();
-            transaction.Commit();
-            Console.WriteLine("Both records are written to database.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            try
-            {
-                // Attempt to roll back the transaction.
-                Console.WriteLine("before end.");
-                transaction.Rollback();
-                Console.WriteLine("Rollback end.");
-            }
-            catch
-            {
-                // Do nothing here; transaction is not active.
-            }
-        }
-        finally
-        {
-        }
-    }
     /// <summary>
     /// Test OdbcTransaction class, using parameters
     /// </summary>
@@ -170,45 +121,5 @@ namespace UnitTest
         CleanupTestTable(conn);
       }
     }
-
-    /// <summary>
-    /// Test_Transaction_Level
-    /// </summary>
-    public static void Test_Transaction_Level()
-    {
-        OdbcTransaction tran = null;
-
-        using (OdbcConnection conn = new OdbcConnection())
-        {
-            conn.ConnectionString = TestCases.connString;
-            conn.Open();
-
-            CreateTestTable(conn);
-
-            tran = conn.BeginTransaction(IsolationLevel.Serializable);
-            Assert.IsTrue(tran.IsolationLevel == IsolationLevel.Serializable);
-            tran.Commit();
-
-            tran = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
-            Assert.IsTrue(tran.IsolationLevel == IsolationLevel.ReadUncommitted);
-            tran.Commit();
-
-            tran = conn.BeginTransaction(IsolationLevel.RepeatableRead);
-            Assert.IsTrue(tran.IsolationLevel == IsolationLevel.RepeatableRead);
-            tran.Commit();
-
-            try
-            {
-                tran = conn.BeginTransaction(IsolationLevel.Chaos);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-            CleanupTestTable(conn);
-        }
-    }
-
   }
 }

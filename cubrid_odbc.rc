@@ -8,7 +8,6 @@
 // Generated from the TEXTINCLUDE 2 resource.
 //
 #include "afxres.h"
-#include "odbc_version.i"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
@@ -132,8 +131,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION MAJOR_VERSION,MINOR_VERSION,PATCH_VERSION,BUILD_SERIAL_NUMBER
- PRODUCTVERSION MAJOR_VERSION,MINOR_VERSION,PATCH_VERSION,BUILD_SERIAL_NUMBER
+ FILEVERSION 9,2,0,1
+ PRODUCTVERSION 9,2,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x9L
@@ -150,13 +149,13 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Search Solution Corporation"
             VALUE "FileDescription", "ODBC CUBRID Driver"
-            VALUE "FileVersion", VERSION_STRING
+            VALUE "FileVersion", "9.2.0.0001"
             VALUE "InternalName", "ODBC CUBRID Driver"
             VALUE "LegalCopyright", "Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution."
             VALUE "OriginalFilename", "cubrid_odbc.dll"
-            VALUE "PrivateBuild", VERSION_STRING
+            VALUE "PrivateBuild", "9.2.0.0001"
             VALUE "ProductName", "ODBC CUBRID Driver"
-            VALUE "ProductVersion", VERSION_STRING
+            VALUE "ProductVersion", "9.2.0.0001"
         END
     END
     BLOCK "VarFileInfo"

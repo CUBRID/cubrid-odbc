@@ -55,7 +55,7 @@ extern "C"
  ************************************************************************/
 
 #define CCI_GET_RESULT_INFO_TYPE(RES_INFO, INDEX)	\
-		(((T_CCI_COL_INFO*) (RES_INFO))[(INDEX) - 1].ext_type)
+		(((T_CCI_COL_INFO*) (RES_INFO))[(INDEX) - 1].type)
 
 #define CCI_GET_RESULT_INFO_SCALE(RES_INFO, INDEX)	\
 		(((T_CCI_COL_INFO*) (RES_INFO))[(INDEX) - 1].scale)
@@ -111,8 +111,7 @@ extern "C"
 #define CCI_IS_COLLECTION_TYPE(TYPE)	\
 	((((TYPE) & CCI_CODE_COLLECTION) || ((TYPE) == CCI_U_TYPE_SET) || ((TYPE) == CCI_U_TYPE_MULTISET) || ((TYPE) == CCI_U_TYPE_SEQUENCE)) ? 1 : 0)
 
-#define CCI_GET_COLLECTION_DOMAIN(TYPE)	(((CCI_TYPE_BIT7_MASK & (TYPE)) >> 2) \
-  | ((TYPE) & CCI_TYPE_LSB_MASK))
+#define CCI_GET_COLLECTION_DOMAIN(TYPE)	(~(CCI_CODE_COLLECTION) & (TYPE))
 
 #define CCI_QUERY_RESULT_RESULT(QR, INDEX)	\
 	(((T_CCI_QUERY_RESULT*) (QR))[(INDEX) - 1].result_count)
@@ -132,14 +131,11 @@ extern "C"
 #define CCI_GET_PARAM_INFO_MODE(PARAM_INFO, INDEX)	\
 	(((T_CCI_PARAM_INFO*) (PARAM_INFO))[(INDEX) - 1].mode)
 #define CCI_GET_PARAM_INFO_TYPE(PARAM_INFO, INDEX)	\
-	(((T_CCI_PARAM_INFO*) (PARAM_INFO))[(INDEX) - 1].ext_type)
+	(((T_CCI_PARAM_INFO*) (PARAM_INFO))[(INDEX) - 1].type)
 #define CCI_GET_PARAM_INFO_SCALE(PARAM_INFO, INDEX)	\
 	(((T_CCI_PARAM_INFO*) (PARAM_INFO))[(INDEX) - 1].scale)
 #define CCI_GET_PARAM_INFO_PRECISION(PARAM_INFO, INDEX)	\
 	(((T_CCI_PARAM_INFO*) (PARAM_INFO))[(INDEX) - 1].precision)
-
-#define CCI_NET_TYPE_HAS_2BYTES(type) \
-  ((((type) & CCI_TYPE_BIT7_MASK) != 0) ? true : false)
 
 #define CCI_BIND_PTR			1
 
@@ -150,7 +146,6 @@ extern "C"
 #define CCI_PREPARE_UPDATABLE		0x02
 #define CCI_PREPARE_QUERY_INFO          0x04
 #define CCI_PREPARE_HOLDABLE		0x08
-#define CCI_PREPARE_XASL_CACHE_PINNED 	0x10
 #define CCI_PREPARE_CALL		0x40
 
 #define CCI_EXEC_ASYNC			0x01
@@ -158,18 +153,11 @@ extern "C"
 #define CCI_EXEC_QUERY_INFO		0x04
 #define CCI_EXEC_ONLY_QUERY_PLAN        0x08
 #define CCI_EXEC_THREAD			0x10
-#define CCI_EXEC_NOT_USED		0x20	/* not currently used */
-#define CCI_EXEC_RETURN_GENERATED_KEYS	0x40
 
 #define CCI_FETCH_SENSITIVE		1
 
 #define CCI_CLASS_NAME_PATTERN_MATCH	1
 #define CCI_ATTR_NAME_PATTERN_MATCH	2
-
-/* encoding of composed type :
- * TCCT TTTT  (T - set type bits ; C - collection bits) */
-#define CCI_TYPE_BIT7_MASK		0x80
-#define CCI_TYPE_LSB_MASK		0x1f
 
 #define CCI_CODE_SET			0x20
 #define CCI_CODE_MULTISET		0x40
@@ -178,9 +166,6 @@ extern "C"
 
 #define CCI_LOCK_TIMEOUT_INFINITE	-1
 #define CCI_LOCK_TIMEOUT_DEFAULT	-2
-
-#define CCI_LOGIN_TIMEOUT_INFINITE      (0)
-#define CCI_LOGIN_TIMEOUT_DEFAULT       (30000)
 
 #define CCI_CLOSE_CURRENT_RESULT	0
 #define CCI_KEEP_CURRENT_RESULT		1
@@ -216,10 +201,8 @@ extern "C"
 /* database connection URL */
 #define CCI_DS_PROPERTY_URL				"url"
 
-/* number of connection that are borrowed */
-#define CCI_DS_PROPERTY_POOL_SIZE			"pool_size"
 /* number of connection that are created when the pool is started */
-#define CCI_DS_PROPERTY_MAX_POOL_SIZE			"max_pool_size"
+#define CCI_DS_PROPERTY_POOL_SIZE			"pool_size"
 /* max wait msec for a connection to be returned, or -1 to wait indefinitely */
 #define CCI_DS_PROPERTY_MAX_WAIT			"max_wait"
 /* enable prepared statement pooling */
@@ -239,22 +222,12 @@ extern "C"
 /* default lock timeout in sec for connections created by pool*/
 #define CCI_DS_PROPERTY_DEFAULT_LOCK_TIMEOUT		"default_lock_timeout"
 
-#define CCI_TZ_SIZE 63
-
 /* for cci auto_comit mode support */
   typedef enum
   {
     CCI_AUTOCOMMIT_FALSE = 0,
     CCI_AUTOCOMMIT_TRUE
   } CCI_AUTOCOMMIT_MODE;
-
-  /* for cci cas_change mode support */
-  typedef enum
-  {
-    CCI_CAS_CHANGE_MODE_UNKNOWN = 0,
-    CCI_CAS_CHANGE_MODE_AUTO = 1,
-    CCI_CAS_CHANGE_MODE_KEEP = 2
-  } CCI_CAS_CHANGE_MODE_MODE;
 
 #define SET_AUTOCOMMIT_FROM_CASINFO(c) \
   (c)->autocommit_mode = \
@@ -298,18 +271,6 @@ extern "C"
 
   typedef struct
   {
-    short yr;
-    short mon;
-    short day;
-    short hh;
-    short mm;
-    short ss;
-    short ms;
-    char tz[CCI_TZ_SIZE + 1];
-  } T_CCI_DATE_TZ;
-
-  typedef struct
-  {
     int result_count;
     int stmt_type;
     int err_no;
@@ -348,20 +309,9 @@ extern "C"
     CCI_U_TYPE_BLOB = 23,
     CCI_U_TYPE_CLOB = 24,
     CCI_U_TYPE_ENUM = 25,
-    CCI_U_TYPE_USHORT = 26,
-    CCI_U_TYPE_UINT = 27,
-    CCI_U_TYPE_UBIGINT = 28,
-    CCI_U_TYPE_TIMESTAMPTZ = 29,
-    CCI_U_TYPE_TIMESTAMPLTZ = 30,
-    CCI_U_TYPE_DATETIMETZ = 31,
-    CCI_U_TYPE_DATETIMELTZ = 32,
-    /* Disabled type */
-    CCI_U_TYPE_TIMETZ = 33,	/* internal use only - RESERVED */
-    /* end of disabled types */
-    CCI_U_TYPE_LAST = CCI_U_TYPE_DATETIMELTZ
-  } T_CCI_U_TYPE;
 
-  typedef unsigned char T_CCI_U_EXT_TYPE;
+    CCI_U_TYPE_LAST = CCI_U_TYPE_ENUM
+  } T_CCI_U_TYPE;
 
   typedef void *T_CCI_SET;
 
@@ -379,18 +329,10 @@ extern "C"
     CCI_A_TYPE_BLOB,
     CCI_A_TYPE_CLOB,
     CCI_A_TYPE_REQ_HANDLE,
-    CCI_A_TYPE_UINT,
-    CCI_A_TYPE_UBIGINT,
-    CCI_A_TYPE_DATE_TZ,
-    CCI_A_TYPE_LAST = CCI_A_TYPE_DATE_TZ,
+    CCI_A_TYPE_LAST = CCI_A_TYPE_REQ_HANDLE,
 
     CCI_A_TYTP_LAST = CCI_A_TYPE_LAST	/* typo but backward compatibility */
   } T_CCI_A_TYPE;
-
-  enum
-  {
-    UNMEASURED_LENGTH = -1
-  };
 
   typedef enum
   {
@@ -471,10 +413,7 @@ extern "C"
     CCI_ER_INVALID_LOB_HANDLE = -20032,
 
     CCI_ER_NO_PROPERTY = -20033,
-
     CCI_ER_PROPERTY_TYPE = -20034,
-    CCI_ER_INVALID_PROPERTY_VALUE = CCI_ER_PROPERTY_TYPE,
-
     CCI_ER_INVALID_DATASOURCE = -20035,
     CCI_ER_DATASOURCE_TIMEOUT = -20036,
     CCI_ER_DATASOURCE_TIMEDWAIT = -20037,
@@ -522,7 +461,7 @@ extern "C"
     CUBRID_STMT_ROLLBACK_WORK,
     CUBRID_STMT_GRANT,
     CUBRID_STMT_REVOKE,
-    CUBRID_STMT_UPDATE_STATS,
+    CUBRID_STMT_STATISTICS,
     CUBRID_STMT_INSERT,
     CUBRID_STMT_SELECT,
     CUBRID_STMT_UPDATE,
@@ -548,28 +487,7 @@ extern "C"
     CUBRID_STMT_GET_STATS,
     CUBRID_STMT_CREATE_USER,
     CUBRID_STMT_DROP_USER,
-    CUBRID_STMT_ALTER_USER,
-    CUBRID_STMT_SET_SYS_PARAMS,
-    CUBRID_STMT_ALTER_INDEX,
-
-    CUBRID_STMT_CREATE_STORED_PROCEDURE,
-    CUBRID_STMT_DROP_STORED_PROCEDURE,
-    CUBRID_STMT_PREPARE_STATEMENT,
-    CUBRID_STMT_EXECUTE_PREPARE,
-    CUBRID_STMT_DEALLOCATE_PREPARE,
-    CUBRID_STMT_TRUNCATE,
-    CUBRID_STMT_DO,
-    CUBRID_STMT_SELECT_UPDATE,
-    CUBRID_STMT_SET_SESSION_VARIABLES,
-    CUBRID_STMT_DROP_SESSION_VARIABLES,
-    CUBRID_STMT_MERGE,
-    CUBRID_STMT_SET_NAMES,
-    CUBRID_STMT_ALTER_STORED_PROCEDURE,
-    CUBRID_STMT_ALTER_STORED_PROCEDURE_OWNER =
-      CUBRID_STMT_ALTER_STORED_PROCEDURE,
-    CUBRID_STMT_KILL,
-
-    CUBRID_MAX_STMT_TYPE
+    CUBRID_STMT_ALTER_USER
   } T_CCI_CUBRID_STMT;
 
   typedef int T_CCI_CONN;
@@ -632,22 +550,11 @@ extern "C"
 #define SQLX_CMD_ALTER_USER   CUBRID_STMT_ALTER_USER
 #define SQLX_CMD_SET_SYS_PARAMS   CUBRID_STMT_SET_SYS_PARAMS
 #define SQLX_CMD_ALTER_INDEX   CUBRID_STMT_ALTER_INDEX
-
 #define SQLX_CMD_CREATE_STORED_PROCEDURE   CUBRID_STMT_CREATE_STORED_PROCEDURE
+#define SQLX_CMD_ALTER_STORED_PROCEDURE_OWNER   CUBRID_STMT_ALTER_STORED_PROCEDURE_OWNER
 #define SQLX_CMD_DROP_STORED_PROCEDURE   CUBRID_STMT_DROP_STORED_PROCEDURE
-#define SQLX_CMD_PREPARE_STATEMENT  CUBRID_STMT_PREPARE_STATEMENT
-#define SQLX_CMD_EXECUTE_PREPARE  CUBRID_STMT_EXECUTE_PREPARE
-#define SQLX_CMD_DEALLOCATE_PREPARE  CUBRID_STMT_DEALLOCATE_PREPARE
-#define SQLX_CMD_TRUNCATE  CUBRID_STMT_TRUNCATE
-#define SQLX_CMD_DO  CUBRID_STMT_DO
 #define SQLX_CMD_SELECT_UPDATE   CUBRID_STMT_SELECT_UPDATE
-#define SQLX_CMD_SET_SESSION_VARIABLES  CUBRID_STMT_SET_SESSION_VARIABLES
-#define SQLX_CMD_DROP_SESSION_VARIABLES  CUBRID_STMT_DROP_SESSION_VARIABLES
-#define SQLX_CMD_STMT_MERGE  CUBRID_STMT_MERGE
 #define SQLX_CMD_SET_NAMES   CUBRID_STMT_SET_NAMES
-#define SQLX_CMD_ALTER_STORED_PROCEDURE   CUBRID_STMT_ALTER_STORED_PROCEDURE
-#define SQLX_CMD_ALTER_STORED_PROCEDURE_OWNER   CUBRID_STMT_ALTER_STORED_PROCEDURE
-
 #define SQLX_MAX_CMD_TYPE   CUBRID_MAX_STMT_TYPE
 
 #define SQLX_CMD_CALL_SP CUBRID_STMT_CALL_SP
@@ -662,7 +569,7 @@ extern "C"
 
   typedef struct
   {
-    T_CCI_U_EXT_TYPE ext_type;	/* extended type : TCCT TTTT (T : set type, C: collection flags) */
+    T_CCI_U_TYPE type;
     char is_non_null;
     short scale;
     int precision;
@@ -727,8 +634,7 @@ extern "C"
     CCI_DS_KEY_DISCONNECT_ON_QUERY_TIMEOUT,
     CCI_DS_KEY_DEFAULT_AUTOCOMMIT,
     CCI_DS_KEY_DEFAULT_ISOLATION,
-    CCI_DS_KEY_DEFAULT_LOCK_TIMEOUT,
-    CCI_DS_KEY_MAX_POOL_SIZE
+    CCI_DS_KEY_DEFAULT_LOCK_TIMEOUT
   } T_CCI_DATASOURCE_KEY;
 
 #if !defined(CAS)
@@ -738,14 +644,13 @@ extern "C"
   typedef enum
   {
     TRAN_UNKNOWN_ISOLATION = 0,
-    TRAN_ISOLATION_MIN = 4,
+    TRAN_ISOLATION_MIN = 1,
 
-    TRAN_READ_COMMITTED = 4,
-    TRAN_REP_CLASS_COMMIT_INSTANCE = 4,	/* for backward compatibility */
-
-    TRAN_REPEATABLE_READ = 5,
-    TRAN_REP_CLASS_REP_INSTANCE = 5,	/* for backward compatibility */
-
+    TRAN_COMMIT_CLASS_UNCOMMIT_INSTANCE = 1,
+    TRAN_COMMIT_CLASS_COMMIT_INSTANCE = 2,
+    TRAN_REP_CLASS_UNCOMMIT_INSTANCE = 3,
+    TRAN_REP_CLASS_COMMIT_INSTANCE = 4,
+    TRAN_REP_CLASS_REP_INSTANCE = 5,
     TRAN_SERIALIZABLE = 6,
 
     TRAN_ISOLATION_MAX = 6
@@ -773,7 +678,7 @@ extern "C"
   typedef struct
   {
     T_CCI_PARAM_MODE mode;
-    T_CCI_U_EXT_TYPE ext_type;	/* extended type : TCCT TTTT (T : set type, C: collection flags) */
+    T_CCI_U_TYPE type;
     short scale;
     int precision;
   } T_CCI_PARAM_INFO;
@@ -822,11 +727,10 @@ extern "C"
   extern T_CCI_COL_INFO *cci_get_result_info (int req_handle,
 					      T_CCI_CUBRID_STMT * cmd_type,
 					      int *num);
-  extern int cci_bind_param (int req_handle, int index, T_CCI_A_TYPE a_type,
+  extern int cci_bind_param (int req_handle,
+			     int index,
+			     T_CCI_A_TYPE a_type,
 			     void *value, T_CCI_U_TYPE u_type, char flag);
-  extern int cci_bind_param_ex (int mapped_stmt_id, int index,
-				T_CCI_A_TYPE a_type, void *value, int length,
-				T_CCI_U_TYPE u_type, char flag);
   extern int cci_execute (int req_handle,
 			  char flag, int max_col_size, T_CCI_ERROR * err_buf);
   extern int cci_prepare_and_execute (int con_handle, char *sql_stmt,
@@ -836,8 +740,6 @@ extern "C"
 				   void *value, T_CCI_ERROR * err_buf);
   extern int cci_set_db_parameter (int con_handle, T_CCI_DB_PARAM param_name,
 				   void *value, T_CCI_ERROR * err_buf);
-  extern int cci_set_cas_change_mode (int mapped_conn_id, int mode,
-				      T_CCI_ERROR * err_buf);
   extern long cci_escape_string (int con_h_id, char *to, const char *from,
 				 unsigned long length, T_CCI_ERROR * err_buf);
   extern int cci_close_query_result (int req_handle, T_CCI_ERROR * err_buf);
@@ -872,11 +774,6 @@ extern "C"
 				 CCI_AUTOCOMMIT_MODE autocommit_mode);
   extern int cci_set_holdability (int con_handle_id, int holdable);
   extern int cci_get_holdability (int con_handle_id);
-  extern int cci_set_login_timeout (int mapped_conn_id, int timeout,
-				    T_CCI_ERROR * err_buf);
-  extern int cci_get_login_timeout (int mapped_conn_id, int *timeout,
-				    T_CCI_ERROR * err_buf);
-
   extern int cci_get_class_num_objs (int conn_handle, char *class_name,
 				     int flag, int *num_objs, int *num_pages,
 				     T_CCI_ERROR * err_buf);
@@ -1033,9 +930,6 @@ extern "C"
 					   T_CCI_ERROR * err_buf);
   extern int cci_datasource_release (T_CCI_DATASOURCE * date_source,
 				     T_CCI_CONN conn, T_CCI_ERROR * err_buf);
-  extern int cci_datasource_change_property (T_CCI_DATASOURCE * ds,
-					     const char *key,
-					     const char *val);
 
   extern int cci_set_query_timeout (int req_h_id, int timeout);
   extern int cci_get_query_timeout (int req_h_id);

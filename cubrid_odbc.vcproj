@@ -460,15 +460,6 @@
 				RelativePath=".\odbc_util.c"
 				>
 			</File>
-			<Filter
-				Name="Resource Files"
-				Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
-				>
-				<File
-					RelativePath=".\cubrid_odbc.rc"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -520,6 +511,15 @@
 			</File>
 			<File
 				RelativePath=".\odbc_util.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+			>
+			<File
+				RelativePath=".\cubrid_odbc.rc"
 				>
 			</File>
 		</Filter>
