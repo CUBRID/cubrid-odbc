@@ -2564,7 +2564,6 @@ free_column_data (COLUMN_DATA * data, int option)
       data->column_no = 0;
       data->remain_length = 0;
       data->prev_return_status = -1;
-      data->offset = 0;
       break;
 
     case FREE_ALL:
@@ -2770,8 +2769,7 @@ get_flag_of_cci_prepare (ODBC_STATEMENT * stmt)
 
   if (IS_UPDATABLE (stmt->attr_cursor_type))
     {
-      cci_set_holdability(stmt->conn->connhd, 0);
-      return (CCI_PREPARE_INCLUDE_OID|CCI_PREPARE_UPDATABLE);
+      return (CCI_PREPARE_UPDATABLE | CCI_PREPARE_INCLUDE_OID);
     }
 
   return 0;

@@ -40,8 +40,6 @@
 #define		UT_MAKE_BINARY(ptr, length) ut_make_binary(ptr, length)
 #define		UT_APPEND_STRING(str1, str2, len2)	ut_append_string(str1, str2, len2)
 
-#define           UT_ALLOC_BSTR(size)   ut_alloc_bstr(size)
-#define           UT_FREE_BSTR(ptr)     ut_free_bstr(ptr) 
 #define		UT_SET_DELIMITER			";;"
 
 /* NC_FREE - NULL check free 
@@ -192,9 +190,7 @@ PUBLIC void *ut_realloc (void *ptr, int size);
 PUBLIC char *ut_make_string (const char *src, int length);
 PUBLIC char *ut_append_string (char *str1, char *str2, int len2);
 PUBLIC char *ut_make_binary (const char *src, int length);
-PUBLIC WCHAR*  ut_alloc_bstr (SQLLEN size);
-PUBLIC void ut_free_bstr  (WCHAR *ptr);
-PUBLIC int sqlwcharlen(const WCHAR *wstr);
+
 PUBLIC int element_from_setstring (char **current, char *buf);
 
 PUBLIC void add_element_to_setstring (char *setstring, char *element);
@@ -235,23 +231,5 @@ PUBLIC const char *next_element (const char *element_list);
 PUBLIC const char *element_value (const char *element);
 PUBLIC const char *element_value_by_key (const char *element_list,
 					 const char *key);
-PUBLIC void get_connect_attr (struct st_odbc_connection_attr* attr, 
-                           const char* ConnStrIn, char* buffer);
-PUBLIC int wide_char_to_bytes (wchar_t *str, 
-                       int size, 
-                       char **target, 
-                       int* out_length, 
-                       char* characterset);
-PUBLIC int bytes_to_wide_char (char *str, 
-                       int size, 
-                       wchar_t **buffer, 
-                       int buffer_length,  
-                       int* out_length, 
-                       char* characterset);
-PUBLIC int get_wide_char_result (char *str, 
-					   int size, 
-					   wchar_t **buffer, 
-					   int buffer_length, 
-					   int* out_length, 
-					   char* characterset);
+
 #endif /* ! __CUBRID_ODBC_UTIL_HEADER */

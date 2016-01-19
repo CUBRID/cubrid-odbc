@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution. 
  *
  * Redistribution and use in source and binary forms, with or without modification, 
@@ -48,6 +48,13 @@
 PUBLIC INT_PTR CALLBACK
 ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam,
 		  LPARAM lParam);
+
+#define ODBC_RETURN(rc, handle)					\
+  do {								\
+    if ( handle != NULL )					\
+	((ODBC_ENV*)handle)->diag->retcode = rc;		\
+    return rc;							\
+  } while (0 )
 
 typedef struct __st_DriverConnectInfo
 {
@@ -370,7 +377,7 @@ SQLConnect (SQLHDBC ConnectionHandle,
 		stCharSet, sizeof (stCharSet));
   rc = odbc_connect_new ((ODBC_CONNECTION *) ConnectionHandle, stDataSource,
 			 stDBName, stUserName, stAuthentication, stServerName,
-			 Port, FetchSize, stCharSet, NULL);
+			 Port, FetchSize, stCharSet);
 
   NA_FREE (stDataSource);
   NA_FREE (stUserName);
@@ -457,7 +464,7 @@ SQLDisconnect (SQLHDBC ConnectionHandle)
 
 /*
  *	SQLDriverConnect
- *		- PWD entryëŠ” file DSNì— ì¶”ê°€ë˜ì§€ ì•ŠëŠ”ë‹¤.
+ *		- PWD entry´Â file DSN¿¡ Ãß°¡µÇÁö ¾Ê´Â´Ù.
  */
 ODBC_INTERFACE RETCODE SQL_API
 SQLDriverConnect (HDBC hdbc,
@@ -491,7 +498,7 @@ SQLDriverConnect (HDBC hdbc,
   const char *ptCharSet;
 
   // Deprecated : char            szDriver[ITEMBUFLEN];
-  char ConnStrIn[BUF_SIZE*4];
+  char ConnStrIn[4096];
   char buf[4096];
   char buf2[4096];
   char user[4096] = "";
@@ -579,7 +586,7 @@ SQLDriverConnect (HDBC hdbc,
 	  fetch_size = ptFetchSize ? atoi (ptFetchSize) : 0;
 
 	  rc = odbc_connect_new (hdbc, ptFileDSN, ptDBName, ptUser,
-				 ptPWD, ptServer, port, fetch_size, ptCharSet, ConnStrIn);
+				 ptPWD, ptServer, port, fetch_size, ptCharSet);
 	}
       else
 	{
@@ -594,7 +601,7 @@ SQLDriverConnect (HDBC hdbc,
 			NULL, 0, server, sizeof (server), &port, &fetch_size,
 			charset, sizeof(charset));
 
-	  // cbConnStrInì´ DSNì˜ ì •ë³´ë³´ë‹¤ ìš°ì„ í•˜ë‹¤.
+	  // cbConnStrInÀÌ DSNÀÇ Á¤º¸º¸´Ù ¿ì¼±ÇÏ´Ù.
 	  if (ptDBName == NULL)
 	    {
 	      ptDBName = db_name;
@@ -617,7 +624,7 @@ SQLDriverConnect (HDBC hdbc,
 	    }
 
 	  rc = odbc_connect_new (hdbc, ptDSN, ptDBName, ptUser,
-				 ptPWD, ptServer, port, fetch_size, ptCharSet, ConnStrIn);
+				 ptPWD, ptServer, port, fetch_size, ptCharSet);
 	}
 
       // Building ConnStrOut
@@ -684,7 +691,7 @@ SQLDriverConnect (HDBC hdbc,
   else
     {
       // for creating & managing FILEDSN
-      // SAVEFILEì´ ìˆëŠ” ê²½ìš°, DSNì€ ì°¾ì„ ìˆ˜ ì—†ë‹¤.
+      // SAVEFILEÀÌ ÀÖ´Â °æ¿ì, DSNÀº Ã£À» ¼ö ¾ø´Ù.
       ptDBName = element_value_by_key (buf, KEYWORD_DBNAME);
       ptUser = element_value_by_key (buf, KEYWORD_USER);
       ptPWD = element_value_by_key (buf, KEYWORD_PASSWORD);
@@ -770,7 +777,7 @@ SQLEndTran (SQLSMALLINT HandleType,
 #endif
 
 
-// ì˜¤ì§ SQLExecDirectë§Œ prepareëœ ìƒíƒœë¥¼ í’€ ìˆ˜ ìˆë‹¤.
+// ¿ÀÁ÷ SQLExecDirect¸¸ prepareµÈ »óÅÂ¸¦ Ç® ¼ö ÀÖ´Ù.
 ODBC_INTERFACE RETCODE SQL_API
 SQLExecDirect (SQLHSTMT StatementHandle,
 	       SQLCHAR * StatementText, SQLINTEGER TextLength)
@@ -817,7 +824,7 @@ SQLExecute (SQLHSTMT StatementHandle)
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  // SQLEndTran()ì— ì˜í•´ì„œ cursorê°€ deleteëœ ìƒíƒœ
+  // SQLEndTran()¿¡ ÀÇÇØ¼­ cursor°¡ deleteµÈ »óÅÂ
   if (stmt_handle->is_prepared == _TRUE_ && stmt_handle->stmthd <= 0)
     {
       buf = UT_MAKE_STRING (stmt_handle->sql_text, -1);
@@ -884,11 +891,11 @@ SQLFetchScroll (SQLHSTMT StatementHandle,
  * returns/side-effects:
  * description:
  * NOTE:
- *	SQLExtenedtFetchë¥¼ SQLFetchScrollì— mappingí•˜ê³  ìˆë‹¤.
- *	ì´ ë•Œ odbc 2.xëŠ” SQL_ATTR_ROWS_FETCHED_PTRê³¼ SQL_ATTR_ROW_STATUS_PTR
- *	ì„ RowCountPtr, RowStatusArrayë¡œ ëŒ€ì‹ í•˜ì—¬ ì‚¬ìš©í•˜ë¯€ë¡œ odbc_fetch()ì—ì„œ
- *	ì‘ë™í•˜ê¸° ìœ„í•´ì„œ odbc_set_stmt_attr()ì„ ì‚¬ìš©í•˜ì—¬ settingí•´ ì¤€ë‹¤.
- *	ë¬¼ë¡  SQL_ROWSET_SIZEëŠ” SQL_ATTR_ROW_ARRAY_SIZEë¡œ mappingë˜ì–´ ìˆë‹¤.
+ *	SQLExtenedtFetch¸¦ SQLFetchScroll¿¡ mappingÇÏ°í ÀÖ´Ù.
+ *	ÀÌ ¶§ odbc 2.x´Â SQL_ATTR_ROWS_FETCHED_PTR°ú SQL_ATTR_ROW_STATUS_PTR
+ *	À» RowCountPtr, RowStatusArray·Î ´ë½ÅÇÏ¿© »ç¿ëÇÏ¹Ç·Î odbc_fetch()¿¡¼­
+ *	ÀÛµ¿ÇÏ±â À§ÇØ¼­ odbc_set_stmt_attr()À» »ç¿ëÇÏ¿© settingÇØ ÁØ´Ù.
+ *	¹°·Ğ SQL_ROWSET_SIZE´Â SQL_ATTR_ROW_ARRAY_SIZE·Î mappingµÇ¾î ÀÖ´Ù.
  *
  ************************************************************************/
 // for 2.x backward compatibility
@@ -1129,7 +1136,7 @@ SQLGetDiagField (SQLSMALLINT HandleType,
 
   DEBUG_TIMESTAMP (END_SQLGetDiagField);
 
-  // SQLGetDiagRec SQLGetDiagFieldì— ëŒ€í•´ì„œëŠ” ODBC_RETURN()ì„ ì‚¬ìš©í•  ìˆ˜ ì—†ìŒ.
+  // SQLGetDiagRec SQLGetDiagField¿¡ ´ëÇØ¼­´Â ODBC_RETURN()À» »ç¿ëÇÒ ¼ö ¾øÀ½.
   return rc;
 }
 
@@ -1143,8 +1150,7 @@ SQLGetDiagRec (SQLSMALLINT HandleType,
 	       SQLSMALLINT BufferLength, SQLSMALLINT * TextLength)
 {
   RETCODE rc = SQL_SUCCESS;
-  SQLLEN tmp_StringLength=0;
-  ODBC_ENV *env=NULL;
+  SQLLEN tmp_StringLength;
 
   OutputDebugString ("SQLGetDiagRec called\n");
 
@@ -1154,27 +1160,16 @@ SQLGetDiagRec (SQLSMALLINT HandleType,
 			  NativeError, MessageText, BufferLength,
 			  &tmp_StringLength);
   if (rc != ODBC_SUCCESS)
-  {
-    if(SQL_SUCCESS_WITH_INFO == rc)
-	{
-	  *TextLength = (short) tmp_StringLength;
-	}
-	if(rc == SQL_NO_DATA)
-	{
-		env = (ODBC_ENV*)Handle;
-		odbc_free_diag(env->diag,INIT);
-	}
     return rc;
-  }
 
   if (TextLength != NULL)
     {
-      *TextLength = (SQLSMALLINT)((short) tmp_StringLength>BufferLength?BufferLength:tmp_StringLength);
+      *TextLength = (short) tmp_StringLength;
     }
 
   DEBUG_TIMESTAMP (END_SQLGetDiagRec);
 
-  // SQLGetDiagRec SQLGetDiagFieldì— ëŒ€í•´ì„œëŠ” ODBC_RETURN()ì„ ì‚¬ìš©í•  ìˆ˜ ì—†ìŒ.
+  // SQLGetDiagRec SQLGetDiagField¿¡ ´ëÇØ¼­´Â ODBC_RETURN()À» »ç¿ëÇÒ ¼ö ¾øÀ½.
   return rc;
 }
 
@@ -1398,7 +1393,7 @@ SQLParamData (SQLHSTMT StatementHandle, SQLPOINTER * Value)
   ODBC_RETURN (rc, StatementHandle);
 }
 
-// ì˜¤ì§ SQLPrepareë§Œ preparedëœ ìƒíƒœë¡œ ë§Œë“¤ìˆ˜ ìˆë‹¤.
+// ¿ÀÁ÷ SQLPrepare¸¸ preparedµÈ »óÅÂ·Î ¸¸µé¼ö ÀÖ´Ù.
 ODBC_INTERFACE RETCODE SQL_API
 SQLPrepare (SQLHSTMT StatementHandle,
 	    SQLCHAR * StatementText, SQLINTEGER TextLength)
@@ -1894,7 +1889,7 @@ SQLBrowseConnect (SQLHDBC ConnectionHandle,
  *                           LEVEL 2									*
  *																		*
  ************************************************************************/
-#if 1
+#if 0
 ODBC_INTERFACE RETCODE SQL_API
 SQLColumnPrivileges (SQLHSTMT StatementHandle,
 		     SQLCHAR * CatalogName,
@@ -1930,13 +1925,6 @@ SQLDescribeParam (SQLHSTMT StatementHandle,
 
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
-
-  if (DataTypePtr)
-	*DataTypePtr= SQL_VARCHAR;
-  if (ParameterSizePtr)
-	*ParameterSizePtr= 255;
-  if (NullablePtr)
-	*NullablePtr= SQL_NULLABLE_UNKNOWN;
 
   return (rc);
 }
@@ -2092,51 +2080,6 @@ SQLProcedures (SQLHSTMT StatementHandle,
 
   ODBC_RETURN (odbc_retval, StatementHandle);
 }
-
-ODBC_INTERFACE RETCODE SQL_API
-SQLParamOptions (SQLHSTMT StatementHandle,
-		 SQLUINTEGER crow, SQLUINTEGER * pirow)
-{
-  RETCODE rc = SQL_SUCCESS;
-  ODBC_STATEMENT *stmt_handle;
-
-  OutputDebugString ("SQLParamOptions called\n");
-
-  stmt_handle = (ODBC_STATEMENT *) StatementHandle;
-  odbc_free_diag (stmt_handle->diag, RESET);
-
-  rc= SQLSetStmtAttr(stmt_handle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER)crow, 0);
-  if (!SQL_SUCCEEDED(rc))
-    return rc;
-
-  rc= SQLSetStmtAttr(stmt_handle, SQL_ATTR_PARAMS_PROCESSED_PTR, pirow, 0);
-  return rc;
-}
-
-ODBC_INTERFACE RETCODE SQL_API
-SQLTransact (SQLHENV EnvironmentHandle,
-	     SQLHDBC ConnectionHandle, SQLUSMALLINT CompletionType)
-{
-  RETCODE rc = SQL_SUCCESS;
-
-  OutputDebugString ("SQLTransact called\n");
-
-  if (EnvironmentHandle != NULL)
-    {
-      odbc_free_diag (((ODBC_ENV *) EnvironmentHandle)->diag, RESET);
-      rc = odbc_end_tran (SQL_HANDLE_ENV, EnvironmentHandle, CompletionType);
-      ODBC_RETURN (rc, EnvironmentHandle);
-    }
-  else if (ConnectionHandle != NULL)
-    {
-      odbc_free_diag (((ODBC_CONNECTION *) ConnectionHandle)->diag, RESET);
-      rc = odbc_end_tran (SQL_HANDLE_DBC, ConnectionHandle, CompletionType);
-      ODBC_RETURN (rc, ConnectionHandle);
-    }
-
-  return (SQL_SUCCESS);
-}
-
 
 /****************************************************************
  *                  Driver Manager implements                   *
@@ -2473,7 +2416,7 @@ SQLSetScrollOptions (SQLHSTMT StatementHandle,
  * arguments:
  * returns/side-effects:
  * description:
- *  SQLDriverConnectì‹œ ì‚¬ìš©ë˜ëŠ” dialog boxë¥¼ ë„ìš´ë‹¤.
+ *  SQLDriverConnect½Ã »ç¿ëµÇ´Â dialog box¸¦ ¶ç¿î´Ù.
  * NOTE:
  ************************************************************************/
 PRIVATE INT_PTR CALLBACK

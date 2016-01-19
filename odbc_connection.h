@@ -49,22 +49,11 @@
 #define			KEYWORD_DRIVER		"DRIVER"
 #define			KEYWORD_CHARSET		"CHARSET"
 
-#define			KEYWORD_ALTHOSTS	"ALTHOSTS"
-#define			KEYWORD_RCTIME		"RCTIME"
-#define			KEYWORD_LOADBALANCE	"LOADBALANCE"
-#define			KEYWORD_QUERYTIMEOUT	"QUERYTIMEOUT"
-#define			KEYWORD_QUERY_TIMEOUT	"QUERY_TIMEOUT"
-#define			KEYWORD_LOGINTIMEOUT	"LOGINTIMEOUT"
-#define			KEYWORD_LOGIN_TIMEOUT	"LOGIN_TIMEOUT"
-#define			KEYWORD_DISCONNECT_ON_QUERY_TIMEOUT	"DISCONNECT_ON_QUERY_TIMEOUT"
-#define			KEYWORD_DISCONNECTONQUERYTIMEOUT	"DISCONNECTONQUERYTIMEOUT"
-#define			KEYWORD_LOGFILE		"LOGFILE"
-#define			KEYWORD_LOGBASEDIR	"LOGBASEDIR"
-#define			KEYWORD_LOGSLOWQUERIES	"LOGSLOWQUERIES"
-#define			KEYWORD_SLOWQUERYTHRESHOLDMILLIS	"SLOWQUERYTHRESHOLDMILLIS"
-#define			KEYWORD_LOGTRACEAPI	"LOGTRACEAPI"
-#define			KEYWORD_LOGTRACENETWORK	"LOGTRACENETWORK"
-
+#define		TRAN_COMMIT_CLASS_UNCOMMIT_INSTANCE		1
+#define		TRAN_COMMIT_CLASS_COMMIT_INSTANCE		2
+#define		TRAN_REP_CLASS_UNCOMMIT_INSTANCE		3
+#define		TRAN_REP_CLASS_COMMIT_INSTANCE			4
+#define		TRAN_REP_CLASS_REP_INSTANCE				5
 
 typedef struct stCUBRIDDSNItem
 {
@@ -80,22 +69,6 @@ typedef struct stCUBRIDDSNItem
   char description[2 * ITEMBUFLEN];
   char charset[ITEMBUFLEN];
 } CUBRIDDSNItem;
-
-typedef struct st_odbc_connection_attr
-{
-  char *altHosts;
-  char *rcTime;
-  char *loadBalance;
-  char *login_timeout;
-  char *query_timeout;
-  char *disconnect_on_query_timeout;
-  char *logFile;
-  char *logBaseDir;
-  char *logSlowQueries;
-  char *slowQueryThresholdMillis;
-  char *logTraceApi;
-  char *logTraceNetwork;
-} ODBC_CONNECTION_ATTR;
 
 typedef struct st_odbc_connection
 {
@@ -116,7 +89,6 @@ typedef struct st_odbc_connection
   char *user;			/* CUBRID db user */
   char *password;		/* CUBRID db password */
   int fetch_size;		/* fetch size */
-  struct st_odbc_connection_attr attr_connect;
   char *charset;
   char db_ver[16];
 
@@ -165,8 +137,7 @@ PUBLIC RETCODE odbc_connect_new (ODBC_CONNECTION * conn,
 				 const char *password,
 				 const char *server,
 				 int port, int fetch_size,
-				 const char *charset,
-				 const char *conn_str_in);
+				 const char *charset);
 PUBLIC RETCODE odbc_disconnect (ODBC_CONNECTION * conn);
 PUBLIC RETCODE odbc_set_connect_attr (ODBC_CONNECTION * conn,
 				      long attribute,
@@ -193,6 +164,6 @@ PUBLIC int get_dsn_info (const char *dsn, char *db_name, int db_name_len,
 			 char *user, int user_len, char *pwd, int pwd_len,
 			 char *server, int server_len, int *port,
 			 int *fetch_size,
-			 char *charset, int charset_len);
+			 char *charset, int *charset_len);
 
 #endif /* ! __ODBC_CONN_HEADER */

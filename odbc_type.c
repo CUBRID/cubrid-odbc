@@ -30,7 +30,7 @@
 
 #include <stdio.h>
 #include <math.h>
-#include <LIMITS.H>
+
 #include "odbc_portable.h"
 #include "sqlext.h"
 #include "odbc_type.h"
@@ -206,12 +206,6 @@ PRIVATE DATA_TYPE_INFO odbc_data_type_info_set[] = {
 };
 
 PRIVATE C_DATA_TYPE_INFO c_data_type_info_set[] = {
-  {SQL_WCHAR, CCI_A_TYPE_STR, sizeof (SQLCHAR)}
-  ,
-  {SQL_WVARCHAR, CCI_A_TYPE_STR, sizeof (SQLCHAR)}
-  ,
-  {SQL_WLONGVARCHAR, CCI_A_TYPE_STR, sizeof (SQLCHAR)}
-  ,
   {SQL_C_CHAR, CCI_A_TYPE_STR, sizeof (SQLCHAR)}
   ,
 
@@ -223,6 +217,9 @@ PRIVATE C_DATA_TYPE_INFO c_data_type_info_set[] = {
   {SQL_C_SLONG, CCI_A_TYPE_INT, sizeof (SQLINTEGER)}
   ,
   {SQL_C_ULONG, CCI_A_TYPE_INT, sizeof (SQLUINTEGER)}
+  ,
+
+  {SQL_C_BINARY, CCI_A_TYPE_STR, sizeof (SQLCHAR)}
   ,
 
   {SQL_C_FLOAT, CCI_A_TYPE_FLOAT, sizeof (SQLREAL)}
@@ -242,14 +239,6 @@ PRIVATE C_DATA_TYPE_INFO c_data_type_info_set[] = {
   ,
 
   {SQL_C_BIT, CCI_A_TYPE_BIT, sizeof (SQLCHAR)}
-  ,
-  {SQL_BINARY, CCI_A_TYPE_BIT, sizeof (SQLCHAR)}
-  ,
-  {SQL_VARBINARY, CCI_A_TYPE_BIT, sizeof (SQLCHAR)}
-  ,
-  {SQL_BLOB, CCI_A_TYPE_BLOB, sizeof (SQLCHAR)}
-  ,
-  {SQL_CLOB, CCI_A_TYPE_CLOB, sizeof (SQLCHAR)}
   ,
 
   {SQL_C_SBIGINT, CCI_A_TYPE_BIGINT, sizeof (SQLBIGINT)}
@@ -698,7 +687,7 @@ odbc_column_size (short odbc_type, int precision)
     {
       if (odbc_data_type_info_set[i].concise_sql_type == odbc_type)
 	{
-	  if (odbc_data_type_info_set[i].column_size == -1)
+	  if (odbc_data_type_info_set[i].column_size = -1)
 	    {
 	      if (odbc_data_type_info_set[i].get_display_size != NULL)
 		{
@@ -863,10 +852,6 @@ odbc_type_by_cci (T_CCI_U_TYPE cci_type, int precision)
 	  return SQL_VARCHAR;
 	}
 #endif
-	  if(precision > 8000)
-	  {
-		  return SQL_LONGVARCHAR;
-	  }
       return SQL_VARCHAR;
     case CCI_U_TYPE_NCHAR:
       return SQL_CHAR;
@@ -901,10 +886,7 @@ odbc_type_by_cci (T_CCI_U_TYPE cci_type, int precision)
       return SQL_VARCHAR;
     case CCI_U_TYPE_OBJECT:
       return SQL_CHAR;
-    case CCI_U_TYPE_BLOB:
-      return SQL_BLOB;
-    case CCI_U_TYPE_CLOB:
-      return SQL_CLOB;
+
     case CCI_U_TYPE_UNKNOWN:
     default:
       return -1;
@@ -1087,11 +1069,7 @@ odbc_value_to_cci (void *c_value, short c_type, long c_length,
     case SQL_C_CHAR:
       value = UT_MAKE_STRING (c_value, c_length);
       break;
-    case SQL_C_WCHAR:
-    case SQL_WVARCHAR:
-    case SQL_WLONGVARCHAR:
-      wide_char_to_bytes ((wchar_t*)c_value, c_length, (char **)&value, NULL, NULL);
-      break;
+
     case SQL_C_BINARY:
       value = UT_ALLOC (sizeof (T_CCI_BIT));
       ((T_CCI_BIT *) value)->size = c_length;
@@ -1126,7 +1104,6 @@ odbc_value_to_cci (void *c_value, short c_type, long c_length,
       ((T_CCI_DATE *) value)->hh = ((SQL_TIMESTAMP_STRUCT *) c_value)->hour;
       ((T_CCI_DATE *) value)->mm = ((SQL_TIMESTAMP_STRUCT *) c_value)->minute;
       ((T_CCI_DATE *) value)->ss = ((SQL_TIMESTAMP_STRUCT *) c_value)->second;
-      ((T_CCI_DATE *) value)->ms = (short)(((SQL_TIMESTAMP_STRUCT *) c_value)->fraction);
       break;
 
 	/*---------------------------------------------------------------
@@ -1407,7 +1384,7 @@ PUBLIC SQLLEN
 cci_value_to_odbc (void *c_value, short concise_type,
 		   short precision, short scale,
 		   SQLLEN buffer_length, UNI_CCI_A_TYPE * cci_value,
-		   T_CCI_A_TYPE a_type,int* error_code)
+		   T_CCI_A_TYPE a_type)
 {
   SQLLEN length = 0;
 
@@ -1419,93 +1396,26 @@ cci_value_to_odbc (void *c_value, short concise_type,
 	 *--------------------------------------------------------------*/
     case SQL_C_SHORT:		// for 2.x backward compatibility
     case SQL_C_SSHORT:
-      if(cci_value->i>SHRT_MAX || cci_value->i<SHRT_MIN)
-      {
-          length = 0;
-          *error_code =-1;
-          break;
-      }
+    case SQL_C_USHORT:
       *(short *) c_value = cci_value->i;
       length = sizeof (short);
       break;
-
-    case SQL_C_USHORT:
-
-      if(cci_value->i>USHRT_MAX || cci_value->i<0)
-      {
-          length = 0;
-          *error_code =-1;
-          break;
-      }
-      *(short *) c_value = cci_value->i;
-      length = sizeof (short);
-      break;      
 
     case SQL_C_STINYINT:
-    case SQL_C_TINYINT:
-      if(cci_value->i>UCHAR_MAX || cci_value->i<0)
-      {
-          length = 0;
-          *error_code =-1;
-          break;
-      }
-
-      *(char *) c_value = cci_value->i;
-      length = sizeof (char);
-      break;
-    case SQL_C_UTINYINT:	// for 2.x backward compatibility
-      if(cci_value->i>SCHAR_MAX || cci_value->i<SCHAR_MIN)
-      {
-          length = 0;
-          *error_code =-1;
-          break;
-      }
-
+    case SQL_C_UTINYINT:
+    case SQL_C_TINYINT:	// for 2.x backward compatibility
       *(char *) c_value = cci_value->i;
       length = sizeof (char);
       break;
 
     case SQL_C_LONG:		// for 2.x backward compatibility
     case SQL_C_SLONG:
-     if(cci_value->i>LONG_MAX || cci_value->i<LONG_MIN)
-      {
-          length = 0;
-          *error_code =-1;
-          break;
-      }
-
-      *(long *) c_value = cci_value->i;
-      length = sizeof (long);
-      break;
     case SQL_C_ULONG:
-     if(cci_value->i>ULONG_MAX || cci_value->i<0)
-      {
-          length = 0;
-          *error_code =-1;
-          break;
-      }
-
       *(long *) c_value = cci_value->i;
       length = sizeof (long);
       break;
     case SQL_C_SBIGINT:
-     if(cci_value->i>LLONG_MAX || cci_value->i<LLONG_MIN)
-      {
-          length = 0;
-          *error_code =-1;
-          break;
-      }
-
-      *(__int64 *) c_value = cci_value->bi;
-      length = sizeof (__int64);
-      break;
     case SQL_C_UBIGINT:
-     if(cci_value->i>ULLONG_MAX || cci_value->i<0)
-      {
-          length = 0;
-          *error_code =-1;
-          break;
-      }
       *(__int64 *) c_value = cci_value->bi;
       length = sizeof (__int64);
       break;
@@ -1605,8 +1515,7 @@ cci_value_to_odbc (void *c_value, short concise_type,
 	    str[pt2 - pt] = '\0';
 	    ++pt2;
 	    strcat (str, pt2);
-	    ((SQL_NUMERIC_STRUCT *) c_value)->scale =  strlen (pt2);
-	    num_add_zero = ((SQL_NUMERIC_STRUCT *) c_value)->scale - strlen (pt2);
+	    num_add_zero = scale - strlen (pt2);
 		if (num_add_zero < 0)
 		{
 			str[strlen(str) + num_add_zero] = '\0';
@@ -1647,7 +1556,7 @@ cci_value_to_odbc (void *c_value, short concise_type,
 	    num1 = quot;
 	  }
 
-	//free_num (&num1);
+	free_num (&num1);
 	free_num (&num2);
 	free_num (&quot);
 	free_num (&rem);

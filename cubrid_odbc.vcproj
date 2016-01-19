@@ -80,11 +80,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib wsock32.lib cas_cci.lib  regex38a.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib wsock32.lib cas_cci.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				AdditionalLibraryDirectories="$(ProjectDir)\cci\lib32"
 				GenerateManifest="false"
-				ModuleDefinitionFile="cubrid_odbc.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\$(ProjectName).pdb"
 				SubSystem="2"
@@ -174,11 +173,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib wsock32.lib cas_cci.lib  regex38a.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib wsock32.lib cas_cci.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				AdditionalLibraryDirectories="$(ProjectDir)\cci\lib64"
 				GenerateManifest="false"
-				ModuleDefinitionFile="cubrid_odbc.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\$(ProjectName).pdb"
 				SubSystem="2"
@@ -255,7 +253,6 @@
 				DebugInformationFormat="3"
 				CompileAs="1"
 				DisableSpecificWarnings="4996,4274"
-				EnablePREfast="true"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -271,16 +268,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib wsock32.lib cas_cci_d.lib regex38a_d.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib wsock32.lib cas_cci_d.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				AdditionalLibraryDirectories="$(ProjectDir)\cci\lib32"
 				GenerateManifest="false"
-				ModuleDefinitionFile="cubrid_odbc.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\$(ProjectName).pdb"
 				SubSystem="2"
 				TargetMachine="1"
-				Profile="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -368,11 +363,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib wsock32.lib cas_cci_d.lib  regex38a_d.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib wsock32.lib cas_cci_d.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				AdditionalLibraryDirectories="$(ProjectDir)\cci\lib64"
 				GenerateManifest="false"
-				ModuleDefinitionFile="cubrid_odbc.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\$(ProjectName).pdb"
 				SubSystem="2"
@@ -408,10 +402,6 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
-			<File
-				RelativePath=".\cubrid_odbc.def"
-				>
-			</File>
 			<File
 				RelativePath=".\odbc.c"
 				>
@@ -460,15 +450,6 @@
 				RelativePath=".\odbc_util.c"
 				>
 			</File>
-			<Filter
-				Name="Resource Files"
-				Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
-				>
-				<File
-					RelativePath=".\cubrid_odbc.rc"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -520,6 +501,15 @@
 			</File>
 			<File
 				RelativePath=".\odbc_util.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+			>
+			<File
+				RelativePath=".\cubrid_odbc.rc"
 				>
 			</File>
 		</Filter>

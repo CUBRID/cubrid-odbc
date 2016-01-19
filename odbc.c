@@ -64,58 +64,7 @@ ConfigDriver (HWND hwndParent,
 
   return TRUE;
 }
-/************************************************************************
- * name:  AddDSNProcByParam
- * arguments:
- * returns/side-effects:
- * description:
- * NOTE:
- *		add dsn(app)
- ************************************************************************/
-PRIVATE BOOL FAR PASCAL
-AddDSNProcByParam (CUBRIDDSNItem* pDsn_item)
-{
-	BOOL rc;
-	CUBRIDDSNItem dsn_item = *pDsn_item;
-	rc = SQLWriteDSNToIni (dsn_item.dsn, dsn_item.driver);
-	if (rc == FALSE)
-	{
-	  return FALSE;
-	}
 
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_DBNAME,
-				dsn_item.db_name, "ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_DESCRIPTION,
-				dsn_item.description, "ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_USER, dsn_item.user,
-				"ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_PASSWORD,
-				dsn_item.password, "ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_SERVER,
-				dsn_item.server, "ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_PORT, dsn_item.port,
-				"ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_FETCH_SIZE,
-				dsn_item.fetch_size, "ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_CHARSET,
-				dsn_item.charset, "ODBC.INI");
-
-    return (TRUE);
-}
-/************************************************************************
- * name:  Odbc_strncpy
- * arguments:
- * returns/side-effects:NULL
- * description:
- * NOTE:
- *		strncpy
- ************************************************************************/
-void Odbc_strncpy(char* dst,const char* src,int size)
-{
-	if(src == NULL)
-		return;
-	strncpy(dst,src,size);
-}
 /************************************************************************
  * name:  ConfigDSN
  * arguments:
@@ -132,9 +81,7 @@ ConfigDSN (HWND hwndParent,
   INT_PTR dlgrc;
   CUBRIDDSNItem dsn_item;
   const char *pt;
-  int rc =0;
-  char ConnStrIn[4096] = {0};
-  char *ptemp;
+
 
   OutputDebugString ("ConfigDSN called\n");
 
@@ -144,38 +91,13 @@ ConfigDSN (HWND hwndParent,
 
       memset (&dsn_item, 0, sizeof (CUBRIDDSNItem));
 
-	  if(hwndParent){
-		  sprintf (dsn_item.driver, "%s", lpszDriver);
-          sprintf (dsn_item.fetch_size, "%d", 100);
-		  dlgrc = DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hwndParent,
-	  				  ConfigDSNDlgProc, (LPARAM) & dsn_item);
-		  if (dlgrc < 0)
-            return FALSE;
-	  }
-	  else{
-		  // with ';'
-		  sprintf (dsn_item.driver, "%s", lpszDriver);
-		  memcpy(ConnStrIn,lpszAttributes,strlen(lpszAttributes));
-          for (ptemp = ConnStrIn; *ptemp != '\0'; ++ptemp)
-          {
-             if (*ptemp == ';')		// connection string delimiter
-             *ptemp = '\0';
-          }
-		  Odbc_strncpy(dsn_item.dsn,element_value_by_key (ConnStrIn, KEYWORD_DSN),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.user , element_value_by_key (ConnStrIn, KEYWORD_USER),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.password ,element_value_by_key (ConnStrIn, KEYWORD_PASSWORD),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.fetch_size , element_value_by_key (ConnStrIn, KEYWORD_FETCH_SIZE),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.port , element_value_by_key (ConnStrIn, KEYWORD_PORT),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.server , element_value_by_key (ConnStrIn, KEYWORD_SERVER),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.save_file , element_value_by_key (ConnStrIn, KEYWORD_SAVEFILE),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.charset , element_value_by_key (ConnStrIn, KEYWORD_CHARSET),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.db_name , element_value_by_key (ConnStrIn, KEYWORD_DBNAME),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.description , element_value_by_key (ConnStrIn, KEYWORD_DESCRIPTION),ITEMBUFLEN);
-		  
-		  rc = AddDSNProcByParam(&dsn_item);
-		  if(rc != TRUE)
-			  return rc;
-	  }
+      sprintf (dsn_item.driver, "%s", lpszDriver);
+      sprintf (dsn_item.fetch_size, "%d", 100);
+
+      dlgrc = DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hwndParent,
+			      ConfigDSNDlgProc, (LPARAM) & dsn_item);
+      if (dlgrc < 0)
+	return FALSE;
 
       break;
 
@@ -213,9 +135,6 @@ ConfigDSN (HWND hwndParent,
 				  ITEMBUFLEN, "ODBC.INI");
       SQLGetPrivateProfileString (dsn_item.dsn, KEYWORD_FETCH_SIZE,
 				  "Not Found Field", dsn_item.fetch_size,
-				  ITEMBUFLEN, "ODBC.INI");
-      SQLGetPrivateProfileString (dsn_item.dsn, KEYWORD_CHARSET,
-				  "Not Found Field", dsn_item.charset,
 				  ITEMBUFLEN, "ODBC.INI");
       dlgrc =
 	DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hwndParent,
@@ -291,7 +210,6 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
       SetDlgItemText (hwndParent, IDC_SERVER, ptDSNItem->server);
       SetDlgItemText (hwndParent, IDC_PORT, ptDSNItem->port);
       SetDlgItemText (hwndParent, IDC_FETCH_SIZE, ptDSNItem->fetch_size);
-      SetDlgItemText (hwndParent, IDC_CHARSET, ptDSNItem->charset);
       sprintf (ibuf, "%p", ptDSNItem);
       SetDlgItemText (hwndParent, IDC_PT_DSNITEM, ibuf);
 
@@ -323,8 +241,6 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
 			  ITEMBUFLEN);
 	  GetDlgItemText (hwndParent, IDC_PORT, ptDSNItem->port, ITEMBUFLEN);
 	  GetDlgItemText (hwndParent, IDC_FETCH_SIZE, ptDSNItem->fetch_size,
-			  ITEMBUFLEN);
-        GetDlgItemText (hwndParent, IDC_CHARSET, ptDSNItem->charset,
 			  ITEMBUFLEN);
 
 	  rc = EndDialog (hwndParent, AddDSNProc (hwndParent));
@@ -381,8 +297,6 @@ AddDSNProc (HWND hwndParent)
       GetDlgItemText (hwndParent, IDC_PORT, dsn_item.port, ITEMBUFLEN);
       GetDlgItemText (hwndParent, IDC_FETCH_SIZE, dsn_item.fetch_size,
 		      ITEMBUFLEN);
-      GetDlgItemText (hwndParent, IDC_CHARSET, dsn_item.charset,
-		      ITEMBUFLEN);
 
       rc = SQLWriteDSNToIni (dsn_item.dsn, dsn_item.driver);
       if (rc == FALSE)
@@ -404,8 +318,6 @@ AddDSNProc (HWND hwndParent)
 				    "ODBC.INI");
       SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_FETCH_SIZE,
 				    dsn_item.fetch_size, "ODBC.INI");
-      SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_CHARSET,
-				    dsn_item.charset, "ODBC.INI");
     }
 
   return (TRUE);

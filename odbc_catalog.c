@@ -561,9 +561,8 @@ odbc_tables (ODBC_STATEMENT * stmt,
 
   catalog_result_set_init (stmt, TABLES);
   catalog_set_ird (stmt, table_cinfo, NC_CATALOG_TABLES);
-  
 
-  if (table_type == NULL||table_type[0] == 0)
+  if (table_type == NULL)
     {
       t_type = TABLE_TYPE_ALL;
     }
@@ -588,13 +587,7 @@ odbc_tables (ODBC_STATEMENT * stmt,
       search_pattern_flag = CCI_CLASS_NAME_PATTERN_MATCH;
 
     }
-  if(table_name!=NULL)
-  {
-      if(table_name[0]==0)
-      {
-          table_name=NULL;
-      }
-  }
+
   cci_rc = cci_schema_info (stmt->conn->connhd, CCI_SCH_CLASS,
 			    table_name, NULL, search_pattern_flag,
 			    &cci_err_buf);
@@ -3894,7 +3887,7 @@ PRIVATE int
 sql_execute (int cci_connection, int *cci_request,
 	     char *sql_statment, char *param_list[], int param_num, T_CCI_ERROR *error)
 {
-  int cci_retval = 0;
+  int cci_retval;
   int i;
 
   if (((*cci_request) = cci_prepare (cci_connection, sql_statment,
