@@ -121,7 +121,7 @@ Function WriteRegeDit32
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "Driver" "$INSTDIR\cubrid_odbc32.dll"
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "Setup" "$INSTDIR\cubrid_odbc32.dll"
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "APILevel" "2"
-		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "DriverODBCVer" "10.0.0(32)"
+		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "DriverODBCVer" "9.3.0(32)"
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "ConnectFunctions" "YYN"
 		
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "CreateDSN" "CUBRID Driver 32"
@@ -137,7 +137,7 @@ Function WriteRegeDit64
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "Setup" "$INSTDIR\cubrid_odbc64.dll"
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "Setup" "$INSTDIR\cubrid_odbc64.dll"
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "APILevel" "2"
-		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "DriverODBCVer" "10.0.0(64)"
+		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "DriverODBCVer" "9.3.0(64)"
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "ConnectFunctions" "YYN"
 
 		WriteRegStr HKLM "SOFTWARE\ODBC\ODBCINST.INI\CUBRID Driver" "CreateDSN" "CUBRID Driver 64"

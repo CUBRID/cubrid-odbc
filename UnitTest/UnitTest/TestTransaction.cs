@@ -189,6 +189,10 @@ namespace UnitTest
             Assert.IsTrue(tran.IsolationLevel == IsolationLevel.Serializable);
             tran.Commit();
 
+            tran = conn.BeginTransaction(IsolationLevel.ReadCommitted);
+            Assert.IsTrue(tran.IsolationLevel == IsolationLevel.ReadCommitted);
+            tran.Commit();
+
             tran = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
             Assert.IsTrue(tran.IsolationLevel == IsolationLevel.ReadUncommitted);
             tran.Commit();

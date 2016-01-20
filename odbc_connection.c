@@ -2839,11 +2839,11 @@ set_isolation_level (ODBC_CONNECTION * conn)
       isolation_level = TRAN_REP_CLASS_REP_INSTANCE;
       break;
     case SQL_TXN_READ_COMMITTED:
-      isolation_level = TRAN_REP_CLASS_COMMIT_INSTANCE;
+      isolation_level = TRAN_COMMIT_CLASS_COMMIT_INSTANCE;
       break;
     case SQL_TXN_READ_UNCOMMITTED:
-      odbc_set_diag_by_cci (conn->diag, CCI_ER_NOT_IMPLEMENTED, NULL);
-      return ODBC_ERROR;
+      isolation_level = TRAN_COMMIT_CLASS_UNCOMMIT_INSTANCE;
+      break;
     default:			// serializable
       isolation_level = TRAN_REP_CLASS_REP_INSTANCE;
       break;

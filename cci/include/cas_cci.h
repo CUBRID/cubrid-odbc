@@ -55,7 +55,7 @@ extern "C"
  ************************************************************************/
 
 #define CCI_GET_RESULT_INFO_TYPE(RES_INFO, INDEX)	\
-		(((T_CCI_COL_INFO*) (RES_INFO))[(INDEX) - 1].ext_type)
+		(((T_CCI_COL_INFO*) (RES_INFO))[(INDEX) - 1].type)
 
 #define CCI_GET_RESULT_INFO_SCALE(RES_INFO, INDEX)	\
 		(((T_CCI_COL_INFO*) (RES_INFO))[(INDEX) - 1].scale)
@@ -111,8 +111,7 @@ extern "C"
 #define CCI_IS_COLLECTION_TYPE(TYPE)	\
 	((((TYPE) & CCI_CODE_COLLECTION) || ((TYPE) == CCI_U_TYPE_SET) || ((TYPE) == CCI_U_TYPE_MULTISET) || ((TYPE) == CCI_U_TYPE_SEQUENCE)) ? 1 : 0)
 
-#define CCI_GET_COLLECTION_DOMAIN(TYPE)	(((CCI_TYPE_BIT7_MASK & (TYPE)) >> 2) \
-  | ((TYPE) & CCI_TYPE_LSB_MASK))
+#define CCI_GET_COLLECTION_DOMAIN(TYPE)	(~(CCI_CODE_COLLECTION) & (TYPE))
 
 #define CCI_QUERY_RESULT_RESULT(QR, INDEX)	\
 	(((T_CCI_QUERY_RESULT*) (QR))[(INDEX) - 1].result_count)
@@ -132,14 +131,11 @@ extern "C"
 #define CCI_GET_PARAM_INFO_MODE(PARAM_INFO, INDEX)	\
 	(((T_CCI_PARAM_INFO*) (PARAM_INFO))[(INDEX) - 1].mode)
 #define CCI_GET_PARAM_INFO_TYPE(PARAM_INFO, INDEX)	\
-	(((T_CCI_PARAM_INFO*) (PARAM_INFO))[(INDEX) - 1].ext_type)
+	(((T_CCI_PARAM_INFO*) (PARAM_INFO))[(INDEX) - 1].type)
 #define CCI_GET_PARAM_INFO_SCALE(PARAM_INFO, INDEX)	\
 	(((T_CCI_PARAM_INFO*) (PARAM_INFO))[(INDEX) - 1].scale)
 #define CCI_GET_PARAM_INFO_PRECISION(PARAM_INFO, INDEX)	\
 	(((T_CCI_PARAM_INFO*) (PARAM_INFO))[(INDEX) - 1].precision)
-
-#define CCI_NET_TYPE_HAS_2BYTES(type) \
-  ((((type) & CCI_TYPE_BIT7_MASK) != 0) ? true : false)
 
 #define CCI_BIND_PTR			1
 
@@ -150,7 +146,6 @@ extern "C"
 #define CCI_PREPARE_UPDATABLE		0x02
 #define CCI_PREPARE_QUERY_INFO          0x04
 #define CCI_PREPARE_HOLDABLE		0x08
-#define CCI_PREPARE_XASL_CACHE_PINNED 	0x10
 #define CCI_PREPARE_CALL		0x40
 
 #define CCI_EXEC_ASYNC			0x01
@@ -165,11 +160,6 @@ extern "C"
 
 #define CCI_CLASS_NAME_PATTERN_MATCH	1
 #define CCI_ATTR_NAME_PATTERN_MATCH	2
-
-/* encoding of composed type :
- * TCCT TTTT  (T - set type bits ; C - collection bits) */
-#define CCI_TYPE_BIT7_MASK		0x80
-#define CCI_TYPE_LSB_MASK		0x1f
 
 #define CCI_CODE_SET			0x20
 #define CCI_CODE_MULTISET		0x40
@@ -239,8 +229,6 @@ extern "C"
 /* default lock timeout in sec for connections created by pool*/
 #define CCI_DS_PROPERTY_DEFAULT_LOCK_TIMEOUT		"default_lock_timeout"
 
-#define CCI_TZ_SIZE 63
-
 /* for cci auto_comit mode support */
   typedef enum
   {
@@ -298,18 +286,6 @@ extern "C"
 
   typedef struct
   {
-    short yr;
-    short mon;
-    short day;
-    short hh;
-    short mm;
-    short ss;
-    short ms;
-    char tz[CCI_TZ_SIZE + 1];
-  } T_CCI_DATE_TZ;
-
-  typedef struct
-  {
     int result_count;
     int stmt_type;
     int err_no;
@@ -351,17 +327,9 @@ extern "C"
     CCI_U_TYPE_USHORT = 26,
     CCI_U_TYPE_UINT = 27,
     CCI_U_TYPE_UBIGINT = 28,
-    CCI_U_TYPE_TIMESTAMPTZ = 29,
-    CCI_U_TYPE_TIMESTAMPLTZ = 30,
-    CCI_U_TYPE_DATETIMETZ = 31,
-    CCI_U_TYPE_DATETIMELTZ = 32,
-    /* Disabled type */
-    CCI_U_TYPE_TIMETZ = 33,	/* internal use only - RESERVED */
-    /* end of disabled types */
-    CCI_U_TYPE_LAST = CCI_U_TYPE_DATETIMELTZ
-  } T_CCI_U_TYPE;
 
-  typedef unsigned char T_CCI_U_EXT_TYPE;
+    CCI_U_TYPE_LAST = CCI_U_TYPE_UBIGINT
+  } T_CCI_U_TYPE;
 
   typedef void *T_CCI_SET;
 
@@ -381,8 +349,8 @@ extern "C"
     CCI_A_TYPE_REQ_HANDLE,
     CCI_A_TYPE_UINT,
     CCI_A_TYPE_UBIGINT,
-    CCI_A_TYPE_DATE_TZ,
-    CCI_A_TYPE_LAST = CCI_A_TYPE_DATE_TZ,
+
+    CCI_A_TYPE_LAST = CCI_A_TYPE_UBIGINT,
 
     CCI_A_TYTP_LAST = CCI_A_TYPE_LAST	/* typo but backward compatibility */
   } T_CCI_A_TYPE;
@@ -522,7 +490,7 @@ extern "C"
     CUBRID_STMT_ROLLBACK_WORK,
     CUBRID_STMT_GRANT,
     CUBRID_STMT_REVOKE,
-    CUBRID_STMT_UPDATE_STATS,
+    CUBRID_STMT_STATISTICS,
     CUBRID_STMT_INSERT,
     CUBRID_STMT_SELECT,
     CUBRID_STMT_UPDATE,
@@ -564,10 +532,7 @@ extern "C"
     CUBRID_STMT_DROP_SESSION_VARIABLES,
     CUBRID_STMT_MERGE,
     CUBRID_STMT_SET_NAMES,
-    CUBRID_STMT_ALTER_STORED_PROCEDURE,
-    CUBRID_STMT_ALTER_STORED_PROCEDURE_OWNER =
-      CUBRID_STMT_ALTER_STORED_PROCEDURE,
-    CUBRID_STMT_KILL,
+    CUBRID_STMT_ALTER_STORED_PROCEDURE_OWNER,
 
     CUBRID_MAX_STMT_TYPE
   } T_CCI_CUBRID_STMT;
@@ -645,8 +610,7 @@ extern "C"
 #define SQLX_CMD_DROP_SESSION_VARIABLES  CUBRID_STMT_DROP_SESSION_VARIABLES
 #define SQLX_CMD_STMT_MERGE  CUBRID_STMT_MERGE
 #define SQLX_CMD_SET_NAMES   CUBRID_STMT_SET_NAMES
-#define SQLX_CMD_ALTER_STORED_PROCEDURE   CUBRID_STMT_ALTER_STORED_PROCEDURE
-#define SQLX_CMD_ALTER_STORED_PROCEDURE_OWNER   CUBRID_STMT_ALTER_STORED_PROCEDURE
+#define SQLX_CMD_ALTER_STORED_PROCEDURE_OWNER   CUBRID_STMT_ALTER_STORED_PROCEDURE_OWNER
 
 #define SQLX_MAX_CMD_TYPE   CUBRID_MAX_STMT_TYPE
 
@@ -662,7 +626,7 @@ extern "C"
 
   typedef struct
   {
-    T_CCI_U_EXT_TYPE ext_type;	/* extended type : TCCT TTTT (T : set type, C: collection flags) */
+    T_CCI_U_TYPE type;
     char is_non_null;
     short scale;
     int precision;
@@ -738,14 +702,13 @@ extern "C"
   typedef enum
   {
     TRAN_UNKNOWN_ISOLATION = 0,
-    TRAN_ISOLATION_MIN = 4,
+    TRAN_ISOLATION_MIN = 1,
 
-    TRAN_READ_COMMITTED = 4,
-    TRAN_REP_CLASS_COMMIT_INSTANCE = 4,	/* for backward compatibility */
-
-    TRAN_REPEATABLE_READ = 5,
-    TRAN_REP_CLASS_REP_INSTANCE = 5,	/* for backward compatibility */
-
+    TRAN_COMMIT_CLASS_UNCOMMIT_INSTANCE = 1,
+    TRAN_COMMIT_CLASS_COMMIT_INSTANCE = 2,
+    TRAN_REP_CLASS_UNCOMMIT_INSTANCE = 3,
+    TRAN_REP_CLASS_COMMIT_INSTANCE = 4,
+    TRAN_REP_CLASS_REP_INSTANCE = 5,
     TRAN_SERIALIZABLE = 6,
 
     TRAN_ISOLATION_MAX = 6
@@ -773,7 +736,7 @@ extern "C"
   typedef struct
   {
     T_CCI_PARAM_MODE mode;
-    T_CCI_U_EXT_TYPE ext_type;	/* extended type : TCCT TTTT (T : set type, C: collection flags) */
+    T_CCI_U_TYPE type;
     short scale;
     int precision;
   } T_CCI_PARAM_INFO;

@@ -306,8 +306,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="build\$(PlatformName)_$(ConfigurationName)_Unicode"
-			IntermediateDirectory="temp\$(PlatformName)_$(ConfigurationName)_Unicode"
+			OutputDirectory="build\$(PlatformName)_$(ConfigurationName)"
+			IntermediateDirectory="temp\$(PlatformName)_$(ConfigurationName)"
 			ConfigurationType="2"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
