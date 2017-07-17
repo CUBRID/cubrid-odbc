@@ -1,4 +1,4 @@
-Copyright (C) 2008-2015 Search Solution Corporation. All rights reserved.
+Copyright (C) 2008-2017 Search Solution Corporation. All rights reserved.
 CUBRID is registered trademark of Search Solution Corporation.
 
 This Software is released under BSD according to its components.
