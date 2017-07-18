@@ -1380,7 +1380,14 @@ odbc_set_ird (ODBC_STATEMENT * stmt,
 	    }
 	   else
 	    {
-              type = SQL_WVARCHAR;
+              if (type == SQL_CHAR)
+                {
+                  type = SQL_WCHAR;
+                }
+              else
+                {
+                  type = SQL_WVARCHAR;
+                }
 	    }
        }
      else
