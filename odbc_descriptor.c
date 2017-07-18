@@ -484,9 +484,13 @@ odbc_get_desc_field (ODBC_DESC * desc,
 	case SQL_DESC_CONCISE_TYPE:
 	  if (value_ptr != NULL)
 	    {
-	      if(record->concise_type == SQL_BLOB || record->concise_type == SQL_CLOB)
+	      if (record->concise_type == SQL_BLOB)
 	        {
-	          *(short *) value_ptr = SQL_BINARY;
+	          *(short *) value_ptr = SQL_LONGVARBINARY;
+	        }
+	      else if (record->concise_type == SQL_CLOB)
+	        {
+	          *(short *) value_ptr = SQL_LONGVARCHAR;
 	        }
 	      else
 	        {
