@@ -66,10 +66,15 @@ PUBLIC HINSTANCE hInstance;
 BOOL WINAPI
 DllMain (HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
+  HMODULE hMd = NULL;
 
   if (ul_reason_for_call == DLL_PROCESS_ATTACH)
     {
       cci_init ();
+      DisableThreadLibraryCalls (hModule);
+      GetModuleHandleEx (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN,
+       (LPCTSTR)SQLDriverConnect,
+       &hMd);
     }
 
   // hInstance is declared at resource_proc.c
