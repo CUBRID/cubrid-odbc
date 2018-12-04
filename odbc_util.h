@@ -254,4 +254,10 @@ PUBLIC int get_wide_char_result (char *str,
 					   int buffer_length, 
 					   int* out_length, 
 					   char* characterset);
+/*--------------------------------------------------------------*/
+
+#ifdef CUBRID_ODBC_UNICODE
+PUBLIC int check_if_even_number (SQLUSMALLINT info_type, SQLSMALLINT buffer_length);
+#endif
+
 #endif /* ! __CUBRID_ODBC_UTIL_HEADER */
