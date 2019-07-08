@@ -280,7 +280,7 @@ SQLGetDiagRecW (SQLSMALLINT HandleType,
 
   if (TextLength)
    {
-     *TextLength = (SQLSMALLINT)out_length;
+     *TextLength = (SQLSMALLINT)(message_text_buffer_len * sizeof(wchar_t));
    }
 
   UT_FREE (message_text_buffer);
