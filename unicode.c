@@ -270,7 +270,14 @@ SQLGetDiagRecW (SQLSMALLINT HandleType,
      UT_FREE (message_text_buffer);
      return ret;
    }
-                     
+
+  if (Sqlstate && sql_state)
+  {
+		int temp_buffer_length = MultiByteToWideChar (CP_ACP, 0, (LPCSTR) sql_state, strlen(sql_state), NULL, 0);
+
+		MultiByteToWideChar (CP_ACP, 0, (LPCSTR) sql_state, strlen(sql_state), Sqlstate, temp_buffer_length);
+  }
+  
   bytes_to_wide_char (message_text_buffer, 
                message_text_buffer_len, 
                &MessageText, 
