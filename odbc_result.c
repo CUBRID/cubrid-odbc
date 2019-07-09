@@ -413,10 +413,21 @@ odbc_fetch (ODBC_STATEMENT * stmt,
   if (rc < 0)
     {
       if (rc == ODBC_NO_MORE_DATA)
-	return ODBC_NO_DATA;
+        {
+           if (stmt->query_plan)
+             {
+               stmt->query_plan = _FALSE_;
+               return ODBC_SUCCESS;
+             }
+
+           return ODBC_NO_DATA;
+        }
       else
-	goto error;
+        {
+          goto error;
+        }
     }
+	
   current_tpl_pos = stmt->current_tpl_pos;
 
   for (i = bind_offset;
@@ -570,6 +581,8 @@ odbc_get_data (ODBC_STATEMENT * stmt,
   int cci_ind;
   VALUE_CONTAINER c_value;
 
+  char *query_plan;
+
   if (col_number > stmt->ird->max_count)
     {
       odbc_set_diag (stmt->diag, "07009", 0, NULL);
@@ -583,6 +596,27 @@ odbc_get_data (ODBC_STATEMENT * stmt,
       return ODBC_SUCCESS_WITH_INFO;
     }
 
+
+  if (col_number == 1 && target_type == SQL_C_DEFAULT)
+    {
+      int temp_length;
+
+      cci_rc = cci_get_query_plan(stmt->stmthd, &query_plan);
+	  
+      if (cci_rc < 0)
+        {
+          odbc_set_diag_by_cci(stmt->diag, cci_rc, NULL);
+          goto error;
+        }
+
+        rc =
+          get_wide_char_result(query_plan, strlen(query_plan), (wchar_t **)&bound_ptr,
+            (int)buffer_length, &temp_length, "utf-8");
+
+        *str_ind_ptr = temp_length;
+
+        return rc;
+    }
 
   if (col_number != stmt->column_data.column_no)
     {
