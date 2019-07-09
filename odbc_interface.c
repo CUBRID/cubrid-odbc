@@ -235,6 +235,8 @@ SQLCancel (SQLHSTMT StatementHandle)
 
   rc = odbc_cancel (stmt_handle);
 
+  stmt_handle->canceled = 1;
+
   DEBUG_TIMESTAMP (END_SQLCancel);
 
   ODBC_RETURN (rc, StatementHandle);
@@ -1042,6 +1044,11 @@ SQLGetData (SQLHSTMT StatementHandle,
 
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
+
+  if (stmt_handle->canceled)
+    {
+      ODBC_RETURN(rc, StatementHandle);
+    }
 
   rc = odbc_get_data (stmt_handle, ColumnNumber,
 		      TargetType, TargetValue, BufferLength, StrLen_or_Ind);

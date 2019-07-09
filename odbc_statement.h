@@ -177,6 +177,7 @@ typedef struct st_odbc_statement
   unsigned short *attr_row_operation_ptr;	// 1
   unsigned long attr_simulate_cursor;	// 2
 
+  char canceled;
 
 
   // Descriptor section
