@@ -149,6 +149,7 @@ odbc_alloc_statement (ODBC_CONNECTION * conn, ODBC_STATEMENT ** stmt_ptr)
   s->cursor = NULL;
   s->sql_text = NULL;
   s->is_prepared = _FALSE_;
+  s->query_plan = _FALSE_;
   memset (&s->revised_sql, 0, sizeof (s->revised_sql));
   s->result_type = NULL_RESULT;
   s->data_at_exec_state = STMT_NEED_NO_MORE_DATA;
@@ -2791,6 +2792,11 @@ get_flag_of_cci_execute (ODBC_STATEMENT * stmt)
 {
   if (stmt == NULL)
     return 0;
+
+  if (stmt->query_plan)
+    {
+      return stmt->query_plan;
+    }
 
   if (stmt->attr_async_enable == SQL_ASYNC_ENABLE_ON)
     {

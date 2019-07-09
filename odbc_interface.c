@@ -795,6 +795,18 @@ SQLExecDirect (SQLHSTMT StatementHandle,
 
   stStatementText = UT_MAKE_STRING (StatementText, TextLength);
 
+  if (stricmp(StatementText, "@QP@") == 0)
+    {
+      stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN;
+      return ODBC_SUCCESS;
+    }
+  
+  if (stricmp(StatementText, "@QE@") == 0)
+    {
+      stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN | CCI_EXEC_QUERY_ALL;
+      return ODBC_SUCCESS;
+    }
+
   stmt_handle->is_prepared = _FALSE_;
 
   rc = odbc_prepare (stmt_handle, stStatementText);
