@@ -141,7 +141,7 @@ odbc_alloc_statement (ODBC_CONNECTION * conn, ODBC_STATEMENT ** stmt_ptr)
       goto error;
     }
 
-  s->canceled = 0;
+  s->canceled = _FALSE_;
   s->handle_type = SQL_HANDLE_STMT;
   s->stmthd = 0;
   s->conn = NULL;
