@@ -2789,15 +2789,12 @@ get_flag_of_cci_prepare (ODBC_STATEMENT * stmt)
 PRIVATE char
 get_flag_of_cci_execute (ODBC_STATEMENT * stmt)
 {
-  char flag;
-
   if (stmt == NULL)
     return 0;
 
   if (stmt->query_plan)
     {
-      flag = stmt->query_plan;
-      return flag;
+      return stmt->query_plan;
     }
 
   if (stmt->attr_async_enable == SQL_ASYNC_ENABLE_ON)
