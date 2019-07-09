@@ -141,6 +141,7 @@ odbc_alloc_statement (ODBC_CONNECTION * conn, ODBC_STATEMENT ** stmt_ptr)
       goto error;
     }
 
+  s->canceled = _FALSE_;
   s->handle_type = SQL_HANDLE_STMT;
   s->stmthd = 0;
   s->conn = NULL;
@@ -1860,10 +1861,10 @@ odbc_cancel (ODBC_STATEMENT * stmt)
     {
       /* CHECK : 이로 인해서 발생하는 현상은? */
       if (stmt->stmthd > 0)
-	{
-	  cci_close_req_handle (stmt->stmthd);
-	  stmt->stmthd = -1;
-	}
+        {
+          cci_cancel(stmt->conn->connhd);
+          stmt->stmthd = -1;
+        }
     }
 
   return ODBC_SUCCESS;
