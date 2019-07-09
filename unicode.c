@@ -405,7 +405,7 @@ SQLDescribeColW (SQLHSTMT hstmt, SQLUSMALLINT column,
      return ret;
    }
    
-  bytes_to_wide_char (name_buffer, name_buffer_len, &name, name_max, &out_length, NULL);
+  bytes_to_wide_char (name_buffer, name_buffer_len, &name, name_max, &out_length, "utf-8");
 
   if (name_len)
    {
@@ -1006,7 +1006,7 @@ SQLColAttributeW (SQLHSTMT StatementHandle,
         }
       if (CharacterAttribute && StringLength)
         {
-          bytes_to_wide_char (CharacterAttribute, *StringLength / 2, &wvalue, 0, NULL, NULL);
+          bytes_to_wide_char (CharacterAttribute, *StringLength / 2, &wvalue, 0, NULL, "utf-8");
           if(wvalue != NULL)
            {
              (void)memcpy ((char *)CharacterAttribute, (const char *)wvalue, *StringLength);
