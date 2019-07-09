@@ -957,9 +957,12 @@ odbc_type_to_cci_u_type (short sql_type)
     {
 
     case SQL_CHAR:
+    case SQL_WCHAR:
       return CCI_U_TYPE_CHAR;
     case SQL_VARCHAR:
+    case SQL_WVARCHAR:
     case SQL_LONGVARCHAR:
+    case SQL_WLONGVARCHAR:
       return CCI_U_TYPE_STRING;
 
     case SQL_BINARY:
