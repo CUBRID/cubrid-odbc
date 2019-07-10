@@ -321,12 +321,14 @@ SQLNativeSqlW (SQLHDBC hdbc, SQLWCHAR *in, SQLINTEGER in_len,
    memset (sql_text_buffer, 0 , out_max);
       
   ret = SQLNativeSql(hdbc,  sql_state,  sql_state_len,  sql_text_buffer,  out_max, out_len);
+  sql_state_len = *out_len;
+
   if (ret == ODBC_ERROR)
    {
      UT_FREE (sql_text_buffer);
      return ret;
    }
-  bytes_to_wide_char (sql_state, sql_state_len, &out, out_max, out_len, NULL);   
+  bytes_to_wide_char (sql_text_buffer, sql_state_len, &out, out_max, out_len, NULL);   
   UT_FREE (sql_text_buffer);
   return ret;
 }
