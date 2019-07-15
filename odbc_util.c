@@ -1033,14 +1033,7 @@ str_value_assign (const char *in_value,
 
   if (val_len_ptr != NULL)
     {
-      if (rc == ODBC_SUCCESS_WITH_INFO)
-        {
-          *val_len_ptr = ODBC_STRLEN_IND (in_value);
-        }
-      else
-        {
-          *val_len_ptr = ODBC_STRLEN_IND (out_buf);
-        }
+      *val_len_ptr = ODBC_STRLEN_IND (in_value);
     }
 
   return rc;
