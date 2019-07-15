@@ -41,6 +41,10 @@
 
 static int is_korean (unsigned char ch);
 
+#pragma comment(lib, "legacy_stdio_definitions.lib")
+
+
+
 /************************************************************************
 * name:  InitStr
 * arguments: 
