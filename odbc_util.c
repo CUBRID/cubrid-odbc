@@ -39,6 +39,10 @@
 #define		UNIT_MEMORY_SIZE		256
 #define		STK_SIZE        100
 
+#ifndef CP_EUC_KR
+#define CP_EUC_KR 51949 
+#endif
+
 static int is_korean (unsigned char ch);
 
 #pragma comment(lib, "legacy_stdio_definitions.lib")
@@ -1320,9 +1324,9 @@ encode_string_to_charset(wchar_t *str, int size, char **target, int* out_length,
       {
         wincode = CP_UTF8;
       }
-	else if (_stricmp(charset, "euc-kr") == 0)
+    else if (_stricmp(charset, "euc-kr") == 0)
       {
-        wincode = 51949;
+        wincode = CP_EUC_KR;
       }
 
     nLength = WideCharToMultiByte(wincode, 0, str, -1, NULL, 0, NULL, NULL);
@@ -1422,7 +1426,7 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
     }
   else if (_stricmp(characterset, "euc-kr") == 0)
     {
-      wincode = 51949;
+      wincode = CP_EUC_KR;
     }
 
   if(str == NULL || buffer == NULL)
@@ -1477,7 +1481,7 @@ get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, 
     }
   else if (_stricmp(characterset, "euc-kr") == 0)
     {
-	  wincode = 51949;
+      wincode = CP_EUC_KR;
     }
 
   if(str == NULL || buffer == NULL)

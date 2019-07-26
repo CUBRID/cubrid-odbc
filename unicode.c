@@ -315,14 +315,14 @@ SQLNativeSqlW (SQLHDBC hdbc, SQLWCHAR *in, SQLINTEGER in_len,
   RETCODE ret = ODBC_ERROR;
   SQLCHAR *sql_state, *sql_text_buffer = NULL;
   int sql_state_len;  
-  ODBC_CONNECTION * ConnectionHandle = (ODBC_CONNECTION *) hdbc;
+  ODBC_CONNECTION * conn = (ODBC_CONNECTION *) hdbc;
   
   OutputDebugString ("SQLNativeSqlW called.\n");
-  ret = wide_char_to_bytes (in, in_len, &sql_state,  &sql_state_len, ConnectionHandle->charset);
+  ret = wide_char_to_bytes (in, in_len, &sql_state,  &sql_state_len, conn->charset);
   sql_text_buffer = UT_ALLOC (out_max);
   if (sql_text_buffer == NULL && out_max > 0)
     {
-      odbc_set_diag (ConnectionHandle->diag, "HY001", 0, "malloc failed");
+      odbc_set_diag (conn->diag, "HY001", 0, "malloc failed");
       return ODBC_ERROR;
     }
    memset (sql_text_buffer, 0 , out_max);
@@ -335,7 +335,7 @@ SQLNativeSqlW (SQLHDBC hdbc, SQLWCHAR *in, SQLINTEGER in_len,
      UT_FREE (sql_text_buffer);
      return ret;
    }
-  bytes_to_wide_char (sql_text_buffer, sql_state_len, &out, out_max, out_len, ConnectionHandle->charset);
+  bytes_to_wide_char (sql_text_buffer, sql_state_len, &out, out_max, out_len, conn->charset);
   UT_FREE (sql_text_buffer);
   return ret;
 }
