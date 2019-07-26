@@ -611,7 +611,7 @@ odbc_get_data (ODBC_STATEMENT * stmt,
 
         rc =
           get_wide_char_result(query_plan, strlen(query_plan), (wchar_t **)&bound_ptr,
-            (int)buffer_length, &temp_length, "utf-8");
+            (int)buffer_length, &temp_length, stmt->conn->charset);
 
         *str_ind_ptr = temp_length;
 

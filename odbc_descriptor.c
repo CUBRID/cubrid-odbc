@@ -1371,7 +1371,7 @@ odbc_set_ird (ODBC_STATEMENT * stmt,
   if(IS_STRING_TYPE (type) || IS_BINARY_TYPE (type))
    { 
  #ifdef CUBRID_ODBC_UNICODE
-    if((_stricmp (stmt->conn->charset, "utf-8") == 0))
+    if((_stricmp (stmt->conn->charset, "utf-8") == 0) || (_stricmp(stmt->conn->charset, "euc-kr") == 0))
        {
 	   if(type == SQL_LONGVARCHAR || precision > 4000)
 	    {

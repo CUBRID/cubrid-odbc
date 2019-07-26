@@ -63,7 +63,7 @@ SQLDriverConnectW (SQLHDBC hdbc, SQLHWND hwnd,
   ODBC_CONNECTION* conn = (ODBC_CONNECTION*)hdbc;
 
   OutputDebugString ("SQLDriverConnectW called\n");
-  rc = wide_char_to_bytes (in, in_len, &pt_in, &encode_len, NULL);
+  rc = wide_char_to_bytes (in, in_len, &pt_in, &encode_len, conn->charset);
   if (rc != ODBC_SUCCESS)
     {
       odbc_set_diag (conn->diag, "HY001", 0, "encode failed");
@@ -84,7 +84,7 @@ SQLDriverConnectW (SQLHDBC hdbc, SQLHWND hwnd,
          completion);
   if (out)
     {
-      bytes_to_wide_char (pt_out, strlen (pt_out), &out, out_max, &temp_out_len, NULL);
+      bytes_to_wide_char (pt_out, strlen (pt_out), &out, out_max, &temp_out_len, conn->charset);
     }
   if (out_len)
     {
@@ -111,10 +111,12 @@ SQLConnectW (SQLHDBC hdbc, SQLWCHAR *dsn, SQLSMALLINT dsn_len,
   int cb_user_len, cb_auth_len, cb_dsn_len;
   RETCODE ret;
 
+  ODBC_CONNECTION *conn = (ODBC_CONNECTION *)hdbc;
+
   OutputDebugString ("SQLConnectW called\n");
-  wide_char_to_bytes (user, user_len, &cb_user, &cb_user_len, NULL);
-  wide_char_to_bytes (auth, auth_len, &cb_auth, &cb_auth_len, NULL);
-  wide_char_to_bytes (dsn, dsn_len, &cb_dsn, &cb_dsn_len, NULL);
+  wide_char_to_bytes (user, user_len, &cb_user, &cb_user_len, conn->charset);
+  wide_char_to_bytes (auth, auth_len, &cb_auth, &cb_auth_len, conn->charset);
+  wide_char_to_bytes (dsn, dsn_len, &cb_dsn, &cb_dsn_len, conn->charset);
 
   ret = SQLConnect (hdbc,
                     cb_dsn,
@@ -144,7 +146,9 @@ SQLExecDirectW (SQLHSTMT StatementHandle,
   RETCODE ret;
   int sql_len = 0;
 
-  wide_char_to_bytes (StatementText, TextLength, &sql_text,  &sql_len, NULL);
+  ODBC_STATEMENT *stmt = (ODBC_STATEMENT *)StatementHandle;
+
+  wide_char_to_bytes (StatementText, TextLength, &sql_text,  &sql_len, stmt->conn->charset);
   OutputDebugString ("SQLExecDirectW called\n");
   ret = SQLExecDirect (StatementHandle, sql_text, sql_len);
   UT_FREE (sql_text);
@@ -169,6 +173,7 @@ SQLGetInfoW (SQLHDBC ConnectionHandle,
   SQLLEN tmp_StringLength;
   SQLLEN info_value_size;
   SQLWCHAR *wvalue;
+  char	*charset = ((ODBC_CONNECTION *)ConnectionHandle)->charset;
 
   OutputDebugString ("SQLGetInfoW called\n");
 
@@ -208,7 +213,7 @@ SQLGetInfoW (SQLHDBC ConnectionHandle,
                 }
             }
 
-          bytes_to_wide_char (InfoValue, tmp_StringLength, &wvalue, 0, NULL, "utf-8");
+          bytes_to_wide_char (InfoValue, tmp_StringLength, &wvalue, 0, NULL, charset);
 
           if (wvalue != NULL)
             {
@@ -251,10 +256,12 @@ SQLGetDiagRecW (SQLSMALLINT HandleType,
   RETCODE ret;
   ODBC_ENV *env;
 
+  ODBC_CONNECTION *conn = (ODBC_CONNECTION *)Handle;
+
   env = (ODBC_ENV *) Handle;
 
   OutputDebugString ("SQLGetDiagRecW called\n");
-  wide_char_to_bytes (Sqlstate, sqlwcharlen (Sqlstate), &sql_state,  &sql_state_len, NULL);
+  wide_char_to_bytes (Sqlstate, sqlwcharlen (Sqlstate), &sql_state,  &sql_state_len, conn->charset);
   message_text_buffer = UT_ALLOC (BufferLength);
   if (message_text_buffer == NULL && BufferLength > 0)
     {
@@ -283,7 +290,7 @@ SQLGetDiagRecW (SQLSMALLINT HandleType,
                &MessageText, 
                BufferLength,
                &out_length,
-               NULL);
+               conn->charset);
 
   if (TextLength)
    {
@@ -311,7 +318,7 @@ SQLNativeSqlW (SQLHDBC hdbc, SQLWCHAR *in, SQLINTEGER in_len,
   ODBC_CONNECTION * ConnectionHandle = (ODBC_CONNECTION *) hdbc;
   
   OutputDebugString ("SQLNativeSqlW called.\n");
-  ret = wide_char_to_bytes (in, in_len, &sql_state,  &sql_state_len, NULL);
+  ret = wide_char_to_bytes (in, in_len, &sql_state,  &sql_state_len, ConnectionHandle->charset);
   sql_text_buffer = UT_ALLOC (out_max);
   if (sql_text_buffer == NULL && out_max > 0)
     {
@@ -328,7 +335,7 @@ SQLNativeSqlW (SQLHDBC hdbc, SQLWCHAR *in, SQLINTEGER in_len,
      UT_FREE (sql_text_buffer);
      return ret;
    }
-  bytes_to_wide_char (sql_text_buffer, sql_state_len, &out, out_max, out_len, NULL);   
+  bytes_to_wide_char (sql_text_buffer, sql_state_len, &out, out_max, out_len, ConnectionHandle->charset);
   UT_FREE (sql_text_buffer);
   return ret;
 }
@@ -407,7 +414,7 @@ SQLDescribeColW (SQLHSTMT hstmt, SQLUSMALLINT column,
      return ret;
    }
    
-  bytes_to_wide_char (name_buffer, name_buffer_len, &name, name_max, &out_length, "utf-8");
+  bytes_to_wide_char (name_buffer, name_buffer_len, &name, name_max, &out_length, stmt_handle->conn->charset);
 
   if (name_len)
    {
@@ -440,13 +447,15 @@ SQLForeignKeysW (SQLHSTMT hstmt,
   int  cb_pk_catalog_len = 0,  cb_pk_schema_len = 0, cb_pk_table_len = 0,
          cb_fk_catalog_len = 0,   cb_fk_schema_len = 0,  cb_fk_table_len = 0;
 
+  ODBC_STATEMENT *stmt = (ODBC_STATEMENT *)hstmt;
+
   OutputDebugString ("SQLForeignKeysW called.\n"); 
-  wide_char_to_bytes (pk_catalog, pk_catalog_len, &cb_pk_catalog, &cb_pk_catalog_len, NULL);
-  wide_char_to_bytes (pk_schema, pk_schema_len, &cb_pk_schema, &cb_pk_schema_len, NULL);
-  wide_char_to_bytes (pk_table, pk_table_len, &cb_pk_table, &cb_pk_table_len, NULL);
-  wide_char_to_bytes (fk_catalog, fk_catalog_len, &cb_fk_catalog, &cb_fk_catalog_len, NULL);
-  wide_char_to_bytes (fk_schema, fk_schema_len, &cb_fk_schema, &cb_fk_schema_len, NULL);
-  wide_char_to_bytes (fk_table, fk_table_len, &cb_fk_table, &cb_fk_table_len, NULL);
+  wide_char_to_bytes (pk_catalog, pk_catalog_len, &cb_pk_catalog, &cb_pk_catalog_len, stmt->conn->charset);
+  wide_char_to_bytes (pk_schema, pk_schema_len, &cb_pk_schema, &cb_pk_schema_len, stmt->conn->charset);
+  wide_char_to_bytes (pk_table, pk_table_len, &cb_pk_table, &cb_pk_table_len, stmt->conn->charset);
+  wide_char_to_bytes (fk_catalog, fk_catalog_len, &cb_fk_catalog, &cb_fk_catalog_len, stmt->conn->charset);
+  wide_char_to_bytes (fk_schema, fk_schema_len, &cb_fk_schema, &cb_fk_schema_len, stmt->conn->charset);
+  wide_char_to_bytes (fk_table, fk_table_len, &cb_fk_table, &cb_fk_table_len, stmt->conn->charset);
         
   ret = SQLForeignKeys(hstmt, 
                                        cb_pk_catalog, cb_pk_catalog_len, cb_pk_schema, cb_pk_schema_len,
@@ -509,7 +518,7 @@ SQLGetCursorNameW (SQLHSTMT hstmt, SQLWCHAR *cursor, SQLSMALLINT cursor_max,
      return ret;
    }
                      
-  bytes_to_wide_char (cursor_name, cursor_name_len, &cursor, cursor_max, &out_length, NULL);
+  bytes_to_wide_char (cursor_name, cursor_name_len, &cursor, cursor_max, &out_length, stmt_handle->conn->charset);
 
   if (cursor_len)
    {
@@ -533,9 +542,13 @@ SQLPrepareW (SQLHSTMT hstmt, SQLWCHAR *str, SQLINTEGER str_len)
   RETCODE ret = ODBC_ERROR;
   char* sql_state = NULL;
   int sql_state_len = 0;
+  ODBC_STATEMENT *stmt_handle;
+
   OutputDebugString ("SQLPrepareW called.\n");
   
-  wide_char_to_bytes (str, str_len, &sql_state,  &sql_state_len, NULL);
+  stmt_handle = (ODBC_STATEMENT *)hstmt;
+
+  wide_char_to_bytes (str, str_len, &sql_state,  &sql_state_len, stmt_handle->conn->charset);
   
   ret = SQLPrepare(hstmt, sql_state, sql_state_len);
   UT_FREE(sql_state);
@@ -559,10 +572,12 @@ SQLPrimaryKeysW (SQLHSTMT hstmt,
   SQLCHAR *cb_catalog = NULL,  *cb_schema = NULL, *cb_table = NULL;
   int cb_catalog_len = 0, cb_schema_len = 0, cb_table_len = 0;
   
+  ODBC_STATEMENT *stmt = (ODBC_STATEMENT *)hstmt;
+
   OutputDebugString ("SQLPrimaryKeysW called.\n");
-  wide_char_to_bytes (catalog, catalog_len, &cb_catalog, &cb_catalog_len, NULL);
-  wide_char_to_bytes (schema, schema_len, &cb_schema, &cb_schema_len, NULL);
-  wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, NULL);
+  wide_char_to_bytes (catalog, catalog_len, &cb_catalog, &cb_catalog_len, stmt->conn->charset);
+  wide_char_to_bytes (schema, schema_len, &cb_schema, &cb_schema_len, stmt->conn->charset);
+  wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, stmt->conn->charset);
   
   ret = SQLPrimaryKeys(hstmt, cb_catalog, cb_catalog_len, cb_schema, cb_schema_len, cb_table, cb_table_len);
   
@@ -612,10 +627,12 @@ SQLSpecialColumnsW (SQLHSTMT hstmt, SQLUSMALLINT type,
   SQLCHAR *cb_catalog = NULL,  *cb_schema = NULL, *cb_table = NULL;
   int cb_catalog_len = 0, cb_schema_len = 0, cb_table_len = 0;
   
+  ODBC_STATEMENT *stmt = (ODBC_STATEMENT *)hstmt;
+
   OutputDebugString ("SQLSpecialColumnsW called.\n");
-  wide_char_to_bytes (catalog, catalog_len, &cb_catalog, &cb_catalog_len, NULL);
-  wide_char_to_bytes (schema, schema_len, &cb_schema, &cb_schema_len, NULL);
-  wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, NULL);
+  wide_char_to_bytes (catalog, catalog_len, &cb_catalog, &cb_catalog_len, stmt->conn->charset);
+  wide_char_to_bytes (schema, schema_len, &cb_schema, &cb_schema_len, stmt->conn->charset);
+  wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, stmt->conn->charset);
   
   ret = SQLSpecialColumns(hstmt, type, 
                                                  cb_catalog, cb_catalog_len, 
@@ -647,10 +664,12 @@ SQLStatisticsW (SQLHSTMT hstmt,
   SQLCHAR *cb_catalog = NULL,  *cb_schema = NULL, *cb_table = NULL;
   int cb_catalog_len = 0, cb_schema_len = 0, cb_table_len = 0;
   
+  ODBC_STATEMENT *stmt = (ODBC_STATEMENT *)hstmt;
+
   OutputDebugString ("SQLStatisticsW called.\n");
-  wide_char_to_bytes (catalog, catalog_len, &cb_catalog, &cb_catalog_len, NULL);
-  wide_char_to_bytes (schema, schema_len, &cb_schema, &cb_schema_len, NULL);
-  wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, NULL);
+  wide_char_to_bytes (catalog, catalog_len, &cb_catalog, &cb_catalog_len, stmt->conn->charset);
+  wide_char_to_bytes (schema, schema_len, &cb_schema, &cb_schema_len, stmt->conn->charset);
+  wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, stmt->conn->charset);
   
   ret = SQLStatistics(hstmt, 
                                  cb_catalog, cb_catalog_len, 
@@ -681,10 +700,12 @@ SQLTablePrivilegesW (SQLHSTMT hstmt,
   SQLCHAR *cb_catalog = NULL,  *cb_schema = NULL, *cb_table = NULL;
   int cb_catalog_len = 0, cb_schema_len = 0, cb_table_len = 0;
   
+  ODBC_STATEMENT *stmt = (ODBC_STATEMENT *)hstmt;
+
   OutputDebugString ("SQLTablePrivilegesW called.\n");
-  wide_char_to_bytes (catalog, catalog_len, &cb_catalog, &cb_catalog_len, NULL);
-  wide_char_to_bytes (schema, schema_len, &cb_schema, &cb_schema_len, NULL);
-  wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, NULL);
+  wide_char_to_bytes (catalog, catalog_len, &cb_catalog, &cb_catalog_len, stmt->conn->charset);
+  wide_char_to_bytes (schema, schema_len, &cb_schema, &cb_schema_len, stmt->conn->charset);
+  wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, stmt->conn->charset);
   
   ret = SQLTablePrivileges(hstmt, 
                                            cb_catalog, cb_catalog_len, 
@@ -715,11 +736,13 @@ SQLTablesW (SQLHSTMT hstmt,
   SQLCHAR *cb_catalog = NULL,  *cb_schema = NULL, *cb_table = NULL, *cb_type=NULL;
   int cb_catalog_len = 0, cb_schema_len = 0, cb_table_len = 0, cb_type_len = 0;
   
+  ODBC_STATEMENT *stmt = (ODBC_STATEMENT *)hstmt;
+
   OutputDebugString ("SQLTablesW called.\n");
-  wide_char_to_bytes (catalog, catalog_len, &cb_catalog, &cb_catalog_len, NULL);
-  wide_char_to_bytes (schema, schema_len, &cb_schema, &cb_schema_len, NULL);
-  wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, NULL);
-  wide_char_to_bytes (type, type_len, &cb_type, &cb_type_len, NULL);
+  wide_char_to_bytes (catalog, catalog_len, &cb_catalog, &cb_catalog_len, stmt->conn->charset);
+  wide_char_to_bytes (schema, schema_len, &cb_schema, &cb_schema_len, stmt->conn->charset);
+  wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, stmt->conn->charset);
+  wide_char_to_bytes (type, type_len, &cb_type, &cb_type_len, stmt->conn->charset);
   
   ret = SQLTables(hstmt, 
                              cb_catalog, cb_catalog_len, 
@@ -766,7 +789,7 @@ SQLGetDescFieldW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT field,
      return ret;
    }  
    
-  bytes_to_wide_char (cb_value, cb_value_len, (wchar_t**)&value, value_max, (int*)value_len, NULL);
+  bytes_to_wide_char (cb_value, cb_value_len, (wchar_t**)&value, value_max, (int*)value_len, DescriptorHandle->conn->charset);
   UT_FREE (cb_value);
   return ret;
 }
@@ -810,7 +833,7 @@ SQLGetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLWCHAR *name,
      return ret;
    }
    
-  bytes_to_wide_char (name_buffer, name_buffer_len, &name, name_max, &out_length, NULL);
+  bytes_to_wide_char (name_buffer, name_buffer_len, &name, name_max, &out_length, desc_handle->conn->charset);
 
   if (name_len)
    {
@@ -994,6 +1017,7 @@ SQLColAttributeW (SQLHSTMT StatementHandle,
 {
   RETCODE ret = ODBC_ERROR;
   SQLWCHAR *wvalue;
+  ODBC_STATEMENT *stmt = (ODBC_STATEMENT *)StatementHandle;
   OutputDebugString ("SQLColAttributeW called.\n");
 
   ret = SQLColAttribute (StatementHandle, ColumnNumber,
@@ -1008,7 +1032,7 @@ SQLColAttributeW (SQLHSTMT StatementHandle,
         }
       if (CharacterAttribute && StringLength)
         {
-          bytes_to_wide_char (CharacterAttribute, *StringLength / 2, &wvalue, 0, NULL, "utf-8");
+          bytes_to_wide_char (CharacterAttribute, *StringLength / 2, &wvalue, 0, NULL, stmt->conn->charset);
           if(wvalue != NULL)
            {
              (void)memcpy ((char *)CharacterAttribute, (const char *)wvalue, *StringLength);
