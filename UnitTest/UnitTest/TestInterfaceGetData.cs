@@ -22,7 +22,7 @@ namespace UnitTest
         {
         }
         /// <summary>
-        /// Test OdbcTransaction class
+        /// Test OdbcInterface class
         /// </summary>
         public static void Test_GetData()
         {
