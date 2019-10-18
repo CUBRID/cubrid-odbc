@@ -10,7 +10,7 @@ namespace UnitTest
     public partial class TestCases
     {
         private static readonly string connString =
-         "Driver={CUBRID Driver};server=localhost;port=33000;uid=dba;pwd=;db_name=demodb1;charset=utf8";
+         "Driver={CUBRID Driver Unicode};server=localhost;port=33000;uid=dba;pwd=;db_name=demodb1;charset=utf-8;";
         private static OdbcConnection conn = new OdbcConnection();
 
         public static void TestCase_init()
