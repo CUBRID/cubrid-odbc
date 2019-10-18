@@ -59,8 +59,6 @@ namespace UnitTestCPP
 			retcode = SQLFetch(hStmt);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 
-			getchar();
-
 			// Get Query Plan
 			retcode = SQLGetData(hStmt, 1, SQL_C_DEFAULT, (SQLPOINTER)query_plan, 0, &len);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
