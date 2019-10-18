@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest-CPP", "UnitTest-CPP\UnitTest-CPP.vcxproj", "{FA19B10D-59A2-42F6-AD63-06C00122E9E6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cubrid_odbc", "..\..\cubrid-odbc.git\cubrid_odbc_14.vcxproj", "{37E00A2E-BBC5-4736-90D9-A1B4271759BB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cubrid_odbc", "..\cubrid_odbc_14.vcxproj", "{37E00A2E-BBC5-4736-90D9-A1B4271759BB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cubrid_odbc_unicode", "..\cubrid_odbc_unicode_14.vcxproj", "{0092BD82-BCE8-4E10-A9DB-D083FC5C9D67}"
 EndProject
