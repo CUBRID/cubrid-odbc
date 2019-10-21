@@ -41,7 +41,8 @@ namespace UnitTestCPP
 			/* Allocate a connection handle */
 			SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
 
-			retcode = SQLConnect(dbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+			retcode = SQLDriverConnect(dbc, NULL, L"DSN=CUBRID_UNI;DB_NAME=demodb1;SERVER=localhost;PORT=33000;USER=dba;PWD=;CHARSET=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			//retcode = SQLConnect(dbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
 
 			if (retcode == SQL_ERROR) {
 				SQLGetDiagField(SQL_HANDLE_DBC, dbc, 0, SQL_DIAG_NUMBER, &diag_rec, 0, &plm_pcbErrorMsg);
@@ -103,7 +104,8 @@ namespace UnitTestCPP
 			/* Allocate a connection handle */
 			SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
 
-			retcode = SQLConnect(dbc, L"CUBRID Driver Unicode2", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+			retcode = SQLDriverConnect(dbc, NULL, L"DSN=CUBRID_UNI;DB_NAME=demodb1;SERVER=localhost;PORT=33000;USER=dba;PWD=;CHARSET=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			//retcode = SQLConnect(dbc, L"CUBRID Driver Unicode2", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
 
 			if (retcode == SQL_ERROR) {
 				SQLGetDiagField(SQL_HANDLE_DBC, dbc, 0, SQL_DIAG_NUMBER, &diag_rec, 0, &plm_pcbErrorMsg);
