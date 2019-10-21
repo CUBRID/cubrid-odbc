@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "CppUnitTest.h"
 
 #include <stdio.h>  
 #include <string.h>  
@@ -96,7 +95,7 @@ namespace UnitTestCPP
 			SQLINTEGER diag_rec;
 
 			SQLLEN len;
-
+			
 			/* Allocate an environment handle */
 			SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
 			/* We want ODBC 3 support */
@@ -104,8 +103,8 @@ namespace UnitTestCPP
 			/* Allocate a connection handle */
 			SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
 
-			retcode = SQLDriverConnect(dbc, NULL, L"DSN=CUBRID_UNI;DB_NAME=demodb1;SERVER=localhost;PORT=33000;USER=dba;PWD=;CHARSET=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
-			//retcode = SQLConnect(dbc, L"CUBRID Driver Unicode2", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+			retcode = SQLDriverConnect(dbc, NULL, L"DSN=CUBRID_UNI;DB_NAME=demodb;SERVER=test-db-server;PORT=55300;USER=dba;PWD=;CHARSET=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			//retcode = SQLConnect(dbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
 
 			if (retcode == SQL_ERROR) {
 				SQLGetDiagField(SQL_HANDLE_DBC, dbc, 0, SQL_DIAG_NUMBER, &diag_rec, 0, &plm_pcbErrorMsg);
@@ -117,13 +116,13 @@ namespace UnitTestCPP
 			retcode = SQLAllocHandle(SQL_HANDLE_STMT, dbc, &hStmt);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 
-			retcode = SQLExecDirect(hStmt, L"DROP TABLE IF EXISTS [í…Œì´ë¸”] ", SQL_NTS);
+			retcode = SQLExecDirect(hStmt, L"DROP TABLE IF EXISTS [Å×ÀÌºí] ", SQL_NTS);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
-			retcode = SQLExecDirect(hStmt, L"CREATE TABLE [í…Œì´ë¸”] ([ì´ë¦„] varchar(16), [ë‚˜ì´] integer)", SQL_NTS);
+			retcode = SQLExecDirect(hStmt, L"CREATE TABLE [Å×ÀÌºí] ([ÀÌ¸§] varchar(16), [³ªÀÌ] integer)", SQL_NTS);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
-			retcode = SQLExecDirect(hStmt, L"INSERT INTO [í…Œì´ë¸”] VALUES ('í™ê¸¸ë™', 25)", SQL_NTS);
+			retcode = SQLExecDirect(hStmt, L"INSERT INTO [Å×ÀÌºí] VALUES ('È«±æµ¿', 25)", SQL_NTS);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
-			retcode = SQLExecDirect(hStmt, L"SELECT [ì´ë¦„], [ë‚˜ì´] FROM [í…Œì´ë¸”] WHERE [ë‚˜ì´] > 19", SQL_NTS);
+			retcode = SQLExecDirect(hStmt, L"SELECT [ÀÌ¸§], [³ªÀÌ] FROM [Å×ÀÌºí] WHERE [³ªÀÌ] > 19", SQL_NTS);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 
 			retcode = SQLFetch(hStmt);
@@ -142,8 +141,12 @@ namespace UnitTestCPP
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 
 			if (strlen((const char *)query_plan) > 0) {
-				wchar_t expected[200] = L"Join graph segments (f indicates final):\r\nseg[0]: [0]\r\nseg[1]: ì´ë¦„[0] (f)\r\nseg[2]: ë‚˜ì´[0] (f)\r\nJoin graph nodes:\r\nnode[0]: í…Œì´ë¸” í…Œì´ë¸”(1/1) (sargs 0) (loc 0)\r\nJoin graph terms:\r\nterm[0]: [í…Œì´ë¸”].[ë‚˜ì´] range";
-				int c = wcsncmp(query_plan, expected, wcslen(expected));
+				wchar_t expected_window[198] = L"Join graph segments (f indicates final):\r\nseg[0]: [0]\r\nseg[1]: ÀÌ¸§[0] (f)\r\nseg[2]: ³ªÀÌ[0] (f)\r\nJoin graph nodes:\r\nnode[0]: Å×ÀÌºí Å×ÀÌºí(1/1) (sargs 0) (loc 0)\r\nJoin graph terms:\r\nterm[0]: [Å×ÀÌºí].[³ªÀÌ] range";
+				wchar_t expected_linux[198] = L"Join graph segments (f indicates final):\nseg[0]: [0]\nseg[1]: ÀÌ¸§[0] (f)\nseg[2]: ³ªÀÌ[0] (f)\nJoin graph nodes:\nnode[0]: Å×ÀÌºí Å×ÀÌºí(1/1) (sargs 0) (loc 0)\nJoin graph terms:\nterm[0]: [Å×ÀÌºí].[³ªÀÌ] range";
+				int c = wcsncmp(query_plan, expected_window, wcslen(expected_window));
+				if (c != 0) {
+					c = wcsncmp(query_plan, expected_linux, wcslen(expected_linux));
+				}
 				Assert::AreEqual(c, 0);
 			}
 			else {
