@@ -99,7 +99,12 @@ namespace UnitTest
             //TestCases.Test_GetDiagField();
             //TestCases.Test_GetDescField();
             //TestCases.Test_GetData();
-            TestCases.case_odbc_get_info();
+			/* 
+			Temporarily test case is closed for incorrect test environment 
+			This test case will be fixed and reopened in the future on correct environment
+			
+			TestCases.case_odbc_get_info(); 
+			*/
         }
         [TestMethod]
         public void InitCaseMethod()
@@ -126,5 +131,11 @@ namespace UnitTest
             TestCases.Test_Transaction_Level();
         }
 
+        [TestMethod]
+        public void IssueTestCaseMethod()
+        {
+            TestCases.Test_multibyte_columns();
+            TestCases.Test_multibyte_binding();
+        }
     }
 }

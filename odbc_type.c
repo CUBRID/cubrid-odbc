@@ -426,6 +426,9 @@ PRIVATE int odbc_is_valid_sql_verbose_type (short odbc_type);
 PRIVATE int odbc_is_valid_c_common_type (short c_type);
 PRIVATE int odbc_is_valid_sql_common_type (short sql_type);
 
+PRIVATE int odbc_is_valid_lob_type (short odbc_type);
+PRIVATE int odbc_is_valid_sql_lob_type (short sql_type);
+
 PRIVATE int odbc_is_valid_date_code (short code);
 PRIVATE int odbc_is_valid_internal_code (short code);
 
@@ -435,9 +438,9 @@ PUBLIC int
 odbc_is_valid_type (short odbc_type)
 {
   return (odbc_is_valid_concise_type (odbc_type) ||
-	  odbc_is_valid_verbose_type (odbc_type));
+	  odbc_is_valid_verbose_type (odbc_type) ||
+	  odbc_is_valid_lob_type (odbc_type));
 }
-
 
 PUBLIC int
 odbc_is_valid_code (short code)
@@ -954,9 +957,12 @@ odbc_type_to_cci_u_type (short sql_type)
     {
 
     case SQL_CHAR:
+    case SQL_WCHAR:
       return CCI_U_TYPE_CHAR;
     case SQL_VARCHAR:
+    case SQL_WVARCHAR:
     case SQL_LONGVARCHAR:
+    case SQL_WLONGVARCHAR:
       return CCI_U_TYPE_STRING;
 
     case SQL_BINARY:
@@ -2361,6 +2367,18 @@ odbc_is_valid_sql_common_type (short sql_type)
   int set_size = GET_SET_SIZE (sql_common_type_set);
 
   return seek_in_common_type_set (sql_common_type_set, set_size, sql_type);
+}
+
+PRIVATE int
+odbc_is_valid_lob_type (short odbc_type)
+{
+  return odbc_is_valid_sql_lob_type (odbc_type);
+}
+
+PRIVATE int
+odbc_is_valid_sql_lob_type (short sql_type)
+{
+  return ((sql_type == SQL_BLOB) || (sql_type == SQL_CLOB));
 }
 
 PRIVATE int

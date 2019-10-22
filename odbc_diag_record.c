@@ -509,14 +509,40 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
 	  break;
 
 	case SQL_DIAG_CONNECTION_NAME:	/* yet not implemeted */
-	  if (diag_info_ptr && buffer_length > 0)
-	  {
-		*((char *) diag_info_ptr) = '\0';
-		*string_length_ptr=0;
-		return ODBC_SUCCESS;
-	  }
-	  else
-		return SQL_SUCCESS_WITH_INFO;
+      if (diag_info_ptr && buffer_length > 0)
+        {
+          int connhd = -1;
+          int cci_ret = 0;
+          T_CCI_ERROR cci_err_buf;
+		
+          if (handle_type == SQL_HANDLE_DBC)
+            {
+              connhd = ((ODBC_CONNECTION *) handle)->connhd;
+            }
+          else if (handle_type == SQL_HANDLE_STMT)
+            {
+              connhd = ((ODBC_STATEMENT *) handle)->conn->connhd;
+            }
+
+          if (connhd >= 0)
+            {
+              cci_ret = cci_get_cas_info(connhd, (char *)diag_info_ptr, 32, &cci_err_buf);
+            }
+          if (connhd < 0 || cci_ret < 0)
+            {
+              *((char *) diag_info_ptr) = '\0';
+              *string_length_ptr=0;
+            }
+		  else
+            {
+			  *string_length_ptr = strlen((char *)diag_info_ptr);
+            }
+            return ODBC_SUCCESS;
+          }
+        else
+          {
+             return SQL_SUCCESS_WITH_INFO;
+          }
 
 	case SQL_DIAG_MESSAGE_TEXT:
 	  {

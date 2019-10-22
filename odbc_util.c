@@ -39,7 +39,15 @@
 #define		UNIT_MEMORY_SIZE		256
 #define		STK_SIZE        100
 
+#ifndef CP_EUC_KR
+#define CP_EUC_KR 51949 
+#endif
+
 static int is_korean (unsigned char ch);
+
+#pragma comment(lib, "legacy_stdio_definitions.lib")
+
+
 
 /************************************************************************
 * name:  InitStr
@@ -1299,6 +1307,50 @@ get_connect_attr (ODBC_CONNECTION_ATTR *attr, const char *conn_str_in, char *buf
 }
 
 /************************************************************************
+* name: encode_string_to_charset
+* arguments:
+* returns/side-effects:
+* description:
+* NOTE:
+************************************************************************/
+int
+encode_string_to_charset(wchar_t *str, int size, char **target, int* out_length, char *charset)
+{
+    int nLength;
+    char *tmp_string;
+    int wincode = CP_ACP;
+
+    if (charset == NULL || _stricmp(charset, "utf-8") == 0)
+      {
+        wincode = CP_UTF8;
+      }
+    else if (_stricmp(charset, "euc-kr") == 0)
+      {
+        wincode = CP_EUC_KR;
+      }
+
+    nLength = WideCharToMultiByte(wincode, 0, str, -1, NULL, 0, NULL, NULL);
+    tmp_string = (char *)ut_alloc(sizeof(char) * (nLength + 1));
+    if (tmp_string == NULL)
+      {
+        return CCI_ER_NO_MORE_MEMORY;
+      }
+
+    nLength = WideCharToMultiByte(wincode, 0, str, -1, tmp_string, nLength, NULL, NULL);
+    if (target)
+      {
+        *target = tmp_string;
+      }
+
+    if (out_length)
+      {
+        *out_length = nLength;
+      }
+
+    return ODBC_SUCCESS;
+}
+
+/************************************************************************
  * name: encode_string_to_utf8
  * arguments:
  * returns/side-effects:
@@ -1345,20 +1397,12 @@ encode_string_to_utf8 (wchar_t *str, int size, char **target,  int* out_length)
 int
 wide_char_to_bytes (wchar_t *str, int size, char **target, int* out_length, char* characterset)
 {
-  char set[32] = {0};
   if(size <= 0)
-   { 
-     size = sqlwcharlen(str);
-   }
-  if(characterset == NULL || _stricmp (characterset, "utf-8") == 0)
-   {
-     return encode_string_to_utf8(str, size, target, out_length);
-   }
-    if(out_length)
-     {
-       * out_length = 0;
-     }   
-   return ODBC_ERROR;
+    { 
+      size = sqlwcharlen(str);
+    }
+
+  return encode_string_to_charset(str, size, target, out_length, characterset);
 }
 
 /************************************************************************
@@ -1376,11 +1420,15 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
   wchar_t* temp_buffer = *buffer;
   int temp_buffer_length = buffer_length;
   
-  if (characterset != NULL && _stricmp (characterset, "utf-8") == 0)
-   {
-     wincode = CP_UTF8;
-   }
-  
+  if (characterset == NULL || _stricmp(characterset, "utf-8") == 0)
+    {
+      wincode = CP_UTF8;
+    }
+  else if (_stricmp(characterset, "euc-kr") == 0)
+    {
+      wincode = CP_EUC_KR;
+    }
+
   if(str == NULL || buffer == NULL)
    {
      return ODBC_SUCCESS;
@@ -1388,12 +1436,12 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
   
   temp_buffer_length = MultiByteToWideChar (wincode, 0, (LPCSTR) str, size, NULL, 0);
   if(buffer_length==0) // need to malloc buffer
-   {
-    temp_buffer = UT_ALLOC_BSTR (temp_buffer_length);
-    if (temp_buffer == NULL)
-      {
-	return CCI_ER_NO_MORE_MEMORY;
-      }
+    {
+      temp_buffer = UT_ALLOC_BSTR (temp_buffer_length);
+      if (temp_buffer == NULL)
+        {
+          return CCI_ER_NO_MORE_MEMORY;
+        }
       buffer_length = temp_buffer_length;
    } 
    
@@ -1402,13 +1450,13 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
   *buffer = temp_buffer;
   //SysFreeString (bstrCode);
   if(out_length != NULL)
-   {
-     *out_length = nLength * sizeof(wchar_t);
-   }
+    {
+      *out_length = nLength * sizeof(wchar_t);
+    }
   if ( buffer_length < temp_buffer_length)
-   {
+    {
       return ODBC_SUCCESS_WITH_INFO;
-   }  
+    }  
   return ODBC_SUCCESS;
 }
 
@@ -1427,11 +1475,15 @@ get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, 
   int temp_buffer_length = buffer_length;
   int rc = ODBC_SUCCESS;
   
-  if (characterset != NULL && _stricmp (characterset, "utf-8") == 0)
-   {
-     wincode = CP_UTF8;
-   }
-  
+  if (characterset == NULL || _stricmp (characterset, "utf-8") == 0)
+    {
+      wincode = CP_UTF8;
+    }
+  else if (_stricmp(characterset, "euc-kr") == 0)
+    {
+      wincode = CP_EUC_KR;
+    }
+
   if(str == NULL || buffer == NULL)
    {
      return ODBC_SUCCESS;
@@ -1456,3 +1508,126 @@ get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, 
    }  
   return ODBC_SUCCESS;
 }
+
+#ifdef CUBRID_ODBC_UNICODE
+PRIVATE _BOOL_ is_odd_number (int num)
+{
+  return (num & 1) ? _TRUE_ : _FALSE_;
+}
+
+PUBLIC int check_if_even_number (SQLUSMALLINT info_type, SQLSMALLINT buffer_length)
+{
+  if (buffer_length < 0)
+    {
+      /* ignore case */
+      return ODBC_SUCCESS;
+    }
+
+  switch (info_type)
+    {
+      /* info_type that returns a string */
+      case SQL_ACCESSIBLE_PROCEDURES:
+      case SQL_ACCESSIBLE_TABLES:
+      case SQL_CATALOG_NAME:
+      case SQL_CATALOG_NAME_SEPARATOR:
+      case SQL_CATALOG_TERM:
+      case SQL_COLLATION_SEQ:
+      case SQL_COLUMN_ALIAS:
+      case SQL_DATA_SOURCE_NAME:
+      case SQL_DATA_SOURCE_READ_ONLY:
+      case SQL_DATABASE_NAME:
+      case SQL_DBMS_NAME:
+      case SQL_DBMS_VER:
+      case SQL_DESCRIBE_PARAMETER:
+      case SQL_DRIVER_NAME:
+      case SQL_DRIVER_ODBC_VER:
+      case SQL_DRIVER_VER:
+      case SQL_EXPRESSIONS_IN_ORDERBY:
+      case SQL_IDENTIFIER_QUOTE_CHAR:
+      case SQL_INTEGRITY:
+      case SQL_KEYWORDS:
+      case SQL_LIKE_ESCAPE_CLAUSE:
+      case SQL_MAX_ROW_SIZE_INCLUDES_LONG:
+      case SQL_MULT_RESULT_SETS:
+      case SQL_MULTIPLE_ACTIVE_TXN:
+      case SQL_NEED_LONG_DATA_LEN:
+      case SQL_ORDER_BY_COLUMNS_IN_SELECT:
+      case SQL_PROCEDURE_TERM:
+      case SQL_PROCEDURES:
+      case SQL_ROW_UPDATES:
+      case SQL_SCHEMA_TERM:
+      case SQL_SEARCH_PATTERN_ESCAPE:
+      case SQL_SERVER_NAME:
+      case SQL_SPECIAL_CHARACTERS:
+      case SQL_TABLE_TERM:
+      case SQL_USER_NAME:
+      case SQL_XOPEN_CLI_YEAR:
+        if (is_odd_number (buffer_length))
+          {
+            return ODBC_ERROR;
+          }
+
+        break;
+
+      default:
+        break;
+    }
+
+  return ODBC_SUCCESS;
+}
+
+PUBLIC int decide_info_value_length (SQLUSMALLINT info_type, int buffer_length, int info_value_length)
+{
+  switch (info_type)
+    {
+      /* info_type that returns a string */
+      case SQL_ACCESSIBLE_PROCEDURES:
+      case SQL_ACCESSIBLE_TABLES:
+      case SQL_CATALOG_NAME:
+      case SQL_CATALOG_NAME_SEPARATOR:
+      case SQL_CATALOG_TERM:
+      case SQL_COLLATION_SEQ:
+      case SQL_COLUMN_ALIAS:
+      case SQL_DATA_SOURCE_NAME:
+      case SQL_DATA_SOURCE_READ_ONLY:
+      case SQL_DATABASE_NAME:
+      case SQL_DBMS_NAME:
+      case SQL_DBMS_VER:
+      case SQL_DESCRIBE_PARAMETER:
+      case SQL_DRIVER_NAME:
+      case SQL_DRIVER_ODBC_VER:
+      case SQL_DRIVER_VER:
+      case SQL_EXPRESSIONS_IN_ORDERBY:
+      case SQL_IDENTIFIER_QUOTE_CHAR:
+      case SQL_INTEGRITY:
+      case SQL_KEYWORDS:
+      case SQL_LIKE_ESCAPE_CLAUSE:
+      case SQL_MAX_ROW_SIZE_INCLUDES_LONG:
+      case SQL_MULT_RESULT_SETS:
+      case SQL_MULTIPLE_ACTIVE_TXN:
+      case SQL_NEED_LONG_DATA_LEN:
+      case SQL_ORDER_BY_COLUMNS_IN_SELECT:
+      case SQL_PROCEDURE_TERM:
+      case SQL_PROCEDURES:
+      case SQL_ROW_UPDATES:
+      case SQL_SCHEMA_TERM:
+      case SQL_SEARCH_PATTERN_ESCAPE:
+      case SQL_SERVER_NAME:
+      case SQL_SPECIAL_CHARACTERS:
+      case SQL_TABLE_TERM:
+      case SQL_USER_NAME:
+      case SQL_XOPEN_CLI_YEAR:
+        if (info_value_length > buffer_length - sizeof (SQLWCHAR))
+          {
+            info_value_length = buffer_length - sizeof (SQLWCHAR);
+          }
+
+        break;
+
+      default:
+        break;
+    }
+
+  return info_value_length;
+}
+#endif

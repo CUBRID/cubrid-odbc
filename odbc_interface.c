@@ -66,10 +66,15 @@ PUBLIC HINSTANCE hInstance;
 BOOL WINAPI
 DllMain (HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
+  HMODULE hMd = NULL;
 
   if (ul_reason_for_call == DLL_PROCESS_ATTACH)
     {
       cci_init ();
+      DisableThreadLibraryCalls (hModule);
+      GetModuleHandleEx (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN,
+       (LPCTSTR)SQLDriverConnect,
+       &hMd);
     }
 
   // hInstance is declared at resource_proc.c
@@ -229,6 +234,8 @@ SQLCancel (SQLHSTMT StatementHandle)
   odbc_free_diag (stmt_handle->diag, RESET);
 
   rc = odbc_cancel (stmt_handle);
+
+  stmt_handle->canceled = _TRUE_;
 
   DEBUG_TIMESTAMP (END_SQLCancel);
 
@@ -788,6 +795,18 @@ SQLExecDirect (SQLHSTMT StatementHandle,
 
   stStatementText = UT_MAKE_STRING (StatementText, TextLength);
 
+  if (stricmp(StatementText, "@QP@") == 0)
+    {
+      stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN;
+      return ODBC_SUCCESS;
+    }
+  
+  if (stricmp(StatementText, "@QE@") == 0)
+    {
+      stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN | CCI_EXEC_QUERY_ALL;
+      return ODBC_SUCCESS;
+    }
+
   stmt_handle->is_prepared = _FALSE_;
 
   rc = odbc_prepare (stmt_handle, stStatementText);
@@ -1037,6 +1056,11 @@ SQLGetData (SQLHSTMT StatementHandle,
 
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
+
+  if (stmt_handle->canceled == _TRUE_)
+    {
+      ODBC_RETURN(rc, StatementHandle);
+    }
 
   rc = odbc_get_data (stmt_handle, ColumnNumber,
 		      TargetType, TargetValue, BufferLength, StrLen_or_Ind);

@@ -7,7 +7,11 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+//#include "afxres.h"
+
+#include "WinResrc.h"
+#define IDC_STATIC -1
+
 #include "odbc_version.i"
 
 /////////////////////////////////////////////////////////////////////////////

@@ -141,6 +141,7 @@ odbc_alloc_statement (ODBC_CONNECTION * conn, ODBC_STATEMENT ** stmt_ptr)
       goto error;
     }
 
+  s->canceled = _FALSE_;
   s->handle_type = SQL_HANDLE_STMT;
   s->stmthd = 0;
   s->conn = NULL;
@@ -148,6 +149,7 @@ odbc_alloc_statement (ODBC_CONNECTION * conn, ODBC_STATEMENT ** stmt_ptr)
   s->cursor = NULL;
   s->sql_text = NULL;
   s->is_prepared = _FALSE_;
+  s->query_plan = _FALSE_;
   memset (&s->revised_sql, 0, sizeof (s->revised_sql));
   s->result_type = NULL_RESULT;
   s->data_at_exec_state = STMT_NEED_NO_MORE_DATA;
@@ -1860,10 +1862,10 @@ odbc_cancel (ODBC_STATEMENT * stmt)
     {
       /* CHECK : 이로 인해서 발생하는 현상은? */
       if (stmt->stmthd > 0)
-	{
-	  cci_close_req_handle (stmt->stmthd);
-	  stmt->stmthd = -1;
-	}
+        {
+          cci_cancel(stmt->conn->connhd);
+          stmt->stmthd = -1;
+        }
     }
 
   return ODBC_SUCCESS;
@@ -2790,6 +2792,11 @@ get_flag_of_cci_execute (ODBC_STATEMENT * stmt)
 {
   if (stmt == NULL)
     return 0;
+
+  if (stmt->query_plan)
+    {
+      return stmt->query_plan;
+    }
 
   if (stmt->attr_async_enable == SQL_ASYNC_ENABLE_ON)
     {

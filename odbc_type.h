@@ -36,7 +36,7 @@
 #include		"cas_cci.h"
 
 #define			MAX_CUBRID_CHAR_LEN			(1073741823)
-#define			DEFAULT_COL_PRECISION		(256)
+#define			DEFAULT_COL_PRECISION		(4*1024)
 
 #define			SQL_UNI_MONETARY		30
 #define			SQL_C_UNI_MONETARY		SQL_UNI_MONETARY

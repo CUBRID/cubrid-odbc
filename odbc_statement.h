@@ -150,7 +150,7 @@ typedef struct st_odbc_statement
   T_CCI_CUBRID_STMT stmt_type;
   PARAM_DATA param_data;	/* For data at exec */
   char is_prepared;		// SQLPrepare에 의해서만 prepare상태에 놓인다.
-
+  char query_plan;
 
   /* Supported attributes */
   unsigned long attr_metadata_id;	// Core
@@ -177,6 +177,7 @@ typedef struct st_odbc_statement
   unsigned short *attr_row_operation_ptr;	// 1
   unsigned long attr_simulate_cursor;	// 2
 
+  char canceled;
 
 
   // Descriptor section
