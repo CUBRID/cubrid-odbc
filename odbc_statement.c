@@ -66,7 +66,7 @@ typedef struct __st_DescInfo
 {
   short type;
   long bind_type;
-  long offset_size;
+  long long offset_size;
   void *value_ptr;
   unsigned long length;
   long *ind_ptr;
@@ -550,6 +550,7 @@ odbc_set_stmt_attr (ODBC_STATEMENT * stmt,
 
     case SQL_ATTR_ROW_ARRAY_SIZE:
     case SQL_ROWSET_SIZE:	// for 2.x backward compatiablity
+		DEBUG_TIMESTAMP(SQL_ROWSET_SIZE);
       odbc_set_desc_field (stmt->ard, 0, SQL_DESC_ARRAY_SIZE,
 			   valueptr, sizeof (valueptr), 1);
       break;
@@ -617,6 +618,7 @@ odbc_set_stmt_attr (ODBC_STATEMENT * stmt,
 
   return ODBC_SUCCESS;
 error:
+  DEBUG_TIMESTAMP(odbc_set_stmt_attr_ERROR);
   return ODBC_ERROR;
 }
 

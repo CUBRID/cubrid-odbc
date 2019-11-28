@@ -1026,7 +1026,7 @@ get_bind_info (ODBC_STATEMENT * stmt,
 	       SQLLEN ** strlen_ind_ptr)
 {
   long element_size;
-  long offset_size;
+  long long offset_size;
 
   element_size = stmt->ard->bind_type;	/* 0 means single or column wise, >0 means row wise */
   if (stmt->ard->bind_offset_ptr == NULL)
@@ -1069,13 +1069,13 @@ get_bind_info (ODBC_STATEMENT * stmt,
   /* recalculating bount_ptr & strlen_ind_ptr */
   if (stmt->ard->bind_type == SQL_BIND_BY_COLUMN)
     {
-      (long) *bound_ptr += offset_size + row_index * (*buffer_length);
-      (long) *strlen_ind_ptr += offset_size + row_index * sizeof (long);
+      (*(long long *)bound_ptr) += offset_size + row_index * (*buffer_length);
+      (*(long long *)strlen_ind_ptr) += offset_size + row_index * sizeof (long);
     }
   else
     {
-      (long) *bound_ptr += offset_size + row_index * element_size;
-      (long) *strlen_ind_ptr += offset_size + row_index * element_size;
+	  (*(long long *)bound_ptr) += offset_size + row_index * element_size;
+      (*(long long *)strlen_ind_ptr) += offset_size + row_index * element_size;
     }
 
   return;

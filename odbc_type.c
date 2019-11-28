@@ -1480,7 +1480,7 @@ cci_value_to_odbc (void *c_value, short concise_type,
           break;
       }
 
-      *(long *) c_value = cci_value->i;
+      *(long *)c_value = cci_value->i;
       length = sizeof (long);
       break;
     case SQL_C_ULONG:
