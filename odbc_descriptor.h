@@ -104,10 +104,10 @@ typedef struct st_odbc_desc
   unsigned long fetched_size;
 
   unsigned short *array_status_ptr;
-  long *bind_offset_ptr;
+  long long *bind_offset_ptr;
   long bind_type;
   short max_count;
-  unsigned long *rows_processed_ptr;
+  unsigned long long *rows_processed_ptr;
 
   struct st_odbc_record *records;
 
