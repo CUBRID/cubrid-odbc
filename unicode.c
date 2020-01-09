@@ -260,6 +260,11 @@ SQLGetDiagRecW (SQLSMALLINT HandleType,
 
   env = (ODBC_ENV *) Handle;
 
+  if (HandleType == SQL_HANDLE_STMT)
+    {
+      conn = env->conn;
+    }
+
   OutputDebugString ("SQLGetDiagRecW called\n");
   wide_char_to_bytes (Sqlstate, sqlwcharlen (Sqlstate), &sql_state,  &sql_state_len, conn->charset);
   message_text_buffer = UT_ALLOC (BufferLength);
