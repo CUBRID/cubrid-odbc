@@ -1232,7 +1232,11 @@ odbc_prepare (ODBC_STATEMENT * stmt, char *statement_text)
 						 oid_param_pos,
 						 &stmt->revised_sql.
 						 oid_param_val);
-
+  if (stmt->revised_sql.oid_param_num < 0)
+    {
+	odbc_set_diag(stmt->diag, "HY000", 0, "Too many bind Parameters used.");
+	return ODBC_ERROR;
+    }
   flag_cci_prepare = get_flag_of_cci_prepare (stmt);
   cci_rc =
     cci_prepare (stmt->conn->connhd, stmt->revised_sql.sql_text,

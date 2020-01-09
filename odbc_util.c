@@ -38,6 +38,7 @@
 
 #define		UNIT_MEMORY_SIZE		256
 #define		STK_SIZE        100
+#define           PARAM_POS_SIZE  512
 
 #ifndef CP_EUC_KR
 #define CP_EUC_KR 51949 
@@ -443,12 +444,12 @@ ut_make_binary (const char *src, int length)
 * arguments:
 * NOTE:
 ************************************************************************/
-PUBLIC void
-add_element_to_setstring (char *setstring, char *element)
+PUBLIC int
+add_element_to_setstring(char *setstring, char *element, int size)
 {
-  if (setstring == NULL || element == NULL)
+    if (setstring == NULL || element == NULL || size < 0 || (strlen(setstring) + strlen(element)) >= size)
     {
-      return;
+      return -1;
     }
 
   if (setstring[0] == '\0')
@@ -460,6 +461,7 @@ add_element_to_setstring (char *setstring, char *element)
       strcat (setstring, UT_SET_DELIMITER);
       strcat (setstring, element);
     }
+  return 0;
 }
 
 
@@ -897,9 +899,9 @@ replace_oid (char *sql_text, char **org_param_pos_pt,
 	     char **oid_param_pos_pt, char **oid_param_val_pt)
 {
   char *oid_buf = NULL;
-  char oid_param_pos[256];
-  char org_param_pos[256];
-  char oid_param_val[1024];
+  char oid_param_pos[PARAM_POS_SIZE];
+  char org_param_pos[PARAM_POS_SIZE];
+  char oid_param_val[PARAM_POS_SIZE*4];
   char buf[126];
   char *pt;
   char *pt_tmp;
@@ -917,7 +919,10 @@ replace_oid (char *sql_text, char **org_param_pos_pt,
 	case '?':
 	  ++current_param_pos;
 	  sprintf (buf, "%d", current_param_pos);
-	  add_element_to_setstring (org_param_pos, buf);
+	  if (add_element_to_setstring(org_param_pos, buf, PARAM_POS_SIZE) < 0)
+	    {
+		return -1;
+	    }
 	  break;
 
 	case '\'':
@@ -942,10 +947,16 @@ replace_oid (char *sql_text, char **org_param_pos_pt,
 	      ++oid_param_num;
 
 	      sprintf (buf, "%d", current_param_pos);
-	      add_element_to_setstring (oid_param_pos, buf);
+		if (add_element_to_setstring(oid_param_pos, buf, PARAM_POS_SIZE) < 0)
+		{
+		    return -1;
+		}
 
 	      sprintf (buf, "%s", oid_buf);
-	      add_element_to_setstring (oid_param_val, buf);
+		if (add_element_to_setstring(oid_param_val, buf, PARAM_POS_SIZE) < 0)
+		  {
+		    return -1;
+		  }
 
 	      // replace oid string value to parameter marker
 	      *pt = '?';
