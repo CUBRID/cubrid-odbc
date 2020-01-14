@@ -38,7 +38,7 @@
 
 #define		UNIT_MEMORY_SIZE		256
 #define		STK_SIZE        100
-#define           PARAM_POS_SIZE  256
+#define           PARAM_POS_SIZE  1024
 
 #ifndef CP_EUC_KR
 #define CP_EUC_KR 51949 
