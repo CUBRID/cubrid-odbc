@@ -38,7 +38,7 @@
 
 #define		UNIT_MEMORY_SIZE		256
 #define		STK_SIZE        100
-#define           PARAM_POS_SIZE  512
+#define           PARAM_POS_SIZE  256
 
 #ifndef CP_EUC_KR
 #define CP_EUC_KR 51949 
@@ -447,7 +447,7 @@ ut_make_binary (const char *src, int length)
 PUBLIC int
 add_element_to_setstring(char *setstring, char *element, int size)
 {
-    if (setstring == NULL || element == NULL || size < 0 || (strlen(setstring) + strlen(element)) >= size)
+    if (setstring == NULL || element == NULL || (strlen(setstring) + strlen(element)) >= size)
     {
       return -1;
     }
@@ -953,7 +953,7 @@ replace_oid (char *sql_text, char **org_param_pos_pt,
 		}
 
 	      sprintf (buf, "%s", oid_buf);
-		if (add_element_to_setstring(oid_param_val, buf, PARAM_POS_SIZE) < 0)
+		if (add_element_to_setstring(oid_param_val, buf, PARAM_POS_SIZE*4) < 0)
 		  {
 		    return -1;
 		  }

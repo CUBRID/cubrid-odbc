@@ -206,7 +206,7 @@ PUBLIC void ut_free_bstr  (WCHAR *ptr);
 PUBLIC int sqlwcharlen(const WCHAR *wstr);
 PUBLIC int element_from_setstring (char **current, char *buf);
 
-PUBLIC int add_element_to_setstring (char *setstring, char *element);
+PUBLIC int add_element_to_setstring (char *setstring, char *element, int size);
 
 PUBLIC char *odbc_trim (char *str);
 PUBLIC RETCODE str_value_assign (const char *in_value,
