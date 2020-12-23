@@ -1015,6 +1015,7 @@ odbc_bind_parameter (ODBC_STATEMENT * stmt,
   short odbc_type;
   long size;
   ODBC_RECORD *record;
+  SQLLEN actual_size;
 
   apd = stmt->apd;
   ipd = stmt->ipd;
@@ -1059,7 +1060,18 @@ odbc_bind_parameter (ODBC_STATEMENT * stmt,
     }
 
   /* char data type의 경우는 buffer_length를 octet_length로 사용한다. */
-  size = odbc_octet_length (value_type, (int) buffer_length);
+  if (strlen_ind_ptr)
+    {
+       actual_size = *strlen_ind_ptr > buffer_length ? buffer_length : *strlen_ind_ptr;
+    }
+  else
+    {
+       actual_size = (int) buffer_length;
+    }
+
+  actual_size = buffer_length;
+
+  size = odbc_octet_length (value_type, (int) actual_size);
   rc = odbc_set_desc_field (apd, parameter_num, SQL_DESC_OCTET_LENGTH,
 			    (void *) size, 0, 1);
   ERROR_GOTO (rc, error1);
