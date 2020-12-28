@@ -1330,6 +1330,12 @@ encode_string_to_charset(wchar_t *str, int size, char **target, int* out_length,
     int nLength;
     char *tmp_string;
     int wincode = CP_ACP;
+    int num_wchars = -1;
+
+    if (size > 0)
+      {
+         num_wchars = size;
+      }
 
     if (charset == NULL || _stricmp(charset, "utf-8") == 0)
       {
@@ -1340,14 +1346,15 @@ encode_string_to_charset(wchar_t *str, int size, char **target, int* out_length,
         wincode = CP_EUC_KR;
       }
 
-    nLength = WideCharToMultiByte(wincode, 0, str, -1, NULL, 0, NULL, NULL);
+    nLength = WideCharToMultiByte(wincode, 0, str, num_wchars, NULL, 0, NULL, NULL);
     tmp_string = (char *)ut_alloc(sizeof(char) * (nLength + 1));
     if (tmp_string == NULL)
       {
         return CCI_ER_NO_MORE_MEMORY;
       }
 
-    nLength = WideCharToMultiByte(wincode, 0, str, -1, tmp_string, nLength, NULL, NULL);
+    memset(tmp_string, 0, nLength + 1);
+    nLength = WideCharToMultiByte(wincode, 0, str, num_wchars, tmp_string, nLength, NULL, NULL);
     if (target)
       {
         *target = tmp_string;
@@ -1520,12 +1527,12 @@ get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, 
   return ODBC_SUCCESS;
 }
 
-#ifdef CUBRID_ODBC_UNICODE
-PRIVATE _BOOL_ is_odd_number (int num)
+PUBLIC _BOOL_ is_odd_number (int num)
 {
   return (num & 1) ? _TRUE_ : _FALSE_;
 }
 
+#ifdef CUBRID_ODBC_UNICODE
 PUBLIC int check_if_even_number (SQLUSMALLINT info_type, SQLSMALLINT buffer_length)
 {
   if (buffer_length < 0)

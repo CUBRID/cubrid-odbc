@@ -206,6 +206,20 @@ SQLBindParameter (SQLHSTMT StatementHandle,
 
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
 
+  if (StrLen_or_IndPtr && ValueType == SQL_WCHAR)
+    {
+	if (is_odd_number(*StrLen_or_IndPtr))
+	  {
+	    odbc_set_diag(stmt_handle->diag, "HY090", 0, NULL);
+	    ODBC_RETURN(ODBC_ERROR, StatementHandle);
+	  }
+	else
+	  {
+	    *StrLen_or_IndPtr = *StrLen_or_IndPtr / sizeof (wchar_t);
+	  }
+
+    }
+
   odbc_free_diag (stmt_handle->diag, RESET);
 
   rc = odbc_bind_parameter (stmt_handle, ParameterNumber,
