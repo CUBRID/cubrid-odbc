@@ -122,7 +122,7 @@
       <ResourceOutputFileName>$(IntDir)cubrid_odbc.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_14.lib;regex38a.lib;Msvcrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_14.lib;libssl.lib;libcrypto.lib;Crypt32.lib;Ws2_32.lib;msvcrtd.lib;msvcmrtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <AdditionalLibraryDirectories>$(ProjectDir)\cci\lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cubrid_odbc.def</ModuleDefinitionFile>
@@ -163,7 +163,7 @@
       <ResourceOutputFileName>$(IntDir)cubrid_odbc.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_14.lib;regex38a.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_14.lib;libssl.lib;libcrypto.lib;Crypt32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <AdditionalLibraryDirectories>$(ProjectDir)\cci\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cubrid_odbc.def</ModuleDefinitionFile>
@@ -207,7 +207,7 @@
       <ResourceOutputFileName>$(IntDir)cubrid_odbc.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_d_14.lib;regex38a_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_d_14.lib;libssl.lib;libcrypto.lib;Crypt32.lib;Ws2_32.lib;msvcrtd.lib;msvcmrtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <AdditionalLibraryDirectories>$(ProjectDir)\cci\lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cubrid_odbc.def</ModuleDefinitionFile>
@@ -251,7 +251,7 @@
       <ResourceOutputFileName>$(IntDir)cubrid_odbc.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_d_14.lib;regex38a_d.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_d_14.lib;libssl.lib;libcrypto.lib;Crypt32.lib;Ws2_32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <AdditionalLibraryDirectories>$(ProjectDir)\cci\lib64;C:\Program Files %28x86%29\Microsoft Visual Studio 14.0\VC\lib\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cubrid_odbc.def</ModuleDefinitionFile>
