@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
+ * Copyright (c) 2016 CUBRID Corporation.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -234,6 +235,8 @@
 #define CCI_DS_PROPERTY_DEFAULT_ISOLATION		"default_isolation"
 /* default lock timeout in sec for connections created by pool*/
 #define CCI_DS_PROPERTY_DEFAULT_LOCK_TIMEOUT		"default_lock_timeout"
+/* flag for security(SSL/TLS)  */
+#define CCI_DS_PROPERTY_USESSL    "useSSL"
 
 #define CCI_TZ_SIZE 63
 
@@ -491,6 +494,8 @@ typedef enum
   CCI_ER_NO_SHARD_AVAILABLE = -20045,
   CCI_ER_INVALID_SHARD = -20046,
 
+  CCI_ER_SSL_HANDSHAKE = -21047,
+
   CCI_ER_NOT_IMPLEMENTED = -20099,
   CCI_ER_END = -20100
 } T_CCI_ERROR_CODE;
@@ -566,8 +571,6 @@ typedef enum
   CUBRID_STMT_ALTER_STORED_PROCEDURE,
   CUBRID_STMT_ALTER_STORED_PROCEDURE_OWNER = CUBRID_STMT_ALTER_STORED_PROCEDURE,
   CUBRID_STMT_KILL,
-  CUBRID_STMT_VACUUM,
-  CUBRID_STMT_SET_TIMEZONE,
 
   CUBRID_MAX_STMT_TYPE
 } T_CCI_CUBRID_STMT;
@@ -727,7 +730,8 @@ typedef enum
   CCI_DS_KEY_DEFAULT_AUTOCOMMIT,
   CCI_DS_KEY_DEFAULT_ISOLATION,
   CCI_DS_KEY_DEFAULT_LOCK_TIMEOUT,
-  CCI_DS_KEY_MAX_POOL_SIZE
+  CCI_DS_KEY_MAX_POOL_SIZE,
+  CCI_DS_KEY_USESSL
 } T_CCI_DATASOURCE_KEY;
 
 typedef DB_TRAN_ISOLATION T_CCI_TRAN_ISOLATION;	// alias
@@ -949,7 +953,6 @@ extern "C"
   extern int cci_is_shard (int con_h_id, T_CCI_ERROR * err_buf);
   extern int cci_get_cas_info (int mapped_conn_id, char *info_buf, int buf_length, T_CCI_ERROR * err_buf);
 
-  extern T_CCI_ERROR_CODE map_open_otc(T_CCI_CONN connection_id, T_CCI_CONN * mapped_conn_id);
 #ifdef __cplusplus
 }
 #endif
