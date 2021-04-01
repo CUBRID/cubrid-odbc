@@ -53,6 +53,15 @@
 ;--------------------------------
 ;Installer Sections
 
+Function .onInit
+  Call CheckVCRedist
+    Pop $R9
+    StrCmp $R9 "No" 0 +4
+    MessageBox MB_OK|MB_ICONSTOP "This driver requires Visual Studio(2015 or Higher) x86 Redistributable. Please install the Redistributable then run this installer again." IDOK ERRORVCRedist
+  ERRORVCRedist:
+  Abort
+FunctionEnd
+
 Section "ODBC Driver" SecODBC
 
 	SetOutPath "$INSTDIR"
@@ -147,3 +156,25 @@ Function WriteRegeDit64
 		SetRegView 32
 FunctionEnd
 
+Function CheckVCRedist
+    Push $R9
+    ClearErrors
+
+    System::Call "kernel32::GetCurrentProcess() i .s"
+    System::Call "kernel32::IsWow64Process(i s, *i .r0)"
+    StrCmp $0 '0' Win32 Win64
+        Win32:
+        SetRegView 32
+	GOTO EndBitCheck
+        Win64:
+        SetRegView 64 
+
+EndBitCheck:
+
+    ReadRegStr $R9 HKLM "SOFTWARE\Classes\Installer\Dependencies\Microsoft.VS.VC_RuntimeAdditionalVSU_x86,v14" "Version"
+    SetRegView Default
+    IfErrors 0 VSRedistInstalled
+    StrCpy $R9 "No" 
+    VSRedistInstalled:
+        Exch $R9
+FunctionEnd

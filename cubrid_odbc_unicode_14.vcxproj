@@ -122,7 +122,7 @@
       <ResourceOutputFileName>$(IntDir)cubrid_odbc.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_14.lib;libssl.lib;libcrypto.lib;Crypt32.lib;Ws2_32.lib;Msvcrt.lib;msvcrtd.lib;msvcmrtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_14.lib;libssl.lib;libcrypto.lib;Crypt32.lib;Ws2_32.lib;Msvcrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
       <AdditionalLibraryDirectories>$(ProjectDir)\cci\lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cubrid_odbc_unicode.def</ModuleDefinitionFile>
