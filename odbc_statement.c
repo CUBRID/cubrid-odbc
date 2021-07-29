@@ -2719,10 +2719,10 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
 	    (UINT_PTR) desc_info_ptr->ind_ptr + desc_info_ptr->offset_size +
 	    (row_index - 1) * element_size;
 #else
-	  *(UINT_PTR *) =
+	  *(UINT_PTR *) value_addr =
 		  (UINT_PTR)desc_info_ptr->value_ptr + desc_info_ptr->offset_size +
 		  (row_index - 1) * element_size;
-	  *(UINT_PTR *) =
+	  *(UINT_PTR *)ind_addr =
 		  (UINT_PTR)desc_info_ptr->ind_ptr + desc_info_ptr->offset_size +
 		  (row_index - 1) * element_size;
 #endif

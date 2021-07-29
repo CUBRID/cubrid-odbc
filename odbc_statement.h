@@ -210,7 +210,7 @@ PUBLIC RETCODE odbc_get_stmt_attr(ODBC_STATEMENT * stmt,
 #else
 PUBLIC RETCODE odbc_get_stmt_attr(ODBC_STATEMENT * stmt,
 				   long attr,
-				   SQLPOINTER *value_ptr,
+				   SQLPOINTER value_ptr,
 				   SQLINTEGER buffer_length, SQLINTEGER *length_ptr);
 #endif
 PUBLIC RETCODE odbc_set_cursor_name (ODBC_STATEMENT * stmt,
