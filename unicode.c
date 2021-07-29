@@ -28,7 +28,9 @@
  *
  */
 
+#if defined (_WINDOWS)
 #include		<windows.h>
+#endif
 #include		<stdio.h>
 
 #include		"odbc_portable.h"
@@ -1014,7 +1016,7 @@ SQLColAttributeW (SQLHSTMT StatementHandle,
                   SQLUSMALLINT FieldIdentifier,
                   SQLPOINTER CharacterAttribute,
                   SQLSMALLINT BufferLength, SQLSMALLINT * StringLength,
-#ifdef _WIN64
+#if defined(_WIN64) || defined (__linux__) || defined (AIX)
                   SQLLEN * NumericAttribute)
 #else
                   SQLPOINTER NumericAttribute)

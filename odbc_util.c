@@ -33,7 +33,9 @@
 #include		<string.h>
 
 #include		"odbc_portable.h"
+#if defined (_WINDOWS)
 #include		"odbc_util.h"
+#endif
 #include		"odbc_statement.h"
 
 #define		UNIT_MEMORY_SIZE		256
@@ -1532,6 +1534,90 @@ PUBLIC _BOOL_ is_odd_number (int num)
   return (num & 1) ? _TRUE_ : _FALSE_;
 }
 
+#define LINE_SZ 256
+
+int
+get_section_from_file(const char *ini, const char *section, char *value_p, int size)
+{
+	FILE *fp, *fopen();
+	char buf[LINE_SZ];
+	char *p, *pt;
+	int rc = -1;
+	int found = 0;
+
+	if (ini == NULL || section == NULL || value_p == NULL || size < 1)
+	  {
+		return -1;
+	  }
+
+	if ((fp = fopen(ini, "r")) == NULL)
+	  {
+		return -1;
+	  }
+
+	while (!feof(fp))
+	  {
+		if (fgets(buf, LINE_SZ, fp))
+		  {
+			if (buf[0] == '[')
+			  {
+				p = strchr(buf, ']');
+				if (p != NULL)
+				  {
+					*p = '\0';
+					if (strcasecmp(&buf[1], section) == 0)
+					  {
+						found = 1;
+						break;
+					  }
+				  }
+			  }
+			else
+			  {
+				continue;
+			  }
+		  }
+	  }
+
+	if (!found)
+	  {
+		return -1;
+	  }
+
+	while (!feof(fp))
+	  {
+		if (fgets(buf, LINE_SZ, fp))
+		  {
+			p = strchr(buf, '\n');
+			if (p)
+			  {
+				*p = '\0';
+			  }
+			if (buf[0] == '\0' || buf[0] == '#' || buf[0] == '[')
+			  {
+				rc = 0;
+				break;
+			  }
+
+			strcat(value_p, buf);
+			strcat(value_p, ";");
+			rc = 0;
+		  }
+	  }
+	fclose(fp);
+
+	for (pt = value_p; *pt != '\0'; ++pt)
+	  {
+		if (*pt == ';')
+		  {
+			*pt = '\0';
+		  }
+	  }
+
+	return rc;
+}
+
+
 #ifdef CUBRID_ODBC_UNICODE
 PUBLIC int check_if_even_number (SQLUSMALLINT info_type, SQLSMALLINT buffer_length)
 {
@@ -1649,3 +1735,33 @@ PUBLIC int decide_info_value_length (SQLUSMALLINT info_type, int buffer_length, 
   return info_value_length;
 }
 #endif
+
+#include <stdarg.h>
+
+
+PUBLIC
+PRINT_DEBUG(const char *szLog, ...)
+{
+	FILE *fp = NULL;
+	char szOut[1024 * 128] = { 0, };
+	va_list args;
+	char logfile[512] = { 0, };
+	int len = 0;
+
+#if defined (_WINDOWS)
+	fp = fopen("c:/tmp/odbc.log", "a");
+#else
+	fp = fopen("/tmp/odbc.log", "a");
+#endif
+
+	va_start(args, szLog);
+	vsprintf(szOut, szLog, args);
+	va_end(args);
+	len = strlen(szOut);
+	if (len > 0 && szOut[len - 1] == '\n')
+	  {
+		szOut[len - 1] = 0x00;
+	  }
+	fprintf(fp, ">> %s\n", szOut);
+	fclose(fp);
+}

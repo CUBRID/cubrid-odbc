@@ -2667,12 +2667,21 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
 
   if (desc_info_ptr->value_ptr == NULL)
     {
+#if defined (_WINDOWS)
       (void *) *value_addr = NULL;
       (long *) *ind_addr = NULL;
       if (octet_len_addr)
 	{
 	  (long *) *octet_len_addr = NULL;
 	}
+#else
+	  *(UINT_PTR *) value_addr = NULL;
+	  *(UINT_PTR *) ind_addr = NULL;
+	  if (octet_len_addr)
+	  {
+		  *(UINT_PTR *) octet_len_addr = NULL;
+	  }
+#endif
     }
   else
     {
@@ -2692,25 +2701,42 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
 		  desc_info_ptr->offset_size + (row_index -
 						1) * sizeof (long);
 	      else
+#if defined (_WINDOWS)
 		(long *) *octet_len_addr = NULL;
+#else
+			  *(long *) octet_len_addr = NULL;
+#endif
 	    }
 	}
       else
 	{
 	  element_size = desc_info_ptr->bind_type;
+#if defined (_WINDOWS)
 	  *value_addr =
 	    (UINT_PTR) desc_info_ptr->value_ptr + desc_info_ptr->offset_size +
 	    (row_index - 1) * element_size;
 	  *ind_addr =
 	    (UINT_PTR) desc_info_ptr->ind_ptr + desc_info_ptr->offset_size +
 	    (row_index - 1) * element_size;
+#else
+	  *(UINT_PTR *) =
+		  (UINT_PTR)desc_info_ptr->value_ptr + desc_info_ptr->offset_size +
+		  (row_index - 1) * element_size;
+	  *(UINT_PTR *) =
+		  (UINT_PTR)desc_info_ptr->ind_ptr + desc_info_ptr->offset_size +
+		  (row_index - 1) * element_size;
+#endif
 	  if (octet_len_addr)
 	    {
 	      if (desc_info_ptr->octet_len_ptr)
 		*octet_len_addr = (UINT_PTR) desc_info_ptr->octet_len_ptr +
 		  desc_info_ptr->offset_size + (row_index - 1) * element_size;
 	      else
+#if defined (_WINDOWS)
 		(long *) *octet_len_addr = NULL;
+#else
+		*(UINT_PTR *) octet_len_addr = NULL;
+#endif
 	    }
 	}
     }

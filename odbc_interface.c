@@ -28,7 +28,10 @@
  *
  */
 
+#if defined (_WINDOWS)
 #include		<windows.h>
+#endif
+
 #include		<stdio.h>
 
 #include		"odbc_portable.h"
@@ -63,6 +66,7 @@ ConnectDlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 PUBLIC HINSTANCE hInstance;
 
+#if defined (_WINDOWS)
 BOOL WINAPI
 DllMain (HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -82,6 +86,7 @@ DllMain (HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 
   return TRUE;
 }
+#endif
 
 const char *cci_client_name = "ODBC";
 
@@ -286,7 +291,7 @@ SQLColAttribute (SQLHSTMT StatementHandle,
 		 SQLUSMALLINT FieldIdentifier,
 		 SQLPOINTER CharacterAttribute,
 		 SQLSMALLINT BufferLength, SQLSMALLINT * StringLength,
-#ifdef _WIN64
+#if defined (_WIN64) || defined (__linux__) || defined (AIX)
 		 SQLLEN * NumericAttribute)
 #else
 		 SQLPOINTER NumericAttribute)
@@ -294,11 +299,16 @@ SQLColAttribute (SQLHSTMT StatementHandle,
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
+  int str_len;
 
   OutputDebugString ("SQLColAttribute called\n");
 
   DEBUG_TIMESTAMP (START_SQLColAttribute);
 
+  if (StringLength == NULL)
+    {
+	  StringLength = &str_len;
+    }
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
@@ -578,11 +588,13 @@ SQLDriverConnect (HDBC hdbc,
 	      sprintf (dci.pwd, "");
 	    }
 
+#if defined (_WINDOWS)
 	  if (strcmp (dci.user, "") == 0)
 	    {
 	      DialogBoxParam (hInstance, (LPCTSTR) IDD_DRIVERCONNECT, hWnd,
 			      ConnectDlgProc, (LPARAM) & dci);
 	    }
+#endif
 	  ptUser = dci.user;
 	  ptPWD = dci.pwd;
 	}
@@ -1958,7 +1970,11 @@ ODBC_INTERFACE RETCODE SQL_API
 SQLDescribeParam (SQLHSTMT StatementHandle,
 		  SQLUSMALLINT ParameterNumber,
 		  SQLSMALLINT * DataTypePtr,
+#if defined (_WINDOWS)
 		  SQLUINTEGER * ParameterSizePtr,
+#else
+		  SQLULEN * ParameterSizePtr,
+#endif
 		  SQLSMALLINT * DecimalDigitsPtr, SQLSMALLINT * NullablePtr)
 {
   RETCODE rc = SQL_SUCCESS;
@@ -2133,7 +2149,11 @@ SQLProcedures (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLParamOptions (SQLHSTMT StatementHandle,
+#if defined (_WINDOWS)
 		 SQLUINTEGER crow, SQLUINTEGER * pirow)
+#else
+		 SQLULEN crow, SQLULEN * pirow)
+#endif
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -2514,6 +2534,7 @@ SQLSetScrollOptions (SQLHSTMT StatementHandle,
  *  SQLDriverConnect시 사용되는 dialog box를 띄운다.
  * NOTE:
  ************************************************************************/
+#if defined (_WINDOWS)
 PRIVATE INT_PTR CALLBACK
 ConnectDlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -2578,3 +2599,4 @@ ConnectDlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
   return (TRUE);
 }
+#endif

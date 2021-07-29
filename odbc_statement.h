@@ -202,10 +202,17 @@ PUBLIC RETCODE odbc_set_stmt_attr (ODBC_STATEMENT * stmt,
 				   long attribute,
 				   void *valueptr,
 				   long stringlength, short is_driver);
-PUBLIC RETCODE odbc_get_stmt_attr (ODBC_STATEMENT * stmt,
+#if defined (_WINDOWS)
+PUBLIC RETCODE odbc_get_stmt_attr(ODBC_STATEMENT * stmt,
 				   long attr,
 				   void *value_ptr,
 				   long buffer_length, long *length_ptr);
+#else
+PUBLIC RETCODE odbc_get_stmt_attr(ODBC_STATEMENT * stmt,
+				   long attr,
+				   SQLPOINTER *value_ptr,
+				   SQLINTEGER buffer_length, SQLINTEGER *length_ptr);
+#endif
 PUBLIC RETCODE odbc_set_cursor_name (ODBC_STATEMENT * stmt,
 				     char *cursor_name, short name_length);
 PUBLIC RETCODE odbc_get_cursor_name (ODBC_STATEMENT * stmt,
