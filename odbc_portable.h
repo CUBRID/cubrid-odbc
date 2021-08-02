@@ -104,26 +104,30 @@
 
 extern PUBLIC HINSTANCE hInstance;
 
+#if defined (_WINDOWS)
+#define WCHAR_SIZE_BYTES (sizeof (wchar_t))
+#else
+#define WCHAR_SIZE_BYTES 2
+#endif
+
 #if !defined (_WINDOWS)
 #if !defined (_WCHAR_H)
 #include <wchar.h>
 #endif
 
-#define WCHAR_SIZE_BYTES 2
-
 #ifndef CP_EUC_KR
 #define CP_EUC_KR 51949
 #endif
 
-#if !defined(CP_ACP)
+#if !defined (CP_ACP)
 #define CP_ACP 949      /* code page 949 is KSC5601 */
 #endif
 
-#if !defined(CP_UTF8)
+#if !defined (CP_UTF8)
 #define CP_UTF8 65001
 #endif
 
-#if !defined(CP_UTF7)
+#if !defined (CP_UTF7)
 #define CP_UTF7 65000
 #endif /* CP_UTF7 */
 
