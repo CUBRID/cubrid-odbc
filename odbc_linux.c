@@ -41,17 +41,27 @@
 #include	"odbc_connection.h"
 #include	"odbc_util.h"
 
+#if defined AIX
+#define assert
+if !defined (CAST_STRLEN)
+#define CAST_STRLEN (int)
+#endif /* CAST_STRLEN */
+#endif /* AIX */
+
 #ifndef OLECHAR
 typedef WCHAR OLECHAR;
 #endif
 
 #ifndef BSTR
-typedef OLECHAR *BSTR;
+typeef OLECHAR *BSTR;
 #endif
 
 PUBLIC INT_PTR CALLBACK
 ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam,
 		                  LPARAM lParam);
+
+static void set_unicode_char_set ();
+#define UNICODE_DEFAULT_CODE "UCS-2"
 
 #include <stdarg.h>
 
@@ -145,12 +155,66 @@ itoa (int value, char *string, int radix)
 
 #define TRAN_BUF_SIZE 4096
 
+static char *unicode_charset = NULL;
+
 int MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int cbMultiByte, 
 		wchar_t *lpWideCharStr, int cchWideChar)
 {
-	return 0;
-}
+  char *charset;
+  wchar_t *iconv_out = lpWideCharStr;
+  char *iconv_in = lpMultiByteStr;
+  size_t iconv_in_len = cbMultiByte;
+  size_t iconv_out_len = cchWideChar * sizeof (wchar_t);
+  size_t iconv_out_org = iconv_out_len;
+  wchar_t _buf [TRAN_BUF_SIZE];
+  iconv_t cd;
+  int ret, required;
 
+  if (unicode_charset == NULL)
+    {
+      set_unicode_char_set ();
+    }
+
+  if (cchWideChar == 0)
+    {
+      iconv_out_len = TRAN_BUF_SIZE;
+      iconv_out_org = TRAN_BUF_SIZE;
+      iconv_out = &_buf [0];
+    }
+
+  switch (codepage)
+  {
+  case CP_EUC_KR:
+    charset = "EUCKR";
+    break;
+  case CP_UTF8:
+  case CP_ACP:
+    charset = "UTF-8";
+    break;
+  default:
+    charset = "UTF-8";
+    break;
+  }
+
+  if ((cd = iconv_open (default_unicode_charset, charset)) < 0)
+    {
+      OutputDebugString ("ERROR: iconv_open");
+      return -1;
+    }
+
+  ret = iconv (cd, &iconv_in, &iconv_in_len, &iconv_out, &iconv_out_len);
+
+  iconv_close (cd);
+
+  if (ret < 0)
+    {
+      return -1;
+    }
+
+  required = (iconv_out_org - iconv_out_len) / sizeof (unsigned short);
+
+  return required;
+}
 
 
 int WideCharToMultiByte (int wincode,
@@ -162,7 +226,84 @@ int WideCharToMultiByte (int wincode,
 				 char *lpdefaultchar, 
 				 char *lpusedfdefaultchar)
 {
-	return 0;
+
+  char *charset;
+  iconv_t cd;
+  char *iconv_out = out_buffer;
+  unsigned char *iconv_in = (unsigned char *) str;
+  size_t iconv_in_len = (size_t) sizeof (unsigned short) * size;
+  size_t iconv_out_len = (size_t) cbMultiByte;
+  size_t iconv_out_org = (size_t) cbMultiByte;
+  int ret, required;
+  char _buf [TRAN_BUF_SIZE];
+
+  if (unicode_charset == NULL)
+    {
+      set_unicode_char_set ();
+    }
+
+  if (out_buffer == NULL)
+   {
+     iconv_out = _buf;
+     iconv_out_org = (size_t) TRAN_BUF_SIZE;
+     iconv_out_len = (size_t) TRAN_BUF_SIZE;
+   }
+
+  if (size < 0)
+   {
+     size = TRAN_BUF_SIZE/sizeof(wchar_t);
+   }
+
+  switch (wincode)
+   {
+   case CP_UTF8:
+     charset = "UTF-8";
+     break;
+   case CP_EUC_KR:
+     charset = "EUCKR";
+     break;
+   default:
+     charset = "UTF-8";
+     break;
+   }
+
+  if ((cd = iconv_open (charset, unicode_charset)) < 0)
+    {
+      return -1;
+    }
+  memset (iconv_out, 0, iconv_out_len);
+  ret = iconv (cd, &iconv_in, &iconv_in_len, &iconv_out, &iconv_out_len);
+
+  iconv_close (cd);
+
+  if (ret < 0)
+    {
+      return -1;
+    }
+
+  required = iconv_out_org - iconv_out_len;
+
+  return required;
+}
+
+static void
+set_unicode_char_set ()
+{
+
+  char *charset;
+  char buf [512];
+  int ret;
+
+  ret = SQLGetPrivateProfileString ("system", KEYWORD_NLS_NCHAR, "", buf,
+                                    sizeof (buf), "ODBC.INI");
+  if (ret != 0)
+    {
+      unicode_charset = UNICODE_DEFAULT_CODE;
+    }
+  else
+    {
+      unicode_charset = UT_MAKE_STRING (buf, -1);
+    }
 }
 
 /*
@@ -179,13 +320,13 @@ ODBC_INTERFACE RETCODE SQL_API
                   SQLSMALLINT * NameLength1Ptr,
                   SQLCHAR * Description,
                   SQLSMALLINT BufferLength2, SQLSMALLINT * NameLength2Ptr)
-  {
+{
     RETCODE rc = SQL_SUCCESS;
 
     OutputDebugString ("SQLDataSources called\n");
 
     return (rc);
-  }
+}
 
 BOOL SQLSetConfigMode (UWORD wConfigMode)
 {
