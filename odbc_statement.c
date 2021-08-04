@@ -2679,7 +2679,7 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
 	  *(UINT_PTR *) ind_addr = NULL;
 	  if (octet_len_addr)
 	  {
-		  *(UINT_PTR *) octet_len_addr = NULL;
+		*(UINT_PTR *) octet_len_addr = NULL;
 	  }
 #endif
     }
@@ -2687,10 +2687,10 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
     {
       if (desc_info_ptr->bind_type == SQL_PARAM_BIND_BY_COLUMN)
 	{
-	  *value_addr =
+	  *(UINT_PTR *) value_addr =
 	    (UINT_PTR) desc_info_ptr->value_ptr + desc_info_ptr->offset_size +
 	    (row_index - 1) * (desc_info_ptr->length);
-	  *ind_addr =
+	  *(UINT_PTR *) ind_addr =
 	    (UINT_PTR) desc_info_ptr->ind_ptr + desc_info_ptr->offset_size +
 	    (row_index - 1) * sizeof (long);
 	  if (octet_len_addr)
@@ -2704,7 +2704,7 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
 #if defined (_WINDOWS)
 		(long *) *octet_len_addr = NULL;
 #else
-			  *(long *) octet_len_addr = NULL;
+		*(long *) octet_len_addr = NULL;
 #endif
 	    }
 	}
