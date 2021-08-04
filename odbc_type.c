@@ -45,6 +45,8 @@
 
 #define GET_SET_SIZE(x) ((sizeof (x)) / (sizeof ((x)[0])))
 
+#define SIZE_INT 4
+
 typedef int (*OCTET_LEN_FUNC) (int);
 PRIVATE int octet_len_char (int precision);
 PRIVATE int octet_len_binary (int precision);
@@ -1483,9 +1485,15 @@ cci_value_to_odbc (void *c_value, short concise_type,
           *error_code =-1;
           break;
       }
-
-      *(long *)c_value = cci_value->i;
-      length = sizeof (long);
+      if ((sizeof(long) == SIZE_INT))
+        {
+          *(long *)c_value = cci_value->i;
+        }
+      else
+        {
+          *(int *)c_value = cci_value->i;
+        }
+      length = SIZE_INT;
       break;
     case SQL_C_ULONG:
      if(cci_value->i>ULONG_MAX || cci_value->i<0)
