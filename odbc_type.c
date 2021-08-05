@@ -1504,7 +1504,7 @@ cci_value_to_odbc (void *c_value, short concise_type,
       }
 
       *(long *) c_value = cci_value->i;
-      length = sizeof (long);
+      length = SIZE_INT;
       break;
     case SQL_C_SBIGINT:
      if(cci_value->i>LLONG_MAX || cci_value->i<LLONG_MIN)
