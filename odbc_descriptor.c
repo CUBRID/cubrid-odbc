@@ -1086,7 +1086,11 @@ odbc_set_desc_field (ODBC_DESC * desc,
 	  break;
 
 	case SQL_DESC_INDICATOR_PTR:
+#if defined (_WINDOWS)
 	  record->indicator_ptr = value_ptr;
+#else
+	  record->indicator_ptr =  (long *) value_ptr;
+#endif
 	  break;
 
 	case SQL_DESC_LENGTH:
@@ -1102,7 +1106,11 @@ odbc_set_desc_field (ODBC_DESC * desc,
 	  break;
 
 	case SQL_DESC_OCTET_LENGTH_PTR:
+#if defined (_WINDOWS)
 	  record->octet_length_ptr = value_ptr;
+#else
+	  record->octet_length_ptr = (long *) value_ptr;
+#endif
 	  break;
 
 	case SQL_DESC_PARAMETER_TYPE:

@@ -2657,7 +2657,7 @@ get_dsn_info (const char *dsn,
 	      char *db_name, int db_name_len,
 	      char *user, int user_len,
 	      char *pwd, int pwd_len,
-	      char *server, int server_len, int *port, int *fetch_size,
+	      char *server, int server_len, SQLINTEGER *port, SQLINTEGER *fetch_size,
 	      char *charset, int charset_len)
 
 {
