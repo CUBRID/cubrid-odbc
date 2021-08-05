@@ -1520,7 +1520,12 @@ get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, 
   //SysFreeString (bstrCode);
   if(out_length != NULL)
    {
+#ifdef _WINDOWS
+     *out_length = nLength * sizeof(wchar_t);
+#else
      *out_length = nLength * WCHAR_SIZE_BYTES;
+#endif
+
    }
   if ( buffer_length < temp_buffer_length)
    {
