@@ -65,6 +65,7 @@
 #define			KEYWORD_LOGTRACEAPI	"LOGTRACEAPI"
 #define			KEYWORD_LOGTRACENETWORK	"LOGTRACENETWORK"
 
+#define     KEYWORD_NLS_NCHAR "NLS_NCHAR"
 
 typedef struct stCUBRIDDSNItem
 {
@@ -191,8 +192,8 @@ PUBLIC RETCODE odbc_get_info (ODBC_CONNECTION * conn, SQLUSMALLINT info_type,
 			      SQLLEN * string_length_ptr);
 PUBLIC int get_dsn_info (const char *dsn, char *db_name, int db_name_len,
 			 char *user, int user_len, char *pwd, int pwd_len,
-			 char *server, int server_len, int *port,
-			 int *fetch_size,
+			 char *server, int server_len, SQLINTEGER *port,
+			 SQLINTEGER *fetch_size,
 			 char *charset, int charset_len);
 
 #endif /* ! __ODBC_CONN_HEADER */

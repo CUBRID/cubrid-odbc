@@ -472,6 +472,10 @@ odbc_set_connect_attr (ODBC_CONNECTION * conn,
       conn->attr_query_timeout = (unsigned long) valueptr;
       break;
 
+    case SQL_ATTR_ANSI_APP:
+      goto error;
+      break;
+
     default:
       /* (DM) HY092 - */
       odbc_set_diag (conn->diag, "HY092", 0, NULL);
@@ -2673,7 +2677,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_DBNAME, "", buf,
 				    sizeof (buf), "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	buf[0] = '\0';
       str_value_assign (buf, db_name, db_name_len, NULL);
     }
@@ -2684,7 +2688,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_USER, "", buf, sizeof (buf),
 				    "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	buf[0] = '\0';
       str_value_assign (buf, user, user_len, NULL);
     }
@@ -2695,7 +2699,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_PASSWORD, "", buf,
 				    sizeof (buf), "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	buf[0] = '\0';
       str_value_assign (buf, pwd, pwd_len, NULL);
     }
@@ -2706,7 +2710,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_SERVER, "", buf,
 				    sizeof (buf), "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	buf[0] = '\0';
       str_value_assign (buf, server, server_len, NULL);
     }
@@ -2717,7 +2721,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_PORT, "", buf, sizeof (buf),
 				    "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	*port = 0;
       else
 	*port = atoi (buf);
@@ -2729,7 +2733,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_FETCH_SIZE, "", buf,
 				    sizeof (buf), "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	*fetch_size = 0;
       else
 	*fetch_size = atoi (buf);
@@ -2740,7 +2744,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_CHARSET, "", buf,
 				    sizeof (buf), "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	buf[0] = '\0';
       else
         str_value_assign (buf, charset, server_len, NULL);

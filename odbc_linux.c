@@ -43,7 +43,7 @@
 
 #if defined AIX
 #define assert
-if !defined (CAST_STRLEN)
+#if !defined (CAST_STRLEN)
 #define CAST_STRLEN (int)
 #endif /* CAST_STRLEN */
 #endif /* AIX */
@@ -53,7 +53,7 @@ typedef WCHAR OLECHAR;
 #endif
 
 #ifndef BSTR
-typeef OLECHAR *BSTR;
+typedef OLECHAR *BSTR;
 #endif
 
 PUBLIC INT_PTR CALLBACK
@@ -67,7 +67,28 @@ static void set_unicode_char_set ();
 
 void OutputDebugString (const char *str, ...)
 {
-	/* Prototype */
+#if defined (LINUX_ODBC_DEBUG)
+  va_list args;
+  char sz_out [4096];
+  char logfile [256];
+
+  memset (sz_out, 0, 4096);
+  va_start (args, str);
+  vsprintf (sz_out, str, args);
+  va_end (args);
+
+  FILE *fp, *fopen();
+
+  sprintf (logfile, "%s/tmp/proto.sql", getenv("HOME"));
+  fp = fopen (logfile, "a");
+  if (fp == NULL)
+    {
+      return;
+    }
+
+  fprintf (fp, sz_out);
+  fclose (fp);
+#endif /* LINUX_ODBC_DEBUG */
 }
 
 WCHAR *
@@ -164,7 +185,7 @@ int MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int 
   wchar_t *iconv_out = lpWideCharStr;
   char *iconv_in = lpMultiByteStr;
   size_t iconv_in_len = cbMultiByte;
-  size_t iconv_out_len = cchWideChar * sizeof (wchar_t);
+  size_t iconv_out_len = cchWideChar;
   size_t iconv_out_org = iconv_out_len;
   wchar_t _buf [TRAN_BUF_SIZE];
   iconv_t cd;
@@ -196,7 +217,7 @@ int MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int 
     break;
   }
 
-  if ((cd = iconv_open (default_unicode_charset, charset)) < 0)
+  if ((cd = iconv_open (unicode_charset, charset)) < 0)
     {
       OutputDebugString ("ERROR: iconv_open");
       return -1;
@@ -212,6 +233,11 @@ int MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int 
     }
 
   required = (iconv_out_org - iconv_out_len) / sizeof (unsigned short);
+
+  OutputDebugString ("iconv-pre: org = %d, iconv_out = %d required = %d\n",
+                  iconv_out_org, iconv_out_len, iconv_out_org - iconv_out_len);
+  OutputDebugString ("iconv: (%s) '%s' to UNICODE, rc=%d): requested len = %d, processed/required len  = %d, str = |%s|\n",
+                  cchWideChar == 0 ? "Query" : "Convert from", charset, ret, cbMultiByte, required, lpMultiByteStr);
 
   return required;
 }
@@ -282,6 +308,10 @@ int WideCharToMultiByte (int wincode,
     }
 
   required = iconv_out_org - iconv_out_len;
+
+  OutputDebugString ("iconv (to '%s' rc = %d): unicode chars = %d, iconv_out = %d, Multibyte = %d, req/proc = %d, org len = %d, outlen = %d (%d)\n",
+            charset, ret, size, iconv_out_len, cbMultiByte, required, iconv_out_org, required, iconv_in_len);
+
 
   return required;
 }
@@ -392,7 +422,7 @@ int INSTAPI SQLGetPrivateProfileString (
        strcpy (lpszRetBuffer,  p); 
 
        PRINT_DEBUG ("Profile: %s\n", lpszRetBuffer);
-	return rc;
+	return 0;
 }
 
 /*
