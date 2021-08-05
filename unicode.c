@@ -440,7 +440,11 @@ SQLDescribeColW (SQLHSTMT hstmt, SQLUSMALLINT column,
 
   if (name_len)
    {
+#if defined (_WINDOWS)
      *name_len = (SQLSMALLINT)out_length;
+#else
+     *name_len = (SQLSMALLINT)name_buffer_len;
+#endif
    }
 
   UT_FREE (name_buffer);     
