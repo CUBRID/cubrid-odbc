@@ -220,7 +220,7 @@ SQLBindParameter (SQLHSTMT StatementHandle,
 	  }
 	else
 	  {
-	    *StrLen_or_IndPtr = *StrLen_or_IndPtr / sizeof (wchar_t);
+	    *StrLen_or_IndPtr = *StrLen_or_IndPtr / WCHAR_SIZE_BYTES;
 	  }
 
     }
@@ -299,7 +299,7 @@ SQLColAttribute (SQLHSTMT StatementHandle,
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
-  int str_len;
+  SQLSMALLINT str_len;
 
   OutputDebugString ("SQLColAttribute called\n");
 
@@ -548,7 +548,33 @@ SQLDriverConnect (HDBC hdbc,
       if (*pt == ';')		// connection string delimiter
 	*pt = '\0';
     }
-  ptDriver = element_value_by_key (ConnStrIn, KEYWORD_DRIVER);
+  ptDSN = element_value_by_key (ConnStrIn, KEYWORD_DSN);
+
+#if !defined (_WINDOWS)
+#define INI_SZ  4096
+  {
+    char value_p [BUF_SIZE*4];
+    char *home_dir, *ini_envp;
+    char ini[INI_SZ];
+
+    ini_envp = getenv ("ODBCINI");
+    if (ini_envp == NULL)
+    {
+      sprintf (ini, "%s/.odbc.ini", getenv ("HOME"));
+    }
+  else
+    {
+      sprintf (ini, "%s", ini_envp);
+    }
+
+  memset (value_p, 0, INI_SZ);
+  if (get_section_from_file (ini, ptDSN, value_p, BUF_SIZE*4) == 0)
+    {
+      memcpy (ConnStrIn, value_p, BUF_SIZE*4);
+      ptDSN = element_value_by_key (ConnStrIn, KEYWORD_DSN);
+    }
+  }
+#endif
   /*
      pt = strchr(ptDriver, '{');
      if ( pt == NULL ) {
@@ -560,7 +586,8 @@ SQLDriverConnect (HDBC hdbc,
      szDriver[pt2-pt -1] = '\0';
      }
    */
-  ptDSN = element_value_by_key (ConnStrIn, KEYWORD_DSN);
+
+  ptDriver = element_value_by_key (ConnStrIn, KEYWORD_DRIVER);
   ptUser = element_value_by_key (ConnStrIn, KEYWORD_USER);
   ptPWD = element_value_by_key (ConnStrIn, KEYWORD_PASSWORD);
   ptSaveFile = element_value_by_key (ConnStrIn, KEYWORD_SAVEFILE);
@@ -821,13 +848,13 @@ SQLExecDirect (SQLHSTMT StatementHandle,
 
   stStatementText = UT_MAKE_STRING (StatementText, TextLength);
 
-  if (stricmp(StatementText, "@QP@") == 0)
+  if (_stricmp(StatementText, "@QP@") == 0)
     {
       stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN;
       return ODBC_SUCCESS;
     }
   
-  if (stricmp(StatementText, "@QE@") == 0)
+  if (_stricmp(StatementText, "@QE@") == 0)
     {
       stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN | CCI_EXEC_QUERY_ALL;
       return ODBC_SUCCESS;
