@@ -1550,7 +1550,6 @@ get_section_from_file (const char *ini, const char *section, char *value_p, int 
   int rc = -1;
   int found = 0;
 
-PRINT_DEBUG ("ini2 = %s", ini);
   memset (buf, 0, LINE_SZ);
   if (ini == NULL || section == NULL || value_p == NULL || size < 1)
     {
@@ -1743,32 +1742,3 @@ PUBLIC int decide_info_value_length (SQLUSMALLINT info_type, int buffer_length, 
 }
 #endif
 
-#include <stdarg.h>
-
-
-PUBLIC
-PRINT_DEBUG(const char *szLog, ...)
-{
-	FILE *fp = NULL;
-	char szOut[1024 * 128] = { 0, };
-	va_list args;
-	char logfile[512] = { 0, };
-	int len = 0;
-
-#if defined (_WINDOWS)
-	fp = fopen("c:/tmp/odbc.log", "a");
-#else
-	fp = fopen("/tmp/odbc.log", "a");
-#endif
-
-	va_start(args, szLog);
-	vsprintf(szOut, szLog, args);
-	va_end(args);
-	len = strlen(szOut);
-	if (len > 0 && szOut[len - 1] == '\n')
-	  {
-		szOut[len - 1] = 0x00;
-	  }
-	fprintf(fp, ">> %s\n", szOut);
-	fclose(fp);
-}

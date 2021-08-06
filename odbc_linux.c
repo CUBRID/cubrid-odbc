@@ -405,23 +405,19 @@ int INSTAPI SQLGetPrivateProfileString (
 	  }
 
 	memset (element_list, 0, NELEM);
-	PRINT_DEBUG ("file = %s, \n", inifile);
+
 	if (get_section_from_file (inifile, lpszSection, element_list, NELEM) < 0)
 	  {
 	    return -1;
 	  }
-	PRINT_DEBUG ("sec = %s, %s |%s|\n", lpszSection, lpszEntry, element_list);
 
        if ((p = element_value_by_key (element_list, lpszEntry)) == NULL)
          {
            return rc;
          }
 
-	PRINT_DEBUG ("val = %s\n", lpszRetBuffer);
-
        strcpy (lpszRetBuffer,  p); 
 
-       PRINT_DEBUG ("Profile: %s\n", lpszRetBuffer);
 	return 0;
 }
 
