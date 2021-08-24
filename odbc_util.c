@@ -1331,7 +1331,11 @@ encode_string_to_charset(wchar_t *str, int size, char **target, int* out_length,
 {
     int nLength;
     char *tmp_string;
+#if defined (_WINDOWS)
+    int wincode = CP_ACP;
+#else
     int wincode = CP_UTF8;
+#endif
     int num_wchars = -1;
 
     if (size > 0)
@@ -1441,10 +1445,14 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
   wchar_t *temp_buffer = *buffer;
   int temp_buffer_length = buffer_length;
 
-  if (characterset != NULL && _stricmp (characterset, "utf-8") == 0)
+  if (characterset == NULL || _stricmp (characterset, "utf-8") == 0)
    {
      wincode = CP_UTF8;
    }
+  else if (_stricmp(characterset, "euc-kr") == 0)
+         {
+	   wincode = CP_EUC_KR;
+         }
   if(str == NULL || buffer == NULL)
    {
      return ODBC_SUCCESS;
@@ -1462,7 +1470,7 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
    }
   nLength = MultiByteToWideChar (wincode, 0, (LPCSTR) str, size, temp_buffer, buffer_length);
 
-  //temp_buffer[nLength] = '\0';
+  temp_buffer[nLength] = '\0';
   *buffer = temp_buffer;
 
   //SysFreeString (bstrCode);
