@@ -1466,6 +1466,8 @@ odbc_set_ird (ODBC_STATEMENT * stmt,
 		       (SQLPOINTER) scale, 0, 1);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_DISPLAY_SIZE,
 		       (SQLPOINTER) display_size, 0, 1);
+  odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_NULLABLE,
+		       (SQLPOINTER) nullable, 0, 1);
 
   searchable = odbc_type_searchable (type);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_SEARCHABLE,
