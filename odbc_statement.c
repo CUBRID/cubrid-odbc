@@ -1383,7 +1383,7 @@ odbc_execute (ODBC_STATEMENT * stmt)
 	    odbc_get_desc_field (stmt->ipd, i, SQL_DESC_LENGTH,
 				 &(desc_info.length), 0, NULL);
 
-	  if (ind_ptr != NULL && *ind_ptr == SQL_NULL_DATA)
+	  if (value_ptr == NULL || ind_ptr != NULL && *ind_ptr == SQL_NULL_DATA)
 	    {
 	      cci_rc =
 		cci_bind_param (stmt->stmthd, RevisedParamPos, a_type, NULL,
