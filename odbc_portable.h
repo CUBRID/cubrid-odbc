@@ -31,7 +31,13 @@
 #ifndef	__ODBC_PORTABLE_HEADER
 #define	__ODBC_PORTABLE_HEADER
 
+#if defined (_WINDOWS)
 #include "windows.h"
+#ifdef _MSC_VER
+#define strncasecmp _strnicmp
+#define strcasecmp _stricmp
+#endif
+#endif
 #include "sqlext.h"
 
 #define	ODBC_INTERFACE
@@ -98,4 +104,80 @@
 
 extern PUBLIC HINSTANCE hInstance;
 
+#if defined (_WINDOWS)
+#define WCHAR_SIZE_BYTES (sizeof (wchar_t))
+#else
+#define WCHAR_SIZE_BYTES 2
+#endif
+
+#if !defined (_WINDOWS)
+#if !defined (_WCHAR_H)
+#include <wchar.h>
+#endif
+
+#ifndef CP_EUC_KR
+#define CP_EUC_KR 51949
+#endif
+
+#if !defined (CP_ACP)
+#define CP_ACP 949      /* code page 949 is KSC5601 */
+#endif
+
+#if !defined (CP_UTF8)
+#define CP_UTF8 65001
+#endif
+
+#if !defined (CP_UTF7)
+#define CP_UTF7 65000
+#endif /* CP_UTF7 */
+
+#if !defined (INT_PTR)
+typedef int * INT_PTR;
+#endif
+
+#if !defined (UNIT_PTR)
+typedef unsigned long long * UINT_PTR;
+#endif
+
+#if !defined (WPARAM)
+typedef short   WPARAM;
+#endif
+
+#ifndef LPARAM
+typedef long    LPARAM;
+#endif
+
+#if !defined (LPCTSTR)
+typedef const char * LPCTSTR;
+#endif
+
+#if !defined (_MAX_PATH)
+#define _MAX_PATH 1024
+#endif
+
+#if !defined (__int64)
+typedef long long int __int64;
+#endif
+
+#if !defined (TRUE)
+typedef enum { TRUE = 1, FALSE = 0 } bool;
+#endif
+
+#if !defined (_stricmp)
+#define _stricmp strcasecmp
+#endif
+
+#if !defined (_atoi64)
+#define _atoi64 atoll
+#endif
+
+#if !defined (_snprintf)
+#define _snprintf snprintf
+#endif
+
+#if !defined (_strnicmp)
+#define _strnicmp strncasecmp
+#endif
+
+#endif /* _WINDOWS */
 #endif /* ! __ODBC_PORTABLE_HEADER */

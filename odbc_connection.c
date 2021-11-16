@@ -28,7 +28,10 @@
  *
  */
 
+#if defined (_WINDOWS)
 #include		<windows.h>
+#endif
+
 #include		<stdio.h>
 
 #include		"odbc_portable.h"
@@ -467,6 +470,10 @@ odbc_set_connect_attr (ODBC_CONNECTION * conn,
 
     case SQL_ATTR_QUERY_TIMEOUT:
       conn->attr_query_timeout = (unsigned long) valueptr;
+      break;
+
+    case SQL_ATTR_ANSI_APP:
+      goto error;
       break;
 
     default:
@@ -2650,7 +2657,7 @@ get_dsn_info (const char *dsn,
 	      char *db_name, int db_name_len,
 	      char *user, int user_len,
 	      char *pwd, int pwd_len,
-	      char *server, int server_len, int *port, int *fetch_size,
+	      char *server, int server_len, SQLINTEGER *port, SQLINTEGER *fetch_size,
 	      char *charset, int charset_len)
 
 {
@@ -2670,7 +2677,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_DBNAME, "", buf,
 				    sizeof (buf), "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	buf[0] = '\0';
       str_value_assign (buf, db_name, db_name_len, NULL);
     }
@@ -2681,7 +2688,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_USER, "", buf, sizeof (buf),
 				    "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	buf[0] = '\0';
       str_value_assign (buf, user, user_len, NULL);
     }
@@ -2692,7 +2699,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_PASSWORD, "", buf,
 				    sizeof (buf), "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	buf[0] = '\0';
       str_value_assign (buf, pwd, pwd_len, NULL);
     }
@@ -2703,7 +2710,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_SERVER, "", buf,
 				    sizeof (buf), "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	buf[0] = '\0';
       str_value_assign (buf, server, server_len, NULL);
     }
@@ -2714,7 +2721,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_PORT, "", buf, sizeof (buf),
 				    "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	*port = 0;
       else
 	*port = atoi (buf);
@@ -2726,7 +2733,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_FETCH_SIZE, "", buf,
 				    sizeof (buf), "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	*fetch_size = 0;
       else
 	*fetch_size = atoi (buf);
@@ -2737,7 +2744,7 @@ get_dsn_info (const char *dsn,
       rcn =
 	SQLGetPrivateProfileString (dsn, KEYWORD_CHARSET, "", buf,
 				    sizeof (buf), "ODBC.INI");
-      if (rcn == 0)
+      if (rcn != 0)
 	buf[0] = '\0';
       else
         str_value_assign (buf, charset, server_len, NULL);

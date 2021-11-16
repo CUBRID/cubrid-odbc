@@ -74,7 +74,7 @@ odbc_alloc_env (ODBC_ENV ** envptr)
       env->program_name = UT_MAKE_STRING ("ODBC", -1);
 
       /* Default Attribute value */
-      env->attr_odbc_version = 0;
+      env->attr_odbc_version = 380UL;
       env->attr_connection_pooling = SQL_CP_DEFAULT;
       env->attr_cp_match = SQL_CP_MATCH_DEFAULT;
       env->attr_output_nts = SQL_TRUE;

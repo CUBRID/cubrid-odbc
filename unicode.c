@@ -28,7 +28,9 @@
  *
  */
 
+#if defined (_WINDOWS)
 #include		<windows.h>
+#endif
 #include		<stdio.h>
 
 #include		"odbc_portable.h"
@@ -199,33 +201,48 @@ SQLGetInfoW (SQLHDBC ConnectionHandle,
     {
       info_value_size = tmp_StringLength * sizeof (SQLWCHAR);
 
-      if (InfoValue != NULL)
-        {
-          *StringLength = (SQLSMALLINT)decide_info_value_length (InfoType, BufferLength, info_value_size);
+      switch (InfoType)
+      {
+      case SQL_CURSOR_ROLLBACK_BEHAVIOR:
+      case SQL_MAX_TABLE_NAME_LEN:
+      case SQL_MAX_PROCEDURE_NAME_LEN:
+      case SQL_CURSOR_COMMIT_BEHAVIOR:
+      case SQL_TXN_ISOLATION_OPTION:
+      case SQL_SCHEMA_USAGE:
+      case SQL_TXN_CAPABLE:
+      case SQL_MAX_SCHEMA_NAME_LEN:
+            break;
+      default:
 
-          if (rc == SQL_SUCCESS)
-            {
-              if (*StringLength < info_value_size)
-                {
-                  rc = SQL_SUCCESS_WITH_INFO;
+        if (InfoValue != NULL)
+          {
+            *StringLength = (SQLSMALLINT)decide_info_value_length (InfoType, BufferLength, info_value_size);
 
-                  odbc_set_diag (((ODBC_CONNECTION *) ConnectionHandle)->diag, "01004", 0, NULL);
-                }
-            }
+            if (rc == SQL_SUCCESS)
+              {
+                if (*StringLength < info_value_size)
+                  {
+                    rc = SQL_SUCCESS_WITH_INFO;
 
-          bytes_to_wide_char (InfoValue, tmp_StringLength, &wvalue, 0, NULL, charset);
+                    odbc_set_diag (((ODBC_CONNECTION *) ConnectionHandle)->diag, "01004", 0, NULL);
+                  }
+              }
 
-          if (wvalue != NULL)
-            {
-              (void)memcpy ((char *)InfoValue, (const char *)wvalue, *StringLength);
-              ((SQLWCHAR *)InfoValue)[*StringLength / 2] = 0;
-              UT_FREE_BSTR (wvalue);
-            }
-        }
-      else
-        {
-          *StringLength = (SQLSMALLINT)info_value_size;
-        }
+            bytes_to_wide_char (InfoValue, tmp_StringLength, &wvalue, 0, NULL, charset);
+
+            if (wvalue != NULL)
+              {
+                (void)memcpy ((char *)InfoValue, (const char *)wvalue, *StringLength);
+                ((SQLWCHAR *)InfoValue)[*StringLength / 2] = 0;
+                UT_FREE_BSTR (wvalue);
+              }
+          }
+        else
+          {
+            *StringLength = (SQLSMALLINT)info_value_size;
+          }
+        break;
+      }
     }
 
   DEBUG_TIMESTAMP (END_SQLGetInfo);
@@ -400,7 +417,7 @@ SQLDescribeColW (SQLHSTMT hstmt, SQLUSMALLINT column,
   SQLCHAR *name_buffer = NULL;
   SQLSMALLINT name_buffer_len=0;
   ODBC_STATEMENT* stmt_handle = (ODBC_STATEMENT *) hstmt;
-  int out_length;
+  int out_length = -1;
 
   OutputDebugString ("SQLDescribeColW called.\n");
   
@@ -423,7 +440,11 @@ SQLDescribeColW (SQLHSTMT hstmt, SQLUSMALLINT column,
 
   if (name_len)
    {
+#if defined (_WINDOWS)
      *name_len = (SQLSMALLINT)out_length;
+#else
+     *name_len = (SQLSMALLINT)name_buffer_len;
+#endif
    }
 
   UT_FREE (name_buffer);     
@@ -1014,7 +1035,7 @@ SQLColAttributeW (SQLHSTMT StatementHandle,
                   SQLUSMALLINT FieldIdentifier,
                   SQLPOINTER CharacterAttribute,
                   SQLSMALLINT BufferLength, SQLSMALLINT * StringLength,
-#ifdef _WIN64
+#if defined (_WIN64) || defined (__linux__) || defined (AIX)
                   SQLLEN * NumericAttribute)
 #else
                   SQLPOINTER NumericAttribute)

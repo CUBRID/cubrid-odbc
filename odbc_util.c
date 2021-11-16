@@ -33,7 +33,9 @@
 #include		<string.h>
 
 #include		"odbc_portable.h"
+#if defined (_WINDOWS)
 #include		"odbc_util.h"
+#endif
 #include		"odbc_statement.h"
 
 #define		UNIT_MEMORY_SIZE		256
@@ -1329,7 +1331,11 @@ encode_string_to_charset(wchar_t *str, int size, char **target, int* out_length,
 {
     int nLength;
     char *tmp_string;
+#if defined (_WINDOWS)
     int wincode = CP_ACP;
+#else
+    int wincode = CP_UTF8;
+#endif
     int num_wchars = -1;
 
     if (size > 0)
@@ -1383,7 +1389,7 @@ encode_string_to_utf8 (wchar_t *str, int size, char **target,  int* out_length)
   int wincode = CP_UTF8;
 
   nLength = WideCharToMultiByte (wincode, 0, str, -1, NULL, 0, NULL,
-				 NULL);
+                                 NULL);
   tmp_string = (char *) ut_alloc (sizeof (char) * (nLength + 1));
   if (tmp_string == NULL)
     {
@@ -1391,19 +1397,20 @@ encode_string_to_utf8 (wchar_t *str, int size, char **target,  int* out_length)
     }
 
   nLength = WideCharToMultiByte (wincode, 0, str, -1, tmp_string, nLength, NULL,
-		       NULL);
+                       NULL);
   if (target)
     {
       *target = tmp_string;
     }
-    
+
     if(out_length)
      {
        * out_length = nLength;
      }
-    
+
   return ODBC_SUCCESS;
 }
+
 
 /************************************************************************
  * name: encode_string
@@ -1415,8 +1422,8 @@ encode_string_to_utf8 (wchar_t *str, int size, char **target,  int* out_length)
 int
 wide_char_to_bytes (wchar_t *str, int size, char **target, int* out_length, char* characterset)
 {
-  if(size <= 0)
-    { 
+  if (size <= 0)
+    {
       size = sqlwcharlen(str);
     }
 
@@ -1435,48 +1442,51 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
 {
   int nLength;
   int wincode = CP_ACP;
-  wchar_t* temp_buffer = *buffer;
+  wchar_t *temp_buffer = *buffer;
   int temp_buffer_length = buffer_length;
-  
-  if (characterset == NULL || _stricmp(characterset, "utf-8") == 0)
-    {
-      wincode = CP_UTF8;
-    }
-  else if (_stricmp(characterset, "euc-kr") == 0)
-    {
-      wincode = CP_EUC_KR;
-    }
 
+  if (characterset == NULL || _stricmp (characterset, "utf-8") == 0)
+   {
+     wincode = CP_UTF8;
+   }
+  else if (_stricmp(characterset, "euc-kr") == 0)
+         {
+	   wincode = CP_EUC_KR;
+         }
   if(str == NULL || buffer == NULL)
    {
      return ODBC_SUCCESS;
    }
-  
+
   temp_buffer_length = MultiByteToWideChar (wincode, 0, (LPCSTR) str, size, NULL, 0);
   if(buffer_length==0) // need to malloc buffer
-    {
-      temp_buffer = UT_ALLOC_BSTR (temp_buffer_length);
-      if (temp_buffer == NULL)
-        {
-          return CCI_ER_NO_MORE_MEMORY;
-        }
+   {
+    temp_buffer = UT_ALLOC_BSTR (temp_buffer_length);
+    if (temp_buffer == NULL)
+      {
+        return CCI_ER_NO_MORE_MEMORY;
+      }
       buffer_length = temp_buffer_length;
-   } 
-   
+   }
   nLength = MultiByteToWideChar (wincode, 0, (LPCSTR) str, size, temp_buffer, buffer_length);
+
   temp_buffer[nLength] = '\0';
   *buffer = temp_buffer;
+
   //SysFreeString (bstrCode);
+
   if(out_length != NULL)
-    {
-      *out_length = nLength * sizeof(wchar_t);
-    }
+   {
+     *out_length = nLength * WCHAR_SIZE_BYTES;
+   }
   if ( buffer_length < temp_buffer_length)
-    {
+   {
       return ODBC_SUCCESS_WITH_INFO;
-    }  
+   }
   return ODBC_SUCCESS;
 }
+
+
 
 /************************************************************************
  * name: decode_string
@@ -1518,7 +1528,12 @@ get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, 
   //SysFreeString (bstrCode);
   if(out_length != NULL)
    {
+#ifdef _WINDOWS
      *out_length = nLength * sizeof(wchar_t);
+#else
+     *out_length = nLength * WCHAR_SIZE_BYTES;
+#endif
+
    }
   if ( buffer_length < temp_buffer_length)
    {
@@ -1531,6 +1546,91 @@ PUBLIC _BOOL_ is_odd_number (int num)
 {
   return (num & 1) ? _TRUE_ : _FALSE_;
 }
+
+#define LINE_SZ 256
+
+int
+get_section_from_file (const char *ini, const char *section, char *value_p, int size)
+{
+  FILE *fp, *fopen();
+  char buf [LINE_SZ];
+  char *p, *pt;
+  int rc = -1;
+  int found = 0;
+
+  memset (buf, 0, LINE_SZ);
+  if (ini == NULL || section == NULL || value_p == NULL || size < 1)
+    {
+      return -1;
+    }
+
+    if ((fp = fopen (ini, "r")) == NULL)
+      {
+        return 1;
+      }
+
+      while (!feof(fp))
+        {
+          if (fgets (buf, LINE_SZ, fp))
+            {
+              if (buf[0] == '[')
+                {
+                  p = strchr(buf, ']');
+                  if (p != NULL)
+                    {
+                      *p = '\0';
+                      if (strcasecmp (&buf[1], section) == 0)
+                        {
+                          found = 1;
+                          break;
+                        }
+                    }
+              }
+            else
+              {
+                continue;
+              }
+            }
+      }
+
+      if (!found)
+        {
+          return -1;
+        }
+
+      while (!feof(fp))
+        {
+          if (fgets (buf, LINE_SZ, fp))
+            {
+              p = strchr (buf, '\n');
+              if (p)
+                {
+                  *p = '\0';
+                }
+
+              if (buf [0] == '\0' || buf [0] == '#' || buf [0] == '[')
+                {
+                  rc = 0;
+                  break;
+                }
+
+              strcat (value_p, buf);
+              strcat (value_p, ";");
+              rc = 0;
+            }
+          }
+
+      fclose (fp);
+    for (pt = value_p; *pt != '\0'; ++pt)
+     {
+      if (*pt == ';')           // connection string delimiter
+        *pt = '\0';
+     }
+
+      return rc;
+}
+
+
 
 #ifdef CUBRID_ODBC_UNICODE
 PUBLIC int check_if_even_number (SQLUSMALLINT info_type, SQLSMALLINT buffer_length)
@@ -1649,3 +1749,4 @@ PUBLIC int decide_info_value_length (SQLUSMALLINT info_type, int buffer_length, 
   return info_value_length;
 }
 #endif
+

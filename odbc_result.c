@@ -189,7 +189,6 @@ odbc_describe_col (ODBC_STATEMENT * stmt,
 	  odbc_get_desc_field (ird, column_number, SQL_DESC_LENGTH,
 			       column_size_ptr, 0, NULL);
 	}
-      //odbc_get_desc_field(ird, column_number, SQL_DESC_LENGTH, column_size_ptr, 0, NULL);
     }
 
   if (decimal_digits_ptr != NULL)
@@ -700,9 +699,11 @@ odbc_get_data (ODBC_STATEMENT * stmt,
                        target_type == SQL_WVARCHAR ||
                        target_type == SQL_WLONGVARCHAR)
                 {
+                  int len = 0;
                   rc =
                     get_wide_char_result (cci_value.str, strlen(cci_value.str), (wchar_t **)&bound_ptr,
-                                      (int) buffer_length, str_ind_ptr, stmt->conn->charset);
+                                      (int) buffer_length, &len, stmt->conn->charset);
+                  *str_ind_ptr = len;
                   if (rc == ODBC_SUCCESS_WITH_INFO)
                     {
                       if (buffer_length > 0)
@@ -1069,6 +1070,7 @@ get_bind_info (ODBC_STATEMENT * stmt,
   /* recalculating bount_ptr & strlen_ind_ptr */
   if (stmt->ard->bind_type == SQL_BIND_BY_COLUMN)
     {
+#if defined (_WINDOWS)
       (*(long long *)bound_ptr) += offset_size + row_index * (*buffer_length);
       (*(long long *)strlen_ind_ptr) += offset_size + row_index * sizeof (long);
     }
@@ -1077,6 +1079,16 @@ get_bind_info (ODBC_STATEMENT * stmt,
 	  (*(long long *)bound_ptr) += offset_size + row_index * element_size;
       (*(long long *)strlen_ind_ptr) += offset_size + row_index * element_size;
     }
+#else
+      *(long long *) bound_ptr += offset_size + row_index * (*buffer_length);
+      *(SQLLEN *) strlen_ind_ptr += offset_size + row_index * sizeof(long*);
+    }
+  else
+    {
+      *(long long *)bound_ptr += offset_size + row_index * element_size;
+      *(long long *)strlen_ind_ptr += offset_size + row_index * element_size;
+    }
+#endif
 
   return;
 }

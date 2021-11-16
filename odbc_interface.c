@@ -28,7 +28,10 @@
  *
  */
 
+#if defined (_WINDOWS)
 #include		<windows.h>
+#endif
+
 #include		<stdio.h>
 
 #include		"odbc_portable.h"
@@ -63,6 +66,7 @@ ConnectDlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 PUBLIC HINSTANCE hInstance;
 
+#if defined (_WINDOWS)
 BOOL WINAPI
 DllMain (HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -82,6 +86,7 @@ DllMain (HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 
   return TRUE;
 }
+#endif
 
 const char *cci_client_name = "ODBC";
 
@@ -215,7 +220,7 @@ SQLBindParameter (SQLHSTMT StatementHandle,
 	  }
 	else
 	  {
-	    *StrLen_or_IndPtr = *StrLen_or_IndPtr / sizeof (wchar_t);
+	    *StrLen_or_IndPtr = *StrLen_or_IndPtr / WCHAR_SIZE_BYTES;
 	  }
 
     }
@@ -286,7 +291,7 @@ SQLColAttribute (SQLHSTMT StatementHandle,
 		 SQLUSMALLINT FieldIdentifier,
 		 SQLPOINTER CharacterAttribute,
 		 SQLSMALLINT BufferLength, SQLSMALLINT * StringLength,
-#ifdef _WIN64
+#if defined (_WIN64) || defined (__linux__) || defined (AIX)
 		 SQLLEN * NumericAttribute)
 #else
 		 SQLPOINTER NumericAttribute)
@@ -294,11 +299,16 @@ SQLColAttribute (SQLHSTMT StatementHandle,
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
+  SQLSMALLINT str_len;
 
   OutputDebugString ("SQLColAttribute called\n");
 
   DEBUG_TIMESTAMP (START_SQLColAttribute);
 
+  if (StringLength == NULL)
+    {
+	  StringLength = &str_len;
+    }
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
@@ -538,7 +548,33 @@ SQLDriverConnect (HDBC hdbc,
       if (*pt == ';')		// connection string delimiter
 	*pt = '\0';
     }
-  ptDriver = element_value_by_key (ConnStrIn, KEYWORD_DRIVER);
+  ptDSN = element_value_by_key (ConnStrIn, KEYWORD_DSN);
+
+#if !defined (_WINDOWS)
+#define INI_SZ  4096
+  {
+    char value_p [BUF_SIZE*4];
+    char *home_dir, *ini_envp;
+    char ini[INI_SZ];
+
+    ini_envp = getenv ("ODBCINI");
+    if (ini_envp == NULL)
+    {
+      sprintf (ini, "%s/.odbc.ini", getenv ("HOME"));
+    }
+  else
+    {
+      sprintf (ini, "%s", ini_envp);
+    }
+
+  memset (value_p, 0, INI_SZ);
+  if (get_section_from_file (ini, ptDSN, value_p, BUF_SIZE*4) == 0)
+    {
+      memcpy (ConnStrIn, value_p, BUF_SIZE*4);
+      ptDSN = element_value_by_key (ConnStrIn, KEYWORD_DSN);
+    }
+  }
+#endif
   /*
      pt = strchr(ptDriver, '{');
      if ( pt == NULL ) {
@@ -550,7 +586,8 @@ SQLDriverConnect (HDBC hdbc,
      szDriver[pt2-pt -1] = '\0';
      }
    */
-  ptDSN = element_value_by_key (ConnStrIn, KEYWORD_DSN);
+
+  ptDriver = element_value_by_key (ConnStrIn, KEYWORD_DRIVER);
   ptUser = element_value_by_key (ConnStrIn, KEYWORD_USER);
   ptPWD = element_value_by_key (ConnStrIn, KEYWORD_PASSWORD);
   ptSaveFile = element_value_by_key (ConnStrIn, KEYWORD_SAVEFILE);
@@ -578,11 +615,13 @@ SQLDriverConnect (HDBC hdbc,
 	      sprintf (dci.pwd, "");
 	    }
 
+#if defined (_WINDOWS)
 	  if (strcmp (dci.user, "") == 0)
 	    {
 	      DialogBoxParam (hInstance, (LPCTSTR) IDD_DRIVERCONNECT, hWnd,
 			      ConnectDlgProc, (LPARAM) & dci);
 	    }
+#endif
 	  ptUser = dci.user;
 	  ptPWD = dci.pwd;
 	}
@@ -809,13 +848,13 @@ SQLExecDirect (SQLHSTMT StatementHandle,
 
   stStatementText = UT_MAKE_STRING (StatementText, TextLength);
 
-  if (stricmp(StatementText, "@QP@") == 0)
+  if (_stricmp(StatementText, "@QP@") == 0)
     {
       stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN;
       return ODBC_SUCCESS;
     }
   
-  if (stricmp(StatementText, "@QE@") == 0)
+  if (_stricmp(StatementText, "@QE@") == 0)
     {
       stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN | CCI_EXEC_QUERY_ALL;
       return ODBC_SUCCESS;
@@ -1958,7 +1997,11 @@ ODBC_INTERFACE RETCODE SQL_API
 SQLDescribeParam (SQLHSTMT StatementHandle,
 		  SQLUSMALLINT ParameterNumber,
 		  SQLSMALLINT * DataTypePtr,
+#if defined (_WINDOWS)
 		  SQLUINTEGER * ParameterSizePtr,
+#else
+		  SQLULEN * ParameterSizePtr,
+#endif
 		  SQLSMALLINT * DecimalDigitsPtr, SQLSMALLINT * NullablePtr)
 {
   RETCODE rc = SQL_SUCCESS;
@@ -2133,7 +2176,11 @@ SQLProcedures (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLParamOptions (SQLHSTMT StatementHandle,
+#if defined (_WINDOWS)
 		 SQLUINTEGER crow, SQLUINTEGER * pirow)
+#else
+		 SQLULEN crow, SQLULEN * pirow)
+#endif
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -2514,6 +2561,7 @@ SQLSetScrollOptions (SQLHSTMT StatementHandle,
  *  SQLDriverConnect시 사용되는 dialog box를 띄운다.
  * NOTE:
  ************************************************************************/
+#if defined (_WINDOWS)
 PRIVATE INT_PTR CALLBACK
 ConnectDlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -2578,3 +2626,4 @@ ConnectDlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
   return (TRUE);
 }
+#endif
