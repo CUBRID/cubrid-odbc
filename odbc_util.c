@@ -1482,7 +1482,7 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
   if ( buffer_length < temp_buffer_length)
    {
       return ODBC_SUCCESS_WITH_INFO;
- }
+   }
   return ODBC_SUCCESS;
 }
 
