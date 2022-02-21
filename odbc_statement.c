@@ -1652,7 +1652,7 @@ odbc_execute (ODBC_STATEMENT * stmt)
   if (flag_stmt_need_data != 0)
     return ODBC_NEED_DATA;
 
-  if (!RESULTSET_STMT_TYPE (stmt->stmt_type))
+  if (!RESULTSET_STMT_TYPE (stmt->stmt_type) || stmt->conn->attr_autocommit == SQL_AUTOCOMMIT_ON)
     {
       odbc_auto_commit (stmt->conn);
     }

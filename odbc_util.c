@@ -1532,6 +1532,30 @@ PUBLIC _BOOL_ is_odd_number (int num)
   return (num & 1) ? _TRUE_ : _FALSE_;
 }
 
+/************************************************************************
+* name: ut_tolower
+* arguments:
+*		in_value - source string
+* returns/side-effects:
+* description:
+*               Convert source string to lowercase
+* NOTE:
+************************************************************************/
+void
+ut_tolower (char *str)
+{
+  char *p;
+
+  if (str == NULL)
+    return;
+
+  for (p = str; *p; p++)
+    {
+      if (*p >= 'A' && *p <= 'Z')
+        *p = *p - 'A' + 'a';
+    }
+}
+
 #ifdef CUBRID_ODBC_UNICODE
 PUBLIC int check_if_even_number (SQLUSMALLINT info_type, SQLSMALLINT buffer_length)
 {

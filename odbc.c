@@ -99,6 +99,8 @@ AddDSNProcByParam (CUBRIDDSNItem* pDsn_item)
 				dsn_item.fetch_size, "ODBC.INI");
 	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_CHARSET,
 				dsn_item.charset, "ODBC.INI");
+	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_AUTOCOMMIT,
+	                        dsn_item.autocommit, "ODBC.INI");
 
     return (TRUE);
 }
@@ -171,6 +173,7 @@ ConfigDSN (HWND hwndParent,
 		  Odbc_strncpy(dsn_item.charset , element_value_by_key (ConnStrIn, KEYWORD_CHARSET),ITEMBUFLEN);
 		  Odbc_strncpy(dsn_item.db_name , element_value_by_key (ConnStrIn, KEYWORD_DBNAME),ITEMBUFLEN);
 		  Odbc_strncpy(dsn_item.description , element_value_by_key (ConnStrIn, KEYWORD_DESCRIPTION),ITEMBUFLEN);
+		  Odbc_strncpy(dsn_item.autocommit, element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT), ITEMBUFLEN);
 		  
 		  rc = AddDSNProcByParam(&dsn_item);
 		  if(rc != TRUE)
@@ -217,6 +220,9 @@ ConfigDSN (HWND hwndParent,
       SQLGetPrivateProfileString (dsn_item.dsn, KEYWORD_CHARSET,
 				  "Not Found Field", dsn_item.charset,
 				  ITEMBUFLEN, "ODBC.INI");
+      SQLGetPrivateProfileString (dsn_item.dsn, KEYWORD_AUTOCOMMIT,
+	                          "Not Found Field", dsn_item.autocommit,
+	                          ITEMBUFLEN, "ODBC.INI");
       dlgrc =
 	DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hwndParent,
 			ConfigDSNDlgProc, (LPARAM) & dsn_item);
@@ -292,6 +298,7 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
       SetDlgItemText (hwndParent, IDC_PORT, ptDSNItem->port);
       SetDlgItemText (hwndParent, IDC_FETCH_SIZE, ptDSNItem->fetch_size);
       SetDlgItemText (hwndParent, IDC_CHARSET, ptDSNItem->charset);
+      SetDlgItemText (hwndParent, IDC_AUTOCOMMIT, ptDSNItem->autocommit);
       sprintf (ibuf, "%p", ptDSNItem);
       SetDlgItemText (hwndParent, IDC_PT_DSNITEM, ibuf);
 
@@ -324,8 +331,10 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
 	  GetDlgItemText (hwndParent, IDC_PORT, ptDSNItem->port, ITEMBUFLEN);
 	  GetDlgItemText (hwndParent, IDC_FETCH_SIZE, ptDSNItem->fetch_size,
 			  ITEMBUFLEN);
-        GetDlgItemText (hwndParent, IDC_CHARSET, ptDSNItem->charset,
+          GetDlgItemText (hwndParent, IDC_CHARSET, ptDSNItem->charset,
 			  ITEMBUFLEN);
+	  GetDlgItemText (hwndParent, IDC_AUTOCOMMIT, ptDSNItem->autocommit,
+	                  ITEMBUFLEN);
 
 	  rc = EndDialog (hwndParent, AddDSNProc (hwndParent));
 	  SetCursor (hOldCursor);
@@ -383,6 +392,8 @@ AddDSNProc (HWND hwndParent)
 		      ITEMBUFLEN);
       GetDlgItemText (hwndParent, IDC_CHARSET, dsn_item.charset,
 		      ITEMBUFLEN);
+      GetDlgItemText (hwndParent, IDC_AUTOCOMMIT, dsn_item.autocommit,
+	              ITEMBUFLEN);
 
       rc = SQLWriteDSNToIni (dsn_item.dsn, dsn_item.driver);
       if (rc == FALSE)
@@ -406,6 +417,8 @@ AddDSNProc (HWND hwndParent)
 				    dsn_item.fetch_size, "ODBC.INI");
       SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_CHARSET,
 				    dsn_item.charset, "ODBC.INI");
+      SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_AUTOCOMMIT,
+	                            dsn_item.autocommit, "ODBC.INI");
     }
 
   return (TRUE);
