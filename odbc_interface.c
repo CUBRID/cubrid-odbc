@@ -868,6 +868,18 @@ SQLExecute (SQLHSTMT StatementHandle)
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
+  if (stricmp (stmt_handle->sql_text, "@QP@") == 0)
+    {
+      stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN;
+      return ODBC_SUCCESS;
+    }
+
+  if (stricmp (stmt_handle->sql_text, "@QE@") == 0)
+    {
+      stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN | CCI_EXEC_QUERY_ALL;
+      return ODBC_SUCCESS;
+    }
+
   // SQLEndTran()에 의해서 cursor가 delete된 상태
   if (stmt_handle->is_prepared == _TRUE_ && stmt_handle->stmthd <= 0)
     {
@@ -1471,6 +1483,20 @@ SQLPrepare (SQLHSTMT StatementHandle,
   odbc_free_diag (stmt_handle->diag, RESET);
 
   stStatementText = UT_MAKE_STRING (StatementText, TextLength);
+
+  if (stricmp (StatementText, "@QP@") == 0)
+    {
+      stmt_handle->sql_text = UT_MAKE_STRING (StatementText, TextLength);
+      stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN;
+      return ODBC_SUCCESS;
+    }
+
+  if (stricmp (StatementText, "@QE@") == 0)
+    {
+      stmt_handle->sql_text = UT_MAKE_STRING (StatementText, TextLength);
+      stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN | CCI_EXEC_QUERY_ALL;
+      return ODBC_SUCCESS;
+    }
 
   rc = odbc_prepare (stmt_handle, stStatementText);
   stmt_handle->is_prepared = _TRUE_;
