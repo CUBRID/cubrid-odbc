@@ -36,7 +36,7 @@
 #include		"odbc_env.h"
 #include		"odbc_statement.h"
 
-#define			KEYWORD_DSN			"DSN"
+#define			KEYWORD_DSN		"DSN"
 #define			KEYWORD_FILEDSN		"FILEDSN"
 #define			KEYWORD_DBNAME		"DB_NAME"
 #define			KEYWORD_USER		"UID"
@@ -48,6 +48,7 @@
 #define			KEYWORD_SAVEFILE	"SAVEFILE"
 #define			KEYWORD_DRIVER		"DRIVER"
 #define			KEYWORD_CHARSET		"CHARSET"
+#define			KEYWORD_AUTOCOMMIT	"AUTOCOMMIT"
 
 #define			KEYWORD_ALTHOSTS	"ALTHOSTS"
 #define			KEYWORD_RCTIME		"RCTIME"
@@ -79,6 +80,7 @@ typedef struct stCUBRIDDSNItem
   char save_file[_MAX_PATH];
   char description[2 * ITEMBUFLEN];
   char charset[ITEMBUFLEN];
+  char autocommit[ITEMBUFLEN];
 } CUBRIDDSNItem;
 
 typedef struct st_odbc_connection_attr
@@ -166,6 +168,7 @@ PUBLIC RETCODE odbc_connect_new (ODBC_CONNECTION * conn,
 				 const char *server,
 				 int port, int fetch_size,
 				 const char *charset,
+                                 const char *autocommit,
 				 const char *conn_str_in);
 PUBLIC RETCODE odbc_disconnect (ODBC_CONNECTION * conn);
 PUBLIC RETCODE odbc_set_connect_attr (ODBC_CONNECTION * conn,
@@ -193,6 +196,7 @@ PUBLIC int get_dsn_info (const char *dsn, char *db_name, int db_name_len,
 			 char *user, int user_len, char *pwd, int pwd_len,
 			 char *server, int server_len, int *port,
 			 int *fetch_size,
-			 char *charset, int charset_len);
+			 char *charset, int charset_len,
+                         char *autocommit, int autocommit_len);
 
 #endif /* ! __ODBC_CONN_HEADER */

@@ -774,6 +774,7 @@ odbc_connect_new (ODBC_CONNECTION * conn,
 		  int port, 
 		  int fetch_size,
 		  const char *charset,
+                  const char *autocommit,
 		  const char* conn_str)
 {
   int connhd;
@@ -816,6 +817,16 @@ odbc_connect_new (ODBC_CONNECTION * conn,
 
   pt = charset == NULL ? "" : charset;
   conn->charset = UT_MAKE_STRING (pt, -1);
+
+  pt = autocommit == NULL ? "on" : autocommit;
+  if (_stricmp (autocommit, "on") == 0)
+    {
+      conn->attr_autocommit = SQL_AUTOCOMMIT_ON;
+    }
+  else
+    {
+      conn->attr_autocommit = SQL_AUTOCOMMIT_OFF;
+    }
 
   if (port > 0)
     {
@@ -2651,7 +2662,8 @@ get_dsn_info (const char *dsn,
 	      char *user, int user_len,
 	      char *pwd, int pwd_len,
 	      char *server, int server_len, int *port, int *fetch_size,
-	      char *charset, int charset_len)
+	      char *charset, int charset_len,
+              char *autocommit, int autocommit_len)
 
 {
   char buf[1024];
@@ -2741,6 +2753,18 @@ get_dsn_info (const char *dsn,
 	buf[0] = '\0';
       else
         str_value_assign (buf, charset, server_len, NULL);
+    }
+
+  // Get autocommit entry
+  if (autocommit != NULL)
+    {
+      rcn =
+	SQLGetPrivateProfileString (dsn, KEYWORD_AUTOCOMMIT, "", buf, sizeof (buf),
+	  "ODBC.INI");
+      if (rcn == 0)
+	buf[0] = '\0';
+      else
+	str_value_assign (buf, autocommit, autocommit_len, NULL);
     }
 
   return 0;

@@ -374,6 +374,7 @@ SQLConnect (SQLHDBC ConnectionHandle,
   SQLCHAR stServerName[ITEMBUFLEN];
   SQLINTEGER Port, FetchSize;
   SQLCHAR stCharSet[ITEMBUFLEN];
+  SQLCHAR stAutocommit[ITEMBUFLEN];
 
 
   OutputDebugString ("SQLConnect called\n");
@@ -388,10 +389,10 @@ SQLConnect (SQLHDBC ConnectionHandle,
 
   get_dsn_info (stDataSource, stDBName, sizeof (stDBName), NULL, 0, NULL, 0,
 		stServerName, sizeof (stServerName), &Port, &FetchSize,
-		stCharSet, sizeof (stCharSet));
+		stCharSet, sizeof (stCharSet), stAutocommit, sizeof (stAutocommit));
   rc = odbc_connect_new ((ODBC_CONNECTION *) ConnectionHandle, stDataSource,
 			 stDBName, stUserName, stAuthentication, stServerName,
-			 Port, FetchSize, stCharSet, NULL);
+			 Port, FetchSize, stCharSet, stAutocommit, NULL);
 
   NA_FREE (stDataSource);
   NA_FREE (stUserName);
@@ -510,6 +511,7 @@ SQLDriverConnect (HDBC hdbc,
   const char *ptFetchSize;
   const char *ptDescription;
   const char *ptCharSet;
+  const char *ptAutoCommit;
 
   // Deprecated : char            szDriver[ITEMBUFLEN];
   char ConnStrIn[BUF_SIZE*4];
@@ -520,6 +522,7 @@ SQLDriverConnect (HDBC hdbc,
   char db_name[ITEMBUFLEN] = "";
   char server[ITEMBUFLEN] = "";
   char charset[ITEMBUFLEN] = "";
+  char autocommit[ITEMBUFLEN] = "";
   int port = 0;
   int fetch_size = 0;
 
@@ -555,6 +558,7 @@ SQLDriverConnect (HDBC hdbc,
   ptPWD = element_value_by_key (ConnStrIn, KEYWORD_PASSWORD);
   ptSaveFile = element_value_by_key (ConnStrIn, KEYWORD_SAVEFILE);
   ptCharSet = element_value_by_key (ConnStrIn, KEYWORD_CHARSET);
+  ptAutoCommit = element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT);
 
   if (ptSaveFile == NULL)
     {				// for just connect
@@ -565,7 +569,7 @@ SQLDriverConnect (HDBC hdbc,
 	  if (ptDSN != NULL)
 	    {
 	      get_dsn_info (ptDSN, NULL, 0, user, sizeof (user),
-			    pwd, sizeof (pwd), NULL, 0, NULL, NULL, NULL, 0);
+			    pwd, sizeof (pwd), NULL, 0, NULL, NULL, NULL, 0, NULL, 0);
 	    }
 	  if (ptUser == NULL || ptUser[0] == '\0')
 	    {
@@ -595,12 +599,13 @@ SQLDriverConnect (HDBC hdbc,
 	  ptPort = element_value_by_key (ConnStrIn, KEYWORD_PORT);
 	  ptFetchSize = element_value_by_key (ConnStrIn, KEYWORD_FETCH_SIZE);
 	  ptCharSet = element_value_by_key (ConnStrIn, KEYWORD_CHARSET);
+	  ptAutoCommit = element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT);
 
 	  port = ptPort ? atoi (ptPort) : 0;
 	  fetch_size = ptFetchSize ? atoi (ptFetchSize) : 0;
 
 	  rc = odbc_connect_new (hdbc, ptFileDSN, ptDBName, ptUser,
-				 ptPWD, ptServer, port, fetch_size, ptCharSet, ConnStrIn);
+				 ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, ConnStrIn);
 	}
       else
 	{
@@ -613,7 +618,7 @@ SQLDriverConnect (HDBC hdbc,
 
 	  get_dsn_info (ptDSN, db_name, sizeof (db_name), NULL, 0,
 			NULL, 0, server, sizeof (server), &port, &fetch_size,
-			charset, sizeof(charset));
+			charset, sizeof(charset), autocommit, sizeof(autocommit));
 
 	  // cbConnStrIn이 DSN의 정보보다 우선하다.
 	  if (ptDBName == NULL)
@@ -636,9 +641,13 @@ SQLDriverConnect (HDBC hdbc,
 	    {
 	      ptCharSet = charset;
 	    }
+	  if (ptAutoCommit == NULL)
+	    {
+	      ptAutoCommit = autocommit;
+	    }
 
 	  rc = odbc_connect_new (hdbc, ptDSN, ptDBName, ptUser,
-				 ptPWD, ptServer, port, fetch_size, ptCharSet, ConnStrIn);
+				 ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, ConnStrIn);
 	}
 
       // Building ConnStrOut
@@ -691,6 +700,11 @@ SQLDriverConnect (HDBC hdbc,
 	  sprintf (buf2, "%s=%s;", KEYWORD_CHARSET, ptCharSet);
 	  strcat (buf, buf2);
 	}
+      if (ptAutoCommit != NULL)
+	{
+	  sprintf (buf2, "%s=%s;", KEYWORD_AUTOCOMMIT, ptAutoCommit);
+	  strcat (buf, buf2);
+	}
 
       if ((szConnStrOut) && cbConnStrOut > 0)
 	{
@@ -714,6 +728,7 @@ SQLDriverConnect (HDBC hdbc,
       ptFetchSize = element_value_by_key (buf, KEYWORD_FETCH_SIZE);
       ptDescription = element_value_by_key (buf, KEYWORD_DESCRIPTION);
       ptCharSet = element_value_by_key (buf, KEYWORD_CHARSET);
+      ptAutoCommit = element_value_by_key (buf, KEYWORD_AUTOCOMMIT);
 
 
       memset (&dsn_item, 0, sizeof (CUBRIDDSNItem));
@@ -735,11 +750,13 @@ SQLDriverConnect (HDBC hdbc,
 	strcpy (dsn_item.description, ptDescription);
       if (ptCharSet != NULL)
 	strcpy (dsn_item.charset, ptCharSet);
+      if (ptAutoCommit != NULL)
+	strcpy (dsn_item.autocommit, ptAutoCommit);
 
       dlgrc = DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hWnd,
 			      ConfigDSNDlgProc, (LPARAM) & dsn_item);
 
-      sprintf (buf, "%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s",
+      sprintf (buf, "%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s",
 	       KEYWORD_DRIVER, ptDriver,
 	       KEYWORD_SAVEFILE, ptSaveFile,
 	       KEYWORD_DESCRIPTION, dsn_item.description,
@@ -749,7 +766,8 @@ SQLDriverConnect (HDBC hdbc,
 	       KEYWORD_SERVER, dsn_item.server,
 	       KEYWORD_PORT, dsn_item.port,
 	       KEYWORD_FETCH_SIZE, dsn_item.fetch_size,
-	       KEYWORD_CHARSET, dsn_item.charset);
+	       KEYWORD_CHARSET, dsn_item.charset,
+	       KEYWORD_AUTOCOMMIT, dsn_item.autocommit);
 
       if ((szConnStrOut) && cbConnStrOut > 0)
 	{

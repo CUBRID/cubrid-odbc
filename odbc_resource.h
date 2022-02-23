@@ -22,6 +22,7 @@
 #define IDC_PT_DSNITEM                  1015
 #define IDC_DCI_PTR                     1016
 #define IDC_CHARSET                     1018
+#define IDC_AUTOCOMMIT                  1020
 
 // Next default values for new objects
 // 
