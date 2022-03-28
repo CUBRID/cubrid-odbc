@@ -1070,7 +1070,7 @@ get_bind_info (ODBC_STATEMENT * stmt,
   if (stmt->ard->bind_type == SQL_BIND_BY_COLUMN)
     {
       (*(long long *)bound_ptr) += offset_size + row_index * (*buffer_length);
-      (*(long long *)strlen_ind_ptr) += offset_size + row_index * sizeof (long);
+      (*(long long *)strlen_ind_ptr) += offset_size + row_index * sizeof (long *);
     }
   else
     {
