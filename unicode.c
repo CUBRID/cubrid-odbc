@@ -423,7 +423,7 @@ SQLDescribeColW (SQLHSTMT hstmt, SQLUSMALLINT column,
 
   if (name_len)
    {
-     *name_len = (SQLSMALLINT)out_length;
+     *name_len = (SQLSMALLINT) (out_length / sizeof (wchar_t));
    }
 
   UT_FREE (name_buffer);     

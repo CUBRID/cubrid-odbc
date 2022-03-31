@@ -1337,7 +1337,7 @@ encode_string_to_charset(wchar_t *str, int size, char **target, int* out_length,
          num_wchars = size;
       }
 
-    if (charset == NULL || _stricmp(charset, "utf-8") == 0)
+    if (charset == NULL || _stricmp(charset, "utf-8") == 0 || _stricmp(charset, "utf8") == 0)
       {
         wincode = CP_UTF8;
       }
@@ -1438,7 +1438,7 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
   wchar_t* temp_buffer = *buffer;
   int temp_buffer_length = buffer_length;
   
-  if (characterset == NULL || _stricmp(characterset, "utf-8") == 0)
+  if (characterset == NULL || _stricmp(characterset, "utf-8") == 0 || _stricmp(characterset, "utf8") == 0)
     {
       wincode = CP_UTF8;
     }
@@ -1493,7 +1493,7 @@ get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, 
   int temp_buffer_length = buffer_length;
   int rc = ODBC_SUCCESS;
   
-  if (characterset == NULL || _stricmp (characterset, "utf-8") == 0)
+  if (characterset == NULL || _stricmp (characterset, "utf-8") == 0 || _stricmp (characterset, "utf8") == 0)
     {
       wincode = CP_UTF8;
     }
