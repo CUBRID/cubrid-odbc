@@ -615,6 +615,7 @@ SQLDriverConnect (HDBC hdbc,
 	  ptPort = element_value_by_key (ConnStrIn, KEYWORD_PORT);
 	  ptFetchSize = element_value_by_key (ConnStrIn, KEYWORD_FETCH_SIZE);
 	  ptCharSet = element_value_by_key (ConnStrIn, KEYWORD_CHARSET);
+	  ptAutoCommit = element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT);
 
 	  get_dsn_info (ptDSN, db_name, sizeof (db_name), NULL, 0,
 			NULL, 0, server, sizeof (server), &port, &fetch_size,
