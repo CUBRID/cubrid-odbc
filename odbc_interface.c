@@ -604,8 +604,6 @@ SQLDriverConnect (HDBC hdbc,
 	  port = ptPort ? atoi (ptPort) : 0;
 	  fetch_size = ptFetchSize ? atoi (ptFetchSize) : 0;
 
-	  ptAutoCommit = ptAutoCommit == NULL ? "off" : ptAutoCommit;
-
 	  rc = odbc_connect_new (hdbc, ptFileDSN, ptDBName, ptUser,
 				 ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, ConnStrIn);
 	}
