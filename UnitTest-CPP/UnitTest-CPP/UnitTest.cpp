@@ -19,6 +19,35 @@ namespace UnitTestCPP
 		{
 		}
 
+		TEST_METHOD(TestAutoCommit)
+		{
+			RETCODE retcode;
+
+			SQLHENV env;
+			SQLHDBC dbc;
+			SQLHSTMT hStmt = SQL_NULL_HSTMT;
+			SWORD plm_pcbErrorMsg = 0;
+			SQLINTEGER diag_rec;
+			SQLINTEGER autocommit;
+
+			/* Allocate an environment handle */
+			SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
+			/* We want ODBC 3 support */
+			SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			/* Allocate a connection handle */
+			SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
+
+			retcode = SQLDriverConnect(dbc, NULL, L"DSN=CUBRID Driver Unicode;DB_NAME=demodb;SERVER=192.168.2.32;PORT=33000;USER=dba;PWD=;CHARSET=utf-8;AUTOCOMMIT=ON", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+
+			if (retcode == SQL_ERROR) {
+				SQLGetDiagField(SQL_HANDLE_DBC, dbc, 0, SQL_DIAG_NUMBER, &diag_rec, 0, &plm_pcbErrorMsg);
+			}
+
+			retcode = SQLGetConnectAttr(dbc, SQL_ATTR_AUTOCOMMIT, &autocommit, 0, NULL);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			Assert::AreEqual((int)autocommit, 1);
+		}
+
 		TEST_METHOD(QueryPlan)
 		{
 			RETCODE retcode;
