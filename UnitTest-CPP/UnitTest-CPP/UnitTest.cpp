@@ -271,5 +271,85 @@ namespace UnitTestCPP
 			SQLFreeHandle(SQL_HANDLE_ENV, env);
 
 		}
+
+		TEST_METHOD(NullAble_APIS875)
+		{
+
+#define MAX_COL_NAME_LEN  256
+
+			RETCODE retcode;
+			SQLCHAR name[MAX_COL_NAME_LEN];
+			SQLSMALLINT name_len;
+			SQLSMALLINT    data_type;
+			SQLULEN        data_size;
+			SQLSMALLINT    num_digits;
+			SQLSMALLINT    nullable;
+
+
+			SQLHENV env;
+			SQLHDBC dbc;
+			SQLHSTMT hStmt = SQL_NULL_HSTMT;
+			SWORD plm_pcbErrorMsg = 0;
+			SQLINTEGER diag_rec;
+
+			SQLLEN len;
+
+			/* Allocate an environment handle */
+			SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
+			/* We want ODBC 3 support */
+			SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			/* Allocate a connection handle */
+			SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
+
+			//retcode = SQLDriverConnect(dbc, NULL, L"DSN=CUBRID Driver Unicode;DB_NAME=demodb;SERVER=192.168.2.33;PORT=33000;USER=public;PWD=;CHARSET=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			retcode = SQLConnect(dbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+
+			if (retcode == SQL_ERROR) {
+				SQLGetDiagField(SQL_HANDLE_DBC, dbc, 0, SQL_DIAG_NUMBER, &diag_rec, 0, &plm_pcbErrorMsg);
+			}
+
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			// Allocate statement handle and execute a query
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, dbc, &hStmt);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLPrepare(hStmt, L"select * from public.athlete", SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLDescribeCol(
+				hStmt,              // Select Statement (Prepared)
+				1,                  // col1 (code): NOT NULL
+				(SQLWCHAR *)name,               // Column Name (returned)
+				MAX_COL_NAME_LEN,   // size of Column Name buffer
+				&name_len,          // Actual size of column name
+				&data_type,         // SQL Data type of column
+				&data_size,         // Data size of column in table
+				&num_digits,        // Number of decimal digits
+				&nullable);         // Whether column nullable
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			Assert::AreEqual((int)nullable, SQL_NO_NULLS);
+
+			retcode = SQLDescribeCol(
+				hStmt,              // Select Statement (Prepared)
+				3,                  // col23 (gender): NULLABLE
+				(SQLWCHAR *)name,               // Column Name (returned)
+				MAX_COL_NAME_LEN,   // size of Column Name buffer
+				&name_len,          // Actual size of column name
+				&data_type,         // SQL Data type of column
+				&data_size,         // Data size of column in table
+				&num_digits,        // Number of decimal digits
+				&nullable);         // Whether column nullable
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			Assert::AreEqual((int)nullable, SQL_NULLABLE);
+
+			// Clean up.
+			SQLDisconnect(dbc);
+			SQLFreeHandle(SQL_HANDLE_DBC, dbc);
+			SQLFreeHandle(SQL_HANDLE_ENV, env);
+
+
+		}
+
 	};
 }
