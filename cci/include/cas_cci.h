@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
+ * Copyright (C) 2008 Search Solution Corporation. 
  * Copyright (c) 2016 CUBRID Corporation.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -31,6 +31,12 @@
 
 /*
  * cas_cci.h -
+ *
+ * CAUTION!
+ *
+ * In case of common,
+ * engine source (src/broker/broker_cas_cci.h) must be updated,
+ * becuase CCI source and Engine source have been separated.
  */
 
 #ifndef	_CAS_CCI_H_
@@ -44,8 +50,8 @@
 /************************************************************************
  * IMPORTED OTHER HEADER FILES						*
  ************************************************************************/
-#include "cas_error.h"
-#include "dbtran_def.h"
+#include "compat_dbtran_def.h"
+#include "broker_cas_error.h"
 
 /************************************************************************
  * EXPORTED DEFINITIONS							*
@@ -95,6 +101,9 @@
 
 #define CCI_GET_RESULT_INFO_IS_SHARED(RES_INFO, INDEX)	\
 		(((T_CCI_COL_INFO*) (RES_INFO))[(INDEX) - 1].is_shared)
+
+#define CCI_GET_RESULT_INFO_CHARSET(RES_INFO, INDEX)	\
+		(((T_CCI_COL_INFO*) (RES_INFO))[(INDEX) - 1].charset)
 
 #define CCI_IS_SET_TYPE(TYPE)	\
 	(((((TYPE) & CCI_CODE_COLLECTION) == CCI_CODE_SET) || ((TYPE) == CCI_U_TYPE_SET)) ? 1 : 0)
@@ -545,6 +554,8 @@ typedef enum
   CUBRID_STMT_USE,
   CUBRID_STMT_REMOVE_TRIGGER,
   CUBRID_STMT_RENAME_TRIGGER,
+  CUBRID_STMT_RENAME_SERVER,
+  CUBRID_STMT_ALTER_SERVER,
   CUBRID_STMT_ON_LDB,
   CUBRID_STMT_GET_LDB,
   CUBRID_STMT_SET_LDB,
@@ -574,13 +585,12 @@ typedef enum
 
   CUBRID_MAX_STMT_TYPE
 } T_CCI_CUBRID_STMT;
-
+#endif
 typedef int T_CCI_CONN;
 typedef int T_CCI_REQ;
 typedef struct PROPERTIES_T T_CCI_PROPERTIES;
 typedef struct DATASOURCE_T T_CCI_DATASOURCE;
 
-#endif
 #endif
 #define CUBRID_STMT_CALL_SP	0x7e
 #define CUBRID_STMT_UNKNOWN	0x7f
@@ -625,6 +635,8 @@ typedef struct DATASOURCE_T T_CCI_DATASOURCE;
 #define SQLX_CMD_USE   CUBRID_STMT_USE
 #define SQLX_CMD_REMOVE_TRIGGER   CUBRID_STMT_REMOVE_TRIGGER
 #define SQLX_CMD_RENMAE_TRIGGER   CUBRID_STMT_RENAME_TRIGGER
+#define SQLX_CMD_RENMAE_SERVER   CUBRID_STMT_RENAME_SERVER
+#define SQLX_CMD_ALTER_SERVER    CUBRID_STMT_ALTER_SERVER
 #define SQLX_CMD_ON_LDB   CUBRID_STMT_ON_LDB
 #define SQLX_CMD_GET_LDB   CUBRID_STMT_GET_LDB
 #define SQLX_CMD_SET_LDB   CUBRID_STMT_SET_LDB
@@ -679,7 +691,21 @@ typedef struct
   char is_reverse_index;
   char is_reverse_unique;
   char is_shared;
+  int charset;
 } T_CCI_COL_INFO;
+
+typedef enum
+{
+  CCI_CHARSET_ERROR = -2,
+  CCI_CHARSET_NONE = -1,
+  CCI_CHARSET_ASCII,		/* US English charset, ASCII encoding */
+  CCI_CHARSET_RAW_BITS,		/* Uninterpreted bits, Raw encoding */
+  CCI_CHARSET_RAW_BYTES,	/* Uninterpreted bytes, Raw encoding */
+  CCI_CHARSET_ISO88591,		/* Latin 1 charset, ISO 8859 encoding */
+  CCI_CHARSET_KSC5601_EUC,	/* KSC 5601 1990 charset , EUC encoding */
+  CCI_CHARSET_UTF8,		/* UNICODE charset, UTF-8 encoding */
+  CCI_CHARSET_LAST
+} T_CCI_CHARSET_TYPE;
 
 typedef enum
 {
@@ -962,5 +988,13 @@ extern "C"
 /************************************************************************
  * EXPORTED VARIABLES							*
  ************************************************************************/
+
+/*
+ * CAUTION!
+ *
+ * In case of common,
+ * engine source (src/cci/broker_cas_cci.h) must be updated,
+ * becuase CCI source and Engine source have been separated.
+ */
 
 #endif				/* _CAS_CCI_H_ */

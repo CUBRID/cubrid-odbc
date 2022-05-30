@@ -1,5 +1,5 @@
 set WORKSPACE=%~dp0
-set INSTALL_DIRS=output
+set INSTALL_DIRS=output_unicode
 echo %INSTALL_DIRS%
 
 :VS2017COMNTOOLS PATH=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\
