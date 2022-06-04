@@ -351,5 +351,43 @@ namespace UnitTestCPP
 
 		}
 
+		TEST_METHOD(APIS_876_BindNull)
+		{
+			SQLHENV		hEnv;
+			SQLHDBC		hDbc;
+			SQLHSTMT	hStmt;
+
+			RETCODE retcode(0);
+
+			// DB Connection
+
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLConnect(hDbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt);
+
+			retcode = SQLExecDirect(hStmt, L"drop table if exists apis876", SQL_NTS);
+			retcode = SQLExecDirect(hStmt, L"create table apis876 (col1 varchar (2), col2 varchar(20))", SQL_NTS);
+
+			retcode = SQLPrepare(hStmt, (SQLWCHAR*)(wchar_t*)L"INSERT INTO apis876(col1, col2) VALUES(?, ?)", SQL_NTS);
+
+			retcode = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_VARCHAR,
+				2, 0, NULL, 2, NULL);
+			retcode = SQLBindParameter(hStmt, 2, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_VARCHAR,
+				20, 0, L"test", 4, NULL);
+
+			retcode = SQLExecute(hStmt);
+
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			// Release Connection
+			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
+			SQLFreeStmt(hStmt, SQL_DROP);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+		}
+
 	};
 }
