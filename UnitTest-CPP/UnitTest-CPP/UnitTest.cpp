@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 
 #include <stdio.h>  
 #include <string.h>  
@@ -111,6 +111,89 @@ namespace UnitTestCPP
 			SQLFreeHandle(SQL_HANDLE_ENV, env);
 		}
 
+		TEST_METHOD(APIS_926_Array_Bind_UNICODE)
+		{
+			SQLHENV		hEnv;
+			SQLHDBC		hDbc;
+			SQLHSTMT	hStmt;
+#define ARRAY_SIZE	8
+#define	MAXLEN		40
+#define	STR_SZ		10
+#define COL_SIZE	20
+
+			RETCODE retcode(0);
+			int nArraySize(ARRAY_SIZE); // number of rows to insert
+			int nMaxLen(MAXLEN);		// offset for a record
+			SQLUSMALLINT	ParamStatusArray[ARRAY_SIZE];
+			SQLLEN			ParamsProcessed = 0;
+			SQLLEN pIndicator[8];	// StrLen_or_IndPtr array is required but values ere meaningless
+
+			// Connect DB
+
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLConnect(hDbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt);
+			retcode = SQLExecDirect(hStmt, L"drop table if exists apis926", SQL_NTS);
+
+			// Create table apis926 (col1 int, col2 varchar(20));
+			retcode = SQLExecDirect(hStmt, L"create table apis926 (col1 int auto_increment, col2 varchar(20))", SQL_NTS);
+
+			retcode = SQLPrepare(hStmt, (SQLWCHAR*)(wchar_t*)L"INSERT INTO apis926(col2) VALUES(?)", SQL_NTS);
+
+			// Prepare Bind Arrays
+			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAM_BIND_TYPE, SQL_PARAM_BIND_BY_COLUMN, 0);
+			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER)ARRAY_SIZE, 0);
+			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAM_STATUS_PTR, ParamStatusArray, ARRAY_SIZE);
+			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAMS_PROCESSED_PTR, &ParamsProcessed, 0);
+
+			wchar_t address[ARRAY_SIZE][STR_SZ] = { L"?ab", L"ab", L"123", L"6234", L"9", L"db", L"Abc", L"Bbcd" };
+
+			BYTE* pBufData = (BYTE*)new wchar_t[MAXLEN * ARRAY_SIZE];
+			BYTE *ppBuf = pBufData;
+			memset(pBufData, 0, (MAXLEN * nArraySize) * sizeof(wchar_t));
+
+			for (int i = 0; i < ARRAY_SIZE; i++)
+			{
+				memcpy(ppBuf, address[i], STR_SZ * sizeof(wchar_t));
+				ppBuf = ppBuf + nMaxLen;
+			}
+
+			retcode = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_VARCHAR,
+				COL_SIZE, 0, pBufData, MAXLEN, pIndicator);
+
+			retcode = SQLExecute(hStmt);
+
+			ppBuf = pBufData;
+			for (int i = 0; i < ARRAY_SIZE; i++)	// insert additional rows
+			{
+				swprintf(address[i], L"1-¿¿ %d", i);
+				memcpy(ppBuf, address[i], STR_SZ * sizeof(wchar_t));
+				ppBuf = ppBuf + nMaxLen;
+			}
+
+			retcode = SQLExecute(hStmt);
+
+			ppBuf = pBufData;
+			for (int i = 0; i < ARRAY_SIZE; i++)	// insert additional rows
+			{
+				swprintf(address[i], L"2-¿¿ %d", i);
+				memcpy(ppBuf, address[i], STR_SZ * sizeof(wchar_t));
+				ppBuf = ppBuf + nMaxLen;
+			}
+
+			retcode = SQLExecute(hStmt);
+
+			// ¿¿ ¿¿ 
+			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
+			SQLFreeStmt(hStmt, SQL_DROP);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+		}
+
 		TEST_METHOD(QueryPlanMultiByte)
 		{
 			RETCODE retcode;
@@ -145,13 +228,13 @@ namespace UnitTestCPP
 			retcode = SQLAllocHandle(SQL_HANDLE_STMT, dbc, &hStmt);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 
-			retcode = SQLExecDirect(hStmt, L"DROP TABLE IF EXISTS [í…Œì´ë¸”] ", SQL_NTS);
+			retcode = SQLExecDirect(hStmt, L"DROP TABLE IF EXISTS [Å×ÀÌºí] ", SQL_NTS);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
-			retcode = SQLExecDirect(hStmt, L"CREATE TABLE [í…Œì´ë¸”] ([ì´ë¦„] varchar(16), [ë‚˜ì´] integer)", SQL_NTS);
+			retcode = SQLExecDirect(hStmt, L"CREATE TABLE [Å×ÀÌºí] ([ÀÌ¸§] varchar(16), [³ªÀÌ] integer)", SQL_NTS);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
-			retcode = SQLExecDirect(hStmt, L"INSERT INTO [í…Œì´ë¸”] VALUES ('í™ê¸¸ë™', 25)", SQL_NTS);
+			retcode = SQLExecDirect(hStmt, L"INSERT INTO [Å×ÀÌºí] VALUES ('È«±æµ¿', 25)", SQL_NTS);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
-			retcode = SQLExecDirect(hStmt, L"SELECT [ì´ë¦„], [ë‚˜ì´] FROM [í…Œì´ë¸”] WHERE [ë‚˜ì´] > 19", SQL_NTS);
+			retcode = SQLExecDirect(hStmt, L"SELECT [ÀÌ¸§], [³ªÀÌ] FROM [Å×ÀÌºí] WHERE [³ªÀÌ] > 19", SQL_NTS);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 
 			retcode = SQLFetch(hStmt);
@@ -170,8 +253,8 @@ namespace UnitTestCPP
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 
 			if (strlen((const char *)query_plan) > 0) {
-				wchar_t expected_window[198] = L"Join graph segments (f indicates final):\r\nseg[0]: [0]\r\nseg[1]: ì´ë¦„[0] (f)\r\nseg[2]: ë‚˜ì´[0] (f)\r\nJoin graph nodes:\r\nnode[0]: í…Œì´ë¸” í…Œì´ë¸”(1/1) (sargs 0) (loc 0)\r\nJoin graph terms:\r\nterm[0]: [í…Œì´ë¸”].[ë‚˜ì´] range";
-				wchar_t expected_linux[198] = L"Join graph segments (f indicates final):\nseg[0]: [0]\nseg[1]: ì´ë¦„[0] (f)\nseg[2]: ë‚˜ì´[0] (f)\nJoin graph nodes:\nnode[0]: í…Œì´ë¸” í…Œì´ë¸”(1/1) (sargs 0) (loc 0)\nJoin graph terms:\nterm[0]: [í…Œì´ë¸”].[ë‚˜ì´] range";
+				wchar_t expected_window[198] = L"Join graph segments (f indicates final):\r\nseg[0]: [0]\r\nseg[1]: ÀÌ¸§[0] (f)\r\nseg[2]: ³ªÀÌ[0] (f)\r\nJoin graph nodes:\r\nnode[0]: Å×ÀÌºí Å×ÀÌºí(1/1) (sargs 0) (loc 0)\r\nJoin graph terms:\r\nterm[0]: [Å×ÀÌºí].[³ªÀÌ] range";
+				wchar_t expected_linux[198] = L"Join graph segments (f indicates final):\nseg[0]: [0]\nseg[1]: ÀÌ¸§[0] (f)\nseg[2]: ³ªÀÌ[0] (f)\nJoin graph nodes:\nnode[0]: Å×ÀÌºí Å×ÀÌºí(1/1) (sargs 0) (loc 0)\nJoin graph terms:\nterm[0]: [Å×ÀÌºí].[³ªÀÌ] range";
 				
 				//for windows
 				int c = wcsncmp(query_plan, expected_window, wcslen(expected_window));
@@ -184,7 +267,7 @@ namespace UnitTestCPP
 					std::wstring ws(wc);
 
 					//for under version to 9.2.x
-					if (((int)ws.find(L"í…Œì´ë¸”")) > 0 && ((int)ws.find(L"ì´ë¦„")) > 0 && ((int)ws.find(L"ë‚˜ì´")) > 0){
+					if (((int)ws.find(L"Å×ÀÌºí")) > 0 && ((int)ws.find(L"ÀÌ¸§")) > 0 && ((int)ws.find(L"³ªÀÌ")) > 0){
 						c = 0;
 					}
 				}
@@ -382,101 +465,6 @@ namespace UnitTestCPP
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 
 			// Release Connection
-			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
-			SQLFreeStmt(hStmt, SQL_DROP);
-			retcode = SQLDisconnect(hDbc);
-			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
-			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
-		}
-
-		TEST_METHOD(APIS_926_Array_Bind_UNICODE)
-		{
-			SQLHENV		hEnv;
-			SQLHDBC		hDbc;
-			SQLHSTMT	hStmt;
-#define ARRAY_SIZE	8
-#define	MAXLEN		40
-#define	STR_SZ		10
-#define COL_SIZE	20
-
-			RETCODE retcode(0);
-			int nArraySize(ARRAY_SIZE); // number of rows to insert
-			int nMaxLen(MAXLEN);		// offset for a record
-			SQLUSMALLINT	ParamStatusArray[ARRAY_SIZE];
-			SQLLEN			ParamsProcessed = 0;
-			SQLLEN pIndicator[8];	// StrLen_or_IndPtr array is required but values â€‹â€‹are meaningless
-
-			// Connect DB
-
-			retcode = SQLAllocEnv(&hEnv);
-			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
-			retcode = SQLAllocConnect(hEnv, &hDbc);
-			retcode = SQLConnect(hDbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
-
-			Assert::AreNotEqual((int)retcode, SQL_ERROR);
-
-			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt);
-			retcode = SQLExecDirect(hStmt, L"drop table if exists apis926", SQL_NTS);
-
-			// Create table apis926 (col1 int, col2 varchar(20));
-			retcode = SQLExecDirect(hStmt, L"create table apis926 (col1 int auto_increment, col2 varchar(20))", SQL_NTS);
-
-			retcode = SQLPrepare(hStmt, (SQLWCHAR*)(wchar_t*)L"INSERT INTO apis926(col2) VALUES(?)", SQL_NTS);
-
-			// Prepare Bind Arrays
-			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAM_BIND_TYPE, SQL_PARAM_BIND_BY_COLUMN, 0);
-			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER)ARRAY_SIZE, 0);
-			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAM_STATUS_PTR, ParamStatusArray, ARRAY_SIZE);
-			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAMS_PROCESSED_PTR, &ParamsProcessed, 0);
-
-			Assert::AreNotEqual((int)retcode, SQL_ERROR);
-
-			wchar_t address[ARRAY_SIZE][STR_SZ] = { L"í•œ1ab", L"ab", L"123", L"6234", L"9", L"db", L"Abc", L"Bbcd" };
-
-			BYTE* pBufData = (BYTE*)new wchar_t[MAXLEN * ARRAY_SIZE];
-			BYTE *ppBuf = pBufData;
-			memset(pBufData, 0, (MAXLEN * nArraySize) * sizeof(wchar_t));
-
-			for (int i = 0; i < ARRAY_SIZE; i++)
-			{
-				memcpy(ppBuf, address[i], STR_SZ * sizeof(wchar_t));
-				ppBuf = ppBuf + nMaxLen;
-			}
-
-			retcode = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_VARCHAR,
-				COL_SIZE, 0, pBufData, MAXLEN, pIndicator);
-
-			Assert::AreNotEqual((int)retcode, SQL_ERROR);
-
-			retcode = SQLExecute(hStmt);
-
-			Assert::AreNotEqual((int)retcode, SQL_ERROR);
-
-			ppBuf = pBufData;
-			for (int i = 0; i < ARRAY_SIZE; i++)	// insert additional rows
-			{
-				swprintf(address[i], L"1-í•œê¸€ %d", i);
-				memcpy(ppBuf, address[i], STR_SZ * sizeof(wchar_t));
-				ppBuf = ppBuf + nMaxLen;
-			}
-
-			retcode = SQLExecute(hStmt);
-
-			Assert::AreNotEqual((int)retcode, SQL_ERROR);
-
-			ppBuf = pBufData;
-			for (int i = 0; i < ARRAY_SIZE; i++)	// insert additional rows
-			{
-				swprintf(address[i], L"2-í•œê¸€ %d", i);
-				memcpy(ppBuf, address[i], STR_SZ * sizeof(wchar_t));
-				ppBuf = ppBuf + nMaxLen;
-			}
-
-			retcode = SQLExecute(hStmt);
-
-			Assert::AreNotEqual((int)retcode, SQL_ERROR);
-
-			// ì ‘ì† í•´ì œ 
 			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
 			SQLFreeStmt(hStmt, SQL_DROP);
 			retcode = SQLDisconnect(hDbc);
