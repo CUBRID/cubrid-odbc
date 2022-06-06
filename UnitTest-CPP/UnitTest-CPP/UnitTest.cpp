@@ -186,7 +186,7 @@ namespace UnitTestCPP
 
 			retcode = SQLExecute(hStmt);
 
-			// ¿¿ ¿¿ 
+			// Disconnect
 			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
 			SQLFreeStmt(hStmt, SQL_DROP);
 			retcode = SQLDisconnect(hDbc);
