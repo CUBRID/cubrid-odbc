@@ -149,7 +149,7 @@ namespace UnitTestCPP
 			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAM_STATUS_PTR, ParamStatusArray, ARRAY_SIZE);
 			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAMS_PROCESSED_PTR, &ParamsProcessed, 0);
 
-			wchar_t address[ARRAY_SIZE][STR_SZ] = { L"?ab", L"ab", L"123", L"6234", L"9", L"db", L"Abc", L"Bbcd" };
+			wchar_t address[ARRAY_SIZE][STR_SZ] = { L"ÇÑab", L"ab", L"123", L"6234", L"9", L"db", L"Abc", L"Bbcd" };
 
 			BYTE* pBufData = (BYTE*)new wchar_t[MAXLEN * ARRAY_SIZE];
 			BYTE *ppBuf = pBufData;
@@ -169,7 +169,7 @@ namespace UnitTestCPP
 			ppBuf = pBufData;
 			for (int i = 0; i < ARRAY_SIZE; i++)	// insert additional rows
 			{
-				swprintf(address[i], L"1-¿¿ %d", i);
+				swprintf(address[i], L"1-Å¥ºê %d", i);
 				memcpy(ppBuf, address[i], STR_SZ * sizeof(wchar_t));
 				ppBuf = ppBuf + nMaxLen;
 			}
@@ -179,7 +179,7 @@ namespace UnitTestCPP
 			ppBuf = pBufData;
 			for (int i = 0; i < ARRAY_SIZE; i++)	// insert additional rows
 			{
-				swprintf(address[i], L"2-¿¿ %d", i);
+				swprintf(address[i], L"2-¸®µå %d", i);
 				memcpy(ppBuf, address[i], STR_SZ * sizeof(wchar_t));
 				ppBuf = ppBuf + nMaxLen;
 			}
