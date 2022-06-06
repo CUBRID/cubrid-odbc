@@ -1286,6 +1286,11 @@ odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
 	UT_MAKE_STRING (c_value, c_length);
       break;
 
+    case SQL_C_WCHAR:
+      *((char **) sql_value_root + index) =
+	UT_MAKE_BINARY (c_value, c_length + sizeof (wchar_t));
+      break;
+
     case SQL_C_BINARY:
       ((T_CCI_BIT *) sql_value_root + index)->size = c_length;
       ((T_CCI_BIT *) sql_value_root + index)->buf =
