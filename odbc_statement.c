@@ -2952,7 +2952,7 @@ make_param_array (ODBC_STATEMENT * stmt,
 	    {
 	      void *cci_value;
 
-	      cci_value = odbc_value_to_cci (value_ptr, -8, desc_info->length, 0, 0);
+	      cci_value = odbc_value_to_cci (value_ptr, SQL_WCHAR, desc_info->length, 0, 0);
 	      odbc_value_to_cci2 (param_array->value_array, i, cci_value,
 			     desc_info->type, desc_info->length,
 			     desc_info->precision, desc_info->scale);
