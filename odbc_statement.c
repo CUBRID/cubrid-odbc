@@ -1071,7 +1071,7 @@ odbc_bind_parameter (ODBC_STATEMENT * stmt,
 
   actual_size = buffer_length;
 
-  size = odbc_octet_length (value_type, (int) actual_size);
+  size = (value_type == SQL_C_WCHAR) ? actual_size : odbc_octet_length (value_type, (int) actual_size);
   rc = odbc_set_desc_field (apd, parameter_num, SQL_DESC_OCTET_LENGTH,
 			    (void *) size, 0, 1);
   ERROR_GOTO (rc, error1);
@@ -1121,6 +1121,7 @@ odbc_bind_parameter (ODBC_STATEMENT * stmt,
     }
 
   if (parameter_type == SQL_CHAR ||
+      parameter_type == SQL_WCHAR ||
       parameter_type == SQL_VARCHAR ||
       parameter_type == SQL_LONGVARCHAR ||
       parameter_type == SQL_BINARY ||
@@ -2946,6 +2947,18 @@ make_param_array (ODBC_STATEMENT * stmt,
       else
 	{
 	  param_array->ind_array[i] = 0;
+#ifdef CUBRID_ODBC_UNICODE
+	  if (desc_info->type == SQL_WCHAR)
+	    {
+	      void *cci_value;
+
+	      cci_value = odbc_value_to_cci (value_ptr, SQL_WCHAR, desc_info->length, 0, 0);
+	      odbc_value_to_cci2 (param_array->value_array, i, cci_value,
+			     desc_info->type, desc_info->length,
+			     desc_info->precision, desc_info->scale);
+	      NA_FREE (cci_value);
+	    } else
+#endif
 	  odbc_value_to_cci2 (param_array->value_array, i, value_ptr,
 			      desc_info->type, desc_info->length,
 			      desc_info->precision, desc_info->scale);

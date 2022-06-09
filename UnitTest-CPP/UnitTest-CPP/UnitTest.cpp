@@ -111,6 +111,89 @@ namespace UnitTestCPP
 			SQLFreeHandle(SQL_HANDLE_ENV, env);
 		}
 
+		TEST_METHOD(APIS_926_Array_Bind_UNICODE)
+		{
+			SQLHENV		hEnv;
+			SQLHDBC		hDbc;
+			SQLHSTMT	hStmt;
+#define ARRAY_SIZE	8
+#define	MAXLEN		40
+#define	STR_SZ		10
+#define COL_SIZE	20
+
+			RETCODE retcode(0);
+			int nArraySize(ARRAY_SIZE); // number of rows to insert
+			int nMaxLen(MAXLEN);		// offset for a record
+			SQLUSMALLINT	ParamStatusArray[ARRAY_SIZE];
+			SQLLEN			ParamsProcessed = 0;
+			SQLLEN pIndicator[8];	// StrLen_or_IndPtr array is required but values ere meaningless
+
+			// Connect DB
+
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLConnect(hDbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt);
+			retcode = SQLExecDirect(hStmt, L"drop table if exists apis926", SQL_NTS);
+
+			// Create table apis926 (col1 int, col2 varchar(20));
+			retcode = SQLExecDirect(hStmt, L"create table apis926 (col1 int auto_increment, col2 varchar(20))", SQL_NTS);
+
+			retcode = SQLPrepare(hStmt, (SQLWCHAR*)(wchar_t*)L"INSERT INTO apis926(col2) VALUES(?)", SQL_NTS);
+
+			// Prepare Bind Arrays
+			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAM_BIND_TYPE, SQL_PARAM_BIND_BY_COLUMN, 0);
+			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER)ARRAY_SIZE, 0);
+			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAM_STATUS_PTR, ParamStatusArray, ARRAY_SIZE);
+			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAMS_PROCESSED_PTR, &ParamsProcessed, 0);
+
+			wchar_t address[ARRAY_SIZE][STR_SZ] = { L"한ab", L"ab", L"123", L"6234", L"9", L"db", L"Abc", L"Bbcd" };
+
+			BYTE* pBufData = (BYTE*)new wchar_t[MAXLEN * ARRAY_SIZE];
+			BYTE *ppBuf = pBufData;
+			memset(pBufData, 0, (MAXLEN * nArraySize) * sizeof(wchar_t));
+
+			for (int i = 0; i < ARRAY_SIZE; i++)
+			{
+				memcpy(ppBuf, address[i], STR_SZ * sizeof(wchar_t));
+				ppBuf = ppBuf + nMaxLen;
+			}
+
+			retcode = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_VARCHAR,
+				COL_SIZE, 0, pBufData, MAXLEN, pIndicator);
+
+			retcode = SQLExecute(hStmt);
+
+			ppBuf = pBufData;
+			for (int i = 0; i < ARRAY_SIZE; i++)	// insert additional rows
+			{
+				swprintf(address[i], L"1-큐브 %d", i);
+				memcpy(ppBuf, address[i], STR_SZ * sizeof(wchar_t));
+				ppBuf = ppBuf + nMaxLen;
+			}
+
+			retcode = SQLExecute(hStmt);
+
+			ppBuf = pBufData;
+			for (int i = 0; i < ARRAY_SIZE; i++)	// insert additional rows
+			{
+				swprintf(address[i], L"2-리드 %d", i);
+				memcpy(ppBuf, address[i], STR_SZ * sizeof(wchar_t));
+				ppBuf = ppBuf + nMaxLen;
+			}
+
+			retcode = SQLExecute(hStmt);
+
+			// Disconnect
+			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
+			SQLFreeStmt(hStmt, SQL_DROP);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+		}
+
 		TEST_METHOD(QueryPlanMultiByte)
 		{
 			RETCODE retcode;
