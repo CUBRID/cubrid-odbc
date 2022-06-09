@@ -39,11 +39,12 @@
 #include		"odbc_util.h"
 #include		"odbc_type.h"
 #include		"odbcinst.h"
+#include		"odbc_version.i"
 
 #define		SMALL_BUF_SIZE			256
 
 static const char *CUBRID_DRIVER_ODBC_VER = "03.52";
-static const char *CUBRID_DRIVER_VER = "01.01.0000";
+static const char *CUBRID_DRIVER_VER = VERSION_STRING;
 static const char *CUBRID_DRIVER_NAME = "cubrid_odbc.dll";
 static const char *CUBRID_DBMS_NAME = "CUBRID";
 static const char *CUBRID_SPECIAL_CHARACTERS = "#%";
