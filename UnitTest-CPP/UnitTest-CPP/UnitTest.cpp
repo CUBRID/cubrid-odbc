@@ -42,6 +42,7 @@ namespace UnitTestCPP
 			if (retcode == SQL_ERROR) {
 				SQLGetDiagField(SQL_HANDLE_DBC, dbc, 0, SQL_DIAG_NUMBER, &diag_rec, 0, &plm_pcbErrorMsg);
 			}
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 
 			retcode = SQLGetConnectAttr(dbc, SQL_ATTR_AUTOCOMMIT, &autocommit, 0, NULL);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
@@ -134,6 +135,7 @@ namespace UnitTestCPP
 			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
 			retcode = SQLAllocConnect(hEnv, &hDbc);
 			retcode = SQLConnect(hDbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 
 			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt);
 			retcode = SQLExecDirect(hStmt, L"drop table if exists apis926", SQL_NTS);
@@ -448,6 +450,7 @@ namespace UnitTestCPP
 			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
 			retcode = SQLAllocConnect(hEnv, &hDbc);
 			retcode = SQLConnect(hDbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt);
 
 			retcode = SQLExecDirect(hStmt, L"drop table if exists apis876", SQL_NTS);
