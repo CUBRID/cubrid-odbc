@@ -47,9 +47,13 @@ namespace UnitTestCPP
 			retcode = SQLGetConnectAttr(dbc, SQL_ATTR_AUTOCOMMIT, &autocommit, 0, NULL);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 			Assert::AreEqual((int)autocommit, 1);
+
+			SQLDisconnect(dbc);
+			SQLFreeHandle(SQL_HANDLE_DBC, dbc);
+			SQLFreeHandle(SQL_HANDLE_ENV, env);
 		}
 
-		TEST_METHOD(QueryPlan)
+		TEST_METHOD(APIS_797_QueryPlan)
 		{
 			RETCODE retcode;
 
@@ -196,7 +200,7 @@ namespace UnitTestCPP
 			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
 		}
 
-		TEST_METHOD(QueryPlanMultiByte)
+		TEST_METHOD(APIS_794_QueryPlanMultiByte)
 		{
 			RETCODE retcode;
 
@@ -284,7 +288,7 @@ namespace UnitTestCPP
 			SQLFreeHandle(SQL_HANDLE_ENV, env);
 		}
 
-		TEST_METHOD(QueryPlanAPIS901)
+		TEST_METHOD(APIS_901_QueryPlan)
 		{
 			RETCODE retcode;
 
@@ -357,7 +361,7 @@ namespace UnitTestCPP
 
 		}
 
-		TEST_METHOD(NullAble_APIS875)
+		TEST_METHOD(APIS_875_NullAble)
 		{
 
 #define MAX_COL_NAME_LEN  256
