@@ -37,7 +37,7 @@ namespace UnitTestCPP
 			/* Allocate a connection handle */
 			SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
 
-			retcode = SQLDriverConnect(dbc, NULL, L"DSN=CUBRID Driver Unicode;DB_NAME=demodb;SERVER=test-db-server;PORT=33000;USER=dba;PWD=;CHARSET=utf-8;AUTOCOMMIT=ON", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			retcode = SQLDriverConnect(dbc, NULL, L"DSN=CUBRID Driver Unicode;DB_NAME=demodb;SERVER=test-db-server;PORT=45104;USER=dba;PWD=;CHARSET=utf-8;AUTOCOMMIT=ON", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
 
 			if (retcode == SQL_ERROR) {
 				SQLGetDiagField(SQL_HANDLE_DBC, dbc, 0, SQL_DIAG_NUMBER, &diag_rec, 0, &plm_pcbErrorMsg);
@@ -191,6 +191,41 @@ namespace UnitTestCPP
 			}
 
 			retcode = SQLExecute(hStmt);
+
+			// Disconnect
+			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
+			SQLFreeStmt(hStmt, SQL_DROP);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+		}
+
+		TEST_METHOD(APIS_929_ODBC_VERSION)
+		{
+			SQLHENV         hEnv;
+			SQLHDBC         hDbc;
+			SQLHSTMT        hStmt;
+
+			RETCODE retcode(0);
+			WCHAR szDriver[256];
+			WCHAR msg[512];
+			SWORD nDriverLen;
+
+			// Connect DB
+
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLConnect(hDbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			memset(szDriver, 0, sizeof(szDriver));
+
+			retcode = SQLGetInfo(hDbc, SQL_DRIVER_VER, szDriver, sizeof(szDriver), &nDriverLen);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			wsprintf(msg, L"++ CUBRID ODBC Version = %s", szDriver);
+			Logger::WriteMessage(msg);
 
 			// Disconnect
 			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
