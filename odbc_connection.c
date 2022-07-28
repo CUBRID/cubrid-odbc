@@ -819,12 +819,7 @@ odbc_connect_new (ODBC_CONNECTION * conn,
   pt = charset == NULL ? "" : charset;
   conn->charset = UT_MAKE_STRING (pt, -1);
 
-  pt = autocommit == NULL ? "off" : autocommit;
-  if (_stricmp (pt, "on") == 0)
-    {
-      conn->attr_autocommit = SQL_AUTOCOMMIT_ON;
-    }
-  else
+  if (autocommit != NULL && _stricmp (autocommit, "off") == 0)
     {
       conn->attr_autocommit = SQL_AUTOCOMMIT_OFF;
     }
