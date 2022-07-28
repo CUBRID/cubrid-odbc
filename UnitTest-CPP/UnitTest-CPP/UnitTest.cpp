@@ -229,7 +229,117 @@ namespace UnitTestCPP
 
 			// Disconnect
 			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
-			SQLFreeStmt(hStmt, SQL_DROP);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+		}
+		TEST_METHOD(APIS_932_DEFAULT_AUTO_COMMIT_ON)
+		{
+			SQLHENV         hEnv;
+			SQLHDBC         hDbc;
+			SQLHSTMT        hStmt;
+			WCHAR msg[512];
+			SQLINTEGER		autocommit;
+			int		AUTO_COMMIT_OFF = (int)SQL_AUTOCOMMIT_OFF;
+			int		AUTO_COMMIT_ON = (int)SQL_AUTOCOMMIT_ON;
+
+			RETCODE retcode(0);
+
+			// case APIS_932_DEFAULT_AUTO_COMMIT_ON-1 (connection url with default):
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=public;pwd=;db_name=demodb;charset=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLGetConnectAttr (hDbc, SQL_ATTR_AUTOCOMMIT, &autocommit, 0, NULL);
+			wsprintf(msg, L"case 1 (url off by default): ++ AUTOCOMMIT = %s", autocommit ? L"SQL_AUTOCOMMIT_ON (1)" : L"SQL_AUTOCOMMIT_OFF (0)");
+			Logger::WriteMessage(msg);
+			Assert::AreEqual((int)autocommit, AUTO_COMMIT_ON);
+
+			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+
+			// case APIS_932_DEFAULT_AUTO_COMMIT_ON-2 (connection url with autocommit=on):
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=public;pwd=;db_name=demodb;charset=utf-8;autocommit=on", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLGetConnectAttr(hDbc, SQL_ATTR_AUTOCOMMIT, &autocommit, 0, NULL);
+			wsprintf(msg, L"case 2 (url on): ++ AUTOCOMMIT = %s", autocommit ? L"SQL_AUTOCOMMIT_ON (1)" : L"SQL_AUTOCOMMIT_OFF (0)");
+			Logger::WriteMessage(msg);
+			Assert::AreEqual((int)autocommit, AUTO_COMMIT_ON);
+
+			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+
+			// case APIS_932_DEFAULT_AUTO_COMMIT_ON-3 (connection url with autocommit=off):
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=public;pwd=;db_name=demodb;charset=utf-8;autocommit=off", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLGetConnectAttr(hDbc, SQL_ATTR_AUTOCOMMIT, &autocommit, 0, NULL);
+			wsprintf(msg, L"case 3 (url off): ++ AUTOCOMMIT = %s", autocommit ? L"SQL_AUTOCOMMIT_ON (1)" : L"SQL_AUTOCOMMIT_OFF (0)");
+			Logger::WriteMessage(msg);
+			Assert::AreEqual((int)autocommit, AUTO_COMMIT_OFF);
+
+			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+
+			// case APIS_932_DEFAULT_AUTO_COMMIT_ON-4 (connection DSN with autocommit=off):
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLConnect(hDbc, L"cubrid_autocommit_off", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+
+			retcode = SQLGetConnectAttr(hDbc, SQL_ATTR_AUTOCOMMIT, &autocommit, 0, NULL);
+			wsprintf(msg, L"case 4 (DSN off): ++ AUTOCOMMIT = %s", autocommit ? L"SQL_AUTOCOMMIT_ON (1)" : L"SQL_AUTOCOMMIT_OFF (0)");
+			Logger::WriteMessage(msg);
+			Assert::AreEqual((int)autocommit, AUTO_COMMIT_OFF);
+
+			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+
+			// case APIS_932_DEFAULT_AUTO_COMMIT_ON-5 (connection DSN with autocommit=on):
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLConnect(hDbc, L"cubrid_autocommit_on", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+
+			retcode = SQLGetConnectAttr(hDbc, SQL_ATTR_AUTOCOMMIT, &autocommit, 0, NULL);
+			wsprintf(msg, L"case 5 (DSN on): ++ AUTOCOMMIT = %s", autocommit ? L"SQL_AUTOCOMMIT_ON (1)" : L"SQL_AUTOCOMMIT_OFF (0)");
+			Logger::WriteMessage(msg);
+			Assert::AreEqual((int)autocommit, AUTO_COMMIT_ON);
+
+			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+
+			// case APIS_932_DEFAULT_AUTO_COMMIT_ON-6 (connection DSN with autocommit=off):
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLConnect(hDbc, L"cubrid_autocommit_unknown", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+
+			retcode = SQLGetConnectAttr(hDbc, SQL_ATTR_AUTOCOMMIT, &autocommit, 0, NULL);
+			wsprintf(msg, L"case 6  (DSN on by default):++ AUTOCOMMIT = %s", autocommit ? L"SQL_AUTOCOMMIT_ON (1)" : L"SQL_AUTOCOMMIT_OFF (0)");
+			Logger::WriteMessage(msg);
+			Assert::AreEqual((int)autocommit, AUTO_COMMIT_ON);
+
+			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
 			retcode = SQLDisconnect(hDbc);
 			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
 			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
