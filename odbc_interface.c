@@ -1389,6 +1389,12 @@ SQLNativeSql (SQLHDBC ConnectionHandle,
 
   odbc_free_diag (((ODBC_CONNECTION *) ConnectionHandle)->diag, RESET);
 
+  if (TextLength2Ptr == NULL)
+    {
+      odbc_set_diag (((ODBC_CONNECTION *) ConnectionHandle)->diag, "HY009", 0, "NULL pointer: TextLength2Ptr");
+      return ODBC_ERROR;
+    }
+
   stInStatementText = UT_MAKE_STRING (InStatementText, TextLength1);
 
 
