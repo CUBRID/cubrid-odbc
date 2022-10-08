@@ -345,6 +345,54 @@ namespace UnitTestCPP
 			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
 		}
 
+		TEST_METHOD(APIS_936_TextLength2Ptr_NULL_CHK)
+		{
+			SQLHENV         hEnv;
+			SQLHDBC         hDbc;
+			SQLHSTMT        hStmt;
+			WCHAR			query2 [512] = L"select date_format(now(),'%T')";
+			WCHAR			query [512] = L"show tables";
+			WCHAR			converted_qry [512];
+			WCHAR			col1[512];
+			WCHAR msg[512];
+			SQLINTEGER		length;
+			SQLINTEGER		retcode;
+			SQLLEN			len;
+			int				num_rows = 0;
+
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=public;pwd=;db_name=demodb;charset=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt);
+
+			// Case-1: Check if SQL_ERROR is returned when TextLength2Ptr is NULL
+			retcode = SQLNativeSqlW (hDbc, query, sizeof(query), converted_qry, sizeof(converted_qry), NULL);
+			Assert::AreEqual((int)retcode, SQL_ERROR);
+
+			// Case-2: Convert and execute with proper TextLength2Ptr
+			retcode = SQLNativeSqlW(hDbc, query, sizeof(query), converted_qry, sizeof(converted_qry), &length);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			wsprintf(msg, L"len = %d, converted qry = '%s'", length, converted_qry);
+			Logger::WriteMessage(msg);
+
+			retcode = SQLPrepareW(hStmt, converted_qry, SQL_NTS);
+			retcode = SQLExecute(hStmt);
+			retcode = SQLBindCol(hStmt, 1, SQL_C_WCHAR, (SQLPOINTER)col1, sizeof(col1), &len);
+
+			memset(col1, 0, sizeof(col1));
+			while ((retcode = SQLFetch(hStmt)) == SQL_SUCCESS) {
+				wsprintf (msg, L"rows [%2d]: col1 = '%s'\n", ++num_rows, col1);
+				Logger::WriteMessage(msg);
+				memset(col1, 0, sizeof(col1));
+			}
+
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+		}
+
 		TEST_METHOD(APIS_794_QueryPlanMultiByte)
 		{
 			RETCODE retcode;
