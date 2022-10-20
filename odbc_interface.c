@@ -2065,6 +2065,12 @@ SQLPrimaryKeys (SQLHSTMT StatementHandle,
 
   DEBUG_TIMESTAMP (END_SQLPrimaryKeys);
 
+  if (stmt_handle->conn->attr_autocommit == SQL_AUTOCOMMIT_ON)
+    {
+          odbc_auto_commit(stmt_handle->conn);
+    }
+
+
   ODBC_RETURN (odbc_retval, StatementHandle);
 }
 
@@ -2099,6 +2105,12 @@ SQLForeignKeys (SQLHSTMT StatementHandle,
   NA_FREE (stFKTableName);
 
   DEBUG_TIMESTAMP (END_SQLForeignKeys);
+
+  if (stmt_handle->conn->attr_autocommit == SQL_AUTOCOMMIT_ON)
+    {
+          odbc_auto_commit(stmt_handle->conn);
+    }
+
 
   ODBC_RETURN (odbc_retval, StatementHandle);
 }
