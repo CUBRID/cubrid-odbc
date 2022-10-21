@@ -393,6 +393,68 @@ namespace UnitTestCPP
 			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
 		}
 
+		TEST_METHOD(APIS_900_CATALOG_AUTO_COMMIT)
+		{
+			SQLHENV         hEnv;
+			SQLHDBC         hDbc;
+			SQLHSTMT        hstmt;
+			WCHAR			query2[512] = L"select date_format(now(),'%T')";
+			WCHAR			query[512] = L"show tables";
+			WCHAR			converted_qry[512];
+			WCHAR			col1[512];
+			CHAR			msg[512];
+			SQLINTEGER		length;
+			SQLINTEGER		retcode;
+			SQLLEN			len;
+			int				num_rows = 0;
+			SQLSMALLINT		columns;
+			SQLCHAR			tablename [512];
+			SQLWCHAR		tablenameW [512];
+			SQLLEN			StrLen_or_IndPtr;
+			int				MAX_NUM_STMTS = 100;
+			SQLCHAR			foreign[512];
+
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=public;pwd=;db_name=demodb;charset=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+
+			retcode = SQLTables(hstmt, NULL, 0, NULL, 0, NULL, 0, L"TABLE", SQL_NTS);
+			retcode = SQLNumResultCols(hstmt, &columns);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			sprintf(msg, "num cols = %d", columns);
+			Logger::WriteMessage(msg);
+
+			while (SQL_SUCCEEDED(retcode = SQLFetch(hstmt))) {
+				retcode = SQLGetData (hstmt, 3, SQL_C_CHAR, tablename, sizeof(tablename), &StrLen_or_IndPtr);
+				sprintf(msg, "%s", tablename);
+				if (StrLen_or_IndPtr != NULL)
+				{
+					Logger::WriteMessage(msg);
+				}
+			}
+
+			wsprintf(tablenameW, L"game");
+			for (int i = 0; i < MAX_NUM_STMTS; i++) {
+				retcode = SQLPrimaryKeysW(hstmt, NULL, 0, NULL, 0, tablenameW, SQL_NTS);
+				Assert::AreNotEqual((int)retcode, SQL_ERROR);
+				while ((retcode == SQL_SUCCESS) || (retcode == SQL_SUCCESS_WITH_INFO)) {
+					retcode = SQLFetch(hstmt);
+				}
+			}
+
+			retcode = SQLFreeStmt(hstmt, SQL_CLOSE);
+
+			retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+
+		}
+
 		TEST_METHOD(APIS_794_QueryPlanMultiByte)
 		{
 			RETCODE retcode;
