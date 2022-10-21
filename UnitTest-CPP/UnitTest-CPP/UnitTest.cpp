@@ -398,15 +398,10 @@ namespace UnitTestCPP
 			SQLHENV         hEnv;
 			SQLHDBC         hDbc;
 			SQLHSTMT        hstmt;
-			WCHAR			query2[512] = L"select date_format(now(),'%T')";
-			WCHAR			query[512] = L"show tables";
-			WCHAR			converted_qry[512];
-			WCHAR			col1[512];
 			CHAR			msg[512];
 			SQLINTEGER		length;
 			SQLINTEGER		retcode;
 			SQLLEN			len;
-			int				num_rows = 0;
 			SQLSMALLINT		columns;
 			SQLCHAR			tablename [512];
 			SQLWCHAR		tablenameW [512];
