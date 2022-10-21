@@ -607,6 +607,11 @@ odbc_tables (ODBC_STATEMENT * stmt,
   rc = make_table_result_set (stmt, handle, t_type);
   ERROR_GOTO (rc, error);
 
+  if (stmt->conn->attr_autocommit == SQL_AUTOCOMMIT_ON)
+    {
+          odbc_auto_commit(stmt->conn);
+    }
+
   cci_close_req_handle (handle);
   handle = -1;
 
