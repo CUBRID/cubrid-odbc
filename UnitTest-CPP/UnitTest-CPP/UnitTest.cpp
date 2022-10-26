@@ -497,6 +497,7 @@ namespace UnitTestCPP
 						strcmp((const char *) table_name, "public.olympic") == 0) {
 						ret = strcmp((const char *)comments, "this is new comment for olympic2");
 						Assert::AreEqual((int)ret, 0);
+						Logger::WriteMessage("********** Passed for Table COMMENT **********");
 					}
 
 					sprintf(msg, "table = '%s', comment = '%s'", table_name, comments);
