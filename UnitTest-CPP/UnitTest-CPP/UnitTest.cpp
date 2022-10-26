@@ -450,6 +450,89 @@ namespace UnitTestCPP
 
 		}
 
+		TEST_METHOD(APIS_939_TABLE_COLUMN_COMMENT)
+		{
+			SQLHENV         hEnv;
+			SQLHDBC         hDbc;
+			SQLHSTMT        hstmt;
+			CHAR			msg[512];
+			SQLINTEGER		retcode;
+			SQLSMALLINT		columns;
+			int				MAX_NUM_STMTS = 100;
+			SQLLEN			indicator;
+			SQLWCHAR		*qry_alt_table_comment = L"ALTER TABLE olympic COMMENT = 'this is new comment for olympic2';";
+			SQLWCHAR		*qry_alt_column_comment = L"ALTER TABLE olympic COMMENT ON COLUMN host_year = 'The year the Olympics were held';";
+
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=public;pwd=;db_name=demodb;charset=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+
+			retcode = SQLExecDirect(hstmt, qry_alt_table_comment, SQL_NTS);
+			retcode = SQLExecDirect(hstmt, qry_alt_column_comment, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLTables(hstmt, NULL, 0, NULL, 0, NULL, 0, L"TABLE", SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			// fetch table name and comments
+			while (SQL_SUCCEEDED(retcode = SQLFetch(hstmt))) {
+				SQLUSMALLINT i;
+				SQLCHAR table_name[256];
+				SQLCHAR comments[2048];
+
+				memset(table_name, 0, sizeof(table_name));
+				memset(comments, 0, sizeof(comments));
+
+				retcode = SQLGetData(hstmt, 3, SQL_C_CHAR, table_name, sizeof(table_name), &indicator);
+				retcode = SQLGetData(hstmt, 5, SQL_C_CHAR, comments, sizeof(comments), &indicator);
+				Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+				if (SQL_SUCCEEDED(retcode)) {
+					int ret = -1;
+
+					if (strcmp((const char *) table_name, "olympic") == 0 ||
+						strcmp((const char *) table_name, "public.olympic") == 0) {
+						ret = strcmp((const char *)comments, "this is new comment for olympic2");
+						Assert::AreEqual((int)ret, 0);
+					}
+
+					sprintf(msg, "table = '%s', comment = '%s'", table_name, comments);
+					Logger::WriteMessage(msg);
+				}
+			}
+
+				retcode = SQLFreeStmt(hstmt, SQL_CLOSE);
+				retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+				retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+
+				retcode = SQLColumnsW(hstmt, NULL, 0, NULL, 0, L"olympic", SQL_NTS, L"host_year", SQL_NTS);
+
+				while (SQL_SUCCEEDED(retcode = SQLFetch(hstmt))) {
+					SQLCHAR buf[255];
+					int ret = -1;
+
+					memset(buf, 0, sizeof(buf));
+
+					retcode = SQLGetData(hstmt, 12, SQL_C_CHAR, buf, sizeof(buf), &indicator);
+
+					if (SQL_SUCCEEDED(retcode)) {
+						ret = strcmp((const char *)buf, "The year the Olympics were held");
+						sprintf(msg, "COLUMN COMMENT: olympic (host_year) = '%s', compare result = %d", buf, ret);
+						Logger::WriteMessage(msg);
+						Assert::AreEqual((int)ret, 0);
+					}
+				}
+
+				retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+				retcode = SQLDisconnect(hDbc);
+				retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+				retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+
+		}
+
 		TEST_METHOD(APIS_794_QueryPlanMultiByte)
 		{
 			RETCODE retcode;
