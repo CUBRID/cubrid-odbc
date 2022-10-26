@@ -474,6 +474,7 @@ namespace UnitTestCPP
 			retcode = SQLExecDirect(hstmt, qry_alt_column_comment, SQL_NTS);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 
+			Logger::WriteMessage("Phase1: ********** Check for Table COMMENT **********");
 			retcode = SQLTables(hstmt, NULL, 0, NULL, 0, NULL, 0, L"TABLE", SQL_NTS);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 
@@ -504,33 +505,38 @@ namespace UnitTestCPP
 					Logger::WriteMessage(msg);
 				}
 			}
+			Logger::WriteMessage("********** Passed for Table COMMENT **********");
 
-				retcode = SQLFreeStmt(hstmt, SQL_CLOSE);
-				retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-				retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+			retcode = SQLFreeStmt(hstmt, SQL_CLOSE);
+			retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
 
-				retcode = SQLColumnsW(hstmt, NULL, 0, NULL, 0, L"olympic", SQL_NTS, L"host_year", SQL_NTS);
+			Logger::WriteMessage("Phase2: ********** Check for Column COMMENT **********");
 
-				while (SQL_SUCCEEDED(retcode = SQLFetch(hstmt))) {
-					SQLCHAR buf[255];
-					int ret = -1;
+			retcode = SQLColumnsW(hstmt, NULL, 0, NULL, 0, L"olympic", SQL_NTS, L"host_year", SQL_NTS);
 
-					memset(buf, 0, sizeof(buf));
+			while (SQL_SUCCEEDED(retcode = SQLFetch(hstmt))) {
+				SQLCHAR buf[255];
+				int ret = -1;
 
-					retcode = SQLGetData(hstmt, 12, SQL_C_CHAR, buf, sizeof(buf), &indicator);
+				memset(buf, 0, sizeof(buf));
 
-					if (SQL_SUCCEEDED(retcode)) {
-						ret = strcmp((const char *)buf, "The year the Olympics were held");
-						sprintf(msg, "COLUMN COMMENT: olympic (host_year) = '%s', compare result = %d", buf, ret);
-						Logger::WriteMessage(msg);
-						Assert::AreEqual((int)ret, 0);
-					}
+				retcode = SQLGetData(hstmt, 12, SQL_C_CHAR, buf, sizeof(buf), &indicator);
+
+				if (SQL_SUCCEEDED(retcode)) {
+					ret = strcmp((const char *)buf, "The year the Olympics were held");
+					sprintf(msg, "COLUMN COMMENT: olympic (host_year) = '%s', compare result = %d", buf, ret);
+					Logger::WriteMessage(msg);
+					Assert::AreEqual((int)ret, 0);
 				}
+			}
 
-				retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-				retcode = SQLDisconnect(hDbc);
-				retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
-				retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+			Logger::WriteMessage("********** Passed for Column COMMENT **********");
+
+			retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
 
 		}
 
