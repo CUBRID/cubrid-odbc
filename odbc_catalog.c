@@ -70,6 +70,7 @@ typedef struct tagODBC_TABLE_VALUE
 {
   char *table_name;
   char *table_type;
+  char *remarks;
 } ODBC_TABLE_VALUE;
 
 typedef struct tagODBC_COLUMN_VALUE
@@ -88,6 +89,7 @@ typedef struct tagODBC_COLUMN_VALUE
   short subcode;
   int octet_length;
   int ordinal_position;
+  char *remarks;
 } ODBC_COLUMN_VALUE;
 
 typedef struct tagODBC_STAT_VALUE
@@ -1264,8 +1266,16 @@ odbc_get_table_data (ODBC_STATEMENT * stmt,
       c_value->type = SQL_C_CHAR;
       break;
     case 5:			// remark, SQL_C_CHAR
-      c_value->value.str = "";
-      c_value->length = strlen ("") + 1;
+      if (table_tuple->remarks)
+        {
+          c_value->value.str = table_tuple->remarks;
+          c_value->length = strlen(table_tuple->remarks) + 1;
+        }
+      else
+        {
+          c_value->value.str = "";
+          c_value->length = strlen("") + 1;
+        }
       c_value->type = SQL_C_CHAR;
       break;
     default:
@@ -1342,8 +1352,16 @@ odbc_get_column_data (ODBC_STATEMENT * stmt,
       c_value->type = SQL_C_SHORT;
       break;
     case 12:			// remarks, SQL_C_CHAR
-      c_value->value.str = "";
-      c_value->length = strlen ("") + 1;
+      if (column_tuple->remarks)
+        {
+          c_value->value.str = column_tuple->remarks;
+	  c_value->length = strlen(column_tuple->remarks) + 1;
+        }
+      else
+        {
+          c_value->value.str = "";
+          c_value->length = strlen ("") + 1;
+        }
       c_value->type = SQL_C_CHAR;
       break;
     case 13:			// column default value, SQL_C_CHAR
@@ -2309,6 +2327,12 @@ make_table_result_set (ODBC_STATEMENT * stmt, int req_handle, int type_option)
 	  table_node->table_type = UT_MAKE_STRING ("TABLE", -1);
 	}
 
+      cci_rc = cci_get_data (req_handle, 3, CCI_A_TYPE_STR, &cci_value, &cci_ind);
+      if (cci_rc == 0 && cci_value.str != NULL)
+        {
+          table_node->remarks = UT_MAKE_STRING(cci_value.str, -1);
+        }
+
       ListTailAdd (stmt->catalog_result.value, NULL, table_node, NodeAssign);
       ++stmt->tpl_number;
     }
@@ -2541,6 +2565,12 @@ make_column_result_set (ODBC_STATEMENT * stmt, int req_handle)
 	  column_node->default_value = UT_MAKE_STRING (cci_value.str, -1);
 	}
 
+      // get COLUMN comment
+      cci_rc = cci_get_data(req_handle, 14, CCI_A_TYPE_STR, &cci_value, &cci_ind);
+      if (cci_rc == 0 && cci_value.str != NULL)
+        {
+          column_node->remarks = UT_MAKE_STRING(cci_value.str, -1);
+        }
 
       column_node->ordinal_position = current_tpl_pos;
 
