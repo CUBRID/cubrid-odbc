@@ -540,6 +540,86 @@ namespace UnitTestCPP
 
 		}
 
+		TEST_METHOD(APIS_942_LIMIT_TO_SINGLE_SCHEMA)
+		{
+			SQLHENV         hEnv;
+			SQLHDBC         hDbc;
+			SQLHSTMT        hstmt;
+			CHAR			msg[512];
+			SQLINTEGER		retcode;
+
+			SQLWCHAR		*qry_create_user = L"CREATE USER user1 password '1234'";
+			SQLWCHAR		*qry_drop_user = L"DROP USER user1";
+			SQLWCHAR		*qry_create_table0 = L"CREATE TABLE parent(			\
+													id INT NOT NULL PRIMARY KEY,\
+													phome VARCHAR(10)			\
+													)";
+			SQLWCHAR		*qry_create_table1 = L"CREATE TABLE t1 (\
+													id INT NOT NULL, \
+													name VARCHAR(20) NOT NULL, \
+													col1 INT REFERENCES PARENT(id)\
+													)";
+			SQLWCHAR		*qry_create_table2 = L"CREATE TABLE t2 ( \
+													id INT NOT NULL, \
+													address VARCHAR(20) NOT NULL, \
+													CONSTRAINT pk_id PRIMARY KEY(id), \
+													CONSTRAINT fk_id FOREIGN KEY(ID) REFERENCES parent(id) \
+													ON DELETE CASCADE ON UPDATE RESTRICT \
+													); ";
+			SQLWCHAR		*qry_create_table3 = L"CREATE TABLE t3 ( \
+													id INT NOT NULL, \
+													city VARCHAR(20) NOT NULL, \
+													col1 INT REFERENCES PARENT(id) \
+													); ";
+
+			SQLWCHAR		*drop_table_t1 = L"DROP table if exists user1.t1";
+			SQLWCHAR		*drop_table_t2 = L"DROP table if exists user1.t2";
+			SQLWCHAR		*drop_table_t3 = L"DROP table if exists user1.t3";
+			SQLWCHAR		*drop_table_p1 = L"DROP table if exists user1.parent";
+
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=dba;pwd=;db_name=demodb;charset=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+			retcode = SQLExecDirect(hstmt, drop_table_t1, SQL_NTS);
+			retcode = SQLExecDirect(hstmt, drop_table_t2, SQL_NTS);
+			retcode = SQLExecDirect(hstmt, drop_table_t3, SQL_NTS);
+			retcode = SQLExecDirect(hstmt, drop_table_p1, SQL_NTS);
+
+			Logger::WriteMessage("Phase1: ********** CREATE USER **********");
+			retcode = SQLExecDirect(hstmt, qry_drop_user, SQL_NTS);
+			retcode = SQLEndTran(SQL_HANDLE_DBC, hDbc, SQL_COMMIT);
+			retcode = SQLExecDirect(hstmt, qry_create_user, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLFreeStmt(hstmt, SQL_CLOSE);
+			retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+
+			Logger::WriteMessage("Phase2: ********** LOGIN AS 'user1' **********");
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=user1;pwd=1234;db_name=demodb;single_schema=on;charset=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+			retcode = SQLExecDirect(hstmt, qry_create_table0, SQL_NTS);
+			retcode = SQLExecDirect(hstmt, qry_create_table1, SQL_NTS);
+			retcode = SQLExecDirect(hstmt, qry_create_table2, SQL_NTS);
+			retcode = SQLExecDirect(hstmt, qry_create_table3, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			Logger::WriteMessage("Phase3: ********** Tables were created **********");
+
+			retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+
+		}
+
 		TEST_METHOD(APIS_794_QueryPlanMultiByte)
 		{
 			RETCODE retcode;
