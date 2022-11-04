@@ -2254,6 +2254,7 @@ make_table_result_set (ODBC_STATEMENT * stmt, int req_handle, int type_option)
   long current_tpl_pos = 0;
   ODBC_TABLE_VALUE *table_node = NULL;
   int class_type;
+  char *tablename = NULL;
 
   while (1)
     {
@@ -2307,12 +2308,21 @@ make_table_result_set (ODBC_STATEMENT * stmt, int req_handle, int type_option)
 	  goto error;
 	}
 
+	  tablename = cci_value.str;
+	  if (stmt->conn->single_schema)
+	    {
+              if (_strnicmp(tablename, stmt->conn->user, strlen(stmt->conn->user)))
+                {
+                  continue;
+                }
+              tablename = remove_owner_name(cci_value.str);
+	    }
       // create a tuple
       table_node = create_table_value ();
       if (table_node == NULL)
 	continue;
 
-      table_node->table_name = UT_MAKE_STRING (cci_value.str, -1);
+      table_node->table_name = UT_MAKE_STRING (tablename, -1);
 
       if (class_type == 0)
 	{

@@ -222,6 +222,8 @@ PUBLIC short is_oidstr_array (char **array, int size);
 PUBLIC int replace_oid (char *sql_text, char **org_param_pos_pt,
 			char **oid_param_pos_pt, char **oid_param_val_pt);
 
+PUBLIC char *remove_owner_name (char *tablename);
+
 extern ERR_CODE ListTailAdd (ST_LIST * head, void *key, void *val,
 			     ERR_CODE (*assignFunc) (ST_LIST *, void *,
 						     void *));
