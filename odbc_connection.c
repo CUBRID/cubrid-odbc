@@ -776,6 +776,7 @@ odbc_connect_new (ODBC_CONNECTION * conn,
 		  int fetch_size,
 		  const char *charset,
                   const char *autocommit,
+		  const char *ignore_schema,
 		  const char* conn_str)
 {
   int connhd;
@@ -2659,7 +2660,8 @@ get_dsn_info (const char *dsn,
 	      char *pwd, int pwd_len,
 	      char *server, int server_len, int *port, int *fetch_size,
 	      char *charset, int charset_len,
-              char *autocommit, int autocommit_len)
+              char *autocommit, int autocommit_len,
+	      char *ignore_schema, int ignore_schema_len)
 
 {
   char buf[1024];
