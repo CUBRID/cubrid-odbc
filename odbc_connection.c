@@ -866,6 +866,23 @@ odbc_connect_new (ODBC_CONNECTION * conn,
   rc = get_db_version (conn);
   ERROR_GOTO (rc, error);
 
+  conn->single_schema = 0;
+  if (strlen (conn->db_ver))
+    {
+      char *p;
+      int version = atoi (conn->db_ver) * 100;
+
+      p = strchr (conn->db_ver, '.');
+      if (p)
+        {
+          version += atoi (p+1);
+        }
+      if (version >= 1102 && stricmp (ignore_schema, "yes") == 0)
+        {
+          conn->single_schema = 1;
+        }
+    }
+
   // disconnect with cas
   if (conn->connhd > 0)
     {

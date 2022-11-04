@@ -123,6 +123,7 @@ typedef struct st_odbc_connection
   struct st_odbc_connection_attr attr_connect;
   char *charset;
   char db_ver[16];
+  short single_schema;
 
   unsigned long old_txn_isolation;	/* for read-only mode */
 
