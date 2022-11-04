@@ -3834,9 +3834,33 @@ retrieve_table_from_db_class (int cci_connection, char *table_name, T_CCI_ERROR 
   int cci_request;
 
   char *sql_statment = "SELECT class_name FROM db_class WHERE class_name = ?";
-  char *param_list[] = { table_name };
+  char tablename [512];
+  char *param_list[] = { tablename };
+  char query_buf [512];
+  char *query = sql_statment;
+  char *p;
+  char owner [256];
 
-  return sql_execute (cci_connection, &cci_request, sql_statment, param_list,
+  p = strchr (table_name, '.');
+  if (p)
+    {
+      strcpy (owner, table_name);
+      strcpy (tablename, p + 1);
+
+      p = strchr (owner, '.');
+      if (p)
+       {
+         *p = 0x00;
+       }
+      sprintf (query_buf, "%s AND OWNER_NAME = UPPER ('%s')", sql_statment, owner);
+      query = query_buf;
+    }
+  else
+    {
+      strcpy (tablename, table_name);
+    }
+
+  return sql_execute (cci_connection, &cci_request, query, param_list,
 		      1, error);
 }
 
