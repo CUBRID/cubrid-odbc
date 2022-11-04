@@ -794,6 +794,7 @@ odbc_connect_new (ODBC_CONNECTION * conn,
   NA_FREE (conn->server);
   NA_FREE (conn->charset);
 
+
   strncpy (connect_url, "cci:CUBRID:", sizeof(connect_url));
   pt = data_source == NULL ? "" : data_source;
   conn->data_source = UT_MAKE_STRING (pt, -1);
@@ -2764,6 +2765,17 @@ get_dsn_info (const char *dsn,
       else
 	str_value_assign (buf, autocommit, autocommit_len, NULL);
     }
+
+  if (ignore_schema != NULL)
+  {
+	  rcn =
+		  SQLGetPrivateProfileString(dsn, KEYWORD_IGNORE_SCHEMA, "", buf, sizeof(buf),
+			  "ODBC.INI");
+	  if (rcn == 0)
+		  buf[0] = '\0';
+	  else
+		  str_value_assign(buf, ignore_schema, ignore_schema_len, NULL);
+  }
 
   return 0;
 }
