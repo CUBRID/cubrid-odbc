@@ -551,30 +551,30 @@ namespace UnitTestCPP
 			SQLWCHAR		*qry_create_user = L"CREATE USER user1 password '1234'";
 			SQLWCHAR		*qry_drop_user = L"DROP USER user1";
 			SQLWCHAR		*qry_create_table0 = 
-									L"CREATE TABLE parent(			\
-										id INT NOT NULL PRIMARY KEY,\
-										phome VARCHAR(10)			\
-										)";
+								L"CREATE TABLE parent( \
+									id INT NOT NULL PRIMARY KEY, \
+									phome VARCHAR(10) \
+									)";
 			SQLWCHAR		*qry_create_table1 = 
-									L"CREATE TABLE t1 (\
-										id INT NOT NULL, \
-										name VARCHAR(20) NOT NULL, \
-										col1 INT REFERENCES PARENT(id)\
-										)";
+								L"CREATE TABLE t1 (\
+									id INT NOT NULL, \
+									name VARCHAR(20) NOT NULL, \
+									col1 INT REFERENCES PARENT(id)\
+									)";
 			SQLWCHAR		*qry_create_table2 = 
-									L"CREATE TABLE t2 ( \
-										id INT NOT NULL, \
-										address VARCHAR(20) NOT NULL, \
-										CONSTRAINT pk_id PRIMARY KEY(id), \
-										CONSTRAINT fk_id FOREIGN KEY(ID) REFERENCES parent(id) \
-										ON DELETE CASCADE ON UPDATE RESTRICT \
-										); ";
+								L"CREATE TABLE t2 ( \
+									id INT NOT NULL, \
+									address VARCHAR(20) NOT NULL, \
+									CONSTRAINT pk_id PRIMARY KEY(id), \
+									CONSTRAINT fk_id FOREIGN KEY(ID) REFERENCES parent(id) \
+									ON DELETE CASCADE ON UPDATE RESTRICT \
+									); ";
 			SQLWCHAR		*qry_create_table3 = 
-									L"CREATE TABLE t3 ( \
-										id INT NOT NULL, \
-										city VARCHAR(20) NOT NULL, \
-										col1 INT REFERENCES PARENT(id) \
-										); ";
+								L"CREATE TABLE t3 ( \
+									id INT NOT NULL, \
+									city VARCHAR(20) NOT NULL, \
+									col1 INT REFERENCES PARENT(id) \
+									); ";
 
 			SQLWCHAR		*drop_table_t1 = L"DROP table if exists user1.t1";
 			SQLWCHAR		*drop_table_t2 = L"DROP table if exists user1.t2";
