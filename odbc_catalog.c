@@ -640,6 +640,7 @@ odbc_columns (ODBC_STATEMENT * stmt,
 
   int cci_rc;
   T_CCI_ERROR cci_err_buf;
+  char qualified_tablename[1024];
 
   catalog_result_set_init (stmt, COLUMNS);
   catalog_set_ird (stmt, column_cinfo, NC_CATALOG_COLUMNS);
@@ -654,8 +655,16 @@ odbc_columns (ODBC_STATEMENT * stmt,
 	CCI_CLASS_NAME_PATTERN_MATCH | CCI_ATTR_NAME_PATTERN_MATCH;
     }
 
+  if (stmt->conn->single_schema)
+    {
+	  sprintf(qualified_tablename, "%s.%s", stmt->conn->user, table_name);
+    }
+  else
+    {
+	  strcpy(qualified_tablename, table_name);
+    }
   cci_rc = cci_schema_info (stmt->conn->connhd, CCI_SCH_ATTRIBUTE,
-			    table_name, column_name, search_pattern_flag,
+			    qualified_tablename, column_name, search_pattern_flag,
 			    &cci_err_buf);
   ERROR_GOTO (cci_rc, cci_error);
 
