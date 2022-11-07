@@ -3200,7 +3200,8 @@ make_foreign_keys_result_set (ODBC_STATEMENT * stmt, int req_handle)
 	{
 	  goto cci_error;
 	}
-      foreign_keys_node->pk_table_name = UT_MAKE_STRING (cci_value.str, -1);
+      foreign_keys_node->pk_table_name = UT_MAKE_STRING (
+		  stmt->conn->single_schema ? remove_owner_name (cci_value.str) : cci_value.str, -1);
 
       /* pk column name */
       if ((cci_retval =
