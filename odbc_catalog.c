@@ -804,11 +804,15 @@ error:
 }
 
 PUBLIC RETCODE
-odbc_foreign_keys (ODBC_STATEMENT * stmt, char *pk_table_name,
-		   char *fk_table_name)
+odbc_foreign_keys (ODBC_STATEMENT * stmt, char *pktablename,
+		   char *fktablename)
 {
   int cci_retval = 0;
   int cci_request = 0;
+  char *pk_table_name = pktablename;
+  char *fk_table_name = fktablename;
+  char pk[MAX_TABLE_NAMME_LEN+1];
+  char fk[MAX_TABLE_NAMME_LEN+1];
 
   T_CCI_ERROR cci_error;
   char search_pattern_flag;
@@ -816,6 +820,21 @@ odbc_foreign_keys (ODBC_STATEMENT * stmt, char *pk_table_name,
 
   catalog_result_set_init (stmt, FOREIGN_KEYS);
   catalog_set_ird (stmt, foreign_keys_cinfo, NC_CATALOG_FOREIGN_KEYS);
+
+   if (stmt->conn->single_schema)
+     {
+       if (pk_table_name)
+         {
+           sprintf(pk, "%s.%s", stmt->conn->user, pk_table_name);
+           pk_table_name = pk;
+         }
+
+       if (fk_table_name)
+         {
+           sprintf(fk, "%s.%s", stmt->conn->user, fk_table_name);
+           fk_table_name = fk;
+         }
+   }
 
   if (pk_table_name)
     {
