@@ -158,7 +158,6 @@ typedef struct st_odbc_connection
   unsigned long attr_max_rows;	// 1
   unsigned long attr_query_timeout;	// 2
   int omit_schema;
-  int single_schema;
 } ODBC_CONNECTION;
 
 PUBLIC RETCODE odbc_alloc_connection (ODBC_ENV * env,

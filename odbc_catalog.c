@@ -658,7 +658,7 @@ odbc_columns (ODBC_STATEMENT * stmt,
 	CCI_CLASS_NAME_PATTERN_MATCH | CCI_ATTR_NAME_PATTERN_MATCH;
     }
 
-  if (stmt->conn->single_schema)
+  if (stmt->conn->omit_schema)
     {
 	  sprintf(qualified_tablename, "%s.%s", stmt->conn->user, table_name);
     }
@@ -821,7 +821,7 @@ odbc_foreign_keys (ODBC_STATEMENT * stmt, char *pktablename,
   catalog_result_set_init (stmt, FOREIGN_KEYS);
   catalog_set_ird (stmt, foreign_keys_cinfo, NC_CATALOG_FOREIGN_KEYS);
 
-   if (stmt->conn->single_schema)
+   if (stmt->conn->omit_schema)
      {
        if (pk_table_name)
          {
@@ -943,7 +943,7 @@ odbc_primary_keys (ODBC_STATEMENT * stmt, char *catalog_name,
   catalog_result_set_init (stmt, PRIMARY_KEYS);
   catalog_set_ird (stmt, primary_keys_cinfo, NC_CATALOG_PRIMARY_KEYS);
 
-  if (stmt->conn->single_schema)
+  if (stmt->conn->omit_schema)
     {
       if (table_name)
 	{
@@ -2349,7 +2349,7 @@ make_table_result_set (ODBC_STATEMENT * stmt, int req_handle, int type_option)
 	}
 
 	  tablename = cci_value.str;
-	  if (stmt->conn->single_schema)
+	  if (stmt->conn->omit_schema)
 	    {
               if (_strnicmp(tablename, stmt->conn->user, strlen(stmt->conn->user)))
                 {
@@ -3232,7 +3232,7 @@ make_foreign_keys_result_set (ODBC_STATEMENT * stmt, int req_handle)
 	  goto cci_error;
 	}
       foreign_keys_node->pk_table_name = UT_MAKE_STRING (
-		  stmt->conn->single_schema ? remove_owner_name (cci_value.str) : cci_value.str, -1);
+		  stmt->conn->omit_schema ? remove_owner_name (cci_value.str) : cci_value.str, -1);
 
       /* pk column name */
       if ((cci_retval =
