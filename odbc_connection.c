@@ -163,6 +163,7 @@ odbc_alloc_connection (ODBC_ENV * env, ODBC_CONNECTION ** connptr)
 
   conn->handle_type = SQL_HANDLE_DBC;
   conn->diag = odbc_alloc_diag ();
+  conn->omit_schema = 0;
 
   /* attribute init */
   conn->attr_access_mode = SQL_MODE_DEFAULT;
@@ -866,7 +867,6 @@ odbc_connect_new (ODBC_CONNECTION * conn,
   rc = get_db_version (conn);
   ERROR_GOTO (rc, error);
 
-  conn->omit_schema = 0;
   if (omit_schema && strlen (conn->db_ver))
     {
       char *p;
