@@ -57,6 +57,9 @@
 #define NC_CATALOG_PROCEDURES			8
 #define NC_CATALOG_PROCEDURE_COLUMNS		19
 
+#define	MAX_TABLE_NAMME_LEN		255
+#define	MAX_OWNER_NAMME_LEN		255
+
 typedef struct tagODBC_COL_INFO
 {
   const char *name;
@@ -809,7 +812,6 @@ odbc_foreign_keys (ODBC_STATEMENT * stmt, char *pk_table_name,
 
   T_CCI_ERROR cci_error;
   char search_pattern_flag;
-
   char err_msg[SQL_MAX_MESSAGE_LENGTH + 1];
 
   catalog_result_set_init (stmt, FOREIGN_KEYS);
@@ -3844,12 +3846,12 @@ retrieve_table_from_db_class (int cci_connection, char *table_name, T_CCI_ERROR 
   int cci_request;
 
   char *sql_statment = "SELECT class_name FROM db_class WHERE class_name = ?";
-  char tablename [512];
+  char tablename [MAX_TABLE_NAMME_LEN+1];
   char *param_list[] = { tablename };
-  char query_buf [512];
+  char query_buf [MAX_TABLE_NAMME_LEN+ MAX_OWNER_NAMME_LEN+512];
   char *query = sql_statment;
   char *p;
-  char owner [256];
+  char owner [MAX_TABLE_NAMME_LEN];
 
   p = strchr (table_name, '.');
   if (p)
