@@ -867,7 +867,7 @@ odbc_connect_new (ODBC_CONNECTION * conn,
   ERROR_GOTO (rc, error);
 
   conn->single_schema = 0;
-  if (strlen (conn->db_ver))
+  if (ignore_schema && strlen (conn->db_ver))
     {
       char *p;
       int version = atoi (conn->db_ver) * 100;
