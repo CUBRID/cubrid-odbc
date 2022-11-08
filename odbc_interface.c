@@ -395,13 +395,11 @@ SQLConnect (SQLHDBC ConnectionHandle,
   rc = odbc_connect_new ((ODBC_CONNECTION *) ConnectionHandle, stDataSource,
 			 stDBName, stUserName, stAuthentication, stServerName,
 			 Port, FetchSize, stCharSet, stAutocommit, stIgnoreSchema, NULL);
-
   NA_FREE (stDataSource);
   NA_FREE (stUserName);
   NA_FREE (stAuthentication);
 
   DEBUG_TIMESTAMP (END_SQLConnect);
-
   ODBC_RETURN (rc, ConnectionHandle);
 }
 
@@ -526,7 +524,7 @@ SQLDriverConnect (HDBC hdbc,
   char server[ITEMBUFLEN] = "";
   char charset[ITEMBUFLEN] = "";
   char autocommit[ITEMBUFLEN] = "";
-  char ignore_schema[ITEMBUFLEN] = "";
+  char omit_schema[ITEMBUFLEN] = "";
   int port = 0;
   int fetch_size = 0;
 
@@ -563,8 +561,7 @@ SQLDriverConnect (HDBC hdbc,
   ptSaveFile = element_value_by_key (ConnStrIn, KEYWORD_SAVEFILE);
   ptCharSet = element_value_by_key (ConnStrIn, KEYWORD_CHARSET);
   ptAutoCommit = element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT);
-  ptIgnoreSchema = element_value_by_key (ConnStrIn, KEYWORD_IGNORE_SCHEMA);
-
+  ptIgnoreSchema = element_value_by_key (ConnStrIn, KEYWORD_OMIT_SCHEMA);
   if (ptSaveFile == NULL)
     {				// for just connect
 
@@ -608,7 +605,6 @@ SQLDriverConnect (HDBC hdbc,
 
 	  port = ptPort ? atoi (ptPort) : 0;
 	  fetch_size = ptFetchSize ? atoi (ptFetchSize) : 0;
-
 	  rc = odbc_connect_new (hdbc, ptFileDSN, ptDBName, ptUser,
 				 ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, NULL, ConnStrIn);
 	}
@@ -621,13 +617,12 @@ SQLDriverConnect (HDBC hdbc,
 	  ptFetchSize = element_value_by_key (ConnStrIn, KEYWORD_FETCH_SIZE);
 	  ptCharSet = element_value_by_key (ConnStrIn, KEYWORD_CHARSET);
 	  ptAutoCommit = element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT);
-	  ptIgnoreSchema = element_value_by_key (ConnStrIn, KEYWORD_IGNORE_SCHEMA);
+	  ptIgnoreSchema = element_value_by_key (ConnStrIn, KEYWORD_OMIT_SCHEMA);
 
 	  get_dsn_info (ptDSN, db_name, sizeof (db_name), NULL, 0,
 			NULL, 0, server, sizeof (server), &port, &fetch_size,
 			charset, sizeof(charset), autocommit, sizeof(autocommit),
-			ignore_schema, sizeof (ignore_schema));
-
+			omit_schema, sizeof (omit_schema));
 	  // cbConnStrIn이 DSN의 정보보다 우선하다.
 	  if (ptDBName == NULL)
 	    {
@@ -655,7 +650,7 @@ SQLDriverConnect (HDBC hdbc,
 	    }
 	  if (ptIgnoreSchema == NULL)
 	  {
-		  ptIgnoreSchema = ignore_schema;
+		  ptIgnoreSchema = omit_schema;
 	  }
 
 	  rc = odbc_connect_new (hdbc, ptDSN, ptDBName, ptUser,
@@ -720,7 +715,7 @@ SQLDriverConnect (HDBC hdbc,
 
 	  if (ptIgnoreSchema != NULL)
 	  {
-		  sprintf(buf2, "%s=%s;", KEYWORD_IGNORE_SCHEMA, ptIgnoreSchema);
+		  sprintf(buf2, "%s=%s;", KEYWORD_OMIT_SCHEMA, ptIgnoreSchema);
 		  strcat(buf, buf2);
 	  }
 
@@ -747,7 +742,7 @@ SQLDriverConnect (HDBC hdbc,
       ptDescription = element_value_by_key (buf, KEYWORD_DESCRIPTION);
       ptCharSet = element_value_by_key (buf, KEYWORD_CHARSET);
       ptAutoCommit = element_value_by_key (buf, KEYWORD_AUTOCOMMIT);
-	  ptIgnoreSchema = element_value_by_key(buf, KEYWORD_IGNORE_SCHEMA);
+	  ptIgnoreSchema = element_value_by_key(buf, KEYWORD_OMIT_SCHEMA);
 
 
       memset (&dsn_item, 0, sizeof (CUBRIDDSNItem));
@@ -772,7 +767,7 @@ SQLDriverConnect (HDBC hdbc,
       if (ptAutoCommit != NULL)
 	strcpy (dsn_item.autocommit, ptAutoCommit);
 	  if (ptIgnoreSchema != NULL)
-		  strcpy(dsn_item.ignore_schema, ptIgnoreSchema);
+		  strcpy(dsn_item.omit_schema, ptIgnoreSchema);
 
       dlgrc = DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hWnd,
 			      ConfigDSNDlgProc, (LPARAM) & dsn_item);
@@ -789,7 +784,7 @@ SQLDriverConnect (HDBC hdbc,
 	       KEYWORD_FETCH_SIZE, dsn_item.fetch_size,
 	       KEYWORD_CHARSET, dsn_item.charset,
 	       KEYWORD_AUTOCOMMIT, dsn_item.autocommit,
-		   KEYWORD_IGNORE_SCHEMA, dsn_item.ignore_schema);
+		   KEYWORD_OMIT_SCHEMA, dsn_item.omit_schema);
 
       if ((szConnStrOut) && cbConnStrOut > 0)
 	{
@@ -2108,6 +2103,8 @@ SQLForeignKeys (SQLHSTMT StatementHandle,
 
   SQLCHAR *stPKTableName = NULL;
   SQLCHAR *stFKTableName = NULL;
+  char buf_p[512], buf_f [512];
+
 
   ODBC_STATEMENT *stmt_handle;
 

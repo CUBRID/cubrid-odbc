@@ -101,8 +101,8 @@ AddDSNProcByParam (CUBRIDDSNItem* pDsn_item)
 				dsn_item.charset, "ODBC.INI");
 	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_AUTOCOMMIT,
 	                        dsn_item.autocommit, "ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_IGNORE_SCHEMA,
-	                        dsn_item.ignore_schema, "ODBC.INI");
+	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_OMIT_SCHEMA,
+	                        dsn_item.omit_schema, "ODBC.INI");
 
     return (TRUE);
 }
@@ -151,7 +151,7 @@ ConfigDSN (HWND hwndParent,
 	  if(hwndParent){
 		  sprintf (dsn_item.driver, "%s", lpszDriver);
           sprintf (dsn_item.fetch_size, "%d", 100);
-          sprintf (dsn_item.ignore_schema, "no");
+          sprintf (dsn_item.omit_schema, "no");
 		  dlgrc = DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hwndParent,
 	  				  ConfigDSNDlgProc, (LPARAM) & dsn_item);
 		  if (dlgrc < 0)
@@ -177,7 +177,7 @@ ConfigDSN (HWND hwndParent,
 		  Odbc_strncpy(dsn_item.db_name , element_value_by_key (ConnStrIn, KEYWORD_DBNAME),ITEMBUFLEN);
 		  Odbc_strncpy(dsn_item.description , element_value_by_key (ConnStrIn, KEYWORD_DESCRIPTION),ITEMBUFLEN);
 		  Odbc_strncpy(dsn_item.autocommit, element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT), ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.ignore_schema, element_value_by_key (ConnStrIn, KEYWORD_IGNORE_SCHEMA), ITEMBUFLEN);
+		  Odbc_strncpy(dsn_item.omit_schema, element_value_by_key (ConnStrIn, KEYWORD_OMIT_SCHEMA), ITEMBUFLEN);
 		  
 		  rc = AddDSNProcByParam(&dsn_item);
 		  if(rc != TRUE)
@@ -227,8 +227,8 @@ ConfigDSN (HWND hwndParent,
       SQLGetPrivateProfileString (dsn_item.dsn, KEYWORD_AUTOCOMMIT,
 	                          "Not Found Field", dsn_item.autocommit,
 	                          ITEMBUFLEN, "ODBC.INI");
-      SQLGetPrivateProfileString (dsn_item.dsn, KEYWORD_IGNORE_SCHEMA,
-	                          "Not Found Field", dsn_item.ignore_schema,
+      SQLGetPrivateProfileString (dsn_item.dsn, KEYWORD_OMIT_SCHEMA,
+	                          "Not Found Field", dsn_item.omit_schema,
 	                          ITEMBUFLEN, "ODBC.INI");
       dlgrc =
 	DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hwndParent,
@@ -306,7 +306,7 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
       SetDlgItemText (hwndParent, IDC_FETCH_SIZE, ptDSNItem->fetch_size);
       SetDlgItemText (hwndParent, IDC_CHARSET, ptDSNItem->charset);
       SetDlgItemText (hwndParent, IDC_AUTOCOMMIT, ptDSNItem->autocommit);
-      SetDlgItemText (hwndParent, IDC_IGNORE_SCHEMA, ptDSNItem->ignore_schema);
+      SetDlgItemText (hwndParent, IDC_OMIT_SCHEMA, ptDSNItem->omit_schema);
       sprintf (ibuf, "%p", ptDSNItem);
       SetDlgItemText (hwndParent, IDC_PT_DSNITEM, ibuf);
 
@@ -402,7 +402,7 @@ AddDSNProc (HWND hwndParent)
 		      ITEMBUFLEN);
       GetDlgItemText (hwndParent, IDC_AUTOCOMMIT, dsn_item.autocommit,
 	              ITEMBUFLEN);
-      GetDlgItemText (hwndParent, IDC_IGNORE_SCHEMA, dsn_item.ignore_schema,
+      GetDlgItemText (hwndParent, IDC_OMIT_SCHEMA, dsn_item.omit_schema,
 	              ITEMBUFLEN);
 
       rc = SQLWriteDSNToIni (dsn_item.dsn, dsn_item.driver);
@@ -429,8 +429,8 @@ AddDSNProc (HWND hwndParent)
 				    dsn_item.charset, "ODBC.INI");
       SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_AUTOCOMMIT,
 	                            dsn_item.autocommit, "ODBC.INI");
-      SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_IGNORE_SCHEMA,
-	                            dsn_item.ignore_schema, "ODBC.INI");
+      SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_OMIT_SCHEMA,
+	                            dsn_item.omit_schema, "ODBC.INI");
     }
 
   return (TRUE);

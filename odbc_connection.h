@@ -49,7 +49,7 @@
 #define			KEYWORD_DRIVER		"DRIVER"
 #define			KEYWORD_CHARSET		"CHARSET"
 #define			KEYWORD_AUTOCOMMIT	"AUTOCOMMIT"
-#define			KEYWORD_IGNORE_SCHEMA	"IGNORE_SCHEMA"
+#define			KEYWORD_OMIT_SCHEMA	"OMIT_SCHEMA"
 
 #define			KEYWORD_ALTHOSTS	"ALTHOSTS"
 #define			KEYWORD_RCTIME		"RCTIME"
@@ -82,7 +82,7 @@ typedef struct stCUBRIDDSNItem
   char description[2 * ITEMBUFLEN];
   char charset[ITEMBUFLEN];
   char autocommit[ITEMBUFLEN];
-  char ignore_schema[ITEMBUFLEN];
+  char omit_schema[ITEMBUFLEN];
 } CUBRIDDSNItem;
 
 typedef struct st_odbc_connection_attr
@@ -123,7 +123,6 @@ typedef struct st_odbc_connection
   struct st_odbc_connection_attr attr_connect;
   char *charset;
   char db_ver[16];
-  short single_schema;
 
   unsigned long old_txn_isolation;	/* for read-only mode */
 
@@ -158,6 +157,8 @@ typedef struct st_odbc_connection
   /* stmt attributes */
   unsigned long attr_max_rows;	// 1
   unsigned long attr_query_timeout;	// 2
+  int omit_schema;
+  int single_schema;
 } ODBC_CONNECTION;
 
 PUBLIC RETCODE odbc_alloc_connection (ODBC_ENV * env,
@@ -172,7 +173,7 @@ PUBLIC RETCODE odbc_connect_new (ODBC_CONNECTION * conn,
 				 int port, int fetch_size,
 				 const char *charset,
                                  const char *autocommit,
-				 const char *ignore_schema,
+				 const char *omit_schema,
 				 const char *conn_str_in);
 PUBLIC RETCODE odbc_disconnect (ODBC_CONNECTION * conn);
 PUBLIC RETCODE odbc_set_connect_attr (ODBC_CONNECTION * conn,
@@ -202,6 +203,6 @@ PUBLIC int get_dsn_info(const char *dsn, char *db_name, int db_name_len,
 	int *fetch_size,
 	char *charset, int charset_len,
 	char *autocommit, int autocommit_len,
-	char *ignore_schema, int ignore_schema_len);
+	char *omit_schema, int omit_schema_len);
 
 #endif /* ! __ODBC_CONN_HEADER */

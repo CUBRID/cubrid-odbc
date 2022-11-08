@@ -776,7 +776,7 @@ odbc_connect_new (ODBC_CONNECTION * conn,
 		  int fetch_size,
 		  const char *charset,
                   const char *autocommit,
-		  const char *ignore_schema,
+		  const char *omit_schema,
 		  const char* conn_str)
 {
   int connhd;
@@ -867,7 +867,7 @@ odbc_connect_new (ODBC_CONNECTION * conn,
   ERROR_GOTO (rc, error);
 
   conn->single_schema = 0;
-  if (ignore_schema && strlen (conn->db_ver))
+  if (omit_schema && strlen (conn->db_ver))
     {
       char *p;
       int version = atoi (conn->db_ver) * 100;
@@ -877,7 +877,7 @@ odbc_connect_new (ODBC_CONNECTION * conn,
         {
           version += atoi (p+1);
         }
-      if (version >= 1102 && stricmp (ignore_schema, "yes") == 0)
+      if (version >= 1102 && stricmp (omit_schema, "yes") == 0)
         {
           conn->single_schema = 1;
         }
@@ -2679,7 +2679,7 @@ get_dsn_info (const char *dsn,
 	      char *server, int server_len, int *port, int *fetch_size,
 	      char *charset, int charset_len,
               char *autocommit, int autocommit_len,
-	      char *ignore_schema, int ignore_schema_len)
+	      char *omit_schema, int omit_schema_len)
 
 {
   char buf[1024];
@@ -2783,15 +2783,15 @@ get_dsn_info (const char *dsn,
 	str_value_assign (buf, autocommit, autocommit_len, NULL);
     }
 
-  if (ignore_schema != NULL)
+  if (omit_schema != NULL)
   {
 	  rcn =
-		  SQLGetPrivateProfileString(dsn, KEYWORD_IGNORE_SCHEMA, "", buf, sizeof(buf),
+		  SQLGetPrivateProfileString(dsn, KEYWORD_OMIT_SCHEMA, "", buf, sizeof(buf),
 			  "ODBC.INI");
 	  if (rcn == 0)
 		  buf[0] = '\0';
 	  else
-		  str_value_assign(buf, ignore_schema, ignore_schema_len, NULL);
+		  str_value_assign(buf, omit_schema, omit_schema_len, NULL);
   }
 
   return 0;
