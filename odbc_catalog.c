@@ -928,7 +928,7 @@ error:
 
 PUBLIC RETCODE
 odbc_primary_keys (ODBC_STATEMENT * stmt, char *catalog_name,
-		   char *schema_name, char *table_name)
+		   char *schema_name, char *tablename)
 {
   int cci_retval = 0;
   int cci_request = 0;
@@ -937,10 +937,20 @@ odbc_primary_keys (ODBC_STATEMENT * stmt, char *catalog_name,
   char search_pattern_flag;
 
   char err_msg[SQL_MAX_MESSAGE_LENGTH + 1];
+  char *table_name = tablename;
+  char pk[MAX_TABLE_NAMME_LEN+MAX_OWNER_NAMME_LEN + 1];
 
   catalog_result_set_init (stmt, PRIMARY_KEYS);
   catalog_set_ird (stmt, primary_keys_cinfo, NC_CATALOG_PRIMARY_KEYS);
 
+  if (stmt->conn->single_schema)
+    {
+      if (table_name)
+	{
+	  sprintf (pk, "%s.%s", stmt->conn->user, table_name);
+	  table_name = pk;
+	}
+    }
   cci_retval = retrieve_table_from_db_class (stmt->conn->connhd, table_name, &cci_error);
   if (cci_retval == 0)
     {
