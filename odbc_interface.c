@@ -375,7 +375,7 @@ SQLConnect (SQLHDBC ConnectionHandle,
   SQLINTEGER Port, FetchSize;
   SQLCHAR stCharSet[ITEMBUFLEN];
   SQLCHAR stAutocommit[ITEMBUFLEN];
-  SQLCHAR stIgnoreSchema[ITEMBUFLEN];
+  SQLCHAR stOmitSchema[ITEMBUFLEN];
 
 
   OutputDebugString ("SQLConnect called\n");
@@ -391,10 +391,10 @@ SQLConnect (SQLHDBC ConnectionHandle,
   get_dsn_info (stDataSource, stDBName, sizeof (stDBName), NULL, 0, NULL, 0,
 		stServerName, sizeof (stServerName), &Port, &FetchSize,
 		stCharSet, sizeof (stCharSet), stAutocommit, sizeof (stAutocommit),
-	  stIgnoreSchema, sizeof(stIgnoreSchema));
+	  stOmitSchema, sizeof(stOmitSchema));
   rc = odbc_connect_new ((ODBC_CONNECTION *) ConnectionHandle, stDataSource,
 			 stDBName, stUserName, stAuthentication, stServerName,
-			 Port, FetchSize, stCharSet, stAutocommit, stIgnoreSchema, NULL);
+			 Port, FetchSize, stCharSet, stAutocommit, stOmitSchema, NULL);
   NA_FREE (stDataSource);
   NA_FREE (stUserName);
   NA_FREE (stAuthentication);
@@ -512,7 +512,7 @@ SQLDriverConnect (HDBC hdbc,
   const char *ptDescription;
   const char *ptCharSet;
   const char *ptAutoCommit;
-  const char *ptIgnoreSchema;
+  const char *ptOmitSchema;
 
   // Deprecated : char            szDriver[ITEMBUFLEN];
   char ConnStrIn[BUF_SIZE*4];
@@ -561,7 +561,7 @@ SQLDriverConnect (HDBC hdbc,
   ptSaveFile = element_value_by_key (ConnStrIn, KEYWORD_SAVEFILE);
   ptCharSet = element_value_by_key (ConnStrIn, KEYWORD_CHARSET);
   ptAutoCommit = element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT);
-  ptIgnoreSchema = element_value_by_key (ConnStrIn, KEYWORD_OMIT_SCHEMA);
+  ptOmitSchema = element_value_by_key (ConnStrIn, KEYWORD_OMIT_SCHEMA);
   if (ptSaveFile == NULL)
     {				// for just connect
 
@@ -602,11 +602,12 @@ SQLDriverConnect (HDBC hdbc,
 	  ptFetchSize = element_value_by_key (ConnStrIn, KEYWORD_FETCH_SIZE);
 	  ptCharSet = element_value_by_key (ConnStrIn, KEYWORD_CHARSET);
 	  ptAutoCommit = element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT);
+	  ptOmitSchema = element_value_by_key(ConnStrIn, KEYWORD_OMIT_SCHEMA);
 
 	  port = ptPort ? atoi (ptPort) : 0;
 	  fetch_size = ptFetchSize ? atoi (ptFetchSize) : 0;
 	  rc = odbc_connect_new (hdbc, ptFileDSN, ptDBName, ptUser,
-				 ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, NULL, ConnStrIn);
+				 ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, ptOmitSchema, ConnStrIn);
 	}
       else
 	{
@@ -617,7 +618,7 @@ SQLDriverConnect (HDBC hdbc,
 	  ptFetchSize = element_value_by_key (ConnStrIn, KEYWORD_FETCH_SIZE);
 	  ptCharSet = element_value_by_key (ConnStrIn, KEYWORD_CHARSET);
 	  ptAutoCommit = element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT);
-	  ptIgnoreSchema = element_value_by_key (ConnStrIn, KEYWORD_OMIT_SCHEMA);
+	  ptOmitSchema = element_value_by_key (ConnStrIn, KEYWORD_OMIT_SCHEMA);
 
 	  get_dsn_info (ptDSN, db_name, sizeof (db_name), NULL, 0,
 			NULL, 0, server, sizeof (server), &port, &fetch_size,
@@ -648,13 +649,13 @@ SQLDriverConnect (HDBC hdbc,
 	    {
 	      ptAutoCommit = autocommit;
 	    }
-	  if (ptIgnoreSchema == NULL)
+	  if (ptOmitSchema == NULL)
 	  {
-		  ptIgnoreSchema = omit_schema;
+		  ptOmitSchema = omit_schema;
 	  }
 
 	  rc = odbc_connect_new (hdbc, ptDSN, ptDBName, ptUser,
-				 ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, ptIgnoreSchema, ConnStrIn);
+				 ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, ptOmitSchema, ConnStrIn);
 	}
 
       // Building ConnStrOut
@@ -713,9 +714,9 @@ SQLDriverConnect (HDBC hdbc,
 	  strcat (buf, buf2);
 	}
 
-	  if (ptIgnoreSchema != NULL)
+	  if (ptOmitSchema != NULL)
 	  {
-		  sprintf(buf2, "%s=%s;", KEYWORD_OMIT_SCHEMA, ptIgnoreSchema);
+		  sprintf(buf2, "%s=%s;", KEYWORD_OMIT_SCHEMA, ptOmitSchema);
 		  strcat(buf, buf2);
 	  }
 
@@ -742,7 +743,7 @@ SQLDriverConnect (HDBC hdbc,
       ptDescription = element_value_by_key (buf, KEYWORD_DESCRIPTION);
       ptCharSet = element_value_by_key (buf, KEYWORD_CHARSET);
       ptAutoCommit = element_value_by_key (buf, KEYWORD_AUTOCOMMIT);
-	  ptIgnoreSchema = element_value_by_key(buf, KEYWORD_OMIT_SCHEMA);
+	  ptOmitSchema = element_value_by_key(buf, KEYWORD_OMIT_SCHEMA);
 
 
       memset (&dsn_item, 0, sizeof (CUBRIDDSNItem));
@@ -766,8 +767,8 @@ SQLDriverConnect (HDBC hdbc,
 	strcpy (dsn_item.charset, ptCharSet);
       if (ptAutoCommit != NULL)
 	strcpy (dsn_item.autocommit, ptAutoCommit);
-	  if (ptIgnoreSchema != NULL)
-		  strcpy(dsn_item.omit_schema, ptIgnoreSchema);
+	  if (ptOmitSchema != NULL)
+		  strcpy(dsn_item.omit_schema, ptOmitSchema);
 
       dlgrc = DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hWnd,
 			      ConfigDSNDlgProc, (LPARAM) & dsn_item);
