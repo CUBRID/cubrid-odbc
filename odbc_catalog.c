@@ -2348,15 +2348,27 @@ make_table_result_set (ODBC_STATEMENT * stmt, int req_handle, int type_option)
 	  goto error;
 	}
 
-	  tablename = cci_value.str;
-	  if (stmt->conn->omit_schema)
-	    {
-              if (_strnicmp(tablename, stmt->conn->user, strlen(stmt->conn->user)))
-                {
-                  continue;
-                }
-              tablename = remove_owner_name(cci_value.str);
-	    }
+      tablename = cci_value.str;
+      if (stmt->conn->omit_schema)
+        {
+          char owner_name [MAX_OWNER_NAMME_LEN+1];
+          char *p;
+
+          strcpy (owner_name, tablename);
+          p = strchr (owner_name, '.');
+          if (p)
+            {
+              *p = 0x00;
+            }
+
+          if (_stricmp(owner_name, stmt->conn->user))
+            {
+              continue;
+            }
+
+          tablename = remove_owner_name(cci_value.str);
+        }
+
       // create a tuple
       table_node = create_table_value ();
       if (table_node == NULL)
