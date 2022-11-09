@@ -2104,8 +2104,6 @@ SQLForeignKeys (SQLHSTMT StatementHandle,
 
   SQLCHAR *stPKTableName = NULL;
   SQLCHAR *stFKTableName = NULL;
-  char buf_p[512], buf_f [512];
-
 
   ODBC_STATEMENT *stmt_handle;
 
