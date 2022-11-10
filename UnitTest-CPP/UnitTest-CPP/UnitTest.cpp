@@ -624,6 +624,136 @@ namespace UnitTestCPP
 			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
 
 		}
+
+		TEST_METHOD(APIS_942_OMIT_SCHEMA)
+		{
+			SQLHENV         hEnv;
+			SQLHDBC         hDbc;
+			SQLHSTMT        hstmt;
+			CHAR			msg[512];
+			SQLINTEGER		retcode;
+			SQLLEN			StrLen_or_IndPtr;
+			SQLCHAR			tablename[256];
+			char			my_tables[100][256];
+			int				num_table = 0;
+
+			SQLWCHAR		*qry_create_user = L"CREATE USER user1 password '1234'";
+			SQLWCHAR		*qry_drop_user = L"DROP USER user1";
+			SQLWCHAR		*qry_create_table0 = 
+								L"CREATE TABLE parent( \
+									id INT NOT NULL PRIMARY KEY, \
+									phome VARCHAR(10) \
+									)";
+			SQLWCHAR		*qry_create_table1 = 
+								L"CREATE TABLE t1 (\
+									id INT NOT NULL, \
+									name VARCHAR(20) NOT NULL, \
+									col1 INT REFERENCES PARENT(id)\
+									)";
+			SQLWCHAR		*qry_create_table2 = 
+								L"CREATE TABLE t2 ( \
+									id INT NOT NULL, \
+									address VARCHAR(20) NOT NULL, \
+									CONSTRAINT pk_id PRIMARY KEY(id), \
+									CONSTRAINT fk_id FOREIGN KEY(ID) REFERENCES parent(id) \
+									ON DELETE CASCADE ON UPDATE RESTRICT \
+									); ";
+			SQLWCHAR		*qry_create_table3 = 
+								L"CREATE TABLE code ( \
+									id INT NOT NULL, \
+									city VARCHAR(20) NOT NULL, \
+									col1 INT REFERENCES PARENT(id) \
+									); ";
+			SQLWCHAR		*grant_parent_to_public[] = { L"parent", L"t1", L"t2", L"code" };
+
+			SQLWCHAR		*drop_table_t1 = L"DROP table if exists user1.t1";
+			SQLWCHAR		*drop_table_t2 = L"DROP table if exists user1.t2";
+			SQLWCHAR		*drop_table_t3 = L"DROP table if exists user1.code";
+			SQLWCHAR		*drop_table_p1 = L"DROP table if exists user1.parent";
+			SQLWCHAR		*p;
+			int				i;
+
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=dba;pwd=;db_name=demodb;charset=utf-8;omit_schema=yes", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+			retcode = SQLExecDirect(hstmt, drop_table_t1, SQL_NTS);
+			retcode = SQLExecDirect(hstmt, drop_table_t2, SQL_NTS);
+			retcode = SQLExecDirect(hstmt, drop_table_t3, SQL_NTS);
+			retcode = SQLExecDirect(hstmt, drop_table_p1, SQL_NTS);
+
+			Logger::WriteMessage("Phase1: ********** CREATE USER **********");
+			retcode = SQLExecDirect(hstmt, qry_drop_user, SQL_NTS);
+			retcode = SQLEndTran(SQL_HANDLE_DBC, hDbc, SQL_COMMIT);
+			retcode = SQLExecDirect(hstmt, qry_create_user, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLFreeStmt(hstmt, SQL_CLOSE);
+			retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+
+			Logger::WriteMessage("Phase2: ********** Try to LOGIN AS 'user1' **********");
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=user1;pwd=1234;db_name=demodb;single_schema=on;charset=utf-8;omit_schema=yes", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+			retcode = SQLExecDirect(hstmt, qry_create_table0, SQL_NTS);
+			retcode = SQLExecDirect(hstmt, qry_create_table1, SQL_NTS);
+			retcode = SQLExecDirect(hstmt, qry_create_table2, SQL_NTS);
+			retcode = SQLExecDirect(hstmt, qry_create_table3, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			for (i = 0; i < sizeof (grant_parent_to_public)/sizeof (SQLWCHAR *); i++)
+			{
+				SQLWCHAR query[512];
+
+				wsprintf(query, L"GRANT ALL PRIVILEGES on %s to public", grant_parent_to_public[i]);
+				retcode = SQLExecDirect(hstmt, query, SQL_NTS);
+			}
+			Logger::WriteMessage("Phase3: ********** Tables were created **********");
+
+			Logger::WriteMessage("Phase4: ********** Search for table names owned by the login user  **********");
+			retcode = SQLTables(hstmt, NULL, 0, NULL, 0, NULL, 0, L"TABLE", SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			
+			while (SQL_SUCCEEDED(retcode = SQLFetch(hstmt))) {
+				retcode = SQLGetData(hstmt, 3, SQL_C_CHAR, tablename, sizeof(tablename), &StrLen_or_IndPtr);
+				strcpy(my_tables[num_table++], (const char *) tablename);
+				sprintf(msg, "Table = %s", tablename);
+				if (StrLen_or_IndPtr != NULL)
+				{
+					Logger::WriteMessage(msg);
+				}
+			}
+			sprintf(msg, "Num Tables = %d\n", num_table);
+			Logger::WriteMessage(msg);
+
+			/* user 'user1' have to get 4 table names, t1, t2, code, parent, only	*/
+			/* even it has privilege on tables owned by the user 'public' (total 14 tables */
+			Assert::AreEqual(num_table, 4);
+
+			Logger::WriteMessage("Phase4: ********** get colulm of user1.code  **********");
+
+			retcode = SQLColumns(hstmt, NULL, 0, NULL, 0, L"code", SQL_NTS, NULL, 0);
+
+			for (int i = 0; i < num_table; i++)
+			{
+				sprintf(msg, "ResultSet %d = %s", i, my_tables[i]);
+				Logger::WriteMessage(msg);
+			}
+
+			retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+
+		}
+
 		TEST_METHOD(APIS_794_QueryPlanMultiByte)
 		{
 			RETCODE retcode;
