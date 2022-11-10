@@ -371,6 +371,11 @@ SQLColumnsW (SQLHSTMT hstmt,
   wide_char_to_bytes (table, table_len, &cb_table,  &cb_table_len, stmt_handle->conn->charset);
   wide_char_to_bytes (column, column_len, &cb_column,  &cb_column_len, stmt_handle->conn->charset);
 
+  if (cb_column_len == 0)
+    {
+	  NA_FREE(cb_column);
+    }
+
   ret = SQLColumns (hstmt,
                     cb_catalog, cb_catalog_len,
                     cb_schema, cb_schema_len,
@@ -462,6 +467,16 @@ SQLForeignKeysW (SQLHSTMT hstmt,
   wide_char_to_bytes (fk_catalog, fk_catalog_len, &cb_fk_catalog, &cb_fk_catalog_len, stmt->conn->charset);
   wide_char_to_bytes (fk_schema, fk_schema_len, &cb_fk_schema, &cb_fk_schema_len, stmt->conn->charset);
   wide_char_to_bytes (fk_table, fk_table_len, &cb_fk_table, &cb_fk_table_len, stmt->conn->charset);
+
+  if (cb_pk_table_len == 0)
+  {
+	  NA_FREE(cb_pk_table);
+  }
+
+  if (cb_fk_table_len == 0)
+  {
+	  NA_FREE(cb_fk_table);
+  }
         
   ret = SQLForeignKeys(hstmt, 
                                        cb_pk_catalog, cb_pk_catalog_len, cb_pk_schema, cb_pk_schema_len,

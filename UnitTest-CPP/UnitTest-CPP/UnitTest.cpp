@@ -539,7 +539,91 @@ namespace UnitTestCPP
 			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
 
 		}
+		TEST_METHOD(APIS_943_SQLCOLUMNSW)
+		{
+			SQLHENV         hEnv;
+			SQLHDBC         hDbc;
+			SQLHSTMT        hstmt;
+			CHAR			msg[512];
+			SQLINTEGER		retcode;
+			SQLSMALLINT		num_cols = 0;
+			SQLLEN			indicator;
 
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLDriverConnectW(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=public;pwd=;db_name=demodb;charset=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+
+			retcode = SQLColumnsW(hstmt, NULL, 0, NULL, 0, L"participant", SQL_NTS, NULL, 0);
+
+			while (SQL_SUCCEEDED(retcode = SQLFetch(hstmt))) {
+				SQLCHAR buf[255];
+
+				memset(buf, 0, sizeof(buf));
+
+				retcode = SQLGetData(hstmt, 4, SQL_C_CHAR, buf, sizeof(buf), &indicator);
+
+				if (SQL_SUCCEEDED(retcode)) {
+					sprintf(msg, "COLUMN [%d]: %s", 1+num_cols++, buf);
+					Logger::WriteMessage(msg);
+				}
+			}
+
+			sprintf(msg, "Num Cols = %d", num_cols);
+			Logger::WriteMessage(msg);
+
+			Assert::AreNotEqual((int) num_cols, 0);
+
+			retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+		}
+		TEST_METHOD(APIS_943_FOREIGNKEYSW)
+		{
+			SQLHENV         hEnv;
+			SQLHDBC         hDbc;
+			SQLHSTMT        hstmt;
+			CHAR			msg[512];
+			SQLINTEGER		retcode;
+			SQLSMALLINT		num_tables = 0;
+			SQLLEN			indicator;
+
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLDriverConnectW(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=public;pwd=;db_name=demodb;charset=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+
+			retcode = SQLForeignKeysW (hstmt, NULL, 0, NULL, 0, L"olympic", SQL_NTS, NULL, 0, NULL, 0, NULL, 0);
+
+			while (SQL_SUCCEEDED(retcode = SQLFetch(hstmt))) {
+				SQLCHAR buf[255];
+
+				memset(buf, 0, sizeof(buf));
+
+				retcode = SQLGetData(hstmt, 7, SQL_C_CHAR, buf, sizeof(buf), &indicator);
+
+				if (SQL_SUCCEEDED(retcode)) {
+					sprintf(msg, "FK Table [%d]: %s", 1 + num_tables++, buf);
+					Logger::WriteMessage(msg);
+				}
+			}
+
+			sprintf(msg, "Num FK Tables = %d", num_tables);
+			Logger::WriteMessage(msg);
+
+			Assert::AreNotEqual((int)num_tables, 0);
+
+			retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+
+		}
 		TEST_METHOD(APIS_794_QueryPlanMultiByte)
 		{
 			RETCODE retcode;
