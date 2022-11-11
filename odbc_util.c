@@ -1649,3 +1649,22 @@ PUBLIC int decide_info_value_length (SQLUSMALLINT info_type, int buffer_length, 
   return info_value_length;
 }
 #endif
+
+PUBLIC char *
+remove_owner_name (char *tablename)
+{
+  char *p = NULL;
+  char *ret = (char *) tablename;
+
+  if (tablename)
+    {
+      p = strchr (tablename, '.');
+    }
+
+  if (p)
+    {
+      ret = p + 1;
+    }
+
+  return ret;
+}
