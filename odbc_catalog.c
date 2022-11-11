@@ -57,6 +57,9 @@
 #define NC_CATALOG_PROCEDURES			8
 #define NC_CATALOG_PROCEDURE_COLUMNS		19
 
+#define	MAX_TABLE_NAMME_LEN		255
+#define	MAX_OWNER_NAMME_LEN		255
+
 typedef struct tagODBC_COL_INFO
 {
   const char *name;
@@ -640,6 +643,7 @@ odbc_columns (ODBC_STATEMENT * stmt,
 
   int cci_rc;
   T_CCI_ERROR cci_err_buf;
+  char qualified_tablename[1024];
 
   catalog_result_set_init (stmt, COLUMNS);
   catalog_set_ird (stmt, column_cinfo, NC_CATALOG_COLUMNS);
@@ -654,8 +658,16 @@ odbc_columns (ODBC_STATEMENT * stmt,
 	CCI_CLASS_NAME_PATTERN_MATCH | CCI_ATTR_NAME_PATTERN_MATCH;
     }
 
+  if (stmt->conn->omit_schema)
+    {
+	  sprintf(qualified_tablename, "%s.%s", stmt->conn->user, table_name);
+    }
+  else
+    {
+	  strcpy(qualified_tablename, table_name);
+    }
   cci_rc = cci_schema_info (stmt->conn->connhd, CCI_SCH_ATTRIBUTE,
-			    table_name, column_name, search_pattern_flag,
+			    qualified_tablename, column_name, search_pattern_flag,
 			    &cci_err_buf);
   ERROR_GOTO (cci_rc, cci_error);
 
@@ -792,19 +804,37 @@ error:
 }
 
 PUBLIC RETCODE
-odbc_foreign_keys (ODBC_STATEMENT * stmt, char *pk_table_name,
-		   char *fk_table_name)
+odbc_foreign_keys (ODBC_STATEMENT * stmt, char *pktablename,
+		   char *fktablename)
 {
   int cci_retval = 0;
   int cci_request = 0;
+  char *pk_table_name = pktablename;
+  char *fk_table_name = fktablename;
+  char pk[MAX_TABLE_NAMME_LEN+1];
+  char fk[MAX_TABLE_NAMME_LEN+1];
 
   T_CCI_ERROR cci_error;
   char search_pattern_flag;
-
   char err_msg[SQL_MAX_MESSAGE_LENGTH + 1];
 
   catalog_result_set_init (stmt, FOREIGN_KEYS);
   catalog_set_ird (stmt, foreign_keys_cinfo, NC_CATALOG_FOREIGN_KEYS);
+
+   if (stmt->conn->omit_schema)
+     {
+       if (pk_table_name)
+         {
+           sprintf(pk, "%s.%s", stmt->conn->user, pk_table_name);
+           pk_table_name = pk;
+         }
+
+       if (fk_table_name)
+         {
+           sprintf(fk, "%s.%s", stmt->conn->user, fk_table_name);
+           fk_table_name = fk;
+         }
+   }
 
   if (pk_table_name)
     {
@@ -898,7 +928,7 @@ error:
 
 PUBLIC RETCODE
 odbc_primary_keys (ODBC_STATEMENT * stmt, char *catalog_name,
-		   char *schema_name, char *table_name)
+		   char *schema_name, char *tablename)
 {
   int cci_retval = 0;
   int cci_request = 0;
@@ -907,10 +937,20 @@ odbc_primary_keys (ODBC_STATEMENT * stmt, char *catalog_name,
   char search_pattern_flag;
 
   char err_msg[SQL_MAX_MESSAGE_LENGTH + 1];
+  char *table_name = tablename;
+  char pk[MAX_TABLE_NAMME_LEN+MAX_OWNER_NAMME_LEN + 1];
 
   catalog_result_set_init (stmt, PRIMARY_KEYS);
   catalog_set_ird (stmt, primary_keys_cinfo, NC_CATALOG_PRIMARY_KEYS);
 
+  if (stmt->conn->omit_schema)
+    {
+      if (table_name)
+	{
+	  sprintf (pk, "%s.%s", stmt->conn->user, table_name);
+	  table_name = pk;
+	}
+    }
   cci_retval = retrieve_table_from_db_class (stmt->conn->connhd, table_name, &cci_error);
   if (cci_retval == 0)
     {
@@ -2254,6 +2294,7 @@ make_table_result_set (ODBC_STATEMENT * stmt, int req_handle, int type_option)
   long current_tpl_pos = 0;
   ODBC_TABLE_VALUE *table_node = NULL;
   int class_type;
+  char *tablename = NULL;
 
   while (1)
     {
@@ -2307,12 +2348,33 @@ make_table_result_set (ODBC_STATEMENT * stmt, int req_handle, int type_option)
 	  goto error;
 	}
 
+      tablename = cci_value.str;
+      if (stmt->conn->omit_schema)
+        {
+          char owner_name [MAX_OWNER_NAMME_LEN+1];
+          char *p;
+
+          strcpy (owner_name, tablename);
+          p = strchr (owner_name, '.');
+          if (p)
+            {
+              *p = 0x00;
+            }
+
+          if (_stricmp(owner_name, stmt->conn->user))
+            {
+              continue;
+            }
+
+          tablename = remove_owner_name(cci_value.str);
+        }
+
       // create a tuple
       table_node = create_table_value ();
       if (table_node == NULL)
 	continue;
 
-      table_node->table_name = UT_MAKE_STRING (cci_value.str, -1);
+      table_node->table_name = UT_MAKE_STRING (tablename, -1);
 
       if (class_type == 0)
 	{
@@ -3181,7 +3243,8 @@ make_foreign_keys_result_set (ODBC_STATEMENT * stmt, int req_handle)
 	{
 	  goto cci_error;
 	}
-      foreign_keys_node->pk_table_name = UT_MAKE_STRING (cci_value.str, -1);
+      foreign_keys_node->pk_table_name = UT_MAKE_STRING (
+		  stmt->conn->omit_schema ? remove_owner_name (cci_value.str) : cci_value.str, -1);
 
       /* pk column name */
       if ((cci_retval =
@@ -3824,9 +3887,33 @@ retrieve_table_from_db_class (int cci_connection, char *table_name, T_CCI_ERROR 
   int cci_request;
 
   char *sql_statment = "SELECT class_name FROM db_class WHERE class_name = ?";
-  char *param_list[] = { table_name };
+  char tablename [MAX_TABLE_NAMME_LEN+1];
+  char *param_list[] = { tablename };
+  char query_buf [MAX_TABLE_NAMME_LEN+ MAX_OWNER_NAMME_LEN+512];
+  char *query = sql_statment;
+  char *p;
+  char owner [MAX_TABLE_NAMME_LEN];
 
-  return sql_execute (cci_connection, &cci_request, sql_statment, param_list,
+  p = strchr (table_name, '.');
+  if (p)
+    {
+      strcpy (owner, table_name);
+      strcpy (tablename, p + 1);
+
+      p = strchr (owner, '.');
+      if (p)
+       {
+         *p = 0x00;
+       }
+      sprintf (query_buf, "%s AND OWNER_NAME = UPPER ('%s')", sql_statment, owner);
+      query = query_buf;
+    }
+  else
+    {
+      strcpy (tablename, table_name);
+    }
+
+  return sql_execute (cci_connection, &cci_request, query, param_list,
 		      1, error);
 }
 

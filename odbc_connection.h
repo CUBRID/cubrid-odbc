@@ -49,6 +49,7 @@
 #define			KEYWORD_DRIVER		"DRIVER"
 #define			KEYWORD_CHARSET		"CHARSET"
 #define			KEYWORD_AUTOCOMMIT	"AUTOCOMMIT"
+#define			KEYWORD_OMIT_SCHEMA	"OMIT_SCHEMA"
 
 #define			KEYWORD_ALTHOSTS	"ALTHOSTS"
 #define			KEYWORD_RCTIME		"RCTIME"
@@ -81,6 +82,7 @@ typedef struct stCUBRIDDSNItem
   char description[2 * ITEMBUFLEN];
   char charset[ITEMBUFLEN];
   char autocommit[ITEMBUFLEN];
+  char omit_schema[ITEMBUFLEN];
 } CUBRIDDSNItem;
 
 typedef struct st_odbc_connection_attr
@@ -155,6 +157,7 @@ typedef struct st_odbc_connection
   /* stmt attributes */
   unsigned long attr_max_rows;	// 1
   unsigned long attr_query_timeout;	// 2
+  int omit_schema;
 } ODBC_CONNECTION;
 
 PUBLIC RETCODE odbc_alloc_connection (ODBC_ENV * env,
@@ -169,6 +172,7 @@ PUBLIC RETCODE odbc_connect_new (ODBC_CONNECTION * conn,
 				 int port, int fetch_size,
 				 const char *charset,
                                  const char *autocommit,
+				 const char *omit_schema,
 				 const char *conn_str_in);
 PUBLIC RETCODE odbc_disconnect (ODBC_CONNECTION * conn);
 PUBLIC RETCODE odbc_set_connect_attr (ODBC_CONNECTION * conn,
@@ -192,11 +196,12 @@ PUBLIC RETCODE odbc_get_info (ODBC_CONNECTION * conn, SQLUSMALLINT info_type,
 			      SQLPOINTER info_value_ptr,
 			      SQLSMALLINT buffer_length,
 			      SQLLEN * string_length_ptr);
-PUBLIC int get_dsn_info (const char *dsn, char *db_name, int db_name_len,
-			 char *user, int user_len, char *pwd, int pwd_len,
-			 char *server, int server_len, int *port,
-			 int *fetch_size,
-			 char *charset, int charset_len,
-                         char *autocommit, int autocommit_len);
+PUBLIC int get_dsn_info(const char *dsn, char *db_name, int db_name_len,
+	char *user, int user_len, char *pwd, int pwd_len,
+	char *server, int server_len, int *port,
+	int *fetch_size,
+	char *charset, int charset_len,
+	char *autocommit, int autocommit_len,
+	char *omit_schema, int omit_schema_len);
 
 #endif /* ! __ODBC_CONN_HEADER */

@@ -163,6 +163,7 @@ odbc_alloc_connection (ODBC_ENV * env, ODBC_CONNECTION ** connptr)
 
   conn->handle_type = SQL_HANDLE_DBC;
   conn->diag = odbc_alloc_diag ();
+  conn->omit_schema = 0;
 
   /* attribute init */
   conn->attr_access_mode = SQL_MODE_DEFAULT;
@@ -776,6 +777,7 @@ odbc_connect_new (ODBC_CONNECTION * conn,
 		  int fetch_size,
 		  const char *charset,
                   const char *autocommit,
+		  const char *omit_schema,
 		  const char* conn_str)
 {
   int connhd;
@@ -792,6 +794,7 @@ odbc_connect_new (ODBC_CONNECTION * conn,
   NA_FREE (conn->password);
   NA_FREE (conn->server);
   NA_FREE (conn->charset);
+
 
   strncpy (connect_url, "cci:CUBRID:", sizeof(connect_url));
   pt = data_source == NULL ? "" : data_source;
@@ -863,6 +866,22 @@ odbc_connect_new (ODBC_CONNECTION * conn,
 #endif
   rc = get_db_version (conn);
   ERROR_GOTO (rc, error);
+
+  if (omit_schema && strlen (conn->db_ver))
+    {
+      char *p;
+      int version = atoi (conn->db_ver) * 100;
+
+      p = strchr (conn->db_ver, '.');
+      if (p)
+        {
+          version += atoi (p+1);
+        }
+      if (version >= 1102 && stricmp (omit_schema, "yes") == 0)
+        {
+          conn->omit_schema = 1;
+        }
+    }
 
   // disconnect with cas
   if (conn->connhd > 0)
@@ -2659,7 +2678,8 @@ get_dsn_info (const char *dsn,
 	      char *pwd, int pwd_len,
 	      char *server, int server_len, int *port, int *fetch_size,
 	      char *charset, int charset_len,
-              char *autocommit, int autocommit_len)
+              char *autocommit, int autocommit_len,
+	      char *omit_schema, int omit_schema_len)
 
 {
   char buf[1024];
@@ -2762,6 +2782,17 @@ get_dsn_info (const char *dsn,
       else
 	str_value_assign (buf, autocommit, autocommit_len, NULL);
     }
+
+  if (omit_schema != NULL)
+  {
+	  rcn =
+		  SQLGetPrivateProfileString(dsn, KEYWORD_OMIT_SCHEMA, "", buf, sizeof(buf),
+			  "ODBC.INI");
+	  if (rcn == 0)
+		  buf[0] = '\0';
+	  else
+		  str_value_assign(buf, omit_schema, omit_schema_len, NULL);
+  }
 
   return 0;
 }
