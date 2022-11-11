@@ -347,6 +347,41 @@ namespace UnitTestCPP
 
 		TEST_METHOD(APIS_936_TextLength2Ptr_NULL_CHK)
 		{
+			/*
+			 * TEST Description
+			 * 
+			 * 1. Create user user1 in the dba account.
+			 * 2. Log in to demodb as 'user1' and create the following table (omit_schema=yes)
+			 *    'parent', 't1', 't2', 'code'
+			 * 3. Request a table list.
+			 *    - expected: ''parent', 't1', 't2', 'code''
+			 *    - if omit_schema=no (default), you will receive
+			 *      public.stadium
+			 *      public.code
+			 *      public.nation
+			 *      public.event
+			 *      public.athlete
+			 *      public.participant
+			 *      public.olympic
+			 *      public.game
+			 *      public.record
+			 *      public.history
+			 *      user1.parent
+			 *      user1.t1
+			 *      user1.t2
+			 *      user1.code
+			 * 4. Request Column names of table 'code'
+			 *    - expected: 'id', 'city', 'col1'
+			 *    - if omit_schema=no (default), you will receive (colums of 'user1.code' & 'public.code')
+			 *       s_name
+			 *       id
+			 *       f_name
+			 *       city
+			 *       col1
+			 * 5. Login to demodb as 'public' (omit_schema=yes)
+			 * 6. Request table names with table 'user1.parent' as the parent table of the foreign key.
+			 *    - exprect: returns -1 for SQLForeignKeysW () even 'public' has privilege on the table
+			 */
 			SQLHENV         hEnv;
 			SQLHDBC         hDbc;
 			SQLHSTMT        hStmt;
@@ -633,7 +668,8 @@ namespace UnitTestCPP
 			CHAR			msg[512];
 			SQLINTEGER		retcode;
 			SQLLEN			StrLen_or_IndPtr;
-			SQLCHAR			tablename[256];
+			SQLCHAR			table_name[256];
+			SQLCHAR			column_name[256];
 			char			my_tables[100][256];
 			int				num_table = 0;
 
@@ -644,6 +680,7 @@ namespace UnitTestCPP
 									id INT NOT NULL PRIMARY KEY, \
 									phome VARCHAR(10) \
 									)";
+
 			SQLWCHAR		*qry_create_table1 = 
 								L"CREATE TABLE t1 (\
 									id INT NOT NULL, \
@@ -664,19 +701,19 @@ namespace UnitTestCPP
 									city VARCHAR(20) NOT NULL, \
 									col1 INT REFERENCES PARENT(id) \
 									); ";
-			SQLWCHAR		*grant_parent_to_public[] = { L"parent", L"t1", L"t2", L"code" };
 
 			SQLWCHAR		*drop_table_t1 = L"DROP table if exists user1.t1";
 			SQLWCHAR		*drop_table_t2 = L"DROP table if exists user1.t2";
 			SQLWCHAR		*drop_table_t3 = L"DROP table if exists user1.code";
 			SQLWCHAR		*drop_table_p1 = L"DROP table if exists user1.parent";
+			SQLWCHAR        *grant_parent_to_public[] = { L"parent", L"t1", L"t2", L"code" };
 			SQLWCHAR		*p;
 			int				i;
 
 			retcode = SQLAllocEnv(&hEnv);
 			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
 			retcode = SQLAllocConnect(hEnv, &hDbc);
-			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=dba;pwd=;db_name=demodb;charset=utf-8;omit_schema=yes", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=dba;pwd=;db_name=demodb;charset=utf-8", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
 			retcode = SQLExecDirect(hstmt, drop_table_t1, SQL_NTS);
@@ -699,7 +736,7 @@ namespace UnitTestCPP
 			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
 			retcode = SQLAllocConnect(hEnv, &hDbc);
 			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
-			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=user1;pwd=1234;db_name=demodb;single_schema=on;charset=utf-8;omit_schema=yes", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=user1;pwd=1234;db_name=demodb;charset=utf-8;omit_schema=yes", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
 			retcode = SQLExecDirect(hstmt, qry_create_table0, SQL_NTS);
@@ -708,13 +745,14 @@ namespace UnitTestCPP
 			retcode = SQLExecDirect(hstmt, qry_create_table3, SQL_NTS);
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 
-			for (i = 0; i < sizeof (grant_parent_to_public)/sizeof (SQLWCHAR *); i++)
+			for (i = 0; i < sizeof(grant_parent_to_public) / sizeof(SQLWCHAR *); i++)
 			{
 				SQLWCHAR query[512];
 
 				wsprintf(query, L"GRANT ALL PRIVILEGES on %s to public", grant_parent_to_public[i]);
 				retcode = SQLExecDirect(hstmt, query, SQL_NTS);
 			}
+
 			Logger::WriteMessage("Phase3: ********** Tables were created **********");
 
 			Logger::WriteMessage("Phase4: ********** Search for table names owned by the login user  **********");
@@ -722,9 +760,9 @@ namespace UnitTestCPP
 			Assert::AreNotEqual((int)retcode, SQL_ERROR);
 			
 			while (SQL_SUCCEEDED(retcode = SQLFetch(hstmt))) {
-				retcode = SQLGetData(hstmt, 3, SQL_C_CHAR, tablename, sizeof(tablename), &StrLen_or_IndPtr);
-				strcpy(my_tables[num_table++], (const char *) tablename);
-				sprintf(msg, "Table = %s", tablename);
+				retcode = SQLGetData(hstmt, 3, SQL_C_CHAR, table_name, sizeof(table_name), &StrLen_or_IndPtr);
+				strcpy(my_tables[num_table++], (const char *) table_name);
+				sprintf(msg, "Table = %s", table_name);
 				if (StrLen_or_IndPtr != NULL)
 				{
 					Logger::WriteMessage(msg);
@@ -735,15 +773,46 @@ namespace UnitTestCPP
 
 			/* user 'user1' have to get 4 table names, t1, t2, code, parent, only	*/
 			/* even it has privilege on tables owned by the user 'public' (total 14 tables */
+
 			Assert::AreEqual(num_table, 4);
 
 			Logger::WriteMessage("Phase4: ********** get colulm of user1.code  **********");
 
 			retcode = SQLColumns(hstmt, NULL, 0, NULL, 0, L"code", SQL_NTS, NULL, 0);
 
-			for (int i = 0; i < num_table; i++)
-			{
-				sprintf(msg, "ResultSet %d = %s", i, my_tables[i]);
+			i = 0;
+			while (SQL_SUCCEEDED(retcode = SQLFetch(hstmt))) {
+				retcode = SQLGetData(hstmt, 4, SQL_C_CHAR, column_name, sizeof(column_name), &StrLen_or_IndPtr);
+				sprintf(msg, "column name [%d] = %s", ++i, column_name);
+				Logger::WriteMessage(msg);
+			}
+
+			sprintf(msg, "Num Cols = %d", i);
+			Logger::WriteMessage(msg);
+
+			retcode = SQLFreeStmt(hstmt, SQL_CLOSE);
+			retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+			retcode = SQLDriverConnect(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=public;pwd=;db_name=demodb;charset=utf-8;omit_schema=yes", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+
+			/* Get foreign key table names regarding parent table 'parent' */
+			retcode = SQLForeignKeysW(hstmt, NULL, 0, NULL, 0, L"user1.parent", SQL_NTS, NULL, 0, NULL, 0, NULL, 0);
+			Assert::AreEqual((int)retcode, SQL_ERROR);
+
+			i = 0;
+			sprintf(msg, "List FK tables");
+			Logger::WriteMessage(msg);
+
+			while (SQL_SUCCEEDED(retcode = SQLFetch(hstmt))) {
+				retcode = SQLGetData(hstmt, 7, SQL_C_CHAR, table_name, sizeof(table_name), &StrLen_or_IndPtr);
+				sprintf(msg, "FK table_name [%d] = %s", ++i, table_name);
 				Logger::WriteMessage(msg);
 			}
 
