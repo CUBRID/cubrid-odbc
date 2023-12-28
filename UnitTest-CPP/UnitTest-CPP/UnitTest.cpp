@@ -911,8 +911,6 @@ namespace UnitTestCPP
 			SQLFreeHandle(SQL_HANDLE_ENV, env);
 		}
 
-
-
 		TEST_METHOD(APIS_901_QueryPlan)
 		{
 			RETCODE retcode;
