@@ -911,6 +911,8 @@ namespace UnitTestCPP
 			SQLFreeHandle(SQL_HANDLE_ENV, env);
 		}
 
+
+
 		TEST_METHOD(APIS_901_QueryPlan)
 		{
 			RETCODE retcode;
@@ -1061,6 +1063,140 @@ namespace UnitTestCPP
 			SQLFreeHandle(SQL_HANDLE_ENV, env);
 
 
+		}
+
+		TEST_METHOD(APIS_987_BIND_128_Columns)
+		{
+			SQLHENV		hEnv;
+			SQLHDBC		hDbc;
+			SQLHSTMT	hStmt;
+
+			SQLWCHAR *query_insert = L"INSERT INTO COL_NUM_128 ("
+				"COL01,COL02,COL03,COL04,COL05,COL06,COL07,COL08,"
+				"COL09,COL10,COL11,COL12,COL13,COL14,COL15,COL16,"
+				"COL17,COL18,COL19,COL20,COL21,COL22,COL23,COL24,"
+				"COL25,COL26,COL27,COL28,COL29,COL30,COL31,COL32,"
+				"COL33,COL34,COL35,COL36,COL37,COL38,COL39,COL40,"
+				"COL41,COL42,COL43,COL44,COL45,COL46,COL47,COL48,"
+				"COL49,COL50,COL51,COL52,COL53,COL54,COL55,COL56,"
+				"COL57,COL58,COL59,COL60,COL61,COL62,COL63,COL64,"
+				"COL65,COL66,COL67,COL68,COL69,COL70,COL71,COL72,"
+				"COL73,COL74,COL75,COL76,COL77,COL78,COL79,COL80,"
+				"COL81,COL82,COL83,COL84,COL85,COL86,COL87,COL88,"
+				"COL89,COL90,COL91,COL92,COL93,COL94,COL95,COL96,"
+				"COL97, COL98, COL99, COL100,COL101,COL102,COL103,COL104,"
+				"COL105,COL106,COL107,COL108,COL109,COL110,COL111,COL112,"
+				"COL113,COL114,COL115,COL116,COL117,COL118,COL119,COL120,"
+				"COL121,COL122,COL123,COL124,COL125,COL126,COL127,COL128,"
+				"COL129, COL130)"
+				"VALUES ("
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?, ?, ?, ?, ?, ?, ?,"
+				"?, ?"
+				")";
+
+#define	ARRAY_SZ	8
+#define	STR_SZ		20
+#define COL_SIZE	20
+#define NUM_COL		130
+
+			SQLWCHAR query_create[4096];
+			int nArraySize(ARRAY_SZ);
+			int BUFLEN (40);
+			SQLWCHAR tbldata[NUM_COL+1][ARRAY_SZ][COL_SIZE];
+			SQLUSMALLINT	ParamStatusArray[ARRAY_SZ];
+			SQLLEN			ParamsProcessed[ARRAY_SZ];
+			SQLLEN pIndicator[NUM_COL];
+			WCHAR msg[1024];
+			SQLINTEGER diag_rec;
+			SWORD plm_pcbErrorMsg = 0;
+			RETCODE retcode(0);
+
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLConnect(hDbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, NULL, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt);
+
+			// Build query for CREATE Table with 130 columns
+			wsprintf(query_create, L"CREATE TABLE col_num_128 (");
+			for (int i = 1; i <= NUM_COL; i++)
+			{
+				SQLWCHAR col_info[64];
+
+				if (i == NUM_COL)
+					wsprintf(col_info, L"COL%d VARCHAR)", i);
+				else if (i < 10)
+					wsprintf(col_info, L"COL%02d VARCHAR, ", i);
+				else
+					wsprintf(col_info, L"COL%d VARCHAR,", i);
+
+				wcscat_s(query_create, col_info);
+			}
+
+			retcode = SQLExecDirect(hStmt, L"DROP TABLE IF EXISTS col_num_128", SQL_NTS);
+			retcode = SQLExecDirect(hStmt, query_create, SQL_NTS);
+
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLPrepare(hStmt, query_insert, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			// Bind Array for Column Binding
+			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAM_BIND_TYPE, SQL_PARAM_BIND_BY_COLUMN, 0);
+			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER)ARRAY_SZ, 0);
+			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAM_STATUS_PTR, ParamStatusArray, 0);
+			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAMS_PROCESSED_PTR, ParamsProcessed, 0);
+
+			for (int i = 1; i <= NUM_COL; i++)
+			{
+				for (int j = 0; j < ARRAY_SZ; j++)
+				  wsprintf(tbldata[i][j], L"Data %d-%d", i, j);
+				retcode = SQLBindParameter(hStmt, i, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_VARCHAR,
+					COL_SIZE, 0, tbldata[i], BUFLEN, &pIndicator[i]);
+			}
+
+			retcode = SQLExecute(hStmt);
+
+			if (retcode != SQL_SUCCESS) {
+				SQLINTEGER i = 0, NativeError;
+				SQLWCHAR SQLState[8];
+				SQLWCHAR MessageText[256];
+				SQLSMALLINT TextLength;
+
+				do {
+					SQLGetDiagRec(SQL_HANDLE_STMT, hStmt, ++i, SQLState, &NativeError, MessageText, sizeof(MessageText), &TextLength);
+					wsprintf(msg, L"SQLExecute: sqlstate = %s, msg = %s", SQLState, MessageText);
+					Logger::WriteMessage(msg);
+				} while (retcode == SQL_SUCCESS);
+
+				Assert::Fail(L"SQLExec");
+			}
+
+			retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLFreeStmt(hStmt, SQL_DROP);
+			retcode = SQLFreeHandle(SQL_HANDLE_STMT, hStmt);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
 		}
 
 		TEST_METHOD(APIS_876_BindNull)
