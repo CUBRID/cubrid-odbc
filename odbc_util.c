@@ -905,8 +905,8 @@ replace_oid (char *sql_text, char **org_param_pos_pt,
   char buf[126];
   char *pt;
   char *pt_tmp;
-  char current_param_pos = 0;
-  char oid_param_num = 0;
+  int current_param_pos = 0;
+  int oid_param_num = 0;
 
   org_param_pos[0] = '\0';
   oid_param_pos[0] = '\0';
