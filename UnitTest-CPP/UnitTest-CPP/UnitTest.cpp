@@ -1124,6 +1124,8 @@ namespace UnitTestCPP
 			SWORD plm_pcbErrorMsg = 0;
 			RETCODE retcode(0);
 
+			int NUM_LOOP(10);  // 100 * NUM_LOOP rows will be inserted, to measure throughput
+
 			retcode = SQLAllocEnv(&hEnv);
 			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
 			retcode = SQLAllocConnect(hEnv, &hDbc);
@@ -1176,7 +1178,7 @@ namespace UnitTestCPP
 			retcode = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_VARCHAR,
 				COL_SIZE, 0, tbldata2, BUFLEN, &pIndicator[0]);
 
-			for (int i = 1; i < 3; i++)
+			for (int i = 1; i < NUM_LOOP; i++)
 			{
 				retcode = SQLExecute(hStmt);
 				retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
