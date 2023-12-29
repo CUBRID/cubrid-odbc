@@ -1107,15 +1107,15 @@ namespace UnitTestCPP
 				"?, ?"
 				")";
 
-#define	ARRAY_SZ	8
-#define	STR_SZ		20
-#define COL_SIZE	20
+#define	ARRAY_SZ	100
+#define COL_SIZE	80
 #define NUM_COL		130
 
 			SQLWCHAR query_create[4096];
 			int nArraySize(ARRAY_SZ);
-			int BUFLEN (40);
-			SQLWCHAR tbldata[NUM_COL+1][ARRAY_SZ][COL_SIZE];
+			int BUFLEN(COL_SIZE*sizeof(SQLWCHAR));
+			SQLWCHAR tbldata[ARRAY_SZ][COL_SIZE];
+			SQLWCHAR tbldata2[ARRAY_SZ][COL_SIZE];
 			SQLUSMALLINT	ParamStatusArray[ARRAY_SZ];
 			SQLLEN			ParamsProcessed[ARRAY_SZ];
 			SQLLEN pIndicator[NUM_COL];
@@ -1162,15 +1162,25 @@ namespace UnitTestCPP
 			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAM_STATUS_PTR, ParamStatusArray, 0);
 			retcode = SQLSetStmtAttr(hStmt, SQL_ATTR_PARAMS_PROCESSED_PTR, ParamsProcessed, 0);
 
-			for (int i = 1; i <= NUM_COL; i++)
+			for (int i = 0; i < ARRAY_SZ; i++)
 			{
-				for (int j = 0; j < ARRAY_SZ; j++)
-				  wsprintf(tbldata[i][j], L"Data %d-%d", i, j);
-				retcode = SQLBindParameter(hStmt, i, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_VARCHAR,
-					COL_SIZE, 0, tbldata[i], BUFLEN, &pIndicator[i]);
+					wsprintf(tbldata[i], L"큐브리드 ODBC Data %d", i);
+					wsprintf(tbldata2[i], L"큐브리드 ODBC Data_2 %d", i);
 			}
 
-			retcode = SQLExecute(hStmt);
+			for (int i = 1; i < NUM_COL; i++)
+			{
+				retcode = SQLBindParameter(hStmt, i+1, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_VARCHAR,
+					COL_SIZE, 0, &tbldata[0], BUFLEN, &pIndicator[i]);
+			}
+			retcode = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_VARCHAR,
+				COL_SIZE, 0, tbldata2, BUFLEN, &pIndicator[0]);
+
+			for (int i = 1; i < 3; i++)
+			{
+				retcode = SQLExecute(hStmt);
+				retcode = SQLEndTran(SQL_HANDLE_ENV, hEnv, SQL_COMMIT);
+			}
 
 			if (retcode != SQL_SUCCESS) {
 				SQLINTEGER i = 0, NativeError;
