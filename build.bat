@@ -24,3 +24,4 @@ c:
 cd C:\NSIS
 
 makensis %WORKSPACE%\%INSTALL_DIRS%\installer.nsi
+
