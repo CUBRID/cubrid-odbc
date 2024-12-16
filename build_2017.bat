@@ -2,8 +2,7 @@ set WORKSPACE=%~dp0
 set INSTALL_DIRS=output
 echo %INSTALL_DIRS%
 
-:VS2017COMNTOOLS PATH=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\
-call "%VS2017COMNTOOLS%VsDevCmd.bat"
+call "%VS141COMNTOOLS%VsDevCmd.bat"
 mkdir %INSTALL_DIRS%
 
 devenv cubrid_odbc_14.sln /rebuild "Release|Win32"
