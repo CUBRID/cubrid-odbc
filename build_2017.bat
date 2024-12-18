@@ -2,7 +2,7 @@ set WORKSPACE=%~dp0
 set INSTALL_DIRS=output
 echo %INSTALL_DIRS%
 
-call "%VS141COMNTOOLS%VsDevCmd.bat"
+call "%VS2017COMNTOOLS%VsDevCmd.bat"
 mkdir %INSTALL_DIRS%
 
 devenv cubrid_odbc_14.sln /rebuild "Release|Win32"

@@ -2,7 +2,7 @@ set WORKSPACE=%~dp0
 set INSTALL_DIRS=output_unicode
 echo %INSTALL_DIRS%
 
-call "%VS141COMNTOOLS%VsDevCmd.bat"
+call "%VS2017COMNTOOLS%VsDevCmd.bat"
 mkdir %INSTALL_DIRS%
 
 copy build\Win32_Debug_Unicode\cubrid_odbc_unicode.dll  %INSTALL_DIRS%\cubrid_odbc32_d.dll
