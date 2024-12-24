@@ -19,7 +19,4 @@ copy installer\installer.nsi %INSTALL_DIRS%\installer.nsi
 copy installer\license.txt %INSTALL_DIRS%\license.txt
 copy installer\README.txt %INSTALL_DIRS%\README.txt
 
-c:
-cd C:\NSIS
-
 makensis %WORKSPACE%\%INSTALL_DIRS%\installer.nsi

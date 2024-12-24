@@ -14,7 +14,4 @@ copy installer\installer-unicode.nsi %INSTALL_DIRS%\installer-unicode.nsi
 copy installer\license.txt %INSTALL_DIRS%\license.txt
 copy installer\README.txt %INSTALL_DIRS%\README.txt
 
-c:
-cd C:\NSIS
-
 makensis %WORKSPACE%\%INSTALL_DIRS%\installer-unicode.nsi
