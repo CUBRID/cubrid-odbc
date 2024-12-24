@@ -2,7 +2,6 @@ set WORKSPACE=%~dp0
 set INSTALL_DIRS=output_unicode
 echo %INSTALL_DIRS%
 
-:VS2017COMNTOOLS PATH=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\
 call "%VS2017COMNTOOLS%VsDevCmd.bat"
 mkdir %INSTALL_DIRS%
 
@@ -14,8 +13,5 @@ copy build\x64_Release_Unicode\cubrid_odbc_unicode.dll  %INSTALL_DIRS%\cubrid_od
 copy installer\installer-unicode.nsi %INSTALL_DIRS%\installer-unicode.nsi
 copy installer\license.txt %INSTALL_DIRS%\license.txt
 copy installer\README.txt %INSTALL_DIRS%\README.txt
-
-c:
-cd C:\NSIS
 
 makensis %WORKSPACE%\%INSTALL_DIRS%\installer-unicode.nsi
