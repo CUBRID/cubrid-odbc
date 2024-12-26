@@ -1,6 +1,12 @@
+@echo off
+
 set WORKSPACE=%~dp0
 set INSTALL_DIRS=output
-echo %INSTALL_DIRS%
+
+if "%VS2017COMNTOOLS%x" == "x" (
+ echo "Please add 'VS2017COMNTOOLS' in the environment variable\n ex) C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools"
+ GOTO :EOF
+)
 
 call "%VS2017COMNTOOLS%VsDevCmd.bat"
 mkdir %INSTALL_DIRS%
@@ -20,3 +26,8 @@ copy installer\license.txt %INSTALL_DIRS%\license.txt
 copy installer\README.txt %INSTALL_DIRS%\README.txt
 
 makensis %WORKSPACE%\%INSTALL_DIRS%\installer.nsi
+
+if %ERRORLEVEL% NEQ 0 (
+  echo "Error: cannot find NSIS. Are system environment variables set?"
+  GOTO :EOF
+)
