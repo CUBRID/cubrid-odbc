@@ -1,5 +1,5 @@
-call "E:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.bat"
+call "%VS2017COMNTOOLS%VsDevCmd.bat"
 cd UnitTest
-devenv UnitTest.sln /project UnitTest\UnitTest.csproj /rebuild "Release|x86" 
-cd UnitTest\bin\x86\Release
+devenv UnitTest.sln /project UnitTest\UnitTest.csproj /rebuild "Release|x64" 
+cd UnitTest\bin\x64\Release
 MSTest/testcontainer:UnitTest.dll
