@@ -23,7 +23,7 @@
     <ProjectGuid>{FA19B10D-59A2-42F6-AD63-06C00122E9E6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>UnitTestCPP</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <ProjectSubType>NativeUnitTestProject</ProjectSubType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
