@@ -23,7 +23,7 @@
     <ProjectGuid>{FA19B10D-59A2-42F6-AD63-06C00122E9E6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>UnitTestCPP</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <ProjectSubType>NativeUnitTestProject</ProjectSubType>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -159,6 +159,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\cubrid-odbc.git\cubrid_odbc_14.vcxproj">
       <Project>{37e00a2e-bbc5-4736-90d9-a1b4271759bb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\cubrid_odbc_14.vcxproj">
+      <Project>{37e00a2e-bbc5-4736-90d9-a1b4271759bb}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\cubrid_odbc_unicode_14.vcxproj">
       <Project>{0092bd82-bce8-4e10-a9db-d083fc5c9d67}</Project>

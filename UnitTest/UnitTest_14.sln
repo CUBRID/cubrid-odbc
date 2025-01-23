@@ -48,7 +48,7 @@ Global
 		{81F39664-1339-44AE-8068-0968E3C82806}.Release|Mixed Platforms.Build.0 = Release|x86
 		{81F39664-1339-44AE-8068-0968E3C82806}.Release|Win32.ActiveCfg = Release|x86
 		{81F39664-1339-44AE-8068-0968E3C82806}.Release|Win32.Build.0 = Release|x86
-		{81F39664-1339-44AE-8068-0968E3C82806}.Release|x64.ActiveCfg = Release|x86
+		{81F39664-1339-44AE-8068-0968E3C82806}.Release|x64.ActiveCfg = Release|x64
 		{81F39664-1339-44AE-8068-0968E3C82806}.Release|x86.ActiveCfg = Release|x86
 		{81F39664-1339-44AE-8068-0968E3C82806}.Release|x86.Build.0 = Release|x86
 		{37E00A2E-BBC5-4736-90D9-A1B4271759BB}.Debug|Any CPU.ActiveCfg = Debug|Win32
@@ -89,6 +89,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D3C9D461-DCB1-4130-A39E-2B724EDA3A80}
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = UnitTest1.vsmdi
