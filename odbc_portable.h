@@ -31,7 +31,13 @@
 #ifndef	__ODBC_PORTABLE_HEADER
 #define	__ODBC_PORTABLE_HEADER
 
+#if defined (_WINDOWS)
 #include "windows.h"
+#else
+#define CUBRID_LINUX_ODBC
+#include <wchar.h>
+#include <stdint.h>
+#endif
 #include "sqlext.h"
 
 #define	ODBC_INTERFACE
@@ -60,6 +66,37 @@
 
 #define MAX(X, Y)		((X) > (Y) ? (X) : (Y))
 #define MIN(X, Y)		((X) < (Y) ? (X) : (Y))
+
+#if defined (CUBRID_LINUX_ODBC)
+typedef int64_t __int64;
+typedef int INT_PTR;
+typedef unsigned int UINT_PTR;
+typedef const char * LPCTSTR;
+typedef long LONG_PTR;
+typedef LONG_PTR    LPARAM;
+typedef UINT_PTR            WPARAM;
+typedef WCHAR OLECHAR;
+
+#define _stricmp	strcasecmp
+#define _strnicmp	strncasecmp
+#define stricmp		strcasecmp
+#define _atoi64		atoll
+#define _snprintf	snprintf
+
+#define CP_EUC_KR	51949
+#define CP_ACP		949	/* code page 949 is KSC5601 */
+#define CP_UTF8		65001
+#define CP_UTF7		65000
+
+#if !defined (_MAX_PATH)
+#define _MAX_PATH        4096
+#endif
+
+#if !defined (TRUE)
+typedef enum { TRUE = 1, FALSE = 0 } bool;
+#endif
+
+#endif
 
 /* Handle Management */
 #define		INIT					0
