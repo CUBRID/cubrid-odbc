@@ -86,7 +86,7 @@ file(APPEND ${VERSION_FILE} ".${CUBRID_ODBC_MINOR_VERSION}")
 file(APPEND ${VERSION_FILE} ".${CUBRID_ODBC_PATCH_VERSION}")
 file(APPEND ${VERSION_FILE} ".${commit_count}\"\n")
 
-file(APPEND ${VERSION_FILE} "#define ODBC_DRIVER_NAME \"libcubrid-odbc.so.${CUBRID_ODBC_VERSION}\"\n")
+file(APPEND ${VERSION_FILE} "#define LINUX_ODBC_DRIVER_NAME \"libcubrid-odbc.so.${CUBRID_ODBC_VERSION}\"\n")
 
 # cci submodule update
 if (NOT EXISTS ${CCI_COPYING})
