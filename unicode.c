@@ -1030,7 +1030,7 @@ SQLColAttributeW (SQLHSTMT StatementHandle,
                   SQLUSMALLINT FieldIdentifier,
                   SQLPOINTER CharacterAttribute,
                   SQLSMALLINT BufferLength, SQLSMALLINT * StringLength,
-#ifdef _WIN64
+#if defined(_WIN64) || defined(__linux__)
                   SQLLEN * NumericAttribute)
 #else
                   SQLPOINTER NumericAttribute)
