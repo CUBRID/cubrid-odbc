@@ -30,7 +30,13 @@
 
 #include <stdio.h>
 #include <math.h>
+
+#if defined(WINDOWS)
 #include <LIMITS.H>
+#else
+#include <limits.h>
+#endif
+
 #include "odbc_portable.h"
 #include "sqlext.h"
 #include "odbc_type.h"
