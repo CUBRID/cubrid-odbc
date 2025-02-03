@@ -73,8 +73,8 @@ typedef int INT_PTR;
 typedef unsigned int UINT_PTR;
 typedef const char * LPCTSTR;
 typedef long LONG_PTR;
-typedef LONG_PTR    LPARAM;
-typedef UINT_PTR            WPARAM;
+typedef LONG_PTR LPARAM;
+typedef UINT_PTR WPARAM;
 typedef WCHAR OLECHAR;
 
 #define _stricmp	strcasecmp
