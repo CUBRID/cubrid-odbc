@@ -2729,7 +2729,7 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
 #if defined(WINDOWS)
 		(long *) *octet_len_addr = NULL;
 #else
-		*(long *) octet_len_addr = NULL;
+		octet_len_addr = NULL;
 #endif
 	    }
 	}
