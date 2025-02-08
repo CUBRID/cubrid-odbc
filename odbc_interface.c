@@ -296,6 +296,12 @@ SQLColAttribute (SQLHSTMT StatementHandle,
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
+  SQLSMALLINT tmp_StringLength;
+
+  if (StringLength == NULL)
+    {
+      StringLength = &tmp_StringLength;
+    }
 
   OutputDebugString ("SQLColAttribute called\n");
 
