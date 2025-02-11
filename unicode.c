@@ -195,6 +195,21 @@ SQLGetInfoW (SQLHDBC ConnectionHandle,
     odbc_get_info ((ODBC_CONNECTION *) ConnectionHandle, InfoType, InfoValue,
                    BufferLength, &tmp_StringLength);
 
+#if !defined (WINDOW)
+  switch (InfoType)
+    {
+      case SQL_CURSOR_ROLLBACK_BEHAVIOR:
+      case SQL_MAX_TABLE_NAME_LEN:
+      case SQL_MAX_PROCEDURE_NAME_LEN:
+      case SQL_CURSOR_COMMIT_BEHAVIOR:
+      case SQL_TXN_ISOLATION_OPTION:
+      case SQL_SCHEMA_USAGE:
+      case SQL_TXN_CAPABLE:
+      case SQL_MAX_SCHEMA_NAME_LEN:
+        goto ret;
+    }
+#endif
+
   if (StringLength != NULL)
     {
       info_value_size = tmp_StringLength * sizeof (SQLWCHAR);
@@ -228,6 +243,7 @@ SQLGetInfoW (SQLHDBC ConnectionHandle,
         }
     }
 
+ret:
   DEBUG_TIMESTAMP (END_SQLGetInfo);
 
   ODBC_RETURN (rc, ConnectionHandle);
