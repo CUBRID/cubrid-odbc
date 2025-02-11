@@ -2699,12 +2699,11 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
       if (desc_info_ptr->bind_type == SQL_PARAM_BIND_BY_COLUMN)
 	{
 #if !defined (WINDOWS)
-#if 1
 	  if (desc_info_ptr->type == SQL_C_SLONG || desc_info_ptr->type == SQL_C_SSHORT)
 	    {
 		desc_info_ptr->length = sizeof (int);
 	    }
-#endif
+
 	  *value_addr =
 	    desc_info_ptr->value_ptr + desc_info_ptr->offset_size +
 	    (row_index - 1) * (desc_info_ptr->length);
