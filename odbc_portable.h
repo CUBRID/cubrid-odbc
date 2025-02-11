@@ -70,7 +70,7 @@
 #if defined (CUBRID_LINUX_ODBC)
 typedef int64_t __int64;
 typedef int INT_PTR;
-typedef unsigned int UINT_PTR;
+typedef unsigned int *  UINT_PTR;
 typedef const char * LPCTSTR;
 typedef long LONG_PTR;
 typedef LONG_PTR LPARAM;
