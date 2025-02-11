@@ -1245,6 +1245,13 @@ odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
 		    short c_scale)
 {
 
+#if !defined (WINDOWS)
+  if (c_value == NULL || sql_value_root == NULL)
+    {
+      return;
+    }
+#endif
+
   switch (c_type)
     {
 
@@ -1288,8 +1295,17 @@ odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
 	 *					char & binary type
 	 *--------------------------------------------------------------*/
     case SQL_C_CHAR:
+#if defined (WINDOWS)
       *((char **) sql_value_root + index) =
 	UT_MAKE_STRING (c_value, c_length);
+#else
+	{
+	  void *value_p;
+
+	  wide_char_to_bytes ((void *)c_value, c_length, (char **)&value_p, NULL, NULL);
+	  *((char **) sql_value_root + index) = value_p;
+	}
+#endif
       break;
 
     case SQL_C_WCHAR:
