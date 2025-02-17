@@ -352,6 +352,37 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
 	  EndDialog (hwndParent, FALSE);
 	  break;
 
+	case IDC_TEST_BUTTON:
+	  char dsn[256], user[256], password[256];
+	  GetDlgItemText(hwndParent, IDC_DSN, dsn, sizeof(dsn));
+	  GetDlgItemText(hwndParent, IDC_DBUSER, user, sizeof(user));
+	  GetDlgItemText(hwndParent, IDC_PASSWORD, password, sizeof(password));
+
+	  SQLHENV hEnv;
+	  SQLHDBC hDbc;
+	  SQLRETURN ret;
+
+	  SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &hEnv);
+	  SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
+	  SQLAllocHandle(SQL_HANDLE_DBC, hEnv, &hDbc);
+
+	  char connStr[512];
+	  sprintf(connStr, "DSN=%s;UID=%s;PWD=%s;", dsn, user, password);
+
+	  ret = SQLDriverConnect(hDbc, NULL, (SQLCHAR*)connStr, SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+
+	  if (SQL_SUCCEEDED(ret)) {
+        MessageBox(hwndParent, "DB connection successful!", "ODBC Test", MB_OK);
+        SQLDisconnect(hDbc);
+	  }
+	  else {
+        MessageBox(hwndParent, "DB connection failure!", "ODBC Test", MB_OK);
+      }
+
+	  SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+	  SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+	  break;
+
 	default:
 	  return (FALSE);
 	}

@@ -24,6 +24,7 @@
 #define IDC_CHARSET                     1018
 #define IDC_AUTOCOMMIT                  1020
 #define IDC_OMIT_SCHEMA                 1022
+#define IDC_TEST_BUTTON                 1024
 
 // Next default values for new objects
 // 
