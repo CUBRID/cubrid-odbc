@@ -58,7 +58,7 @@
 typedef struct __st_ParamArray
 {
   int value_type;
-#if defined (WINDOWS)
+#if defined (_WINDOWS)
   int *ind_array;
 #else
   UINT_PTR *ind_array;
@@ -73,7 +73,7 @@ typedef struct __st_DescInfo
   long long offset_size;
   void *value_ptr;
   unsigned long length;
-#if defined (WINDOWS)
+#if defined (_WINDOWS)
   long *ind_ptr;
 #else
   UINT_PTR *ind_ptr;
@@ -2675,7 +2675,7 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
   long element_size;
 
   if (desc_info_ptr->value_ptr == NULL)
-#if defined (WINDOWS)
+#if defined (_WINDOWS)
     {
       (void *) *value_addr = NULL;
       (long *) *ind_addr = NULL;
@@ -2698,7 +2698,7 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
     {
       if (desc_info_ptr->bind_type == SQL_PARAM_BIND_BY_COLUMN)
 	{
-#if !defined (WINDOWS)
+#if !defined (_WINDOWS)
 	  if (desc_info_ptr->type == SQL_C_SLONG || desc_info_ptr->type == SQL_C_SSHORT)
 	    {
 		desc_info_ptr->length = sizeof (int);
@@ -2728,7 +2728,7 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
 		  desc_info_ptr->offset_size + (row_index -
 						1) * sizeof (long);
 	      else
-#if defined (WINDOWS)
+#if defined (_WINDOWS)
 		(long *) *octet_len_addr = NULL;
 #else
                 *octet_len_addr = NULL;
@@ -2750,7 +2750,7 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
 		*octet_len_addr = (UINT_PTR) desc_info_ptr->octet_len_ptr +
 		  desc_info_ptr->offset_size + (row_index - 1) * element_size;
 	      else
-#if defined(WINDOWS)
+#if defined(_WINDOWS)
 		(long *) *octet_len_addr = NULL;
 #else
 		*octet_len_addr = NULL;
@@ -3021,7 +3021,7 @@ make_param_array (ODBC_STATEMENT * stmt,
 PRIVATE void
 memory_alloc_param_array (ParamArray * param_array, int array_size)
 {
-#if defined (WINDOWS)
+#if defined (_WINDOWS)
   param_array->ind_array = UT_ALLOC (sizeof (int) * array_size);
 #else
   param_array->ind_array = UT_ALLOC (sizeof (UINT_PTR) * array_size);

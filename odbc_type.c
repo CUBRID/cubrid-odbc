@@ -31,7 +31,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#if defined(WINDOWS)
+#if defined(_WINDOWS)
 #include <LIMITS.H>
 #else
 #include <limits.h>
@@ -1245,7 +1245,7 @@ odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
 		    short c_scale)
 {
 
-#if !defined (WINDOWS)
+#if !defined (_WINDOWS)
   if (c_value == NULL || sql_value_root == NULL)
     {
       return;
@@ -1295,7 +1295,7 @@ odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
 	 *					char & binary type
 	 *--------------------------------------------------------------*/
     case SQL_C_CHAR:
-#if defined (WINDOWS)
+#if defined (_WINDOWS)
       *((char **) sql_value_root + index) =
 	UT_MAKE_STRING (c_value, c_length);
 #else

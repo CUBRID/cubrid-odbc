@@ -63,7 +63,7 @@ ConnectDlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 PUBLIC HINSTANCE hInstance;
 
-#if defined(WINDOWS)
+#if defined(_WINDOWS)
 BOOL WINAPI
 DllMain (HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -592,7 +592,7 @@ SQLDriverConnect (HDBC hdbc,
 	      sprintf (dci.pwd, "");
 	    }
 
-#if defined (WINDOWS)
+#if defined (_WINDOWS)
 	  if (strcmp (dci.user, "") == 0)
 	    {
 	      DialogBoxParam (hInstance, (LPCTSTR) IDD_DRIVERCONNECT, hWnd,
@@ -2036,7 +2036,7 @@ ODBC_INTERFACE RETCODE SQL_API
 SQLDescribeParam (SQLHSTMT StatementHandle,
 		  SQLUSMALLINT ParameterNumber,
 		  SQLSMALLINT * DataTypePtr,
-#if defined(WINDOWS)
+#if defined(_WINDOWS)
 		  SQLUINTEGER * ParameterSizePtr,
 #else
       SQLULEN * ParameterSizePtr,
@@ -2227,7 +2227,7 @@ SQLProcedures (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLParamOptions (SQLHSTMT StatementHandle,
-#if defined(WINDOWS)
+#if defined(_WINDOWS)
 		 SQLUINTEGER crow, SQLUINTEGER * pirow)
 #else
      SQLULEN crow, SQLULEN * pirow)
@@ -2604,7 +2604,7 @@ SQLSetScrollOptions (SQLHSTMT StatementHandle,
 
 #endif
 
-#if defined (WINDOWS)
+#if defined (_WINDOWS)
 /************************************************************************
  * name:  ConnectDlgProc
  * arguments:

@@ -202,7 +202,7 @@ PUBLIC RETCODE odbc_set_stmt_attr (ODBC_STATEMENT * stmt,
 				   long attribute,
 				   void *valueptr,
 				   long stringlength, short is_driver);
-#if defined(WINDOWS)
+#if defined(_WINDOWS)
 PUBLIC RETCODE odbc_get_stmt_attr (ODBC_STATEMENT * stmt,
 				   long attr,
 				   void *value_ptr,

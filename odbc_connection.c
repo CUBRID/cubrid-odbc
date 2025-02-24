@@ -45,7 +45,7 @@
 
 static const char *CUBRID_DRIVER_ODBC_VER = "03.52";
 static const char *CUBRID_DRIVER_VER = VERSION_STRING;
-#if defined (WINDOWS)
+#if defined (_WINDOWS)
 static const char *CUBRID_DRIVER_NAME = "cubrid_odbc.dll";
 #else
 static const char *CUBRID_DRIVER_NAME = LINUX_ODBC_DRIVER_NAME;
