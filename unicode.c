@@ -28,7 +28,9 @@
  *
  */
 
+#if defined (_WINDOWS)
 #include		<windows.h>
+#endif
 #include		<stdio.h>
 
 #include		"odbc_portable.h"
@@ -76,7 +78,7 @@ SQLDriverConnectW (SQLHDBC hdbc, SQLHWND hwnd,
       return ODBC_ERROR;
     }
   memset (pt_out, 0, out_max);
-  
+
   rc = SQLDriverConnect (
          hdbc, hwnd,
          pt_in, in_len,

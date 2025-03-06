@@ -28,7 +28,9 @@
  *
  */
 
+#if defined (_WINDOWS)
 #include		<windows.h>
+#endif
 #include		<stdio.h>
 
 #include		"odbc_portable.h"
