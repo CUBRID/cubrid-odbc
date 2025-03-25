@@ -1,3 +1,4 @@
+```
 Copyright 2016 CUBRID Corporation
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -9,6 +10,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+```
 
 # Requirements
 - unixODBC (https://www.unixodbc.org)
@@ -27,7 +29,7 @@ $ cmake CMakeLists.txt
 $ make
 ```
 
-# Istall binaries
+# Install binaries
 1. downloads/build install unixODBC
 2. buld CUBRID Linux ODBC
 3. copy compiled CUBRID LinuxODBC to destination directory (eg. $HOME/lib)
