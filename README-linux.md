@@ -16,10 +16,10 @@ limitations under the License.
 - unixODBC (https://www.unixodbc.org)
 - CUBRID CCI Driver (https://github.com/CUBRID/cubrid-cci)
 
-# Build
+# Build CUBRID Linux ODBC Driver
 - The build process will also build the CUBRID cci driver used by cubrid linux odbc.
 ```
-$ cd cubrid-udbc
+$ cd cubrid-odbc
 $ git submodule init
 $ git submodule update
 $ cd cci-src
@@ -96,4 +96,10 @@ PWD=1234
 FETCH_SIZE=1
 CHARSET=utf8
 DB_NAME=demodb
+```
+
+# Test
+- Connection test to database demodb with DSN link2
+```
+$ isql link2
 ```
