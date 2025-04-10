@@ -83,6 +83,7 @@ typedef struct stCUBRIDDSNItem
   char charset[ITEMBUFLEN];
   char autocommit[ITEMBUFLEN];
   char omit_schema[ITEMBUFLEN];
+  char old_dsn[ITEMBUFLEN];
 } CUBRIDDSNItem;
 
 typedef struct st_odbc_connection_attr

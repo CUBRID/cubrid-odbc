@@ -734,21 +734,23 @@ SQLDriverConnect (HDBC hdbc,
     {
       // for creating & managing FILEDSN
       // SAVEFILE이 있는 경우, DSN은 찾을 수 없다.
-      ptDBName = element_value_by_key (buf, KEYWORD_DBNAME);
-      ptUser = element_value_by_key (buf, KEYWORD_USER);
-      ptPWD = element_value_by_key (buf, KEYWORD_PASSWORD);
-      ptServer = element_value_by_key (buf, KEYWORD_SERVER);
-      ptPort = element_value_by_key (buf, KEYWORD_PORT);
-      ptFetchSize = element_value_by_key (buf, KEYWORD_FETCH_SIZE);
-      ptDescription = element_value_by_key (buf, KEYWORD_DESCRIPTION);
-      ptCharSet = element_value_by_key (buf, KEYWORD_CHARSET);
-      ptAutoCommit = element_value_by_key (buf, KEYWORD_AUTOCOMMIT);
-	  ptOmitSchema = element_value_by_key(buf, KEYWORD_OMIT_SCHEMA);
+      ptDBName = element_value_by_key (ConnStrIn, KEYWORD_DBNAME);
+      ptUser = element_value_by_key (ConnStrIn, KEYWORD_USER);
+      ptPWD = element_value_by_key (ConnStrIn, KEYWORD_PASSWORD);
+      ptServer = element_value_by_key (ConnStrIn, KEYWORD_SERVER);
+      ptPort = element_value_by_key (ConnStrIn, KEYWORD_PORT);
+      ptFetchSize = element_value_by_key (ConnStrIn, KEYWORD_FETCH_SIZE);
+      ptDescription = element_value_by_key (ConnStrIn, KEYWORD_DESCRIPTION);
+      ptCharSet = element_value_by_key (ConnStrIn, KEYWORD_CHARSET);
+      ptAutoCommit = element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT);
+      ptOmitSchema = element_value_by_key(ConnStrIn, KEYWORD_OMIT_SCHEMA);
 
 
       memset (&dsn_item, 0, sizeof (CUBRIDDSNItem));
 
       strcpy (dsn_item.save_file, ptSaveFile);
+      if (ptDriver != NULL)
+	strcpy (dsn_item.driver, ptDriver);
       if (ptDBName != NULL)
 	strcpy (dsn_item.db_name, ptDBName);
       if (ptUser != NULL)
@@ -772,6 +774,8 @@ SQLDriverConnect (HDBC hdbc,
 
       dlgrc = DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hWnd,
 			      ConfigDSNDlgProc, (LPARAM) & dsn_item);
+      if (dlgrc == IDCANCEL)
+        return SQL_NO_DATA;
 
       sprintf (buf, "%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s",
 	       KEYWORD_DRIVER, ptDriver,
