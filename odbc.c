@@ -52,11 +52,11 @@ PRIVATE VOID SQL_API TestConnection (HWND hwndParent, CUBRIDDSNItem *ptDSNItem);
  * arguments:
  * returns/side-effects:
  * description:
- *		SQLConfigDriver�� ���� driver-specific routine�̴�.
- *		���� ODBC Driver 3.51 for CUBRID���� ���������� 
- *		�����ϴ� routine�� �������� �ʴ´�.
+ *		SQLConfigDriver에 대한 driver-specific routine이다.
+ *		현재 ODBC Driver 3.51 for CUBRID에서 내부적으로 
+ *		수행하는 routine은 존재하지 않는다.
  * NOTE:
- *		INTERFACE�� ODBCINST.h�� ���ǵǾ� �ִ�.
+ *		INTERFACE는 ODBCINST.h에 정의되어 있다.
  ************************************************************************/
 ODBC_INTERFACE INSTAPI
 ConfigDriver (HWND hwndParent,
@@ -130,7 +130,7 @@ void Odbc_strncpy(char* dst,const char* src,int size)
  * returns/side-effects:
  * description:
  * NOTE:
- *		INTERFACE�� ODBCINST.h�� ���ǵǾ� �ִ�.
+ *		INTERFACE는 ODBCINST.h에 정의되어 있다.
  ************************************************************************/
 ODBC_INTERFACE INSTAPI
 ConfigDSN (HWND hwndParent,
@@ -267,7 +267,7 @@ ConfigDSN (HWND hwndParent,
  * arguments:
  * returns/side-effects:						
  * description:
- *  SQLDriverConnect�� ���Ǵ� dialog box�� ����.
+ *  SQLDriverConnect시 사용되는 dialog box를 띄운다.
  * NOTE:
  ************************************************************************/
 PUBLIC INT_PTR CALLBACK
@@ -369,8 +369,8 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
 
 /*	
  * AddDSNProc
- *		- FILEDSN�� SQLDriverConnect�� out connection string
- *		�� ���ؼ� ����, �����ȴ�.  �� ���� �߰������� �ʿ����.
+ *		- FILEDSN은 SQLDriverConnect의 out connection string
+ *		에 의해서 생성, 수정된다.  그 외의 추과과정은 필요없다.
  */
 PRIVATE BOOL FAR PASCAL
 AddDSNProc (HWND hwndParent, char *oldDSN)
