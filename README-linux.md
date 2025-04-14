@@ -17,7 +17,7 @@ limitations under the License.
 - CUBRID CCI Driver (https://github.com/CUBRID/cubrid-cci)
 
 # Build CUBRID Linux ODBC Driver
-- The build process will also build the CUBRID cci driver used by cubrid linux odbc.
+- The build process will also build the CUBRID cci driver used by CUBRID Linux ODBC.
 ```
 $ cd cubrid-odbc
 $ git submodule init
