@@ -67,7 +67,7 @@ FileUsage       = 1
 ```
 
 3. edit .odbc.ini for connecting CUBRID Database Server ( 2 options are available)
-- use predefind CUBRID ODBC Driver name registered in /usr/local/unixODBC/etc/odbcinst.ini
+- use predefined CUBRID ODBC Driver name registered in /usr/local/unixODBC/etc/odbcinst.ini
 - link2 is 'DSN' name of remote CUBRID Database Server
 ```
 $ vi ~/.odbc.ini
