@@ -31,7 +31,7 @@ $ make
 
 # Install binaries
 1. downloads/build install unixODBC
-2. buld CUBRID Linux ODBC
+2. build CUBRID Linux ODBC
 3. copy compiled CUBRID LinuxODBC to destination directory (eg. $HOME/lib)
 ```
 $ cp libcubrid-odbc.so $HOME/lib
