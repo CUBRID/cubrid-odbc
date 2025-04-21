@@ -28,7 +28,9 @@
  *
  */
 
+#if defined (_WINDOWS)
 #include		<windows.h>
+#endif
 #include		<stdio.h>
 
 #include		"odbc_portable.h"
@@ -45,7 +47,11 @@
 
 static const char *CUBRID_DRIVER_ODBC_VER = "03.52";
 static const char *CUBRID_DRIVER_VER = VERSION_STRING;
+#if defined (_WINDOWS)
 static const char *CUBRID_DRIVER_NAME = "cubrid_odbc.dll";
+#else
+static const char *CUBRID_DRIVER_NAME = LINUX_ODBC_DRIVER_NAME;
+#endif
 static const char *CUBRID_DBMS_NAME = "CUBRID";
 static const char *CUBRID_SPECIAL_CHARACTERS = "#%";
 static const char *CUBRID_TABLE_TERM = "table";

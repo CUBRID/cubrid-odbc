@@ -246,8 +246,10 @@ PUBLIC const char *next_element (const char *element_list);
 PUBLIC const char *element_value (const char *element);
 PUBLIC const char *element_value_by_key (const char *element_list,
 					 const char *key);
+#if defined (WINDOWS)
 PUBLIC void get_connect_attr (struct st_odbc_connection_attr* attr, 
                            const char* ConnStrIn, char* buffer);
+#endif
 PUBLIC int wide_char_to_bytes (wchar_t *str, 
                        int size, 
                        char **target, 
