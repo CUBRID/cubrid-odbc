@@ -1,30 +1,30 @@
 /*
- * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution. 
+ * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
- * Redistribution and use in source and binary forms, with or without modification, 
- * are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- *   this list of conditions and the following disclaimer. 
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
  *
- * - Redistributions in binary form must reproduce the above copyright notice, 
- *   this list of conditions and the following disclaimer in the documentation 
- *   and/or other materials provided with the distribution. 
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
  *
- * - Neither the name of the <ORGANIZATION> nor the names of its contributors 
- *   may be used to endorse or promote products derived from this software without 
- *   specific prior written permission. 
+ * - Neither the name of the <ORGANIZATION> nor the names of its contributors
+ *   may be used to endorse or promote products derived from this software without
+ *   specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
- * IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
- * OF SUCH DAMAGE. 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+ * OF SUCH DAMAGE.
  *
  */
 
@@ -55,7 +55,7 @@ PRIVATE VOID SQL_API TestConnection (HWND hwndParent, CUBRIDDSNItem *ptDSNItem);
  * returns/side-effects:
  * description:
  *		SQLConfigDriver에 대한 driver-specific routine이다.
- *		현재 ODBC Driver 3.51 for CUBRID에서 내부적으로 
+ *		현재 ODBC Driver 3.51 for CUBRID에서 내부적으로
  *		수행하는 routine은 존재하지 않는다.
  * NOTE:
  *		INTERFACE는 ODBCINST.h에 정의되어 있다.
@@ -64,7 +64,7 @@ ODBC_INTERFACE INSTAPI
 ConfigDriver (HWND hwndParent,
 	      WORD fRequest,
 	      LPCSTR lpszDriver,
-	      LPCSTR lpszArgs, LPSTR lpszMsg, WORD cbMsgMax, WORD * pcbMsgOut)
+	      LPCSTR lpszArgs, LPSTR lpszMsg, WORD cbMsgMax, WORD *pcbMsgOut)
 {
   OutputDebugString ("ConfigDriver called\n");
 
@@ -79,38 +79,38 @@ ConfigDriver (HWND hwndParent,
  *		add dsn(app)
  ************************************************************************/
 PRIVATE BOOL FAR PASCAL
-AddDSNProcByParam (CUBRIDDSNItem* pDsn_item)
+AddDSNProcByParam (CUBRIDDSNItem *pDsn_item)
 {
-	BOOL rc;
-	CUBRIDDSNItem dsn_item = *pDsn_item;
-	rc = SQLWriteDSNToIni (dsn_item.dsn, dsn_item.driver);
-	if (rc == FALSE)
-	{
-	  return FALSE;
-	}
+  BOOL rc;
+  CUBRIDDSNItem dsn_item = *pDsn_item;
+  rc = SQLWriteDSNToIni (dsn_item.dsn, dsn_item.driver);
+  if (rc == FALSE)
+    {
+      return FALSE;
+    }
 
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_DBNAME,
+  SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_DBNAME,
 				dsn_item.db_name, "ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_DESCRIPTION,
+  SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_DESCRIPTION,
 				dsn_item.description, "ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_USER, dsn_item.user,
+  SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_USER, dsn_item.user,
 				"ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_PASSWORD,
+  SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_PASSWORD,
 				dsn_item.password, "ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_SERVER,
+  SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_SERVER,
 				dsn_item.server, "ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_PORT, dsn_item.port,
+  SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_PORT, dsn_item.port,
 				"ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_FETCH_SIZE,
+  SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_FETCH_SIZE,
 				dsn_item.fetch_size, "ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_CHARSET,
+  SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_CHARSET,
 				dsn_item.charset, "ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_AUTOCOMMIT,
-	                        dsn_item.autocommit, "ODBC.INI");
-	SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_OMIT_SCHEMA,
-	                        dsn_item.omit_schema, "ODBC.INI");
+  SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_AUTOCOMMIT,
+				dsn_item.autocommit, "ODBC.INI");
+  SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_OMIT_SCHEMA,
+				dsn_item.omit_schema, "ODBC.INI");
 
-    return (TRUE);
+  return (TRUE);
 }
 /************************************************************************
  * name:  Odbc_strncpy
@@ -120,11 +120,13 @@ AddDSNProcByParam (CUBRIDDSNItem* pDsn_item)
  * NOTE:
  *		strncpy
  ************************************************************************/
-void Odbc_strncpy(char* dst,const char* src,int size)
+void Odbc_strncpy (char *dst,const char *src,int size)
 {
-	if(src == NULL)
-		return;
-	strncpy(dst,src,size);
+  if (src == NULL)
+    {
+      return;
+    }
+  strncpy (dst,src,size);
 }
 /************************************************************************
  * name:  ConfigDSN
@@ -154,41 +156,49 @@ ConfigDSN (HWND hwndParent,
 
       memset (&dsn_item, 0, sizeof (CUBRIDDSNItem));
 
-	  if(hwndParent){
-		  sprintf (dsn_item.driver, "%s", lpszDriver);
-          sprintf (dsn_item.fetch_size, "%d", 100);
-          sprintf (dsn_item.omit_schema, "no");
-		  dlgrc = DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hwndParent,
-	  				  ConfigDSNDlgProc, (LPARAM) & dsn_item);
-		  if (dlgrc < 0)
-            return FALSE;
-	  }
-	  else{
-		  // with ';'
-		  sprintf (dsn_item.driver, "%s", lpszDriver);
-		  memcpy(ConnStrIn,lpszAttributes,strlen(lpszAttributes));
-          for (ptemp = ConnStrIn; *ptemp != '\0'; ++ptemp)
-          {
-             if (*ptemp == ';')		// connection string delimiter
-             *ptemp = '\0';
-          }
-		  Odbc_strncpy(dsn_item.dsn,element_value_by_key (ConnStrIn, KEYWORD_DSN),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.user , element_value_by_key (ConnStrIn, KEYWORD_USER),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.password ,element_value_by_key (ConnStrIn, KEYWORD_PASSWORD),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.fetch_size , element_value_by_key (ConnStrIn, KEYWORD_FETCH_SIZE),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.port , element_value_by_key (ConnStrIn, KEYWORD_PORT),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.server , element_value_by_key (ConnStrIn, KEYWORD_SERVER),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.save_file , element_value_by_key (ConnStrIn, KEYWORD_SAVEFILE),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.charset , element_value_by_key (ConnStrIn, KEYWORD_CHARSET),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.db_name , element_value_by_key (ConnStrIn, KEYWORD_DBNAME),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.description , element_value_by_key (ConnStrIn, KEYWORD_DESCRIPTION),ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.autocommit, element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT), ITEMBUFLEN);
-		  Odbc_strncpy(dsn_item.omit_schema, element_value_by_key (ConnStrIn, KEYWORD_OMIT_SCHEMA), ITEMBUFLEN);
-		  
-		  rc = AddDSNProcByParam(&dsn_item);
-		  if(rc != TRUE)
-			  return rc;
-	  }
+      if (hwndParent)
+	{
+	  sprintf (dsn_item.driver, "%s", lpszDriver);
+	  sprintf (dsn_item.fetch_size, "%d", 100);
+	  sprintf (dsn_item.omit_schema, "no");
+	  dlgrc = DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hwndParent,
+				  ConfigDSNDlgProc, (LPARAM) & dsn_item);
+	  if (dlgrc < 0)
+	    {
+	      return FALSE;
+	    }
+	}
+      else
+	{
+	  // with ';'
+	  sprintf (dsn_item.driver, "%s", lpszDriver);
+	  memcpy (ConnStrIn,lpszAttributes,strlen (lpszAttributes));
+	  for (ptemp = ConnStrIn; *ptemp != '\0'; ++ptemp)
+	    {
+	      if (*ptemp == ';')		// connection string delimiter
+		{
+		  *ptemp = '\0';
+		}
+	    }
+	  Odbc_strncpy (dsn_item.dsn,element_value_by_key (ConnStrIn, KEYWORD_DSN),ITEMBUFLEN);
+	  Odbc_strncpy (dsn_item.user, element_value_by_key (ConnStrIn, KEYWORD_USER),ITEMBUFLEN);
+	  Odbc_strncpy (dsn_item.password,element_value_by_key (ConnStrIn, KEYWORD_PASSWORD),ITEMBUFLEN);
+	  Odbc_strncpy (dsn_item.fetch_size, element_value_by_key (ConnStrIn, KEYWORD_FETCH_SIZE),ITEMBUFLEN);
+	  Odbc_strncpy (dsn_item.port, element_value_by_key (ConnStrIn, KEYWORD_PORT),ITEMBUFLEN);
+	  Odbc_strncpy (dsn_item.server, element_value_by_key (ConnStrIn, KEYWORD_SERVER),ITEMBUFLEN);
+	  Odbc_strncpy (dsn_item.save_file, element_value_by_key (ConnStrIn, KEYWORD_SAVEFILE),ITEMBUFLEN);
+	  Odbc_strncpy (dsn_item.charset, element_value_by_key (ConnStrIn, KEYWORD_CHARSET),ITEMBUFLEN);
+	  Odbc_strncpy (dsn_item.db_name, element_value_by_key (ConnStrIn, KEYWORD_DBNAME),ITEMBUFLEN);
+	  Odbc_strncpy (dsn_item.description, element_value_by_key (ConnStrIn, KEYWORD_DESCRIPTION),ITEMBUFLEN);
+	  Odbc_strncpy (dsn_item.autocommit, element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT), ITEMBUFLEN);
+	  Odbc_strncpy (dsn_item.omit_schema, element_value_by_key (ConnStrIn, KEYWORD_OMIT_SCHEMA), ITEMBUFLEN);
+
+	  rc = AddDSNProcByParam (&dsn_item);
+	  if (rc != TRUE)
+	    {
+	      return rc;
+	    }
+	}
 
       break;
 
@@ -231,16 +241,18 @@ ConfigDSN (HWND hwndParent,
 				  "Not Found Field", dsn_item.charset,
 				  ITEMBUFLEN, "ODBC.INI");
       SQLGetPrivateProfileString (dsn_item.dsn, KEYWORD_AUTOCOMMIT,
-	                          "Not Found Field", dsn_item.autocommit,
-	                          ITEMBUFLEN, "ODBC.INI");
+				  "Not Found Field", dsn_item.autocommit,
+				  ITEMBUFLEN, "ODBC.INI");
       SQLGetPrivateProfileString (dsn_item.dsn, KEYWORD_OMIT_SCHEMA,
-	                          "Not Found Field", dsn_item.omit_schema,
-	                          ITEMBUFLEN, "ODBC.INI");
+				  "Not Found Field", dsn_item.omit_schema,
+				  ITEMBUFLEN, "ODBC.INI");
       dlgrc =
-	DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hwndParent,
-			ConfigDSNDlgProc, (LPARAM) & dsn_item);
+	      DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hwndParent,
+			      ConfigDSNDlgProc, (LPARAM) & dsn_item);
       if (dlgrc < 0)
-	return FALSE;
+	{
+	  return FALSE;
+	}
 
       break;
 
@@ -267,7 +279,7 @@ ConfigDSN (HWND hwndParent,
 /************************************************************************
  * name:  ConfigDSNDlgProc
  * arguments:
- * returns/side-effects:						
+ * returns/side-effects:
  * description:
  *  SQLDriverConnect시 사용되는 dialog box를 띄운다.
  * NOTE:
@@ -291,15 +303,16 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
       hCtrlDSN = GetDlgItem (hwndParent, IDC_DSN);
 
       if (ptDSNItem->save_file[0] != '\0')
-	{			// FILEDSN
+	{
+	  // FILEDSN
 	  SetDlgItemText (hwndParent, IDC_DSN, "");
 	  SetDlgItemText (hwndParent, IDC_SAVE_FILE, ptDSNItem->save_file);
 	  EnableWindow (hCtrlDSN, FALSE);
-	  memset(ptDSNItem->old_dsn, 0, ITEMBUFLEN);
+	  memset (ptDSNItem->old_dsn, 0, ITEMBUFLEN);
 	}
       else
 	{
-	  strncpy(ptDSNItem->old_dsn, ptDSNItem->dsn, ITEMBUFLEN);
+	  strncpy (ptDSNItem->old_dsn, ptDSNItem->dsn, ITEMBUFLEN);
 	  SetDlgItemText (hwndParent, IDC_DSN, ptDSNItem->dsn);
 	  SetDlgItemText (hwndParent, IDC_SAVE_FILE, "");
 	}
@@ -351,7 +364,7 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
 	  sscanf (ibuf, "%p", &ptDSNItem);
 
 	  GetDSNInfo (hwndParent, ptDSNItem);
-	  TestConnection(hwndParent, ptDSNItem);
+	  TestConnection (hwndParent, ptDSNItem);
 
 	  SetCursor (hOldCursor);
 	  break;
@@ -369,7 +382,7 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 
-/*	
+/*
  * AddDSNProc
  *		- FILEDSN은 SQLDriverConnect의 out connection string
  *		에 의해서 생성, 수정된다.  그 외의 추과과정은 필요없다.
@@ -386,42 +399,42 @@ AddDSNProc (HWND hwndParent, char *oldDSN)
 
   GetDlgItemText (hwndParent, IDC_SAVE_FILE, dsn_item.save_file,
 		  sizeof (dsn_item.save_file));
-      // User DSN, or system DSN
-      GetDlgItemText (hwndParent, IDC_DRIVER, dsn_item.driver, ITEMBUFLEN);
-      GetDlgItemText (hwndParent, IDC_DSN, dsn_item.dsn, ITEMBUFLEN);
-      GetDlgItemText (hwndParent, IDC_DESCRIPTION, dsn_item.description,
-		      sizeof (dsn_item.description));
-      GetDlgItemText (hwndParent, IDC_DBNAME, dsn_item.db_name, ITEMBUFLEN);
-      GetDlgItemText (hwndParent, IDC_DBUSER, dsn_item.user, ITEMBUFLEN);
-      GetDlgItemText (hwndParent, IDC_PASSWORD, dsn_item.password,
-		      ITEMBUFLEN);
-      GetDlgItemText (hwndParent, IDC_SERVER, dsn_item.server, ITEMBUFLEN);
-      GetDlgItemText (hwndParent, IDC_PORT, dsn_item.port, ITEMBUFLEN);
-      GetDlgItemText (hwndParent, IDC_FETCH_SIZE, dsn_item.fetch_size,
-		      ITEMBUFLEN);
-      GetDlgItemText (hwndParent, IDC_CHARSET, dsn_item.charset,
-		      ITEMBUFLEN);
-      GetDlgItemText (hwndParent, IDC_AUTOCOMMIT, dsn_item.autocommit,
-	              ITEMBUFLEN);
-      GetDlgItemText (hwndParent, IDC_OMIT_SCHEMA, dsn_item.omit_schema,
-	              ITEMBUFLEN);
+  // User DSN, or system DSN
+  GetDlgItemText (hwndParent, IDC_DRIVER, dsn_item.driver, ITEMBUFLEN);
+  GetDlgItemText (hwndParent, IDC_DSN, dsn_item.dsn, ITEMBUFLEN);
+  GetDlgItemText (hwndParent, IDC_DESCRIPTION, dsn_item.description,
+		  sizeof (dsn_item.description));
+  GetDlgItemText (hwndParent, IDC_DBNAME, dsn_item.db_name, ITEMBUFLEN);
+  GetDlgItemText (hwndParent, IDC_DBUSER, dsn_item.user, ITEMBUFLEN);
+  GetDlgItemText (hwndParent, IDC_PASSWORD, dsn_item.password,
+		  ITEMBUFLEN);
+  GetDlgItemText (hwndParent, IDC_SERVER, dsn_item.server, ITEMBUFLEN);
+  GetDlgItemText (hwndParent, IDC_PORT, dsn_item.port, ITEMBUFLEN);
+  GetDlgItemText (hwndParent, IDC_FETCH_SIZE, dsn_item.fetch_size,
+		  ITEMBUFLEN);
+  GetDlgItemText (hwndParent, IDC_CHARSET, dsn_item.charset,
+		  ITEMBUFLEN);
+  GetDlgItemText (hwndParent, IDC_AUTOCOMMIT, dsn_item.autocommit,
+		  ITEMBUFLEN);
+  GetDlgItemText (hwndParent, IDC_OMIT_SCHEMA, dsn_item.omit_schema,
+		  ITEMBUFLEN);
 
   if (dsn_item.save_file[0] == '\0')
     {
-      if (oldDSN != NULL && strlen(oldDSN) > 0 && strcmp(oldDSN, dsn_item.dsn) != 0)
-        {
-          rc = SQLRemoveDSNFromIni (oldDSN);
-          if (rc == FALSE)
-            {
-              return FALSE;
-            }
-        }
+      if (oldDSN != NULL && strlen (oldDSN) > 0 && strcmp (oldDSN, dsn_item.dsn) != 0)
+	{
+	  rc = SQLRemoveDSNFromIni (oldDSN);
+	  if (rc == FALSE)
+	    {
+	      return FALSE;
+	    }
+	}
 
       rc = SQLWriteDSNToIni (dsn_item.dsn, dsn_item.driver);
       if (rc == FALSE)
-        {
-          return FALSE;
-        }
+	{
+	  return FALSE;
+	}
 
       SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_DBNAME,
 				    dsn_item.db_name, "ODBC.INI");
@@ -440,97 +453,97 @@ AddDSNProc (HWND hwndParent, char *oldDSN)
       SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_CHARSET,
 				    dsn_item.charset, "ODBC.INI");
       SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_AUTOCOMMIT,
-	                            dsn_item.autocommit, "ODBC.INI");
+				    dsn_item.autocommit, "ODBC.INI");
       SQLWritePrivateProfileString (dsn_item.dsn, KEYWORD_OMIT_SCHEMA,
-	                            dsn_item.omit_schema, "ODBC.INI");
-    } 
-	else
+				    dsn_item.omit_schema, "ODBC.INI");
+    }
+  else
     {
-	    SQLWriteFileDSN(dsn_item.save_file, "ODBC", "DRIVER", dsn_item.driver);
-      SQLWriteFileDSN(dsn_item.save_file, "ODBC", "UID", dsn_item.user);
-      SQLWriteFileDSN(dsn_item.save_file, "ODBC", "PWD", dsn_item.password);
-      SQLWriteFileDSN(dsn_item.save_file, "ODBC", "SERVER", dsn_item.server);
-      SQLWriteFileDSN(dsn_item.save_file, "ODBC", "PORT", dsn_item.port);
-      SQLWriteFileDSN(dsn_item.save_file, "ODBC", "DB_NAME", dsn_item.db_name);
-      SQLWriteFileDSN(dsn_item.save_file, "ODBC", "FETCH_SIZE", dsn_item.fetch_size);
-      SQLWriteFileDSN(dsn_item.save_file, "ODBC", "CHARSET", dsn_item.charset);
-      SQLWriteFileDSN(dsn_item.save_file, "ODBC", "AUTOCOMMIT", dsn_item.autocommit);
-      SQLWriteFileDSN(dsn_item.save_file, "ODBC", "OMIT_SCHEMA", dsn_item.omit_schema);
+      SQLWriteFileDSN (dsn_item.save_file, "ODBC", "DRIVER", dsn_item.driver);
+      SQLWriteFileDSN (dsn_item.save_file, "ODBC", "UID", dsn_item.user);
+      SQLWriteFileDSN (dsn_item.save_file, "ODBC", "PWD", dsn_item.password);
+      SQLWriteFileDSN (dsn_item.save_file, "ODBC", "SERVER", dsn_item.server);
+      SQLWriteFileDSN (dsn_item.save_file, "ODBC", "PORT", dsn_item.port);
+      SQLWriteFileDSN (dsn_item.save_file, "ODBC", "DB_NAME", dsn_item.db_name);
+      SQLWriteFileDSN (dsn_item.save_file, "ODBC", "FETCH_SIZE", dsn_item.fetch_size);
+      SQLWriteFileDSN (dsn_item.save_file, "ODBC", "CHARSET", dsn_item.charset);
+      SQLWriteFileDSN (dsn_item.save_file, "ODBC", "AUTOCOMMIT", dsn_item.autocommit);
+      SQLWriteFileDSN (dsn_item.save_file, "ODBC", "OMIT_SCHEMA", dsn_item.omit_schema);
     }
 
   return (TRUE);
 }
 
 PRIVATE VOID FAR PASCAL
-GetDSNInfo (HWND hwndParent, CUBRIDDSNItem *ptDSNItem) 
+GetDSNInfo (HWND hwndParent, CUBRIDDSNItem *ptDSNItem)
 {
   GetDlgItemText (hwndParent, IDC_DSN, ptDSNItem->dsn,
-				  ITEMBUFLEN);
+		  ITEMBUFLEN);
   GetDlgItemText (hwndParent, IDC_DBNAME, ptDSNItem->db_name,
-				  ITEMBUFLEN);
+		  ITEMBUFLEN);
   GetDlgItemText (hwndParent, IDC_DESCRIPTION, ptDSNItem->description,
-				  ITEMBUFLEN * 2);
+		  ITEMBUFLEN * 2);
   GetDlgItemText (hwndParent, IDC_DBUSER, ptDSNItem->user,
-				  ITEMBUFLEN);
+		  ITEMBUFLEN);
   GetDlgItemText (hwndParent, IDC_PASSWORD, ptDSNItem->password,
-				  ITEMBUFLEN);
+		  ITEMBUFLEN);
   GetDlgItemText (hwndParent, IDC_SERVER, ptDSNItem->server,
-				  ITEMBUFLEN);
+		  ITEMBUFLEN);
   GetDlgItemText (hwndParent, IDC_PORT, ptDSNItem->port, ITEMBUFLEN);
   GetDlgItemText (hwndParent, IDC_FETCH_SIZE, ptDSNItem->fetch_size,
-				  ITEMBUFLEN);
+		  ITEMBUFLEN);
   GetDlgItemText (hwndParent, IDC_CHARSET, ptDSNItem->charset,
-				  ITEMBUFLEN);
+		  ITEMBUFLEN);
   GetDlgItemText (hwndParent, IDC_AUTOCOMMIT, ptDSNItem->autocommit,
-				ITEMBUFLEN);
+		  ITEMBUFLEN);
   GetDlgItemText (hwndParent, IDC_OMIT_SCHEMA, ptDSNItem->omit_schema,
-				ITEMBUFLEN);
+		  ITEMBUFLEN);
 }
 
 PRIVATE VOID SQL_API
-TestConnection (HWND hwndParent, CUBRIDDSNItem *ptDSNItem) 
+TestConnection (HWND hwndParent, CUBRIDDSNItem *ptDSNItem)
 {
   SQLHENV hEnv;
   SQLHDBC hDbc;
   SQLRETURN ret;
-	char ret_str[100];
+  char ret_str[100];
 
-  SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &hEnv);
-  SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
-  SQLAllocHandle(SQL_HANDLE_DBC, hEnv, &hDbc);
+  SQLAllocHandle (SQL_HANDLE_ENV, SQL_NULL_HANDLE, &hEnv);
+  SQLSetEnvAttr (hEnv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
+  SQLAllocHandle (SQL_HANDLE_DBC, hEnv, &hDbc);
 
-  if (strlen(ptDSNItem->driver) == 0
-		  || strlen(ptDSNItem->server) == 0
-      || strlen(ptDSNItem->db_name) == 0
-      || strlen(ptDSNItem->port) == 0
-      || strlen(ptDSNItem->user) == 0) 
+  if (strlen (ptDSNItem->driver) == 0
+      || strlen (ptDSNItem->server) == 0
+      || strlen (ptDSNItem->db_name) == 0
+      || strlen (ptDSNItem->port) == 0
+      || strlen (ptDSNItem->user) == 0)
     {
-		  MessageBox(hwndParent, "Please fill in the fields!\nData Source, Database, User, Server, Port", TEST_NAME, MB_OK);
-		  return;
+      MessageBox (hwndParent, "Please fill in the fields!\nData Source, Database, User, Server, Port", TEST_NAME, MB_OK);
+      return;
     }
 
   char connStr [10 * ITEMBUFLEN + 100];
-  snprintf(connStr, sizeof(connStr),
-         "DRIVER=%s;SERVER=%s;DB_NAME=%s;PORT=%s;UID=%s;PWD=%s;FETCH_SIZE=%s;CHARSET=%s;AUTOCOMMIT=%s;OMIT_SCHEMA=%s;",
-         ptDSNItem->driver, ptDSNItem->server, ptDSNItem->db_name, ptDSNItem->port,
-		 ptDSNItem->user, ptDSNItem->password, ptDSNItem->fetch_size, ptDSNItem->charset,
-		 ptDSNItem->autocommit, ptDSNItem->omit_schema);
+  snprintf (connStr, sizeof (connStr),
+	    "DRIVER=%s;SERVER=%s;DB_NAME=%s;PORT=%s;UID=%s;PWD=%s;FETCH_SIZE=%s;CHARSET=%s;AUTOCOMMIT=%s;OMIT_SCHEMA=%s;",
+	    ptDSNItem->driver, ptDSNItem->server, ptDSNItem->db_name, ptDSNItem->port,
+	    ptDSNItem->user, ptDSNItem->password, ptDSNItem->fetch_size, ptDSNItem->charset,
+	    ptDSNItem->autocommit, ptDSNItem->omit_schema);
 
-  ret = SQLDriverConnect(hDbc, NULL, connStr, SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+  ret = SQLDriverConnect (hDbc, NULL, connStr, SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
 
-  if (SQL_SUCCEEDED(ret)) 
+  if (SQL_SUCCEEDED (ret))
     {
-        MessageBox(hwndParent, "DB connection successful!", TEST_NAME, MB_OK);
-        SQLDisconnect(hDbc);
+      MessageBox (hwndParent, "DB connection successful!", TEST_NAME, MB_OK);
+      SQLDisconnect (hDbc);
     }
-  else 
-	  {
-			  snprintf(ret_str, sizeof(ret_str), "DB connection failure! RETCODE : %d", ret);
-        MessageBox(hwndParent, ret_str, TEST_NAME, MB_OK);
+  else
+    {
+      snprintf (ret_str, sizeof (ret_str), "DB connection failure! RETCODE : %d", ret);
+      MessageBox (hwndParent, ret_str, TEST_NAME, MB_OK);
     }
 
-  SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
-  SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+  SQLFreeHandle (SQL_HANDLE_DBC, hDbc);
+  SQLFreeHandle (SQL_HANDLE_ENV, hEnv);
 
 }
 
