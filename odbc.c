@@ -46,7 +46,7 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam,
 
 
 PRIVATE BOOL FAR PASCAL AddDSNProc (HWND hwndParent, char *oldDSN);
-PRIVATE VOID FAR PASCAL GetDNSInfo (HWND hwndParent, CUBRIDDSNItem *ptDSNItem);
+PRIVATE VOID FAR PASCAL GetDSNInfo (HWND hwndParent, CUBRIDDSNItem *ptDSNItem);
 PRIVATE VOID SQL_API TestConnection (HWND hwndParent, CUBRIDDSNItem *ptDSNItem);
 
 /************************************************************************
@@ -334,7 +334,7 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
 	  GetDlgItemText (hwndParent, IDC_PT_DSNITEM, ibuf, sizeof (ibuf));
 	  sscanf (ibuf, "%p", &ptDSNItem);
 
-	  GetDNSInfo (hwndParent, ptDSNItem);
+	  GetDSNInfo (hwndParent, ptDSNItem);
 
 	  rc = EndDialog (hwndParent, AddDSNProc (hwndParent, ptDSNItem->old_dsn));
 	  SetCursor (hOldCursor);
@@ -350,7 +350,7 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
 	  GetDlgItemText (hwndParent, IDC_PT_DSNITEM, ibuf, sizeof (ibuf));
 	  sscanf (ibuf, "%p", &ptDSNItem);
 
-	  GetDNSInfo (hwndParent, ptDSNItem);
+	  GetDSNInfo (hwndParent, ptDSNItem);
 	  TestConnection(hwndParent, ptDSNItem);
 
 	  SetCursor (hOldCursor);
@@ -462,7 +462,7 @@ AddDSNProc (HWND hwndParent, char *oldDSN)
 }
 
 PRIVATE VOID FAR PASCAL
-GetDNSInfo (HWND hwndParent, CUBRIDDSNItem *ptDSNItem) 
+GetDSNInfo (HWND hwndParent, CUBRIDDSNItem *ptDSNItem) 
 {
   GetDlgItemText (hwndParent, IDC_DSN, ptDSNItem->dsn,
 				  ITEMBUFLEN);
