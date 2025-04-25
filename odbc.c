@@ -408,7 +408,7 @@ AddDSNProc (HWND hwndParent, char *oldDSN)
 
   if (dsn_item.save_file[0] == '\0')
     {
-      if (strlen(oldDSN) > 0 && strcmp(oldDSN, dsn_item.dsn) != 0)
+      if (oldDSN != NULL && strlen(oldDSN) > 0 && strcmp(oldDSN, dsn_item.dsn) != 0)
         {
           rc = SQLRemoveDSNFromIni (oldDSN);
           if (rc == FALSE)
