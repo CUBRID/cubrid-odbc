@@ -813,12 +813,14 @@ SQLDriverConnect (HDBC hdbc,
 	  strcpy (dsn_item.omit_schema, ptOmitSchema);
 	}
 
+#if defined (_WINDOWS)
       dlgrc = DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hWnd,
 			      ConfigDSNDlgProc, (LPARAM) & dsn_item);
       if (dlgrc == IDCANCEL)
 	{
 	  return SQL_NO_DATA;
 	}
+#endif
 
       sprintf (buf, "%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s",
 	       KEYWORD_DRIVER, ptDriver,
