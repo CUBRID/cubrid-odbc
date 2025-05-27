@@ -17,7 +17,7 @@
 #
 message(STATUS "=========== Linux ODBC ===========")
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.21)
 
 PROJECT(cubrid-odbc)
 
@@ -45,8 +45,8 @@ set(CUBRID_ODBC_SOURCES
   )
 set(CUBRID_ODBC_UNICODE_SOURCES ${CUBRID_ODBC_SOURCES} unicode.c)
 
-set(VERSION_FILE "odbc_version.i")
-set(CCI_SOURCE "cci-src")
+set(VERSION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/odbc_version.i")
+set(CCI_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/cci-src")
 set(CCI_COPYING "${CCI_SOURCE}/COPYING")
 set(CCI_LIBDIR "${CCI_SOURCE}/build_x86_64_release/cci")
 set(CCI_SO_LIB "${CCI_LIBDIR}/libcascci.so")
@@ -92,8 +92,7 @@ file(APPEND ${VERSION_FILE} "#define LINUX_ODBC_DRIVER_NAME \"libcubrid-odbc.so.
 if (NOT EXISTS ${CCI_COPYING})
 	if (UNIX)
       execute_process(
-        COMMAND ${GIT_EXECUTABLE} submodule init 
-        COMMAND ${GIT_EXECUTABLE} submodule update
+        COMMAND ${GIT_EXECUTABLE} submodule update --init
         RESULT_VARIABLE git_result)
         if (git_result)
           message(FATAL "Could not update cubrid-cci submodule")
@@ -117,6 +116,7 @@ if(WITH_LIBUNIXODBC STREQUAL "EXTERNAL")
       URL                  ${WITH_LIBUNIXODBC_URL}
       TIMEOUT              600
       DOWNLOAD_NO_PROGRESS 1
+      DOWNLOAD_EXTRACT_TIMESTAMP TRUE
       CONFIGURE_COMMAND    <SOURCE_DIR>/configure --prefix=${CMAKE_CURRENT_BINARY_DIR}/external # ${DEFAULT_CONFIGURE_OPTS}
       BUILD_COMMAND        $(MAKE) AUTOCONF=: AUTOHEADER=: AUTOMAKE=: ACLOCAL=:
       INSTALL_COMMAND      $(MAKE) install AUTOCONF=: AUTOHEADER=: AUTOMAKE=: ACLOCAL=:
@@ -145,3 +145,15 @@ target_link_libraries(${CMAKE_PROJECT_NAME} cascci pthread stdc++)
 SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES SOVERSION ${CUBRID_ODBC_VERSION})
 target_link_libraries(${CUBRID_ODBC_UNICODE} cascci pthread stdc++)
 SET_TARGET_PROPERTIES(${CUBRID_ODBC_UNICODE} PROPERTIES SOVERSION ${CUBRID_ODBC_VERSION})
+
+add_custom_target(package
+  COMMAND ${CMAKE_COMMAND} -E make_directory -p ${CMAKE_BINARY_DIR}/package/lib
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/lib${CMAKE_PROJECT_NAME}.so.${CUBRID_ODBC_VERSION} ${CMAKE_BINARY_DIR}/package/lib/
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/lib${CUBRID_ODBC_UNICODE}.so.${CUBRID_ODBC_VERSION} ${CMAKE_BINARY_DIR}/package/lib/
+  COMMAND ${CMAKE_COMMAND} -E create_symlink lib${CMAKE_PROJECT_NAME}.so.${CUBRID_ODBC_VERSION} ${CMAKE_BINARY_DIR}/package/lib/lib${CMAKE_PROJECT_NAME}.so
+  COMMAND ${CMAKE_COMMAND} -E create_symlink lib${CUBRID_ODBC_UNICODE}.so.${CUBRID_ODBC_VERSION} ${CMAKE_BINARY_DIR}/package/lib/lib${CUBRID_ODBC_UNICODE}.so
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/README-linux.md ${CMAKE_BINARY_DIR}/package/README.txt
+  COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_BINARY_DIR}/package ${CMAKE_COMMAND} -E tar czvf ../CUBRID-ODBC-Linux-${CMAKE_SYSTEM_PROCESSOR}-${CUBRID_ODBC_VERSION}.tar.gz --format=gnutar lib README.txt
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  COMMENT "Creating CUBRID-ODBC-Linux-${CMAKE_SYSTEM_PROCESSOR}-${CUBRID_ODBC_VERSION}.tar.gz"
+)
