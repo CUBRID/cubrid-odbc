@@ -1205,7 +1205,10 @@ SQLGetDescField (SQLHDESC DescriptorHandle,
   rc = odbc_get_desc_field ((ODBC_DESC *) DescriptorHandle, RecNumber,
 			    FieldIdentifier, Value,
 			    BufferLength, &tmp_StringLength);
-  *StringLength = (SQLINTEGER) tmp_StringLength;
+  if (StringLength != NULL)
+    {
+      *StringLength = (SQLINTEGER) tmp_StringLength;
+    }
 
   DEBUG_TIMESTAMP (END_SQLGetDescField);
 
