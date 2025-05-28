@@ -86,12 +86,17 @@ file(APPEND ${VERSION_FILE} ".${CUBRID_ODBC_MINOR_VERSION}")
 file(APPEND ${VERSION_FILE} ".${CUBRID_ODBC_PATCH_VERSION}")
 file(APPEND ${VERSION_FILE} ".${commit_count}\"\n")
 
-file(APPEND ${VERSION_FILE} "#define LINUX_ODBC_DRIVER_NAME \"libcubrid-odbc.so.${CUBRID_ODBC_VERSION}\"\n")
+file(APPEND ${VERSION_FILE} "#ifdef CUBRID_ODBC_UNICODE\n")
+file(APPEND ${VERSION_FILE} "#define LINUX_ODBC_DRIVER_NAME \"lib${CUBRID_ODBC_UNICODE}.so.${CUBRID_ODBC_VERSION}\"\n")
+file(APPEND ${VERSION_FILE} "#else\n")
+file(APPEND ${VERSION_FILE} "#define LINUX_ODBC_DRIVER_NAME \"lib${CMAKE_PROJECT_NAME}.so.${CUBRID_ODBC_VERSION}\"\n")
+file(APPEND ${VERSION_FILE} "#endif\n")
 
 # cci submodule update
 if (NOT EXISTS ${CCI_COPYING})
 	if (UNIX)
       execute_process(
+        COMMAND ${GIT_EXECUTABLE} submodule deinit -f ${CCI_SOURCE}
         COMMAND ${GIT_EXECUTABLE} submodule update --init
         RESULT_VARIABLE git_result)
         if (git_result)
@@ -106,6 +111,28 @@ if(NOT EXISTS ${CCI_SO_LIB})
   	WORKING_DIRECTORY ${CCI_SOURCE}
   	)
 endif(NOT EXISTS ${CCI_SO_LIB})
+
+if(EXISTS ${CCI_SO_LIB})
+  execute_process(
+      COMMAND readlink ${CCI_SO_LIB}
+      OUTPUT_VARIABLE CCI_SO_REAL_FILE_NAME
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      RESULT_VARIABLE readlink_result
+      ERROR_VARIABLE readlink_error
+      WORKING_DIRECTORY ${CCI_SOURCE}
+    )
+  if(readlink_result EQUAL 0)
+    execute_process(
+      COMMAND cp ${CCI_LIBDIR}/${CCI_SO_REAL_FILE_NAME} ${CMAKE_BINARY_DIR}/
+      COMMAND cp -L -a ${CCI_SO_LIB} ${CMAKE_BINARY_DIR}/
+      WORKING_DIRECTORY ${CCI_SOURCE}
+      )
+  else(readlink_result EQUAL 0)
+    message(FATAL_ERROR "Failed to readlink -f ${CCI_SO_LIB}")
+  endif(readlink_result EQUAL 0)
+else(EXISTS ${CCI_SO_LIB})
+  message(FATAL_ERROR "Failed to build cubrid-cci or ${CCI_SO_LIB} not found")
+endif(EXISTS ${CCI_SO_LIB})
 
 if(WITH_LIBUNIXODBC STREQUAL "EXTERNAL")
   set(LIBUNIXODBC_TARGET libodbc)
@@ -146,13 +173,16 @@ SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES SOVERSION ${CUBRID_ODBC_V
 target_link_libraries(${CUBRID_ODBC_UNICODE} cascci pthread stdc++)
 SET_TARGET_PROPERTIES(${CUBRID_ODBC_UNICODE} PROPERTIES SOVERSION ${CUBRID_ODBC_VERSION})
 
+message("Target directory: ${CMAKE_BINARY_DIR}/package/lib")
 add_custom_target(package
-  COMMAND ${CMAKE_COMMAND} -E make_directory -p ${CMAKE_BINARY_DIR}/package/lib
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/package/lib
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/lib${CMAKE_PROJECT_NAME}.so.${CUBRID_ODBC_VERSION} ${CMAKE_BINARY_DIR}/package/lib/
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/lib${CUBRID_ODBC_UNICODE}.so.${CUBRID_ODBC_VERSION} ${CMAKE_BINARY_DIR}/package/lib/
   COMMAND ${CMAKE_COMMAND} -E create_symlink lib${CMAKE_PROJECT_NAME}.so.${CUBRID_ODBC_VERSION} ${CMAKE_BINARY_DIR}/package/lib/lib${CMAKE_PROJECT_NAME}.so
   COMMAND ${CMAKE_COMMAND} -E create_symlink lib${CUBRID_ODBC_UNICODE}.so.${CUBRID_ODBC_VERSION} ${CMAKE_BINARY_DIR}/package/lib/lib${CUBRID_ODBC_UNICODE}.so
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/README-linux.md ${CMAKE_BINARY_DIR}/package/README.txt
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/${CCI_SO_REAL_FILE_NAME} ${CMAKE_BINARY_DIR}/package/lib/
+  COMMAND ${CMAKE_COMMAND} -E create_symlink  ${CMAKE_BINARY_DIR}/${CCI_SO_REAL_FILE_NAME} ${CMAKE_BINARY_DIR}/package/lib/libcascci.so
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/README.txt ${CMAKE_BINARY_DIR}/package/README.txt
   COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_BINARY_DIR}/package ${CMAKE_COMMAND} -E tar czvf ../CUBRID-ODBC-Linux-${CMAKE_SYSTEM_PROCESSOR}-${CUBRID_ODBC_VERSION}.tar.gz --format=gnutar lib README.txt
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   COMMENT "Creating CUBRID-ODBC-Linux-${CMAKE_SYSTEM_PROCESSOR}-${CUBRID_ODBC_VERSION}.tar.gz"

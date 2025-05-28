@@ -3,3 +3,9 @@
 #define PATCH_VERSION 1
 #define BUILD_SERIAL_NUMBER 0062
 #define VERSION_STRING "11.3.1.0062"
+#if defined(CUBRID_ODBC_UNICODE)
+#define LINUX_ODBC_DRIVER_NAME ""
+#else
+#define LINUX_ODBC_DRIVER_NAME ""
+#endif
+

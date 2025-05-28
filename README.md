@@ -19,9 +19,34 @@ Below You will see the brief list of sections to guide You to easily get started
 - http://www.cubrid.org/downloads
 - http://ftp.cubrid.org
 
-## HOW TO CUBRID ODBC Driver
-### [For Windows](README-windows.md)
-### [For Linux](README-linux.md)
+## HOW TO BUILD CUBRID ODBC Driver
+### For Windows
+#### Requirements
+- Visual Studio 2017 version 15.0 or newer (Build)
+- NSIS 3.08 or newer (Package)
+```
+C:\> cd cubrid-odbc
+C:\> build_2017.bat         // Build and Package ANSI
+C:\> build_unicode_2017.bat // Package Unicode
+
+- Result File Directory
+ -- ANSI : output
+ -- Unicode : output_unicode
+```
+### For Linux
+#### Requirements
+- CMAKE 3.21 or newer
+- GCC 8.3 or newer
+- ncurses-devel (for CUBRID CCI Driver)
+```
+$ cd cubrid-odbc
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+$ make package // Package
+```
+For installation on Linux, please refer to Readme.txt.
 
 GETTING HELP
 ============
