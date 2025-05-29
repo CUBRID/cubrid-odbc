@@ -46,7 +46,7 @@ $ cmake ..
 $ make
 $ make package // Package
 ```
-For installation on Linux, please refer to Readme.txt.
+For installation on Linux, please refer to REAME.txt file.
 
 GETTING HELP
 ============
