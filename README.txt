@@ -36,20 +36,12 @@
 
 # Install binaries
 1. downloads/build install unixODBC
-2. build CUBRID Linux ODBC
-3. copy compiled CUBRID LinuxODBC to destination directory (eg. /home/cubrid/cubrid-odbc/lib)
+2. copy CUBRID LinuxODBC to destination directory (eg. user: cubrid , path: /home/cubrid/cubrid-odbc/lib)
 ```
-mkdir -p /home/cubrid/cubrid-odbc/lib
-//ANSI
-$ cp libcubrid-odbc.so /home/cubrid/cubrid-odbc/lib
-$ cp libcubrid-odbc.so.11.4.0 /home/cubrid/cubrid-odbc/lib
-//Unicode
-$ cp libcubrid-odbcw.so /home/cubrid/cubrid-odbc/lib
-$ cp libcubrid-odbcw.so.11.4.0 /home/cubrid/cubrid-odbc/lib
+$ mkdir -p /home/cubrid/cubrid-odbc
+$ cp -rf lib/ /home/cubrid/cubrid-odbc // Copy all files ODBC, Unicode ODBC, and CCI.
 
-$ cp cci-src/build_x86_64_release/cci/libcascci.so /home/cubrid/cubrid-odbc/lib
-$ cp cci-src/build_x86_64_release/cci/libcascci.so.11.2 /home/cubrid/cubrid-odbc/lib
-
+3. Add to 'LD_LIBRARY_PATH'
 $ export LD_LIBRARY_PATH=/home/cubrid/cubrid-odbc/lib:$LD_LIBRARY_PATH
 ```
 
@@ -79,8 +71,8 @@ FileUsage       = 1
 ```
 //Unicode
 $ vi /usr/local/unixODBC/etc/odbcinst.ini
-[CUBRID]
-Description     = ODBC for CUBRID
+[CUBRID_UNICODE]
+Description     = UNICODE ODBC for CUBRID
 Driver          = /home/cubrid/cubrid-odbc/lib/libcubrid-odbcw.so
 FileUsage       = 1
 ```
@@ -89,6 +81,7 @@ FileUsage       = 1
 - use predefined CUBRID ODBC Driver name registered in /usr/local/unixODBC/etc/odbcinst.ini
 - link2 is 'DSN' name of remote CUBRID Database Server
 ```
+//ANSI
 $ vi ~/.odbc.ini
 [LINK2]
 Driver=CUBRID
@@ -101,6 +94,21 @@ FETCH_SIZE=1
 CHARSET=utf8
 DB_NAME=demodb
 ```
+```
+//UNICODE
+$ vi ~/.odbc.ini
+[LINK2]
+Driver=CUBRID_UNICODE
+Description=CUBRID UNICODE ODBC
+SERVER=192.168.2.39
+PORT=33000
+UID=cubrid
+PWD=1234
+FETCH_SIZE=1
+CHARSET=utf8
+DB_NAME=demodb
+```
+
 
 - use CUBRID Linux ODBC library path directly
 ```
@@ -122,7 +130,7 @@ DB_NAME=demodb
 $ vi ~/.odbc.ini
 [LINK2]
 Driver=/home/cubrid/cubrid-odbc/lib/libcubrid-odbcw.so
-Description=CUBRID ODBC
+Description=CUBRID UNICODE ODBC
 SERVER=192.168.2.39
 PORT=33000
 UID=cubrid
