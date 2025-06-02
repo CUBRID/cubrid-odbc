@@ -3886,7 +3886,7 @@ retrieve_table_from_db_class (int cci_connection, char *table_name, T_CCI_ERROR 
 {
   int cci_request;
 
-  char *sql_statment = "SELECT class_name FROM db_class WHERE class_name = ?";
+  char *sql_statment = "SELECT class_name FROM db_class WHERE class_name = LOWER (?)";
   char tablename [MAX_TABLE_NAMME_LEN+1];
   char *param_list[] = { tablename };
   char query_buf [MAX_TABLE_NAMME_LEN+ MAX_OWNER_NAMME_LEN+512];
