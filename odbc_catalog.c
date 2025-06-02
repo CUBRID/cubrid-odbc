@@ -1006,7 +1006,7 @@ odbc_table_privileges (ODBC_STATEMENT * stmt, char *catalog_name,
   int cci_retval = 0;
   int cci_request = 0;
   int db_ver;
-	T_CCI_ERROR cci_error;
+  T_CCI_ERROR cci_error;
 
   char err_msg[SQL_MAX_MESSAGE_LENGTH + 1];
 
@@ -1026,9 +1026,9 @@ odbc_table_privileges (ODBC_STATEMENT * stmt, char *catalog_name,
     }
 
   if (stmt && stmt->conn)
-  {
-	  db_ver = connected_db_ver(stmt->conn->db_ver);
-  }
+    {
+      db_ver = connected_db_ver(stmt->conn->db_ver);
+    }
 
   if ((cci_retval = schema_info_table_privileges (stmt->conn->connhd,
 						  &cci_request,
@@ -3928,9 +3928,9 @@ schema_info_table_privileges (int cci_connection, int *cci_request,
 			      char *table_name, int db_ver, T_CCI_ERROR *error)
 {
   char *sql_statment_default =
-   "SELECT "
+    "SELECT "
       "object_name, grantor_name, grantee_name, auth_type, is_grantable "
-   "FROM " "db_auth " "WHERE " "object_name = ?";
+    "FROM " "db_auth " "WHERE " "object_name = ?";
   char *sql_statment_before_1103 =
     "SELECT "
       "class_name, grantor_name, grantee_name, auth_type, is_grantable "
@@ -3941,7 +3941,7 @@ schema_info_table_privileges (int cci_connection, int *cci_request,
 
   if (db_ver < 1104)
     {
-	  sql_statment = *sql_statment_before_1103;
+      sql_statment = *sql_statment_before_1103;
     }
   return sql_execute (cci_connection, cci_request, sql_statment, param_list,
 		      1, error);

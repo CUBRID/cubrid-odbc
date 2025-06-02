@@ -1672,21 +1672,21 @@ remove_owner_name (char *tablename)
 PUBLIC int
 connected_db_ver(const char *version_string)
 {
-	char *p;
-	int vers = -1;
+  char *p;
+  int vers = -1;
 
-	if (version_string == NULL || strlen(version_string) == 0)
-	{
-		return SQL_ERROR;
-	}
+  if (version_string == NULL || strlen(version_string) == 0)
+    {
+      return SQL_ERROR;
+    }
 
-	vers = atoi(version_string) * 100;
+  vers = atoi(version_string) * 100;
 
-	p = strchr(version_string, '.');
-	if (p)
-	{
-		vers += atoi(p + 1);
-	}
+  p = strchr(version_string, '.');
+  if (p)
+    {
+      vers += atoi(p + 1);
+    }
 
-	return vers;
+  return vers;
 }
