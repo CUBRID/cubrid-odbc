@@ -3941,7 +3941,7 @@ schema_info_table_privileges (int cci_connection, int *cci_request,
 
   if (db_ver < 1104)
     {
-      sql_statment = *sql_statment_before_1103;
+      sql_statment = sql_statment_before_1103;
     }
   return sql_execute (cci_connection, cci_request, sql_statment, param_list,
 		      1, error);
