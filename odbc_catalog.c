@@ -533,7 +533,7 @@ PRIVATE void free_procedure_columns_node (ST_LIST * node);
 PRIVATE int retrieve_table_from_db_class (int cci_connection,
 					  char *table_name, T_CCI_ERROR *error);
 PRIVATE int schema_info_table_privileges (int cci_connection,
-					  int *cci_request, char *table_name, T_CCI_ERROR *error);
+					  int *cci_request, char *table_name, int db_ver, T_CCI_ERROR *error);
 PRIVATE int schema_info_procedures (int cci_connection, int *cci_request,
 				    char *proc_name, T_CCI_ERROR *error);
 PRIVATE int schema_info_procedure_columns (int cci_connection,
@@ -1005,7 +1005,8 @@ odbc_table_privileges (ODBC_STATEMENT * stmt, char *catalog_name,
 {
   int cci_retval = 0;
   int cci_request = 0;
-	T_CCI_ERROR cci_error;
+  int db_ver;
+  T_CCI_ERROR cci_error;
 
   char err_msg[SQL_MAX_MESSAGE_LENGTH + 1];
 
@@ -1024,9 +1025,14 @@ odbc_table_privileges (ODBC_STATEMENT * stmt, char *catalog_name,
       goto cci_error;
     }
 
+  if (stmt && stmt->conn)
+    {
+      db_ver = connected_db_ver(stmt->conn->db_ver);
+    }
+
   if ((cci_retval = schema_info_table_privileges (stmt->conn->connhd,
 						  &cci_request,
-						  table_name, &cci_error)) < 0)
+						  table_name, db_ver, &cci_error)) < 0)
     {
       goto cci_error;
     }
@@ -3919,15 +3925,24 @@ retrieve_table_from_db_class (int cci_connection, char *table_name, T_CCI_ERROR 
 
 PRIVATE int
 schema_info_table_privileges (int cci_connection, int *cci_request,
-			      char *table_name, T_CCI_ERROR *error)
+			      char *table_name, int db_ver, T_CCI_ERROR *error)
 {
-  char *sql_statment =
+  char *sql_statment_default =
     "SELECT "
-    "class_name, grantor_name, grantee_name, auth_type, is_grantable "
+      "object_name, grantor_name, grantee_name, auth_type, is_grantable "
+    "FROM " "db_auth " "WHERE " "object_name = ?";
+  char *sql_statment_before_1103 =
+    "SELECT "
+      "class_name, grantor_name, grantee_name, auth_type, is_grantable "
     "FROM " "db_auth " "WHERE " "class_name = ?";
+  char *sql_statment = sql_statment_default;
 
   char *param_list[] = { table_name };
 
+  if (db_ver < 1104)
+    {
+      sql_statment = sql_statment_before_1103;
+    }
   return sql_execute (cci_connection, cci_request, sql_statment, param_list,
 		      1, error);
 }

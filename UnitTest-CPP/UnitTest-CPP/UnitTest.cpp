@@ -617,6 +617,50 @@ namespace UnitTestCPP
 			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
 		}
 
+		TEST_METHOD(APIS_1048_SQLTablePrivileges_by_version)
+		{
+			/*
+			 * run this test case for
+			 *  1. CUBRID versions CUBRID 11.3 or lower
+			 *  2. CUBRID version 11.4 or higher
+			 */
+
+			SQLHENV         hEnv;
+			SQLHDBC         hDbc;
+			SQLHSTMT        hstmt;
+			SQLINTEGER		retcode;
+			SQLWCHAR		*table_name = L"TEST_TBL1";
+			SQLWCHAR		*user = L"PUBLIC";
+			SQLWCHAR		query[512];
+
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLDriverConnectW(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=public;pwd=;db_name=demodb;charset=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+
+			wsprintf(query, L"DROP TABLE IF EXISTS %s", table_name);
+			retcode = SQLExecDirect(hstmt, query, SQL_NTS);
+
+			wsprintf(query, L"CREATE TABLE %s (col1 int)", table_name);
+			retcode = SQLExecDirect(hstmt, query, SQL_NTS);
+
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLTablePrivileges(hstmt,
+				NULL, 0,
+				user, SQL_NTS,
+				table_name, SQL_NTS);
+
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+		}
+
 		TEST_METHOD(APIS_1049_Lowercase_tablename_for_catalog_qry)
 		{
 			SQLHENV         hEnv;
