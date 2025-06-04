@@ -18,17 +18,32 @@ REM   limitations under the License.
 REM 
 
 set SCRIPT_DIR=%~dp0
-set CCI_WIN_DIR=%SCRIPT_DIR%\cubrid-cci\win\cas_cci
-set CCI_SRC_DIRS=%SCRIPT_DIR%\cubrid-cci\src\cci
-set INSTALL_DIRS=%SCRIPT_DIR%\..\cci
+for %%i in ("%SCRIPT_DIR%\..") do set SOURCE_DIR=%%~fi
+set CCI_SUB_MODULE_DIR=%SOURCE_DIR%\cci-src
+set CCI_WIN_DIR=%CCI_SUB_MODULE_DIR%\win\cas_cci
+set CCI_SRC_DIRS=%CCI_SUB_MODULE_DIR%\src\cci
+set INSTALL_DIRS=%SOURCE_DIR%\cci
 
-if EXIST "%SCRIPT_DIR%\cubrid-cci" rmdir /s /q cubrid-cci
+echo "SCRIPT_DIR: %SCRIPT_DIR%"
+echo "SOURCE_DIR: %SOURCE_DIR%"
+echo "CCI_SUB_MODULE_DIR: %CCI_SUB_MODULE_DIR%"
+echo "CCI_WIN_DIR: %CCI_WIN_DIR%"
+echo "CCI_SRC_DIRS: %CCI_SRC_DIRS%"
+echo "INSTALL_DIRS: %INSTALL_DIRS%"
 
-git clone git@github.com:CUBRID/cubrid-cci.git
+if NOT EXIST "%CCI_SUB_MODULE_DIR%\BUILD_NUMBER" (
+    echo "Source is not found, Submodule force update cci-src"
+    git submodule update --init --recursive --force
+)
 
 if "%VS2017COMNTOOLS%x" == "x" echo "Please add 'VS2017COMNTOOLS' in the environment variable\n ex) C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools"
 
-cd %CCI_WIN_DIR%
+if EXIST "%CCI_WIN_DIR%" (
+  cd %CCI_WIN_DIR%
+) else (
+  echo "CCI_WIN_DIR is not found"
+  GOTO END_SCRIPT
+)
 
 call "%VS2017COMNTOOLS%VsDevCmd.bat"
 devenv cas_cci_v141_lib.vcxproj /build "release|x86"
