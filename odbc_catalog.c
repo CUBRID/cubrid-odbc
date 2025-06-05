@@ -57,9 +57,6 @@
 #define NC_CATALOG_PROCEDURES			8
 #define NC_CATALOG_PROCEDURE_COLUMNS		19
 
-#define	MAX_TABLE_NAMME_LEN		255
-#define	MAX_OWNER_NAMME_LEN		255
-
 typedef struct tagODBC_COL_INFO
 {
   const char *name;

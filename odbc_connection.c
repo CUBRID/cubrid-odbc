@@ -1081,6 +1081,7 @@ odbc_get_info (ODBC_CONNECTION * conn,
 {
   RETCODE rc = ODBC_SUCCESS;
   char buf[1024];
+  int db_ver = connected_db_ver (conn->db_ver);
 
   switch (info_type)
     {
@@ -2094,7 +2095,7 @@ odbc_get_info (ODBC_CONNECTION * conn,
 
     case SQL_MAX_TABLE_NAME_LEN:
       if (info_value_ptr != NULL)
-	*(unsigned short *) info_value_ptr = 255;
+	*(unsigned short *) info_value_ptr = db_ver < 1102 ? MAX_TABLE_NAMME_LEN : MAX_TABLE_NAMME_LEN_1102;
 
       if (string_length_ptr != NULL)
 	*string_length_ptr = sizeof (unsigned short);

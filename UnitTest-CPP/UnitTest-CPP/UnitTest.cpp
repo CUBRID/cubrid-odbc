@@ -661,6 +661,53 @@ namespace UnitTestCPP
 			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
 		}
 
+		TEST_METHOD(APIS_1050_MAX_TABLE_NAME_LEN)
+		{
+			SQLHENV         hEnv;
+			SQLHDBC         hDbc;
+			SQLHSTMT        hstmt;
+			SQLINTEGER		retcode;
+			SQLWCHAR		*user = L"PUBLIC";
+			int				cbTableNameMax;
+			int				max_table_name_len(255);
+			int				len;
+			SQLWCHAR		query[512];
+			SQLWCHAR		msg[512];
+			SQLWCHAR		table_name[512];
+
+			retcode = SQLAllocEnv(&hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocConnect(hEnv, &hDbc);
+			retcode = SQLDriverConnectW(hDbc, NULL, L"DRIVER=CUBRID Driver Unicode;server=test-db-server;port=33000;uid=public;pwd=;db_name=demodb;charset=utf-8;", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hstmt);
+
+			retcode = SQLGetInfo(hDbc, SQL_MAX_TABLE_NAME_LEN, &cbTableNameMax, sizeof(cbTableNameMax), NULL);
+
+			len = cbTableNameMax < max_table_name_len ? cbTableNameMax : max_table_name_len;
+			wsprintf(msg, L"SQL_MAX_TABLE_NAME_LEN = %d (MAX = %d)", cbTableNameMax, max_table_name_len);
+			Logger::WriteMessage(msg);
+
+			memset(table_name, 0, sizeof(table_name));
+			for (int i = 0; i < len; i++)
+			  {
+				table_name[i] = L'A';
+			  }
+
+			wsprintf(query, L"DROP TABLE IF EXISTS %s", table_name);
+			retcode = SQLExecDirect(hstmt, query, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			wsprintf(query, L"CREATE TABLE %s (col1 int)", table_name);
+			retcode = SQLExecDirect(hstmt, query, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+		}
+
 		TEST_METHOD(APIS_1049_Lowercase_tablename_for_catalog_qry)
 		{
 			SQLHENV         hEnv;
