@@ -28,28 +28,28 @@
  *
  */
 
-#include		<stdlib.h>
-#include		"odbc_portable.h"
-#include		"odbc_statement.h"
-#include		"odbc_diag_record.h"
-#include		"odbc_descriptor.h"
-#include		"odbc_type.h"
-#include		"odbc_result.h"
-#include		"odbc_catalog.h"
+#include    <stdlib.h>
+#include    "odbc_portable.h"
+#include    "odbc_statement.h"
+#include    "odbc_diag_record.h"
+#include    "odbc_descriptor.h"
+#include    "odbc_type.h"
+#include    "odbc_result.h"
+#include    "odbc_catalog.h"
 
 PRIVATE void get_bind_info (ODBC_STATEMENT * stmt,
-			    short row_index,
-			    short col_index,
-			    short *type,
-			    void **bound_ptr,
-			    long *buffer_length, SQLLEN ** strlen_ind_ptr);
+          short row_index,
+          short col_index,
+          short *type,
+          void **bound_ptr,
+          long *buffer_length, SQLLEN ** strlen_ind_ptr);
 PRIVATE RETCODE move_catalog_rs (ODBC_STATEMENT * stmt,
-				 unsigned long *current_tpl_pos);
+         unsigned long *current_tpl_pos);
 PRIVATE RETCODE get_catalog_data (ODBC_STATEMENT * stmt,
-				  short row_index, short col_index);
+          short row_index, short col_index);
 PRIVATE RETCODE c_value_to_bound_ptr (void *bound_ptr,
-				      SQLLEN buffer_length,
-				      VALUE_CONTAINER * c_value);
+              SQLLEN buffer_length,
+              VALUE_CONTAINER * c_value);
 
 /************************************************************************
 * name: odbc_bind_col
@@ -60,10 +60,10 @@ PRIVATE RETCODE c_value_to_bound_ptr (void *bound_ptr,
 ************************************************************************/
 PUBLIC RETCODE
 odbc_bind_col (ODBC_STATEMENT * stmt,
-	       SQLUSMALLINT column_num,
-	       SQLSMALLINT target_type,
-	       SQLPOINTER target_value_ptr,
-	       SQLLEN buffer_len, SQLLEN * strlen_indicator)
+         SQLUSMALLINT column_num,
+         SQLSMALLINT target_type,
+         SQLPOINTER target_value_ptr,
+         SQLLEN buffer_len, SQLLEN * strlen_indicator)
 {
 
   ODBC_DESC *ard;
@@ -82,14 +82,14 @@ odbc_bind_col (ODBC_STATEMENT * stmt,
     }
 
   rc = odbc_set_desc_field (ard, column_num, SQL_DESC_CONCISE_TYPE,
-			    (void *) target_type, 0, 1);
+          (void *) target_type, 0, 1);
   ERROR_GOTO (rc, error);
 
   /* setting verbose type */
   odbc_type = odbc_concise_to_verbose_type (target_type);
   rc =
     odbc_set_desc_field (ard, column_num, SQL_DESC_TYPE, (void *) odbc_type,
-			 0, 1);
+       0, 1);
   ERROR_GOTO (rc, error);
 
   /* setting subcode */
@@ -97,8 +97,8 @@ odbc_bind_col (ODBC_STATEMENT * stmt,
     {
       odbc_subcode = odbc_subcode_type (target_type);
       rc =
-	odbc_set_desc_field (ard, column_num, SQL_DESC_DATETIME_INTERVAL_CODE,
-			     (void *) odbc_subcode, 0, 1);
+  odbc_set_desc_field (ard, column_num, SQL_DESC_DATETIME_INTERVAL_CODE,
+           (void *) odbc_subcode, 0, 1);
       ERROR_GOTO (rc, error);
     }
 
@@ -106,23 +106,23 @@ odbc_bind_col (ODBC_STATEMENT * stmt,
   size = odbc_size_of_by_type_id (target_type);
 
   if (size > 0)
-    {				/* target_type is the fixed type */
+    {       /* target_type is the fixed type */
       rc = odbc_set_desc_field (ard, column_num, SQL_DESC_LENGTH,
-				(void *) size, 0, 1);
+        (void *) size, 0, 1);
       ERROR_GOTO (rc, error);
     }
 
   rc = odbc_set_desc_field (ard, column_num, SQL_DESC_OCTET_LENGTH,
-			    (void *) buffer_len, 0, 1);
+          (void *) buffer_len, 0, 1);
   ERROR_GOTO (rc, error);
   rc = odbc_set_desc_field (ard, column_num, SQL_DESC_DATA_PTR,
-			    (void *) target_value_ptr, 0, 1);
+          (void *) target_value_ptr, 0, 1);
   ERROR_GOTO (rc, error);
   rc = odbc_set_desc_field (ard, column_num, SQL_DESC_INDICATOR_PTR,
-			    (void *) strlen_indicator, 0, 1);
+          (void *) strlen_indicator, 0, 1);
   ERROR_GOTO (rc, error);
   rc = odbc_set_desc_field (ard, column_num, SQL_DESC_OCTET_LENGTH_PTR,
-			    (void *) strlen_indicator, 0, 1);
+          (void *) strlen_indicator, 0, 1);
   ERROR_GOTO (rc, error);
 
   return ODBC_SUCCESS;
@@ -141,14 +141,14 @@ error:
 ************************************************************************/
 PUBLIC RETCODE
 odbc_describe_col (ODBC_STATEMENT * stmt,
-		   SQLUSMALLINT column_number,
-		   SQLCHAR * column_name,
-		   SQLSMALLINT buffer_length,
-		   SQLSMALLINT * name_length_ptr,
-		   SQLSMALLINT * data_type_ptr,
-		   SQLULEN * column_size_ptr,
-		   SQLSMALLINT * decimal_digits_ptr,
-		   SQLSMALLINT * nullable_ptr)
+       SQLUSMALLINT column_number,
+       SQLCHAR * column_name,
+       SQLSMALLINT buffer_length,
+       SQLSMALLINT * name_length_ptr,
+       SQLSMALLINT * data_type_ptr,
+       SQLULEN * column_size_ptr,
+       SQLSMALLINT * decimal_digits_ptr,
+       SQLSMALLINT * nullable_ptr)
 {
   ODBC_DESC *ird = NULL;
   ODBC_RECORD *record = NULL;
@@ -161,34 +161,34 @@ odbc_describe_col (ODBC_STATEMENT * stmt,
   if (column_name != NULL)
     {
       rc =
-	odbc_get_desc_field (ird, column_number, SQL_DESC_NAME, column_name,
-			     buffer_length, &int_name_length);
+  odbc_get_desc_field (ird, column_number, SQL_DESC_NAME, column_name,
+           buffer_length, &int_name_length);
       ERROR_GOTO (rc, error);
 
       if (name_length_ptr != NULL)
-	{
-	  *name_length_ptr = (short) int_name_length;
-	}
+  {
+    *name_length_ptr = (short) int_name_length;
+  }
     }
   odbc_get_desc_field (ird, column_number, SQL_DESC_CONCISE_TYPE,
-		       data_type_ptr, 0, NULL);
+           data_type_ptr, 0, NULL);
 
   odbc_get_desc_field (ird, column_number, SQL_DESC_SCALE, &scale, 0, NULL);
 
   if (column_size_ptr != NULL)
     {
       if (*data_type_ptr == SQL_NUMERIC)
-	{
-	  odbc_get_desc_field (ird, column_number, SQL_DESC_PRECISION,
-			       column_size_ptr, 0, NULL);
-	  *(unsigned long *) column_size_ptr =
-	    *(unsigned short *) column_size_ptr;
-	}
+  {
+    odbc_get_desc_field (ird, column_number, SQL_DESC_PRECISION,
+             column_size_ptr, 0, NULL);
+    *(unsigned long *) column_size_ptr =
+      *(unsigned short *) column_size_ptr;
+  }
       else
-	{
-	  odbc_get_desc_field (ird, column_number, SQL_DESC_LENGTH,
-			       column_size_ptr, 0, NULL);
-	}
+  {
+    odbc_get_desc_field (ird, column_number, SQL_DESC_LENGTH,
+             column_size_ptr, 0, NULL);
+  }
       //odbc_get_desc_field(ird, column_number, SQL_DESC_LENGTH, column_size_ptr, 0, NULL);
     }
 
@@ -199,7 +199,7 @@ odbc_describe_col (ODBC_STATEMENT * stmt,
   if (nullable_ptr != NULL)
     {
       odbc_get_desc_field (ird, column_number, SQL_DESC_NULLABLE,
-			   nullable_ptr, 0, NULL);
+         nullable_ptr, 0, NULL);
     }
 
   return ODBC_SUCCESS;
@@ -217,11 +217,11 @@ error:
 ************************************************************************/
 PUBLIC RETCODE
 odbc_col_attribute (ODBC_STATEMENT * stmt,
-		    unsigned short column_number,
-		    unsigned short field_identifier,
-		    void *str_value_ptr,
-		    short buffer_length,
-		    short *string_length_ptr, void *num_value_ptr)
+        unsigned short column_number,
+        unsigned short field_identifier,
+        void *str_value_ptr,
+        short buffer_length,
+        short *string_length_ptr, void *num_value_ptr)
 {
   SQLLEN int_length;
   ODBC_DESC *ird;
@@ -241,33 +241,33 @@ odbc_col_attribute (ODBC_STATEMENT * stmt,
     case SQL_DESC_DISPLAY_SIZE:
     case SQL_DESC_FIXED_PREC_SCALE:
     case SQL_DESC_LENGTH:
-    case SQL_COLUMN_LENGTH:	// for 2.x backward compatibility
+    case SQL_COLUMN_LENGTH: // for 2.x backward compatibility
     case SQL_DESC_NULLABLE:
     case SQL_DESC_NUM_PREC_RADIX:
     case SQL_DESC_OCTET_LENGTH:
     case SQL_DESC_PRECISION:
-    case SQL_COLUMN_PRECISION:	// for 2.x backward compatibility
+    case SQL_COLUMN_PRECISION:  // for 2.x backward compatibility
     case SQL_DESC_SCALE:
-    case SQL_COLUMN_SCALE:	// for 2.x backward compatibility
+    case SQL_COLUMN_SCALE:  // for 2.x backward compatibility
     case SQL_DESC_SEARCHABLE:
     case SQL_DESC_TYPE:
     case SQL_DESC_UNNAMED:
     case SQL_DESC_UNSIGNED:
     case SQL_DESC_UPDATABLE:
       if (field_identifier == SQL_COLUMN_LENGTH)
-	rc =
-	  odbc_get_desc_field (ird, column_number, SQL_DESC_DISPLAY_SIZE,
-			       &temp_value, 0, NULL);
+  rc =
+    odbc_get_desc_field (ird, column_number, SQL_DESC_DISPLAY_SIZE,
+             &temp_value, 0, NULL);
       else
-	rc =
-	  odbc_get_desc_field (ird, column_number, field_identifier,
-			       &temp_value, 0, NULL);
+  rc =
+    odbc_get_desc_field (ird, column_number, field_identifier,
+             &temp_value, 0, NULL);
 
       *(long *) num_value_ptr = temp_value;
       if (string_length_ptr != NULL)
-	{
-	  *string_length_ptr = sizeof (long);
-	}
+  {
+    *string_length_ptr = sizeof (long);
+  }
       ERROR_GOTO (rc, error);
       break;
 
@@ -283,16 +283,16 @@ odbc_col_attribute (ODBC_STATEMENT * stmt,
     case SQL_DESC_SCHEMA_NAME:
     case SQL_DESC_TABLE_NAME:
       rc = odbc_get_desc_field (ird, column_number,
-				field_identifier, str_value_ptr,
-				buffer_length, &int_length);
+        field_identifier, str_value_ptr,
+        buffer_length, &int_length);
       ERROR_GOTO (rc, error);
       *string_length_ptr = (short) int_length;
       break;
   
     case SQL_DESC_TYPE_NAME:
       rc = odbc_get_desc_field (ird, column_number,
-				field_identifier, str_value_ptr,
-				buffer_length, &int_length);
+        field_identifier, str_value_ptr,
+        buffer_length, &int_length);
       ERROR_GOTO (rc, error);
       *string_length_ptr = (short) int_length;
       break;
@@ -340,13 +340,13 @@ odbc_num_result_cols (ODBC_STATEMENT * stmt, short *column_count)
   if (column_count != NULL)
     {
       if (ird != NULL)
-	{
-	  *column_count = ird->max_count;
-	}
+  {
+    *column_count = ird->max_count;
+  }
       else
-	{
-	  *column_count = 0;
-	}
+  {
+    *column_count = 0;
+  }
     }
 
   return ODBC_SUCCESS;
@@ -356,27 +356,27 @@ odbc_num_result_cols (ODBC_STATEMENT * stmt, short *column_count)
 /************************************************************************
 * name: odbc_fetch
 * arguments:
-*	bind_offset - SQLBulkOperation with SQL_FETCH_BY_BOOKMARK를
-*	위해서 고안된 것으로, 설정된 값만큼 ard array index를 이동한다.
-*	flag_cursor_move - 0 - move, 1 - just value fetch
+* bind_offset - SQLBulkOperation with SQL_FETCH_BY_BOOKMARK를
+* 위해서 고안된 것으로, 설정된 값만큼 ard array index를 이동한다.
+* flag_cursor_move - 0 - move, 1 - just value fetch
 * returns/side-effects:
 * description:
 * NOTE:
-*	SQLExtendedFetch는 SQLFetchScroll 등과 다른 error handling 방식을
-*	갖는다.  이 때 모든 exceptions가 고려된 건 아니고, SQLSTATE 01S01만
-*	적용되었다.  그러나 이 경우에도 fetch시 status record 구성 방식이
-*	spec과 다르므로 정확한 적용방식이라고 말하기 힘들다.
-*	참조 : Error handling in SQLFetchScroll
+* SQLExtendedFetch는 SQLFetchScroll 등과 다른 error handling 방식을
+* 갖는다.  이 때 모든 exceptions가 고려된 건 아니고, SQLSTATE 01S01만
+* 적용되었다.  그러나 이 경우에도 fetch시 status record 구성 방식이
+* spec과 다르므로 정확한 적용방식이라고 말하기 힘들다.
+* 참조 : Error handling in SQLFetchScroll
 ************************************************************************/
 PUBLIC RETCODE
 odbc_fetch (ODBC_STATEMENT * stmt,
-	    SQLSMALLINT fetch_orientation,
-	    SQLLEN fetch_offset, long bind_offset, short flag_cursor_move)
+      SQLSMALLINT fetch_orientation,
+      SQLLEN fetch_offset, long bind_offset, short flag_cursor_move)
 {
   unsigned long i;
   short j;
-  long fetched_rows = 0;	/* all fetched rows number, except
-				 * SQL_ROW_NO_ROWS */
+  long fetched_rows = 0;  /* all fetched rows number, except
+         * SQL_ROW_NO_ROWS */
   SQLLEN *strlen_ind_ptr = NULL;
   void *bound_ptr;
   long buffer_length;
@@ -401,8 +401,8 @@ odbc_fetch (ODBC_STATEMENT * stmt,
   else if (stmt->result_type == QUERY)
     {
       rc =
-	move_advanced_cursor (stmt, &stmt->current_tpl_pos, fetch_orientation,
-			      (long) fetch_offset);
+  move_advanced_cursor (stmt, &stmt->current_tpl_pos, fetch_orientation,
+            (long) fetch_offset);
     }
   else
     {
@@ -427,112 +427,112 @@ odbc_fetch (ODBC_STATEMENT * stmt,
           goto error;
         }
     }
-	
+  
   current_tpl_pos = stmt->current_tpl_pos;
 
   for (i = bind_offset;
        (unsigned long) i < (stmt->ard->array_size + bind_offset); ++i)
     {
       if (i != bind_offset)
-	{
-	  if (stmt->result_type == QUERY)
-	    {
-	      rc = move_cursor (stmt->stmthd, &current_tpl_pos, stmt->diag);
-	    }
-	  else
-	    {
-	      rc = move_catalog_rs (stmt, &stmt->current_tpl_pos);
-	    }
-	  if (rc == ODBC_NO_MORE_DATA)
-	    {
-	      if (stmt->ird->array_status_ptr != NULL)
-		{
-		  stmt->ird->array_status_ptr[i] = SQL_ROW_NOROW;
-		}
-	      continue;
-	    }
-	}
+  {
+    if (stmt->result_type == QUERY)
+      {
+        rc = move_cursor (stmt->stmthd, &current_tpl_pos, stmt->diag);
+      }
+    else
+      {
+        rc = move_catalog_rs (stmt, &stmt->current_tpl_pos);
+      }
+    if (rc == ODBC_NO_MORE_DATA)
+      {
+        if (stmt->ird->array_status_ptr != NULL)
+    {
+      stmt->ird->array_status_ptr[i] = SQL_ROW_NOROW;
+    }
+        continue;
+      }
+  }
       ++fetched_rows;
 
       if (stmt->result_type == QUERY)
-	{
-	  rc =
-	    fetch_tuple (stmt->stmthd, stmt->diag,
-			 stmt->attr_cursor_sensitivity);
-	  if (rc < 0)
-	    {
-	      if (rc == ODBC_ROW_DELETED)
-		{
-		  if (stmt->ird->array_status_ptr != NULL)
-		    {
-		      stmt->ird->array_status_ptr[i] = SQL_ROW_DELETED;
-		    }
-		}
-	      else
-		{
-		  if (stmt->ird->array_status_ptr != NULL)
-		    {
-		      stmt->ird->array_status_ptr[i] = SQL_ROW_ERROR;
-		    }
-		}
-	      continue;
-	    }
-	}
+  {
+    rc =
+      fetch_tuple (stmt->stmthd, stmt->diag,
+       stmt->attr_cursor_sensitivity);
+    if (rc < 0)
+      {
+        if (rc == ODBC_ROW_DELETED)
+    {
+      if (stmt->ird->array_status_ptr != NULL)
+        {
+          stmt->ird->array_status_ptr[i] = SQL_ROW_DELETED;
+        }
+    }
+        else
+    {
+      if (stmt->ird->array_status_ptr != NULL)
+        {
+          stmt->ird->array_status_ptr[i] = SQL_ROW_ERROR;
+        }
+    }
+        continue;
+      }
+  }
       // catalog result set의 경우 fetch과정이 필요없다.
 
       // bind BOOKMARK
       if (stmt->attr_use_bookmark == SQL_UB_VARIABLE)
-	{
-	  bookmark_record = find_record_from_desc (stmt->ard, 0);
-	  if (bookmark_record != NULL)
-	    {
-	      get_bind_info (stmt, (short) i, 0, &type, &bound_ptr,
-			     &buffer_length, &strlen_ind_ptr);
-	      *((long *) bound_ptr) = current_tpl_pos;
-	      *((long *) strlen_ind_ptr) = 4;
-	    }
-	}
+  {
+    bookmark_record = find_record_from_desc (stmt->ard, 0);
+    if (bookmark_record != NULL)
+      {
+        get_bind_info (stmt, (short) i, 0, &type, &bound_ptr,
+           &buffer_length, &strlen_ind_ptr);
+        *((long *) bound_ptr) = current_tpl_pos;
+        *((long *) strlen_ind_ptr) = 4;
+      }
+  }
 
       // get each column data per row
-      stmt->column_data.column_no = 0;	// for avoiding confliction with SQLGetData
+      stmt->column_data.column_no = 0;  // for avoiding confliction with SQLGetData
       for (j = 1; j <= stmt->ard->max_count; ++j)
-	{
-	  record = find_record_from_desc (stmt->ard, j);
-	  if (record == NULL)
-	    continue;
+  {
+    record = find_record_from_desc (stmt->ard, j);
+    if (record == NULL)
+      continue;
 
-	  get_bind_info (stmt, (short) i, j, &type, &bound_ptr,
-			 &buffer_length, &strlen_ind_ptr);
-	  if (bound_ptr == NULL)
-	    continue;
-	  rc =
-	    odbc_get_data (stmt, j, type, bound_ptr, buffer_length,
-			   strlen_ind_ptr);
-	  if (rc < 0)
-	    goto error;
-	}
-      stmt->column_data.column_no = 0;	// for avoiding confliction with SQLGetData
+    get_bind_info (stmt, (short) i, j, &type, &bound_ptr,
+       &buffer_length, &strlen_ind_ptr);
+    if (bound_ptr == NULL)
+      continue;
+    rc =
+      odbc_get_data (stmt, j, type, bound_ptr, buffer_length,
+         strlen_ind_ptr);
+    if (rc < 0)
+      goto error;
+  }
+      stmt->column_data.column_no = 0;  // for avoiding confliction with SQLGetData
 
       if (stmt->ird->array_status_ptr != NULL)
-	{
-	  stmt->ird->array_status_ptr[i] = SQL_ROW_SUCCESS;
-	}
+  {
+    stmt->ird->array_status_ptr[i] = SQL_ROW_SUCCESS;
+  }
     }
 
   // array fetch 동안 cursor movement 보정
   if (stmt->result_type == QUERY)
     {
       if (flag_cursor_move == 1)
-	{
-	  stmt->current_tpl_pos = init_current_tpl_pos;
-	}
+  {
+    stmt->current_tpl_pos = init_current_tpl_pos;
+  }
       cci_cursor (stmt->stmthd, stmt->current_tpl_pos, CCI_CURSOR_FIRST,
-		  &cci_err_buf);
+      &cci_err_buf);
     }
 
 
   odbc_get_stmt_attr (stmt, SQL_ATTR_ROWS_FETCHED_PTR, &fetched_rows_ptr, 0,
-		      NULL);
+          NULL);
   if (fetched_rows_ptr != NULL)
     *fetched_rows_ptr = fetched_rows;
 
@@ -543,7 +543,7 @@ odbc_fetch (ODBC_STATEMENT * stmt,
 // 뿌려야 한다.
 
 error:
-  if (stmt->conn->env->attr_odbc_version == SQL_OV_ODBC2)	// for 2.x backward compatibility
+  if (stmt->conn->env->attr_odbc_version == SQL_OV_ODBC2) // for 2.x backward compatibility
     {
       odbc_set_diag (stmt->diag, "01S01", 0, NULL);
       return ODBC_ERROR;
@@ -602,7 +602,7 @@ odbc_get_data (ODBC_STATEMENT * stmt,
       int temp_length;
 
       cci_rc = cci_get_query_plan(stmt->stmthd, &query_plan);
-	  
+    
       if (cci_rc < 0)
         {
           odbc_set_diag_by_cci(stmt->diag, cci_rc, NULL);
@@ -832,7 +832,7 @@ odbc_get_data (ODBC_STATEMENT * stmt,
                         }
                       stmt->column_data.current_pt =
                         target_value.value.str + offset;
-                      stmt->column_data.remain_length = strlen (target_value.value.str) - offset;	// 1 is for '\0'
+                      stmt->column_data.remain_length = strlen (target_value.value.str) - offset; // 1 is for '\0'
 
                       odbc_set_diag (stmt->diag, "01004", 0, NULL);
                       status = SQL_SUCCESS_WITH_INFO;
@@ -929,13 +929,13 @@ odbc_get_data (ODBC_STATEMENT * stmt,
             }
 
         }
-	  else if (target_type == SQL_WCHAR ||
+    else if (target_type == SQL_WCHAR ||
                target_type == SQL_WVARCHAR ||
                target_type == SQL_WLONGVARCHAR)
-	    {
+      {
           rc =
-		    bytes_to_wide_char (stmt->column_data.current_pt, strlen(stmt->column_data.current_pt), 
-				(wchar_t**)(&bound_ptr), buffer_length, str_ind_ptr, stmt->conn->charset);
+        bytes_to_wide_char (stmt->column_data.current_pt, strlen(stmt->column_data.current_pt), 
+        (wchar_t**)(&bound_ptr), buffer_length, str_ind_ptr, stmt->conn->charset);
           if (rc == ODBC_SUCCESS_WITH_INFO)
             {
               if (buffer_length > 0)
@@ -957,7 +957,7 @@ odbc_get_data (ODBC_STATEMENT * stmt,
             {
               stmt->column_data.remain_length = 0;
             }
-	    }
+      }
       else if (target_type == SQL_C_BINARY)
         {
           rc =
@@ -1008,27 +1008,27 @@ error:
 /************************************************************************
  * name: get_bind_info
  * arguments:
- *		type (OUT)
- *		bound_ptr (OUT)
- *		strlen_ind_ptr (OUT)
- *		buffer_length (OUT)
+ *    type (OUT)
+ *    bound_ptr (OUT)
+ *    strlen_ind_ptr (OUT)
+ *    buffer_length (OUT)
  * returns/side-effects:
  * description:
- *		ard로부터 bound_ptr과 strlen_ind_ptr을 얻어온다.
+ *    ard로부터 bound_ptr과 strlen_ind_ptr을 얻어온다.
  * NOTE:
  ************************************************************************/
 PRIVATE void
 get_bind_info (ODBC_STATEMENT * stmt,
-	       short row_index,
-	       short col_index,
-	       short *type,
-	       void **bound_ptr, long *buffer_length,
-	       SQLLEN ** strlen_ind_ptr)
+         short row_index,
+         short col_index,
+         short *type,
+         void **bound_ptr, long *buffer_length,
+         SQLLEN ** strlen_ind_ptr)
 {
   long element_size;
   long long offset_size;
 
-  element_size = stmt->ard->bind_type;	/* 0 means single or column wise, >0 means row wise */
+  element_size = stmt->ard->bind_type;  /* 0 means single or column wise, >0 means row wise */
   if (stmt->ard->bind_offset_ptr == NULL)
     {
       offset_size = 0;
@@ -1039,9 +1039,9 @@ get_bind_info (ODBC_STATEMENT * stmt,
     }
 
   odbc_get_desc_field (stmt->ard, (short) col_index, SQL_DESC_DATA_PTR,
-		       (void *) bound_ptr, 0, NULL);
+           (void *) bound_ptr, 0, NULL);
   odbc_get_desc_field (stmt->ard, (short) col_index, SQL_DESC_INDICATOR_PTR,
-		       (void *) strlen_ind_ptr, 0, NULL);
+           (void *) strlen_ind_ptr, 0, NULL);
 
   // unbind column
 //      if ( *bound_ptr == NULL || *strlen_ind_ptr == NULL ) return ;
@@ -1049,7 +1049,7 @@ get_bind_info (ODBC_STATEMENT * stmt,
     return;
 
   odbc_get_desc_field (stmt->ard, (short) col_index, SQL_DESC_CONCISE_TYPE,
-		       (void *) type, 0, NULL);
+           (void *) type, 0, NULL);
 
   // set과 object type은 string으로 match되어 있다.
   if (*type == SQL_C_CHAR || *type == SQL_C_BINARY
@@ -1057,13 +1057,13 @@ get_bind_info (ODBC_STATEMENT * stmt,
       || *type == SQL_C_DEFAULT || *type == SQL_C_WCHAR)
     {
       odbc_get_desc_field (stmt->ard, (short) col_index,
-			   SQL_DESC_OCTET_LENGTH, (void *) buffer_length, 0,
-			   NULL);
+         SQL_DESC_OCTET_LENGTH, (void *) buffer_length, 0,
+         NULL);
     }
   else
     {
       odbc_get_desc_field (stmt->ard, (short) col_index, SQL_DESC_LENGTH,
-			   (void *) buffer_length, 0, NULL);
+         (void *) buffer_length, 0, NULL);
     }
 
   /* recalculating bount_ptr & strlen_ind_ptr */
@@ -1074,7 +1074,7 @@ get_bind_info (ODBC_STATEMENT * stmt,
     }
   else
     {
-	  (*(long long *)bound_ptr) += offset_size + row_index * element_size;
+    (*(long long *)bound_ptr) += offset_size + row_index * element_size;
       (*(long long *)strlen_ind_ptr) += offset_size + row_index * element_size;
     }
 
@@ -1090,14 +1090,14 @@ get_bind_info (ODBC_STATEMENT * stmt,
  ************************************************************************/
 PUBLIC RETCODE
 move_advanced_cursor (ODBC_STATEMENT * stmt,
-		      long *current_tpl_pos,
-		      short fetch_orientation, long fetch_offset)
+          long *current_tpl_pos,
+          short fetch_orientation, long fetch_offset)
 {
   RETCODE rc = ODBC_SUCCESS;
   int cci_rc;
   T_CCI_ERROR cci_err_buf;
   int tpl_pos;
-  char bound_state = 0;		//0 unknown,  1 before start, 2 after end
+  char bound_state = 0;   //0 unknown,  1 before start, 2 after end
   long result_set_size;
   long row_set_size;
   long bookmark;
@@ -1110,83 +1110,83 @@ move_advanced_cursor (ODBC_STATEMENT * stmt,
     {
     case SQL_FETCH_NEXT:
       if (*current_tpl_pos == 0)
-	{			// before start
-	  cci_rc = cci_cursor (stmt->stmthd, 1, CCI_CURSOR_FIRST,
-			       &cci_err_buf);
-	  tpl_pos = 1;
-	}
+  {     // before start
+    cci_rc = cci_cursor (stmt->stmthd, 1, CCI_CURSOR_FIRST,
+             &cci_err_buf);
+    tpl_pos = 1;
+  }
       else
-	{
-	  cci_rc = cci_cursor (stmt->stmthd, row_set_size, CCI_CURSOR_CURRENT,
-			       &cci_err_buf);
-	  tpl_pos = *current_tpl_pos + row_set_size;
-	  bound_state = 2;
-	}
+  {
+    cci_rc = cci_cursor (stmt->stmthd, row_set_size, CCI_CURSOR_CURRENT,
+             &cci_err_buf);
+    tpl_pos = *current_tpl_pos + row_set_size;
+    bound_state = 2;
+  }
       break;
     case SQL_FETCH_PRIOR:
       if (*current_tpl_pos > 1 && *current_tpl_pos <= row_set_size ||
-	  *current_tpl_pos == -1 && result_set_size < row_set_size)
-	{
-	  cci_rc = cci_cursor (stmt->stmthd, 1, CCI_CURSOR_FIRST,
-			       &cci_err_buf);
-	  tpl_pos = 1;
-	}
+    *current_tpl_pos == -1 && result_set_size < row_set_size)
+  {
+    cci_rc = cci_cursor (stmt->stmthd, 1, CCI_CURSOR_FIRST,
+             &cci_err_buf);
+    tpl_pos = 1;
+  }
       else
-	{
-	  cci_rc =
-	    cci_cursor (stmt->stmthd, -row_set_size, CCI_CURSOR_CURRENT,
-			&cci_err_buf);
-	  tpl_pos = *current_tpl_pos - row_set_size;
-	  bound_state = 1;
-	}
+  {
+    cci_rc =
+      cci_cursor (stmt->stmthd, -row_set_size, CCI_CURSOR_CURRENT,
+      &cci_err_buf);
+    tpl_pos = *current_tpl_pos - row_set_size;
+    bound_state = 1;
+  }
       break;
     case SQL_FETCH_RELATIVE:
       if (*current_tpl_pos > 1 && (*current_tpl_pos + fetch_offset) < 1 &&
-	  (labs (fetch_offset) > row_set_size))
-	{
-	  cci_rc = cci_cursor (stmt->stmthd, 1, CCI_CURSOR_FIRST,
-			       &cci_err_buf);
-	  tpl_pos = 1;
-	}
+    (labs (fetch_offset) > row_set_size))
+  {
+    cci_rc = cci_cursor (stmt->stmthd, 1, CCI_CURSOR_FIRST,
+             &cci_err_buf);
+    tpl_pos = 1;
+  }
       else
-	{
-	  cci_rc = cci_cursor (stmt->stmthd, fetch_offset, CCI_CURSOR_CURRENT,
-			       &cci_err_buf);
-	  tpl_pos = *current_tpl_pos + fetch_offset;
-	  if (fetch_offset > 0)
-	    {
-	      bound_state = 2;
-	    }
-	  else
-	    {
-	      bound_state = 1;
-	    }
-	}
+  {
+    cci_rc = cci_cursor (stmt->stmthd, fetch_offset, CCI_CURSOR_CURRENT,
+             &cci_err_buf);
+    tpl_pos = *current_tpl_pos + fetch_offset;
+    if (fetch_offset > 0)
+      {
+        bound_state = 2;
+      }
+    else
+      {
+        bound_state = 1;
+      }
+  }
       break;
     case SQL_FETCH_ABSOLUTE:
       if (fetch_offset > 0)
-	{
-	  cci_rc =
-	    cci_cursor (stmt->stmthd, fetch_offset, CCI_CURSOR_FIRST,
-			&cci_err_buf);
-	  tpl_pos = fetch_offset;
-	  bound_state = 2;
-	}
+  {
+    cci_rc =
+      cci_cursor (stmt->stmthd, fetch_offset, CCI_CURSOR_FIRST,
+      &cci_err_buf);
+    tpl_pos = fetch_offset;
+    bound_state = 2;
+  }
       else if (fetch_offset < 0 && labs (fetch_offset) > result_set_size
-	       && labs (fetch_offset) <= row_set_size)
-	{
-	  cci_rc =
-	    cci_cursor (stmt->stmthd, 1, CCI_CURSOR_FIRST, &cci_err_buf);
-	  tpl_pos = 1;
-	}
+         && labs (fetch_offset) <= row_set_size)
+  {
+    cci_rc =
+      cci_cursor (stmt->stmthd, 1, CCI_CURSOR_FIRST, &cci_err_buf);
+    tpl_pos = 1;
+  }
       else
-	{
-	  cci_rc =
-	    cci_cursor (stmt->stmthd, -fetch_offset, CCI_CURSOR_LAST,
-			&cci_err_buf);
-	  tpl_pos = result_set_size + fetch_offset + 1;
-	  bound_state = 1;
-	}
+  {
+    cci_rc =
+      cci_cursor (stmt->stmthd, -fetch_offset, CCI_CURSOR_LAST,
+      &cci_err_buf);
+    tpl_pos = result_set_size + fetch_offset + 1;
+    bound_state = 1;
+  }
       break;
     case SQL_FETCH_FIRST:
       cci_rc = cci_cursor (stmt->stmthd, 1, CCI_CURSOR_FIRST, &cci_err_buf);
@@ -1194,54 +1194,54 @@ move_advanced_cursor (ODBC_STATEMENT * stmt,
       break;
     case SQL_FETCH_LAST:
       if (row_set_size > result_set_size)
-	{
-	  cci_rc =
-	    cci_cursor (stmt->stmthd, 1, CCI_CURSOR_LAST, &cci_err_buf);
-	  tpl_pos = 1;
-	}
+  {
+    cci_rc =
+      cci_cursor (stmt->stmthd, 1, CCI_CURSOR_LAST, &cci_err_buf);
+    tpl_pos = 1;
+  }
       else
-	{
-	  cci_rc =
-	    cci_cursor (stmt->stmthd, result_set_size - row_set_size + 1,
-			CCI_CURSOR_LAST, &cci_err_buf);
-	  tpl_pos = result_set_size - row_set_size + 1;
-	}
+  {
+    cci_rc =
+      cci_cursor (stmt->stmthd, result_set_size - row_set_size + 1,
+      CCI_CURSOR_LAST, &cci_err_buf);
+    tpl_pos = result_set_size - row_set_size + 1;
+  }
       break;
     case SQL_FETCH_BOOKMARK:
       if (stmt->attr_use_bookmark == SQL_UB_VARIABLE
-	  && stmt->attr_fetch_bookmark_ptr != NULL)
-	{
-	  bookmark = *((long *) stmt->attr_fetch_bookmark_ptr);
-	  if ((bookmark + fetch_offset) > 0)
-	    {
-	      cci_rc =
-		cci_cursor (stmt->stmthd, bookmark + fetch_offset,
-			    CCI_CURSOR_FIRST, &cci_err_buf);
-	      tpl_pos = bookmark + fetch_offset;
-	      bound_state = 2;
-	    }
-	  else if ((bookmark + fetch_offset) < 0
-		   && labs (bookmark + fetch_offset) > result_set_size
-		   && labs (bookmark + fetch_offset) <= row_set_size)
-	    {
-	      cci_rc =
-		cci_cursor (stmt->stmthd, 1, CCI_CURSOR_FIRST, &cci_err_buf);
-	      tpl_pos = 1;
-	    }
-	  else
-	    {
-	      cci_rc =
-		cci_cursor (stmt->stmthd, -(bookmark + fetch_offset),
-			    CCI_CURSOR_LAST, &cci_err_buf);
-	      tpl_pos = result_set_size + bookmark + fetch_offset + 1;
-	      bound_state = 1;
-	    }
-	}
+    && stmt->attr_fetch_bookmark_ptr != NULL)
+  {
+    bookmark = *((long *) stmt->attr_fetch_bookmark_ptr);
+    if ((bookmark + fetch_offset) > 0)
+      {
+        cci_rc =
+    cci_cursor (stmt->stmthd, bookmark + fetch_offset,
+          CCI_CURSOR_FIRST, &cci_err_buf);
+        tpl_pos = bookmark + fetch_offset;
+        bound_state = 2;
+      }
+    else if ((bookmark + fetch_offset) < 0
+       && labs (bookmark + fetch_offset) > result_set_size
+       && labs (bookmark + fetch_offset) <= row_set_size)
+      {
+        cci_rc =
+    cci_cursor (stmt->stmthd, 1, CCI_CURSOR_FIRST, &cci_err_buf);
+        tpl_pos = 1;
+      }
+    else
+      {
+        cci_rc =
+    cci_cursor (stmt->stmthd, -(bookmark + fetch_offset),
+          CCI_CURSOR_LAST, &cci_err_buf);
+        tpl_pos = result_set_size + bookmark + fetch_offset + 1;
+        bound_state = 1;
+      }
+  }
       else
-	{
-	  odbc_set_diag (stmt->diag, "HY111", 0, NULL);
-	  return ODBC_ERROR;
-	}
+  {
+    odbc_set_diag (stmt->diag, "HY111", 0, NULL);
+    return ODBC_ERROR;
+  }
       break;
 
     default:
@@ -1257,13 +1257,13 @@ move_advanced_cursor (ODBC_STATEMENT * stmt,
   else if (cci_rc == CCI_ER_NO_MORE_DATA)
     {
       if (bound_state == 1)
-	{
-	  *current_tpl_pos = 0;
-	}
+  {
+    *current_tpl_pos = 0;
+  }
       else
-	{
-	  *current_tpl_pos = -1;
-	}
+  {
+    *current_tpl_pos = -1;
+  }
       return ODBC_NO_MORE_DATA;
     }
   else
@@ -1365,17 +1365,17 @@ fetch_tuple (int req_handle, ODBC_DIAG * diag, long sensitivity)
   if (cci_rc < 0)
     {
       if (cci_rc == CCI_ER_DELETED_TUPLE)
-	{
-	  return ODBC_ROW_DELETED;
-	}
+  {
+    return ODBC_ROW_DELETED;
+  }
       else
-	{
-	  if (diag != NULL)
-	    {
-	      odbc_set_diag_by_cci (diag, cci_rc, &cci_err_buf);
-	    }
-	  return ODBC_ERROR;
-	}
+  {
+    if (diag != NULL)
+      {
+        odbc_set_diag_by_cci (diag, cci_rc, &cci_err_buf);
+      }
+    return ODBC_ERROR;
+  }
     }
 
   return ODBC_SUCCESS;
@@ -1405,17 +1405,17 @@ odbc_more_results (ODBC_STATEMENT * stmt)
   if (cci_rc < 0)
     {
       if (cci_rc == CAS_ER_NO_MORE_RESULT_SET ||cci_rc ==  CAS_ER_NOT_IMPLEMENTED)
-	{
-	  return ODBC_NO_DATA;
-	}
+  {
+    return ODBC_NO_DATA;
+  }
       else if (cci_rc == CCI_ER_REQ_HANDLE)
-	{
-	  return ODBC_NO_DATA;
-	}
+  {
+    return ODBC_NO_DATA;
+  }
       else
-	{
-	  goto error;
-	}
+  {
+    goto error;
+  }
     }
   stmt->tpl_number = cci_rc;
 
@@ -1433,7 +1433,7 @@ odbc_more_results (ODBC_STATEMENT * stmt)
   if (stmt->conn->attr_access_mode == SQL_MODE_READ_ONLY &&
       !RESULTSET_STMT_TYPE (stmt->stmt_type))
     {
-			odbc_set_diag (stmt->diag, "HY000", 0, "SQL Mode is read-only.");
+      odbc_set_diag (stmt->diag, "HY000", 0, "SQL Mode is read-only.");
       return ODBC_ERROR;
     }
 
@@ -1454,7 +1454,7 @@ error:
 
 PRIVATE RETCODE
 c_value_to_bound_ptr (void *bound_ptr,
-		      SQLLEN buffer_length, VALUE_CONTAINER * c_value)
+          SQLLEN buffer_length, VALUE_CONTAINER * c_value)
 {
   switch (c_value->type)
     {
@@ -1482,22 +1482,22 @@ c_value_to_bound_ptr (void *bound_ptr,
       break;
     case SQL_C_BINARY:
       bin_value_assign (c_value->value.str, c_value->length, bound_ptr,
-			buffer_length, NULL);
+      buffer_length, NULL);
       break;
     case SQL_C_TYPE_DATE:
-    case SQL_C_DATE:		// for 2.x backward compatibility
+    case SQL_C_DATE:    // for 2.x backward compatibility
       ((SQL_DATE_STRUCT *) bound_ptr)->year = c_value->value.date.year;
       ((SQL_DATE_STRUCT *) bound_ptr)->month = c_value->value.date.month;
       ((SQL_DATE_STRUCT *) bound_ptr)->day = c_value->value.date.day;
       break;
     case SQL_C_TYPE_TIME:
-    case SQL_C_TIME:		// for 2.x backward compatibility
+    case SQL_C_TIME:    // for 2.x backward compatibility
       ((SQL_TIME_STRUCT *) bound_ptr)->hour = c_value->value.time.hour;
       ((SQL_TIME_STRUCT *) bound_ptr)->minute = c_value->value.time.minute;
       ((SQL_TIME_STRUCT *) bound_ptr)->second = c_value->value.time.second;
       break;
     case SQL_C_TYPE_TIMESTAMP:
-    case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
+    case SQL_C_TIMESTAMP: // for 2.x backward compatibility
       ((SQL_TIMESTAMP_STRUCT *) bound_ptr)->year = c_value->value.ts.year;
       ((SQL_TIMESTAMP_STRUCT *) bound_ptr)->month = c_value->value.ts.month;
       ((SQL_TIMESTAMP_STRUCT *) bound_ptr)->day = c_value->value.ts.day;

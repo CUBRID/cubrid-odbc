@@ -28,35 +28,35 @@
 *
 */
 
-#ifndef	__ODBC_DIAG_HEADER	/* to avoid multiple inclusion */
-#define	__ODBC_DIAG_HEADER
+#ifndef __ODBC_DIAG_HEADER  /* to avoid multiple inclusion */
+#define __ODBC_DIAG_HEADER
 
-#include		"cas_cci.h"
+#include    "cas_cci.h"
 
-#define		ODBC_DIAG_INIT			0
-#define		ODBC_DIAG_RESET			1
-#define		ODBC_DIAG_FREE_MEMBER	2
-#define		ODBC_DIAG_FREE_ALL		3
+#define   ODBC_DIAG_INIT      0
+#define   ODBC_DIAG_RESET     1
+#define   ODBC_DIAG_FREE_MEMBER 2
+#define   ODBC_DIAG_FREE_ALL    3
 
-#define		ODBC_DIAG_RECORD_INIT			0
-#define		ODBC_DIAG_RECORD_RESET			1
-#define		ODBC_DIAG_RECORD_FREE_MEMBER	2
-#define		ODBC_DIAG_RECORD_FREE_ALL		3
+#define   ODBC_DIAG_RECORD_INIT     0
+#define   ODBC_DIAG_RECORD_RESET      1
+#define   ODBC_DIAG_RECORD_FREE_MEMBER  2
+#define   ODBC_DIAG_RECORD_FREE_ALL   3
 
 
 /* CUBRID ODBC specific error code */
-#define ODBC_OK				0
-#define	ODBC_ERROR_OFFSET			(-10000)
-#define	ODBC_GENERAL_ERROR			(-1 + ODBC_ERROR_OFFSET)
-#define	ODBC_WARING					(-2 + ODBC_ERROR_OFFSET)
-#define	ODBC_UNKNOWN				(-3 + ODBC_ERROR_OFFSET)
-#define ODBC_NULL_VALUE				(-4 + ODBC_ERROR_OFFSET)
-#define ODBC_CAS_ERROR				(-6 + ODBC_ERROR_OFFSET)
-#define ODBC_NO_MORE_DATA			(-7 + ODBC_ERROR_OFFSET)
-#define ODBC_MEMORY_ALLOC_ERROR		(-8 + ODBC_ERROR_OFFSET)
-#define	ODBC_NOT_IMPLEMENTED		(-9 + ODBC_ERROR_OFFSET)
-#define	ODBC_UNKNOWN_TYPE			(-10 + ODBC_ERROR_OFFSET)
-#define	ODBC_INVALID_TYPE_CONVERSION (-11 + ODBC_ERROR_OFFSET)
+#define ODBC_OK       0
+#define ODBC_ERROR_OFFSET     (-10000)
+#define ODBC_GENERAL_ERROR      (-1 + ODBC_ERROR_OFFSET)
+#define ODBC_WARING         (-2 + ODBC_ERROR_OFFSET)
+#define ODBC_UNKNOWN        (-3 + ODBC_ERROR_OFFSET)
+#define ODBC_NULL_VALUE       (-4 + ODBC_ERROR_OFFSET)
+#define ODBC_CAS_ERROR        (-6 + ODBC_ERROR_OFFSET)
+#define ODBC_NO_MORE_DATA     (-7 + ODBC_ERROR_OFFSET)
+#define ODBC_MEMORY_ALLOC_ERROR   (-8 + ODBC_ERROR_OFFSET)
+#define ODBC_NOT_IMPLEMENTED    (-9 + ODBC_ERROR_OFFSET)
+#define ODBC_UNKNOWN_TYPE     (-10 + ODBC_ERROR_OFFSET)
+#define ODBC_INVALID_TYPE_CONVERSION (-11 + ODBC_ERROR_OFFSET)
 
 typedef struct st_odbc_error_map
 {

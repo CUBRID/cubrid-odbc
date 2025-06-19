@@ -28,29 +28,29 @@
  *
  */
 
-#include		<string.h>
+#include    <string.h>
 #if defined (_WINDOWS)
-#include		<windows.h>
+#include    <windows.h>
 #endif
-#include		<stdio.h>
-#include		"odbc_portable.h"
-#include		"odbc_descriptor.h"
-#include		"odbc_diag_record.h"
-#include		"odbc_util.h"
-#include		"odbc_statement.h"
-#include		"odbc_type.h"
-#include		"sqlext.h"
+#include    <stdio.h>
+#include    "odbc_portable.h"
+#include    "odbc_descriptor.h"
+#include    "odbc_diag_record.h"
+#include    "odbc_util.h"
+#include    "odbc_statement.h"
+#include    "odbc_type.h"
+#include    "sqlext.h"
 
-#define			CUBRID_NUMERIC_PRECISION_DEFAULT	15
-#define			CUBRID_NUMERIC_SCALE_DEFAULT		0
+#define     CUBRID_NUMERIC_PRECISION_DEFAULT  15
+#define     CUBRID_NUMERIC_SCALE_DEFAULT    0
 
 PRIVATE int is_header_field (short desc_field_id);
 PRIVATE int odbc_consistency_check (ODBC_RECORD * record);
 PRIVATE short is_read_only_field (short field_id);
 PRIVATE void header_desc_field_copy (ODBC_DESC * source_desc,
-				     ODBC_DESC * dest_desc);
+             ODBC_DESC * dest_desc);
 PRIVATE void record_desc_field_copy (ODBC_DESC * source_desc,
-				     ODBC_DESC * dest_desc);
+             ODBC_DESC * dest_desc);
 PRIVATE short odbc_type_searchable (short type);
 
 /************************************************************************
@@ -69,7 +69,7 @@ odbc_alloc_desc (ODBC_CONNECTION * conn, ODBC_DESC ** desc_ptr)
   if (desc_ptr == NULL)
     {
       if (conn != NULL)
-	odbc_set_diag (conn->diag, "HY090", 0, NULL);
+  odbc_set_diag (conn->diag, "HY090", 0, NULL);
       goto error;
     }
 
@@ -77,14 +77,14 @@ odbc_alloc_desc (ODBC_CONNECTION * conn, ODBC_DESC ** desc_ptr)
   if (desc_node == NULL)
     {
       if (conn != NULL)
-	odbc_set_diag (conn->diag, "HY001", 0, NULL);
+  odbc_set_diag (conn->diag, "HY001", 0, NULL);
       goto error;
     }
 
   /* init members */
   desc_node->handle_type = SQL_HANDLE_DESC;
   desc_node->diag = odbc_alloc_diag ();
-  desc_node->stmt = NULL;	/* set in odbc_alloc_stmt */
+  desc_node->stmt = NULL; /* set in odbc_alloc_stmt */
   desc_node->conn = NULL;
   desc_node->records = NULL;
 
@@ -93,7 +93,7 @@ odbc_alloc_desc (ODBC_CONNECTION * conn, ODBC_DESC ** desc_ptr)
   desc_node->fetched_size = -1;
   desc_node->array_status_ptr = NULL;
   desc_node->bind_offset_ptr = NULL;
-  desc_node->bind_type = SQL_BIND_BY_COLUMN;	/* equal to SQL_PARAM_BY_COLUMN */
+  desc_node->bind_type = SQL_BIND_BY_COLUMN;  /* equal to SQL_PARAM_BY_COLUMN */
   desc_node->max_count = 0;
   desc_node->rows_processed_ptr = NULL;
 
@@ -136,18 +136,18 @@ odbc_free_desc (ODBC_DESC * desc)
   if (desc->conn != NULL)
     {
       for (d = desc->conn->descriptors, prev = NULL;
-	   d != NULL && d != desc; d = d->next)
-	{
-	  prev = d;
-	}
+     d != NULL && d != desc; d = d->next)
+  {
+    prev = d;
+  }
 
       if (d == desc)
-	{
-	  if (prev != NULL)
-	    prev->next = desc->next;
-	  else
-	    desc->conn->descriptors = desc->next;
-	}
+  {
+    if (prev != NULL)
+      prev->next = desc->next;
+    else
+      desc->conn->descriptors = desc->next;
+  }
     }
 
   odbc_free_all_records (desc->records);
@@ -173,7 +173,7 @@ error:
 * NOTE:
 *    record handle은 정의도 안 되었을뿐만 아니라, 외부에서 직접적으로 사용할
 *    일이 없으므로 NULL을 허용한다.
-*	- error messaging
+* - error messaging
 ************************************************************************/
 PUBLIC RETCODE
 odbc_alloc_record (ODBC_DESC * desc, ODBC_RECORD ** rec, int rec_number)
@@ -221,7 +221,7 @@ odbc_alloc_record (ODBC_DESC * desc, ODBC_RECORD ** rec, int rec_number)
   rec_node->display_size = 0;
   rec_node->fixed_prec_scale = SQL_FALSE;
   rec_node->indicator_ptr = NULL;
-  rec_node->length = 0;		/* ??? */
+  rec_node->length = 0;   /* ??? */
   rec_node->literal_prefix = NULL;
   rec_node->literal_suffix = NULL;
   rec_node->local_type_name = NULL;
@@ -293,18 +293,18 @@ odbc_free_record (ODBC_RECORD * record)
   if (record->desc != NULL)
     {
       for (r = record->desc->records, prev = NULL; r != NULL && r != record;
-	   r = r->next)
-	{
-	  prev = r;
-	}
+     r = r->next)
+  {
+    prev = r;
+  }
 
       if (r == record)
-	{
-	  if (prev != NULL)
-	    prev->next = record->next;
-	  else
-	    record->desc->records = record->next;
-	}
+  {
+    if (prev != NULL)
+      prev->next = record->next;
+    else
+      record->desc->records = record->next;
+  }
     }
 
   UT_FREE (record);
@@ -351,14 +351,14 @@ error:
 * returns/side-effects:
 * description:
 * NOTE:
-*	BASE_COLUMN_NAME, NAME, LABEL are same as SQL_DESC_NAME
+* BASE_COLUMN_NAME, NAME, LABEL are same as SQL_DESC_NAME
 ************************************************************************/
 PUBLIC RETCODE
 odbc_get_desc_field (ODBC_DESC * desc,
-		     SQLSMALLINT rec_number,
-		     SQLSMALLINT field_id,
-		     SQLPOINTER value_ptr,
-		     SQLLEN buffer_length, SQLLEN * string_length_ptr)
+         SQLSMALLINT rec_number,
+         SQLSMALLINT field_id,
+         SQLPOINTER value_ptr,
+         SQLLEN buffer_length, SQLLEN * string_length_ptr)
 {
   RETCODE status = ODBC_SUCCESS, rc;
   ODBC_RECORD *record;
@@ -370,68 +370,68 @@ odbc_get_desc_field (ODBC_DESC * desc,
       /* header field */
 
       switch (field_id)
-	{
-	case SQL_DESC_COUNT:
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = desc->max_count;
+  {
+  case SQL_DESC_COUNT:
+    if (value_ptr != NULL)
+      *(short *) value_ptr = desc->max_count;
 
-	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->max_count);
-	  break;
+    if (string_length_ptr != NULL)
+      *string_length_ptr = sizeof (desc->max_count);
+    break;
 
-	case SQL_DESC_ALLOC_TYPE:
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = desc->alloc_type;
+  case SQL_DESC_ALLOC_TYPE:
+    if (value_ptr != NULL)
+      *(short *) value_ptr = desc->alloc_type;
 
-	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->alloc_type);
-	  break;
+    if (string_length_ptr != NULL)
+      *string_length_ptr = sizeof (desc->alloc_type);
+    break;
 
-	case SQL_DESC_ARRAY_SIZE:
-	  if (value_ptr != NULL)
-	    *(unsigned long *) value_ptr = desc->array_size;
+  case SQL_DESC_ARRAY_SIZE:
+    if (value_ptr != NULL)
+      *(unsigned long *) value_ptr = desc->array_size;
 
-	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->array_status_ptr);
-	  break;
+    if (string_length_ptr != NULL)
+      *string_length_ptr = sizeof (desc->array_status_ptr);
+    break;
 
-	case SQL_DESC_ARRAY_STATUS_PTR:
-	  if (value_ptr != NULL)
-	    *(unsigned short **) value_ptr = desc->array_status_ptr;
+  case SQL_DESC_ARRAY_STATUS_PTR:
+    if (value_ptr != NULL)
+      *(unsigned short **) value_ptr = desc->array_status_ptr;
 
-	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->array_status_ptr);
-	  break;
+    if (string_length_ptr != NULL)
+      *string_length_ptr = sizeof (desc->array_status_ptr);
+    break;
 
-	case SQL_DESC_BIND_OFFSET_PTR:
-	  if (value_ptr != NULL)
-	    *(long long **) value_ptr = desc->bind_offset_ptr;
+  case SQL_DESC_BIND_OFFSET_PTR:
+    if (value_ptr != NULL)
+      *(long long **) value_ptr = desc->bind_offset_ptr;
 
-	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->bind_offset_ptr);
-	  break;
+    if (string_length_ptr != NULL)
+      *string_length_ptr = sizeof (desc->bind_offset_ptr);
+    break;
 
-	case SQL_DESC_BIND_TYPE:
-	  if (value_ptr != NULL)
-	    *(long *) value_ptr = desc->bind_type;
+  case SQL_DESC_BIND_TYPE:
+    if (value_ptr != NULL)
+      *(long *) value_ptr = desc->bind_type;
 
-	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->bind_type);
-	  break;
+    if (string_length_ptr != NULL)
+      *string_length_ptr = sizeof (desc->bind_type);
+    break;
 
-	case SQL_DESC_ROWS_PROCESSED_PTR:
-	  if (value_ptr != NULL)
-	    *(unsigned long long **) value_ptr = desc->rows_processed_ptr;
+  case SQL_DESC_ROWS_PROCESSED_PTR:
+    if (value_ptr != NULL)
+      *(unsigned long long **) value_ptr = desc->rows_processed_ptr;
 
-	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->rows_processed_ptr);
-	  break;
+    if (string_length_ptr != NULL)
+      *string_length_ptr = sizeof (desc->rows_processed_ptr);
+    break;
 
-	default:
-	  /* unknown field */
-	  odbc_set_diag (desc->diag, "HY091", 0, NULL);
-	  goto error;
-	}
+  default:
+    /* unknown field */
+    odbc_set_diag (desc->diag, "HY091", 0, NULL);
+    goto error;
+  }
 
     }
   else
@@ -439,418 +439,418 @@ odbc_get_desc_field (ODBC_DESC * desc,
       /* record filed */
 
       if (rec_number < 0)
-	{
-	  odbc_set_diag (desc->diag, "07009", 0, NULL);
-	  goto error;
-	}
+  {
+    odbc_set_diag (desc->diag, "07009", 0, NULL);
+    goto error;
+  }
 
       record = find_record_from_desc (desc, rec_number);
       if (record == NULL)
-	{
-	  odbc_set_diag (desc->diag, "07009", 0, NULL);
-	  goto error;
-	}
+  {
+    odbc_set_diag (desc->diag, "07009", 0, NULL);
+    goto error;
+  }
 
       switch (field_id)
-	{
+  {
 
-	case SQL_DESC_BASE_COLUMN_NAME:
-	case SQL_DESC_LABEL:
-	case SQL_DESC_NAME:
-	  if (record->name != NULL)
-	    {
-	      pt = record->name;
-	    }
-	  else
-	    {
-	      pt = empty_str;
-	    }
-	  rc =
-	    str_value_assign (pt, value_ptr, buffer_length,
-			      string_length_ptr);
-	  if (rc == ODBC_SUCCESS_WITH_INFO)
-	    {
-	      odbc_set_diag (desc->diag, "01004", 0, NULL);
-	    }
-	  break;
-
-
-	case SQL_DESC_CASE_SENSITIVE:
-	  if (value_ptr != NULL)
-	    *(long *) value_ptr = record->case_sensitive;
-
-	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (record->case_sensitive);
-	  break;
+  case SQL_DESC_BASE_COLUMN_NAME:
+  case SQL_DESC_LABEL:
+  case SQL_DESC_NAME:
+    if (record->name != NULL)
+      {
+        pt = record->name;
+      }
+    else
+      {
+        pt = empty_str;
+      }
+    rc =
+      str_value_assign (pt, value_ptr, buffer_length,
+            string_length_ptr);
+    if (rc == ODBC_SUCCESS_WITH_INFO)
+      {
+        odbc_set_diag (desc->diag, "01004", 0, NULL);
+      }
+    break;
 
 
-	case SQL_DESC_CONCISE_TYPE:
-	  if (value_ptr != NULL)
-	    {
-	      if (record->concise_type == SQL_BLOB)
-	        {
-	          *(short *) value_ptr = SQL_LONGVARBINARY;
-	        }
-	      else if (record->concise_type == SQL_CLOB)
-	        {
-	          *(short *) value_ptr = SQL_LONGVARCHAR;
-	        }
-	      else
-	        {
-	          *(short *) value_ptr = record->concise_type;
-	        }
+  case SQL_DESC_CASE_SENSITIVE:
+    if (value_ptr != NULL)
+      *(long *) value_ptr = record->case_sensitive;
+
+    if (string_length_ptr != NULL)
+      *string_length_ptr = sizeof (record->case_sensitive);
+    break;
+
+
+  case SQL_DESC_CONCISE_TYPE:
+    if (value_ptr != NULL)
+      {
+        if (record->concise_type == SQL_BLOB)
+          {
+            *(short *) value_ptr = SQL_LONGVARBINARY;
+          }
+        else if (record->concise_type == SQL_CLOB)
+          {
+            *(short *) value_ptr = SQL_LONGVARCHAR;
+          }
+        else
+          {
+            *(short *) value_ptr = record->concise_type;
+          }
         }
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->concise_type);
-	    }
-	  break;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->concise_type);
+      }
+    break;
 
-	case SQL_DESC_DATA_PTR:
-	  if (value_ptr != NULL)
-	    *(void **) value_ptr = record->data_ptr;
+  case SQL_DESC_DATA_PTR:
+    if (value_ptr != NULL)
+      *(void **) value_ptr = record->data_ptr;
 
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->data_ptr);
-	    }
-	  break;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->data_ptr);
+      }
+    break;
 
-	case SQL_DESC_DATETIME_INTERVAL_CODE:
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->datetime_interval_code;
+  case SQL_DESC_DATETIME_INTERVAL_CODE:
+    if (value_ptr != NULL)
+      *(short *) value_ptr = record->datetime_interval_code;
 
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->datetime_interval_code);
-	    }
-	  break;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->datetime_interval_code);
+      }
+    break;
 
-	case SQL_DESC_DATETIME_INTERVAL_PRECISION:
-	  if (value_ptr != NULL)
-	    *(long *) value_ptr = record->datetime_interval_precision;
+  case SQL_DESC_DATETIME_INTERVAL_PRECISION:
+    if (value_ptr != NULL)
+      *(long *) value_ptr = record->datetime_interval_precision;
 
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr =
-		sizeof (record->datetime_interval_precision);
-	    }
-	  break;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr =
+    sizeof (record->datetime_interval_precision);
+      }
+    break;
 
-	case SQL_DESC_DISPLAY_SIZE:
-	  if (value_ptr != NULL)
-	    *(long *) value_ptr = record->display_size;
+  case SQL_DESC_DISPLAY_SIZE:
+    if (value_ptr != NULL)
+      *(long *) value_ptr = record->display_size;
 
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->display_size);
-	    }
-	  break;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->display_size);
+      }
+    break;
 
-	case SQL_DESC_FIXED_PREC_SCALE:
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->fixed_prec_scale;
+  case SQL_DESC_FIXED_PREC_SCALE:
+    if (value_ptr != NULL)
+      *(short *) value_ptr = record->fixed_prec_scale;
 
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->fixed_prec_scale);
-	    }
-	  break;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->fixed_prec_scale);
+      }
+    break;
 
-	case SQL_DESC_INDICATOR_PTR:
-	  if (value_ptr != NULL)
-	    *(long **) value_ptr = record->indicator_ptr;
+  case SQL_DESC_INDICATOR_PTR:
+    if (value_ptr != NULL)
+      *(long **) value_ptr = record->indicator_ptr;
 
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->indicator_ptr);
-	    }
-	  break;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->indicator_ptr);
+      }
+    break;
 
     case SQL_DESC_LENGTH:
-	  if (value_ptr != NULL)
-		  switch(record->type){
-	      case SQL_CHAR:
-		  case SQL_VARCHAR:
-			 *(SQLULEN *) value_ptr = record->length;
-		   default:
-	         *(unsigned long *) value_ptr = record->length;
-	      }
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->length);
-	    }
-	  break;
-	case SQL_COLUMN_LENGTH:	// for 2.x backward compatibility
-	  if (value_ptr != NULL)
-		*(unsigned long *) value_ptr = record->length;
+    if (value_ptr != NULL)
+      switch(record->type){
+        case SQL_CHAR:
+      case SQL_VARCHAR:
+       *(SQLULEN *) value_ptr = record->length;
+       default:
+           *(unsigned long *) value_ptr = record->length;
+        }
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->length);
+      }
+    break;
+  case SQL_COLUMN_LENGTH: // for 2.x backward compatibility
+    if (value_ptr != NULL)
+    *(unsigned long *) value_ptr = record->length;
 
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->length);
-	    }
-	  break;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->length);
+      }
+    break;
 
-	case SQL_DESC_LITERAL_PREFIX:
-	  if (record->literal_prefix != NULL)
-	    {
-	      pt = record->literal_prefix;
-	    }
-	  else
-	    {
-	      pt = empty_str;
-	    }
+  case SQL_DESC_LITERAL_PREFIX:
+    if (record->literal_prefix != NULL)
+      {
+        pt = record->literal_prefix;
+      }
+    else
+      {
+        pt = empty_str;
+      }
 
-	  rc =
-	    str_value_assign (pt, value_ptr, buffer_length,
-			      string_length_ptr);
-	  if (rc == ODBC_SUCCESS_WITH_INFO)
-	    {
-	      odbc_set_diag (desc->diag, "01004", 0, NULL);
-	    }
-	  break;
+    rc =
+      str_value_assign (pt, value_ptr, buffer_length,
+            string_length_ptr);
+    if (rc == ODBC_SUCCESS_WITH_INFO)
+      {
+        odbc_set_diag (desc->diag, "01004", 0, NULL);
+      }
+    break;
 
-	case SQL_DESC_LITERAL_SUFFIX:
-	  if (record->literal_suffix != NULL)
-	    {
-	      pt = record->literal_suffix;
-	    }
-	  else
-	    {
-	      pt = empty_str;
-	    }
-	  rc =
-	    str_value_assign (pt, value_ptr, buffer_length,
-			      string_length_ptr);
-	  if (rc == ODBC_SUCCESS_WITH_INFO)
-	    {
-	      odbc_set_diag (desc->diag, "01004", 0, NULL);
-	    }
-	  break;
+  case SQL_DESC_LITERAL_SUFFIX:
+    if (record->literal_suffix != NULL)
+      {
+        pt = record->literal_suffix;
+      }
+    else
+      {
+        pt = empty_str;
+      }
+    rc =
+      str_value_assign (pt, value_ptr, buffer_length,
+            string_length_ptr);
+    if (rc == ODBC_SUCCESS_WITH_INFO)
+      {
+        odbc_set_diag (desc->diag, "01004", 0, NULL);
+      }
+    break;
 
-	case SQL_DESC_LOCAL_TYPE_NAME:
-	  if (record->local_type_name != NULL)
-	    {
-	      pt = record->local_type_name;
-	    }
-	  else
-	    {
-	      pt = empty_str;
-	    }
+  case SQL_DESC_LOCAL_TYPE_NAME:
+    if (record->local_type_name != NULL)
+      {
+        pt = record->local_type_name;
+      }
+    else
+      {
+        pt = empty_str;
+      }
 
-	  rc =
-	    str_value_assign (pt, value_ptr, buffer_length,
-			      string_length_ptr);
-	  if (rc == ODBC_SUCCESS_WITH_INFO)
-	    {
-	      odbc_set_diag (desc->diag, "01004", 0, NULL);
-	    }
-	  break;
-
-
-	case SQL_DESC_NULLABLE:
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->nullable;
-
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->nullable);
-	    }
-	  break;
-
-	case SQL_DESC_NUM_PREC_RADIX:
-	  if (value_ptr != NULL)
-	    *(long *) value_ptr = record->num_prec_radix;
-
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->num_prec_radix);
-	    }
-	  break;
-
-	case SQL_DESC_OCTET_LENGTH:
-	  if (value_ptr != NULL)
-	    *(long *) value_ptr = record->octet_length;
-
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->octet_length);
-	    }
-	  break;
-
-	case SQL_DESC_OCTET_LENGTH_PTR:
-	  if (value_ptr != NULL)
-	    *(long **) value_ptr = record->octet_length_ptr;
-
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->octet_length_ptr);
-	    }
-	  break;
-
-	case SQL_DESC_PARAMETER_TYPE:
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->parameter_type;
-
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->parameter_type);
-	    }
-	  break;
-
-	case SQL_DESC_PRECISION:
-	case SQL_COLUMN_PRECISION:	// for 2.x backward compatibility
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->precision;
-
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->precision);
-	    }
-	  break;
-
-	case SQL_DESC_SCALE:
-	case SQL_COLUMN_SCALE:	// for 2.x backward compatibility
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->scale;
-
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->scale);
-	    }
-	  break;
-
-	case SQL_DESC_SEARCHABLE:
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->searchable;
-
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->searchable);
-	    }
-	  break;
-
-	case SQL_DESC_TABLE_NAME:
-	case SQL_DESC_BASE_TABLE_NAME:	/* 따로 지원하지 않고 TABLE_NAME과 같이 쓴다. */
-	  if (record->table_name != NULL)
-	    {
-	      pt = record->table_name;
-	    }
-	  else
-	    {
-	      pt = empty_str;
-	    }
-
-	  rc =
-	    str_value_assign (pt, value_ptr, buffer_length,
-			      string_length_ptr);
-	  if (rc == ODBC_SUCCESS_WITH_INFO)
-	    {
-	      odbc_set_diag (desc->diag, "01004", 0, NULL);
-	    }
-	  break;
+    rc =
+      str_value_assign (pt, value_ptr, buffer_length,
+            string_length_ptr);
+    if (rc == ODBC_SUCCESS_WITH_INFO)
+      {
+        odbc_set_diag (desc->diag, "01004", 0, NULL);
+      }
+    break;
 
 
-	case SQL_DESC_TYPE:
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->type;
+  case SQL_DESC_NULLABLE:
+    if (value_ptr != NULL)
+      *(short *) value_ptr = record->nullable;
 
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->type);
-	    }
-	  break;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->nullable);
+      }
+    break;
 
-	case SQL_DESC_TYPE_NAME:
-	  if (record->type_name != NULL)
-	    {
-	      pt = record->type_name;
-	    }
-	  else
-	    {
-	      pt = empty_str;
-	    }
+  case SQL_DESC_NUM_PREC_RADIX:
+    if (value_ptr != NULL)
+      *(long *) value_ptr = record->num_prec_radix;
 
-	  rc =
-	    str_value_assign (pt, value_ptr, buffer_length,
-			      string_length_ptr);
-	  if (rc == ODBC_SUCCESS_WITH_INFO)
-	    {
-	      odbc_set_diag (desc->diag, "01004", 0, NULL);
-	    }
-	  break;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->num_prec_radix);
+      }
+    break;
 
-	case SQL_DESC_UNNAMED:
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->unnamed;
+  case SQL_DESC_OCTET_LENGTH:
+    if (value_ptr != NULL)
+      *(long *) value_ptr = record->octet_length;
 
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->unnamed);
-	    }
-	  break;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->octet_length);
+      }
+    break;
 
-	case SQL_DESC_UNSIGNED:
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->unsigned_type;
+  case SQL_DESC_OCTET_LENGTH_PTR:
+    if (value_ptr != NULL)
+      *(long **) value_ptr = record->octet_length_ptr;
 
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (record->unsigned_type);
-	    }
-	  break;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->octet_length_ptr);
+      }
+    break;
 
-	case SQL_DESC_AUTO_UNIQUE_VALUE:
-	  // there is no auto unique attribute in CUBRID
-	  if (value_ptr != NULL)
-	    *(long *) value_ptr = SQL_FALSE;
+  case SQL_DESC_PARAMETER_TYPE:
+    if (value_ptr != NULL)
+      *(short *) value_ptr = record->parameter_type;
 
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (long);
-	    }
-	  break;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->parameter_type);
+      }
+    break;
 
-	case SQL_DESC_CATALOG_NAME:
-	case SQL_DESC_SCHEMA_NAME:
-	  // empty string
-	  rc =
-	    str_value_assign (empty_str, value_ptr, buffer_length,
-			      string_length_ptr);
-	  if (rc == ODBC_SUCCESS_WITH_INFO)
-	    {
-	      odbc_set_diag (desc->diag, "01004", 0, NULL);
-	    }
-	  break;
+  case SQL_DESC_PRECISION:
+  case SQL_COLUMN_PRECISION:  // for 2.x backward compatibility
+    if (value_ptr != NULL)
+      *(short *) value_ptr = record->precision;
 
-	case SQL_DESC_ROWVER:
-	  // there is no rowver attribute in CUBRID
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = SQL_FALSE;
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->precision);
+      }
+    break;
 
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (short);
-	    }
-	  break;
+  case SQL_DESC_SCALE:
+  case SQL_COLUMN_SCALE:  // for 2.x backward compatibility
+    if (value_ptr != NULL)
+      *(short *) value_ptr = record->scale;
+
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->scale);
+      }
+    break;
+
+  case SQL_DESC_SEARCHABLE:
+    if (value_ptr != NULL)
+      *(short *) value_ptr = record->searchable;
+
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->searchable);
+      }
+    break;
+
+  case SQL_DESC_TABLE_NAME:
+  case SQL_DESC_BASE_TABLE_NAME:  /* 따로 지원하지 않고 TABLE_NAME과 같이 쓴다. */
+    if (record->table_name != NULL)
+      {
+        pt = record->table_name;
+      }
+    else
+      {
+        pt = empty_str;
+      }
+
+    rc =
+      str_value_assign (pt, value_ptr, buffer_length,
+            string_length_ptr);
+    if (rc == ODBC_SUCCESS_WITH_INFO)
+      {
+        odbc_set_diag (desc->diag, "01004", 0, NULL);
+      }
+    break;
 
 
-	case SQL_DESC_UPDATABLE:
-	  // always READWRITE_UNKNOWN
-	  if (value_ptr != NULL)
-	    *(short *) value_ptr = SQL_ATTR_READWRITE_UNKNOWN;
+  case SQL_DESC_TYPE:
+    if (value_ptr != NULL)
+      *(short *) value_ptr = record->type;
+
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->type);
+      }
+    break;
+
+  case SQL_DESC_TYPE_NAME:
+    if (record->type_name != NULL)
+      {
+        pt = record->type_name;
+      }
+    else
+      {
+        pt = empty_str;
+      }
+
+    rc =
+      str_value_assign (pt, value_ptr, buffer_length,
+            string_length_ptr);
+    if (rc == ODBC_SUCCESS_WITH_INFO)
+      {
+        odbc_set_diag (desc->diag, "01004", 0, NULL);
+      }
+    break;
+
+  case SQL_DESC_UNNAMED:
+    if (value_ptr != NULL)
+      *(short *) value_ptr = record->unnamed;
+
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->unnamed);
+      }
+    break;
+
+  case SQL_DESC_UNSIGNED:
+    if (value_ptr != NULL)
+      *(short *) value_ptr = record->unsigned_type;
+
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (record->unsigned_type);
+      }
+    break;
+
+  case SQL_DESC_AUTO_UNIQUE_VALUE:
+    // there is no auto unique attribute in CUBRID
+    if (value_ptr != NULL)
+      *(long *) value_ptr = SQL_FALSE;
+
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (long);
+      }
+    break;
+
+  case SQL_DESC_CATALOG_NAME:
+  case SQL_DESC_SCHEMA_NAME:
+    // empty string
+    rc =
+      str_value_assign (empty_str, value_ptr, buffer_length,
+            string_length_ptr);
+    if (rc == ODBC_SUCCESS_WITH_INFO)
+      {
+        odbc_set_diag (desc->diag, "01004", 0, NULL);
+      }
+    break;
+
+  case SQL_DESC_ROWVER:
+    // there is no rowver attribute in CUBRID
+    if (value_ptr != NULL)
+      *(short *) value_ptr = SQL_FALSE;
+
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (short);
+      }
+    break;
 
 
-	  if (string_length_ptr != NULL)
-	    {
-	      *string_length_ptr = sizeof (short);
-	    }
-	  break;
+  case SQL_DESC_UPDATABLE:
+    // always READWRITE_UNKNOWN
+    if (value_ptr != NULL)
+      *(short *) value_ptr = SQL_ATTR_READWRITE_UNKNOWN;
 
-	default:
-	  odbc_set_diag (desc->diag, "HY091", 0, NULL);
-	  goto error;
-	}
+
+    if (string_length_ptr != NULL)
+      {
+        *string_length_ptr = sizeof (short);
+      }
+    break;
+
+  default:
+    odbc_set_diag (desc->diag, "HY091", 0, NULL);
+    goto error;
+  }
 
     }
 
@@ -868,15 +868,15 @@ error:
 ************************************************************************/
 PUBLIC RETCODE
 odbc_get_desc_rec (ODBC_DESC * desc,
-		   SQLSMALLINT rec_number,
-		   SQLCHAR * name,
-		   SQLSMALLINT buffer_length,
-		   SQLSMALLINT * string_length_ptr,
-		   SQLSMALLINT * type_ptr,
-		   SQLSMALLINT * subtype_ptr,
-		   SQLLEN * length_ptr,
-		   SQLSMALLINT * precision_ptr,
-		   SQLSMALLINT * scale_ptr, SQLSMALLINT * nullable_ptr)
+       SQLSMALLINT rec_number,
+       SQLCHAR * name,
+       SQLSMALLINT buffer_length,
+       SQLSMALLINT * string_length_ptr,
+       SQLSMALLINT * type_ptr,
+       SQLSMALLINT * subtype_ptr,
+       SQLLEN * length_ptr,
+       SQLSMALLINT * precision_ptr,
+       SQLSMALLINT * scale_ptr, SQLSMALLINT * nullable_ptr)
 {
   ODBC_RECORD *record = NULL;
   SQLLEN tmp_length;
@@ -891,26 +891,26 @@ odbc_get_desc_rec (ODBC_DESC * desc,
 
   /* WARN : type converting  string_length_ptr(short*) -> (long*) */
   odbc_get_desc_field (desc, rec_number, SQL_DESC_NAME,
-		       (void *) name, buffer_length, &tmp_length);
+           (void *) name, buffer_length, &tmp_length);
   *string_length_ptr = (SQLSMALLINT) tmp_length;
 
   odbc_get_desc_field (desc, rec_number, SQL_DESC_TYPE,
-		       (void *) type_ptr, 0, NULL);
+           (void *) type_ptr, 0, NULL);
 
   odbc_get_desc_field (desc, rec_number, SQL_DESC_DATETIME_INTERVAL_CODE,
-		       (void *) subtype_ptr, 0, NULL);
+           (void *) subtype_ptr, 0, NULL);
 
   odbc_get_desc_field (desc, rec_number, SQL_DESC_OCTET_LENGTH,
-		       (void *) length_ptr, 0, NULL);
+           (void *) length_ptr, 0, NULL);
 
   odbc_get_desc_field (desc, rec_number, SQL_DESC_PRECISION,
-		       (void *) precision_ptr, 0, NULL);
+           (void *) precision_ptr, 0, NULL);
 
   odbc_get_desc_field (desc, rec_number, SQL_DESC_SCALE,
-		       (void *) scale_ptr, 0, NULL);
+           (void *) scale_ptr, 0, NULL);
 
   odbc_get_desc_field (desc, rec_number, SQL_DESC_NULLABLE,
-		       (void *) nullable_ptr, 0, NULL);
+           (void *) nullable_ptr, 0, NULL);
 
   return ODBC_SUCCESS;
 }
@@ -922,14 +922,14 @@ odbc_get_desc_rec (ODBC_DESC * desc,
 * returns/side-effects:
 * description:
 * NOTE:
-*	CHECK : consistency
-*	일부 consistency check가 odbc_set_desc_rec에서 이루어진다. 참고..
+* CHECK : consistency
+* 일부 consistency check가 odbc_set_desc_rec에서 이루어진다. 참고..
 ************************************************************************/
 PUBLIC RETCODE
 odbc_set_desc_field (ODBC_DESC * desc,
-		     short rec_number,
-		     short field_id,
-		     void *value_ptr, long buffer_length, short is_driver)
+         short rec_number,
+         short field_id,
+         void *value_ptr, long buffer_length, short is_driver)
 {
   ODBC_RECORD *record;
   RETCODE status = ODBC_SUCCESS;
@@ -938,7 +938,7 @@ odbc_set_desc_field (ODBC_DESC * desc,
   if (is_driver != 1 && is_read_only_field (field_id) == _TRUE_)
     {
       odbc_set_diag (desc->diag, "HY091", 0, NULL);
-	  DEBUG_TIMESTAMP(odbc_set_desc_field_NODATA);
+    DEBUG_TIMESTAMP(odbc_set_desc_field_NODATA);
       goto error;
     }
 
@@ -946,295 +946,295 @@ odbc_set_desc_field (ODBC_DESC * desc,
     {
       /* header field */
       switch (field_id)
-	{
-	case SQL_DESC_ALLOC_TYPE:
-	  desc->alloc_type = (short) value_ptr;
-	  break;
-	case SQL_DESC_ARRAY_SIZE:
-		DEBUG_TIMESTAMP(SQL_DESC_ARRAY_SIZE);
-	  desc->array_size = (unsigned long) value_ptr;
-	  break;
-	case SQL_DESC_ARRAY_STATUS_PTR:
-	  desc->array_status_ptr = value_ptr;
-	  break;
-	case SQL_DESC_BIND_OFFSET_PTR:
-	  desc->bind_offset_ptr = value_ptr;
-	  break;
-	case SQL_DESC_BIND_TYPE:
-	  desc->bind_type = (long) value_ptr;
-	  break;
-	case SQL_DESC_COUNT:
-	  if ((short) value_ptr < desc->max_count)
-	    {
-	      for (i = desc->max_count; i > (short) value_ptr && i > 0; --i)
-		{
-		  record = find_record_from_desc (desc, i);
-		  if (record != NULL)
-		    {
-		      odbc_free_record (record);
-		    }
-		}
-	    }
-	  desc->max_count = (short) value_ptr;
-	  break;
-	case SQL_DESC_ROWS_PROCESSED_PTR:
-	  desc->rows_processed_ptr = value_ptr;
-	  break;
-	default:
-	  odbc_set_diag (desc->diag, "HY091", 0, NULL);
-	  goto error;
-	}
+  {
+  case SQL_DESC_ALLOC_TYPE:
+    desc->alloc_type = (short) value_ptr;
+    break;
+  case SQL_DESC_ARRAY_SIZE:
+    DEBUG_TIMESTAMP(SQL_DESC_ARRAY_SIZE);
+    desc->array_size = (unsigned long) value_ptr;
+    break;
+  case SQL_DESC_ARRAY_STATUS_PTR:
+    desc->array_status_ptr = value_ptr;
+    break;
+  case SQL_DESC_BIND_OFFSET_PTR:
+    desc->bind_offset_ptr = value_ptr;
+    break;
+  case SQL_DESC_BIND_TYPE:
+    desc->bind_type = (long) value_ptr;
+    break;
+  case SQL_DESC_COUNT:
+    if ((short) value_ptr < desc->max_count)
+      {
+        for (i = desc->max_count; i > (short) value_ptr && i > 0; --i)
+    {
+      record = find_record_from_desc (desc, i);
+      if (record != NULL)
+        {
+          odbc_free_record (record);
+        }
+    }
+      }
+    desc->max_count = (short) value_ptr;
+    break;
+  case SQL_DESC_ROWS_PROCESSED_PTR:
+    desc->rows_processed_ptr = value_ptr;
+    break;
+  default:
+    odbc_set_diag (desc->diag, "HY091", 0, NULL);
+    goto error;
+  }
 
     }
   else
     {
       /* record filed */
       if (rec_number < 0)
-	{
-	  odbc_set_diag (desc->diag, "07009", 0, NULL);
-	  goto error;
-	}
+  {
+    odbc_set_diag (desc->diag, "07009", 0, NULL);
+    goto error;
+  }
 
       record = find_record_from_desc (desc, rec_number);
       if (record == NULL)
-	{
-	  odbc_alloc_record (desc, &record, rec_number);
-	}
+  {
+    odbc_alloc_record (desc, &record, rec_number);
+  }
 
       switch (field_id)
-	{
+  {
 
-	case SQL_DESC_BASE_COLUMN_NAME:
-	case SQL_DESC_LABEL:
-	case SQL_DESC_NAME:
-	  NC_FREE (record->name);
-	  record->name = UT_MAKE_STRING (value_ptr, buffer_length);
-	  break;
+  case SQL_DESC_BASE_COLUMN_NAME:
+  case SQL_DESC_LABEL:
+  case SQL_DESC_NAME:
+    NC_FREE (record->name);
+    record->name = UT_MAKE_STRING (value_ptr, buffer_length);
+    break;
 
-	case SQL_DESC_CASE_SENSITIVE:
-	  record->case_sensitive = (long) value_ptr;
-	  break;
+  case SQL_DESC_CASE_SENSITIVE:
+    record->case_sensitive = (long) value_ptr;
+    break;
 
-	case SQL_DESC_DISPLAY_SIZE:
-	  record->display_size = (long) value_ptr;
-	  break;
-	case SQL_DESC_FIXED_PREC_SCALE:
-	  record->fixed_prec_scale = (short) value_ptr;
-	  break;
-	case SQL_DESC_LITERAL_PREFIX:
-	  NC_FREE (record->literal_prefix);
-	  record->literal_prefix = UT_MAKE_STRING (value_ptr, buffer_length);
-	  break;
-	case SQL_DESC_LITERAL_SUFFIX:
-	  NC_FREE (record->literal_suffix);
-	  record->literal_suffix = UT_MAKE_STRING (value_ptr, buffer_length);
-	  break;
-	case SQL_DESC_LOCAL_TYPE_NAME:
-	  NC_FREE (record->local_type_name);
-	  record->local_type_name = UT_MAKE_STRING (value_ptr, buffer_length);
-	  break;
-	case SQL_DESC_NULLABLE:
-	  record->nullable = (short) value_ptr;
-	  break;
+  case SQL_DESC_DISPLAY_SIZE:
+    record->display_size = (long) value_ptr;
+    break;
+  case SQL_DESC_FIXED_PREC_SCALE:
+    record->fixed_prec_scale = (short) value_ptr;
+    break;
+  case SQL_DESC_LITERAL_PREFIX:
+    NC_FREE (record->literal_prefix);
+    record->literal_prefix = UT_MAKE_STRING (value_ptr, buffer_length);
+    break;
+  case SQL_DESC_LITERAL_SUFFIX:
+    NC_FREE (record->literal_suffix);
+    record->literal_suffix = UT_MAKE_STRING (value_ptr, buffer_length);
+    break;
+  case SQL_DESC_LOCAL_TYPE_NAME:
+    NC_FREE (record->local_type_name);
+    record->local_type_name = UT_MAKE_STRING (value_ptr, buffer_length);
+    break;
+  case SQL_DESC_NULLABLE:
+    record->nullable = (short) value_ptr;
+    break;
 
-	case SQL_DESC_SEARCHABLE:
-	  record->searchable = (short) value_ptr;
-	  break;
-	  /* BASE_TABLE_NAME과 TABLE_NAME과의 구분은 없다. */
-	case SQL_DESC_TABLE_NAME:
-	case SQL_DESC_BASE_TABLE_NAME:
-	  NC_FREE (record->table_name);
-	  record->table_name = UT_MAKE_STRING (value_ptr, buffer_length);
-	  break;
-	case SQL_DESC_TYPE_NAME:
-	  NC_FREE (record->type_name);
-	  record->type_name = UT_MAKE_STRING (value_ptr, buffer_length);
-	  break;
-	case SQL_DESC_UNSIGNED:
-	  record->unsigned_type = (short) value_ptr;
-	  break;
+  case SQL_DESC_SEARCHABLE:
+    record->searchable = (short) value_ptr;
+    break;
+    /* BASE_TABLE_NAME과 TABLE_NAME과의 구분은 없다. */
+  case SQL_DESC_TABLE_NAME:
+  case SQL_DESC_BASE_TABLE_NAME:
+    NC_FREE (record->table_name);
+    record->table_name = UT_MAKE_STRING (value_ptr, buffer_length);
+    break;
+  case SQL_DESC_TYPE_NAME:
+    NC_FREE (record->type_name);
+    record->type_name = UT_MAKE_STRING (value_ptr, buffer_length);
+    break;
+  case SQL_DESC_UNSIGNED:
+    record->unsigned_type = (short) value_ptr;
+    break;
 
-	case SQL_DESC_CONCISE_TYPE:
-	  if (!odbc_is_valid_type ((short) value_ptr))
-	    {
-	      odbc_set_diag (desc->diag, "HY021", 0, NULL);
-	      goto error;
-	    }
-	  record->concise_type = (short) value_ptr;
-	  break;
+  case SQL_DESC_CONCISE_TYPE:
+    if (!odbc_is_valid_type ((short) value_ptr))
+      {
+        odbc_set_diag (desc->diag, "HY021", 0, NULL);
+        goto error;
+      }
+    record->concise_type = (short) value_ptr;
+    break;
 
-	case SQL_DESC_DATA_PTR:
-	  if (!odbc_consistency_check (record))
-	    {
-	      odbc_set_diag (desc->diag, "HY021", 0, NULL);
-	      goto error;
-	    }
-	  record->data_ptr = value_ptr;
-	  break;
+  case SQL_DESC_DATA_PTR:
+    if (!odbc_consistency_check (record))
+      {
+        odbc_set_diag (desc->diag, "HY021", 0, NULL);
+        goto error;
+      }
+    record->data_ptr = value_ptr;
+    break;
 
-	case SQL_DESC_DATETIME_INTERVAL_CODE:
-	  if (!odbc_is_valid_code ((short) value_ptr))
-	    {
-	      odbc_set_diag (desc->diag, "HY021", 0, NULL);
-	      goto error;
-	    }
-	  record->datetime_interval_code = (short) value_ptr;
-	  break;
+  case SQL_DESC_DATETIME_INTERVAL_CODE:
+    if (!odbc_is_valid_code ((short) value_ptr))
+      {
+        odbc_set_diag (desc->diag, "HY021", 0, NULL);
+        goto error;
+      }
+    record->datetime_interval_code = (short) value_ptr;
+    break;
 
-	case SQL_DESC_DATETIME_INTERVAL_PRECISION:
-	  record->datetime_interval_precision = (short) value_ptr;
-	  break;
+  case SQL_DESC_DATETIME_INTERVAL_PRECISION:
+    record->datetime_interval_precision = (short) value_ptr;
+    break;
 
-	case SQL_DESC_INDICATOR_PTR:
-	  record->indicator_ptr = value_ptr;
-	  break;
+  case SQL_DESC_INDICATOR_PTR:
+    record->indicator_ptr = value_ptr;
+    break;
 
-	case SQL_DESC_LENGTH:
-	  record->length = (unsigned long) value_ptr;
-	  break;
+  case SQL_DESC_LENGTH:
+    record->length = (unsigned long) value_ptr;
+    break;
 
-	case SQL_DESC_NUM_PREC_RADIX:
-	  record->num_prec_radix = (long) value_ptr;
-	  break;
+  case SQL_DESC_NUM_PREC_RADIX:
+    record->num_prec_radix = (long) value_ptr;
+    break;
 
-	case SQL_DESC_OCTET_LENGTH:
-	  record->octet_length = (long) value_ptr;
-	  break;
+  case SQL_DESC_OCTET_LENGTH:
+    record->octet_length = (long) value_ptr;
+    break;
 
-	case SQL_DESC_OCTET_LENGTH_PTR:
-	  record->octet_length_ptr = value_ptr;
-	  break;
+  case SQL_DESC_OCTET_LENGTH_PTR:
+    record->octet_length_ptr = value_ptr;
+    break;
 
-	case SQL_DESC_PARAMETER_TYPE:
-	  if ((short) value_ptr == SQL_PARAM_INPUT)
-	    {
-	      record->parameter_type = (short) value_ptr;
-	    }
-	  else
-	    {
-	      odbc_set_diag (desc->diag, "HY091", 0, NULL);
-	      goto error;
-	    }
-	  break;
+  case SQL_DESC_PARAMETER_TYPE:
+    if ((short) value_ptr == SQL_PARAM_INPUT)
+      {
+        record->parameter_type = (short) value_ptr;
+      }
+    else
+      {
+        odbc_set_diag (desc->diag, "HY091", 0, NULL);
+        goto error;
+      }
+    break;
 
-	case SQL_DESC_PRECISION:
-	  record->precision = (short) value_ptr;
-	  break;
+  case SQL_DESC_PRECISION:
+    record->precision = (short) value_ptr;
+    break;
 
-	case SQL_DESC_SCALE:
-	  record->scale = (short) value_ptr;
-	  break;
+  case SQL_DESC_SCALE:
+    record->scale = (short) value_ptr;
+    break;
 
-	case SQL_DESC_TYPE:
-	  switch ((short) value_ptr)
-	    {
-	    case SQL_CHAR:	/* SQL_C_CHAR */
-	    case SQL_VARCHAR:
-	    case SQL_WCHAR:
-	    case SQL_WVARCHAR:
-	    case SQL_WLONGVARCHAR:
-	      record->type = (short) value_ptr;
-	      record->length = 1;
-	      record->precision = 0;
-	      break;
+  case SQL_DESC_TYPE:
+    switch ((short) value_ptr)
+      {
+      case SQL_CHAR:  /* SQL_C_CHAR */
+      case SQL_VARCHAR:
+      case SQL_WCHAR:
+      case SQL_WVARCHAR:
+      case SQL_WLONGVARCHAR:
+        record->type = (short) value_ptr;
+        record->length = 1;
+        record->precision = 0;
+        break;
 
-	    case SQL_DATETIME:
-	      record->type = (short) value_ptr;
-	      switch (record->datetime_interval_code)
-		{
-		case SQL_CODE_DATE:
-		case SQL_CODE_TIME:
-		  record->precision = 0;
-		  break;
-		case SQL_CODE_TIMESTAMP:
-		  record->precision = 6;
-		  break;
-		}
-	      break;
+      case SQL_DATETIME:
+        record->type = (short) value_ptr;
+        switch (record->datetime_interval_code)
+    {
+    case SQL_CODE_DATE:
+    case SQL_CODE_TIME:
+      record->precision = 0;
+      break;
+    case SQL_CODE_TIMESTAMP:
+      record->precision = 6;
+      break;
+    }
+        break;
 
-	    case SQL_DECIMAL:
-	    case SQL_NUMERIC:	/* SQL_C_NUMERIC */
-	      record->type = (short) value_ptr;
-	      record->precision = CUBRID_NUMERIC_PRECISION_DEFAULT;
-	      record->scale = CUBRID_NUMERIC_SCALE_DEFAULT;
-	      break;
+      case SQL_DECIMAL:
+      case SQL_NUMERIC: /* SQL_C_NUMERIC */
+        record->type = (short) value_ptr;
+        record->precision = CUBRID_NUMERIC_PRECISION_DEFAULT;
+        record->scale = CUBRID_NUMERIC_SCALE_DEFAULT;
+        break;
 
-	    case SQL_FLOAT:
-	    case SQL_C_FLOAT:
-	      record->type = (short) value_ptr;
-	      /* WARN : NEED precision setting as default value */
-	      break;
+      case SQL_FLOAT:
+      case SQL_C_FLOAT:
+        record->type = (short) value_ptr;
+        /* WARN : NEED precision setting as default value */
+        break;
 
-	    case SQL_INTERVAL:
-	      odbc_set_diag (desc->diag, "HYC00", 0, NULL);
-	      goto error;
+      case SQL_INTERVAL:
+        odbc_set_diag (desc->diag, "HYC00", 0, NULL);
+        goto error;
 
 
-	    case SQL_C_UBIGINT:
-	    case SQL_C_SBIGINT:
-	    case SQL_C_STINYINT:
-	    case SQL_C_UTINYINT:
-	    case SQL_C_TINYINT:	// for 2.x backward compatibility
-	    case SQL_C_SHORT:	// for 2.x backward compatibility
-	    case SQL_C_SSHORT:
-	    case SQL_C_USHORT:
-	    case SQL_C_LONG:
-	    case SQL_C_SLONG:
-	    case SQL_C_ULONG:
-	    case SQL_C_GUID:
-	    case SQL_BIT:
-	    case SQL_BIGINT:
-	    case SQL_LONGVARBINARY:
-	    case SQL_VARBINARY:
-	    case SQL_BINARY:
-	    case SQL_LONGVARCHAR:
-	    case SQL_C_DOUBLE:
-	    case SQL_C_DEFAULT:
-	    case SQL_TYPE_TIME:
-	    case SQL_TYPE_TIMESTAMP:
-	    case SQL_C_UNI_OBJECT:
-	    case SQL_C_UNI_SET:
-	      record->type = (short) value_ptr;
-	      break;
+      case SQL_C_UBIGINT:
+      case SQL_C_SBIGINT:
+      case SQL_C_STINYINT:
+      case SQL_C_UTINYINT:
+      case SQL_C_TINYINT: // for 2.x backward compatibility
+      case SQL_C_SHORT: // for 2.x backward compatibility
+      case SQL_C_SSHORT:
+      case SQL_C_USHORT:
+      case SQL_C_LONG:
+      case SQL_C_SLONG:
+      case SQL_C_ULONG:
+      case SQL_C_GUID:
+      case SQL_BIT:
+      case SQL_BIGINT:
+      case SQL_LONGVARBINARY:
+      case SQL_VARBINARY:
+      case SQL_BINARY:
+      case SQL_LONGVARCHAR:
+      case SQL_C_DOUBLE:
+      case SQL_C_DEFAULT:
+      case SQL_TYPE_TIME:
+      case SQL_TYPE_TIMESTAMP:
+      case SQL_C_UNI_OBJECT:
+      case SQL_C_UNI_SET:
+        record->type = (short) value_ptr;
+        break;
 
-	    default:
-	      odbc_set_diag (desc->diag, "HY024", 0, NULL);
-	      goto error;
-	    }
-	  break;
+      default:
+        odbc_set_diag (desc->diag, "HY024", 0, NULL);
+        goto error;
+      }
+    break;
 
-	case SQL_DESC_UNNAMED:
-	  switch ((short) value_ptr)
-	    {
-	    case SQL_NAMED:
-	    case SQL_UNNAMED:
-	      record->unnamed = (short) value_ptr;
-	      break;
-	    default:
-	      odbc_set_diag (desc->diag, "HY024", 0, NULL);
-	      goto error;
-	    }
-	  break;
+  case SQL_DESC_UNNAMED:
+    switch ((short) value_ptr)
+      {
+      case SQL_NAMED:
+      case SQL_UNNAMED:
+        record->unnamed = (short) value_ptr;
+        break;
+      default:
+        odbc_set_diag (desc->diag, "HY024", 0, NULL);
+        goto error;
+      }
+    break;
 
-	case SQL_DESC_UPDATABLE:
-	  record->updatable = (short) value_ptr;
-	  break;
+  case SQL_DESC_UPDATABLE:
+    record->updatable = (short) value_ptr;
+    break;
 
-	case SQL_DESC_AUTO_UNIQUE_VALUE:
-	case SQL_DESC_CATALOG_NAME:
-	case SQL_DESC_ROWVER:
-	case SQL_DESC_SCHEMA_NAME:
-	  odbc_set_diag (desc->diag, "HYC00", 0, NULL);
-	  goto error;
+  case SQL_DESC_AUTO_UNIQUE_VALUE:
+  case SQL_DESC_CATALOG_NAME:
+  case SQL_DESC_ROWVER:
+  case SQL_DESC_SCHEMA_NAME:
+    odbc_set_diag (desc->diag, "HYC00", 0, NULL);
+    goto error;
 
-	default:
-	  /* unknown field */
-	  odbc_set_diag (desc->diag, "HY091", 0, NULL);
-	  goto error;
-	}
+  default:
+    /* unknown field */
+    odbc_set_diag (desc->diag, "HY091", 0, NULL);
+    goto error;
+  }
 
     }
-	DEBUG_TIMESTAMP(FieldSetSuccess);
+  DEBUG_TIMESTAMP(FieldSetSuccess);
   return status;
 error:
   DEBUG_TIMESTAMP(UnknownField);
@@ -1251,14 +1251,14 @@ error:
 ************************************************************************/
 PUBLIC RETCODE
 odbc_set_desc_rec (ODBC_DESC * desc,
-		   SQLSMALLINT rec_number,
-		   SQLSMALLINT type,
-		   SQLSMALLINT subtype,
-		   SQLLEN length,
-		   SQLSMALLINT precision,
-		   SQLSMALLINT scale,
-		   SQLPOINTER data_ptr,
-		   SQLLEN * string_length_ptr, SQLLEN * indicator_ptr)
+       SQLSMALLINT rec_number,
+       SQLSMALLINT type,
+       SQLSMALLINT subtype,
+       SQLLEN length,
+       SQLSMALLINT precision,
+       SQLSMALLINT scale,
+       SQLPOINTER data_ptr,
+       SQLLEN * string_length_ptr, SQLLEN * indicator_ptr)
 {
   /* ODBC_RECORD *record; */
   short concise_type;
@@ -1273,36 +1273,36 @@ odbc_set_desc_rec (ODBC_DESC * desc,
     }
 
   odbc_set_desc_field (desc, rec_number, SQL_DESC_TYPE,
-		       (void *) type, sizeof (type), 1);
+           (void *) type, sizeof (type), 1);
 
   if (subtype == SQL_DATETIME || subtype == SQL_INTERVAL)
     {
       odbc_set_desc_field (desc, rec_number, SQL_DESC_DATETIME_INTERVAL_CODE,
-			   (void *) subtype, sizeof (subtype), 1);
+         (void *) subtype, sizeof (subtype), 1);
     }
 
   concise_type = odbc_verbose_to_concise_type (type, subtype);
   odbc_set_desc_field (desc, rec_number, SQL_DESC_CONCISE_TYPE,
-		       (void *) concise_type, sizeof (concise_type), 1);
+           (void *) concise_type, sizeof (concise_type), 1);
 
   odbc_set_desc_field (desc, rec_number, SQL_DESC_OCTET_LENGTH,
-		       (void *) length, sizeof (length), 1);
+           (void *) length, sizeof (length), 1);
 
   odbc_set_desc_field (desc, rec_number, SQL_DESC_PRECISION,
-		       (void *) precision, sizeof (precision), 1);
+           (void *) precision, sizeof (precision), 1);
 
   odbc_set_desc_field (desc, rec_number, SQL_DESC_SCALE,
-		       (void *) scale, sizeof (scale), 1);
+           (void *) scale, sizeof (scale), 1);
 
   odbc_set_desc_field (desc, rec_number, SQL_DESC_DATA_PTR,
-		       (void *) data_ptr, sizeof (data_ptr), 1);
+           (void *) data_ptr, sizeof (data_ptr), 1);
 
   odbc_set_desc_field (desc, rec_number, SQL_DESC_OCTET_LENGTH_PTR,
-		       (void *) string_length_ptr, sizeof (string_length_ptr),
-		       1);
+           (void *) string_length_ptr, sizeof (string_length_ptr),
+           1);
 
   odbc_set_desc_field (desc, rec_number, SQL_DESC_INDICATOR_PTR,
-		       (void *) indicator_ptr, sizeof (indicator_ptr), 1);
+           (void *) indicator_ptr, sizeof (indicator_ptr), 1);
 
   return ODBC_SUCCESS;
 }
@@ -1358,11 +1358,11 @@ odbc_is_ird (ODBC_DESC * desc)
 ************************************************************************/
 PUBLIC void
 odbc_set_ird (ODBC_STATEMENT * stmt,
-	      short column_number,
-	      short type,
-	      char *table_name,
-	      char *column_name,
-	      long precision, short scale, short nullable, short updatable)
+        short column_number,
+        short type,
+        char *table_name,
+        char *column_name,
+        long precision, short scale, short nullable, short updatable)
 {
   short verbose_type;
   long display_size;
@@ -1418,62 +1418,62 @@ odbc_set_ird (ODBC_STATEMENT * stmt,
     }
 
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_TABLE_NAME,
-		       (SQLPOINTER) table_name, SQL_NTS, 1);
+           (SQLPOINTER) table_name, SQL_NTS, 1);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_NAME,
-		       (SQLPOINTER) column_name, SQL_NTS, 1);
+           (SQLPOINTER) column_name, SQL_NTS, 1);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_CONCISE_TYPE,
-		       (SQLPOINTER) type, 0, 1);
+           (SQLPOINTER) type, 0, 1);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_TYPE_NAME,
-		       (SQLPOINTER) odbc_type_name (type), SQL_NTS, 1);
+           (SQLPOINTER) odbc_type_name (type), SQL_NTS, 1);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_TYPE,
-		       (SQLPOINTER) verbose_type, 0, 1);
+           (SQLPOINTER) verbose_type, 0, 1);
 
 #ifdef DELPHI
   if (type == SQL_LONGVARCHAR)
     {
       odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_LOCAL_TYPE_NAME,
-			   (SQLPOINTER) "string", SQL_NTS, 1);
+         (SQLPOINTER) "string", SQL_NTS, 1);
     }
 #endif
 
   if (IS_STRING_TYPE (type) || IS_BINARY_TYPE (type))
     {
       odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_PRECISION,
-			   (SQLPOINTER) 0, 0, 1);
+         (SQLPOINTER) 0, 0, 1);
       // precision에 대해서 정의하고 있지 않다.
     }
   else if (odbc_is_valid_sql_date_type (type))
     {
       odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_PRECISION,
-			   (SQLPOINTER) 0, 0, 1);
+         (SQLPOINTER) 0, 0, 1);
       // CUBRID는 date type에 대해서 precision(for second)은 0이다.
       // date type에 대한 length는 char형색의 display size와 같다.
     }
   else
     {
       odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_PRECISION,
-			   (SQLPOINTER) precision, 0, 1);
+         (SQLPOINTER) precision, 0, 1);
     }
 
   if (type == SQL_NUMERIC)
     odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_LENGTH,
-			 (SQLPOINTER) precision, 0, 1);
+       (SQLPOINTER) precision, 0, 1);
   else
     odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_LENGTH,
-			 (SQLPOINTER) display_size, 0, 1);
+       (SQLPOINTER) display_size, 0, 1);
   //odbc_set_desc_field(stmt->ird, column_number, SQL_DESC_LENGTH, (SQLPOINTER)display_size, 0, 1);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_OCTET_LENGTH,
-		       (SQLPOINTER) octet_length, 0, 1);
+           (SQLPOINTER) octet_length, 0, 1);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_SCALE,
-		       (SQLPOINTER) scale, 0, 1);
+           (SQLPOINTER) scale, 0, 1);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_DISPLAY_SIZE,
-		       (SQLPOINTER) display_size, 0, 1);
+           (SQLPOINTER) display_size, 0, 1);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_NULLABLE,
-		       (SQLPOINTER) nullable, 0, 1);
+           (SQLPOINTER) nullable, 0, 1);
 
   searchable = odbc_type_searchable (type);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_SEARCHABLE,
-		       (SQLPOINTER) searchable, 0, 1);
+           (SQLPOINTER) searchable, 0, 1);
 }
 
 /************************************************************************
@@ -1501,9 +1501,9 @@ find_record_from_desc (ODBC_DESC * desc, int rec_number)
   for (rec = desc->records; rec != NULL; rec = rec->next)
     {
       if (rec->record_number == rec_number)
-	{
-	  return rec;
-	}
+  {
+    return rec;
+  }
     }
 
   return NULL;
@@ -1515,9 +1515,9 @@ find_record_from_desc (ODBC_DESC * desc, int rec_number)
 * returns/side-effects: record pointer
 * description:
 * NOTE:
-*		SQL_DESC_ROWS_PROCESSED_PTR,
-*		SQL_DESC_ARRAY_STATUS_PTR의 경우에는 사용자에 의해서 설정되므로
-*		delete하지 말아야 한다.
+*   SQL_DESC_ROWS_PROCESSED_PTR,
+*   SQL_DESC_ARRAY_STATUS_PTR의 경우에는 사용자에 의해서 설정되므로
+*   delete하지 말아야 한다.
 ************************************************************************/
 PUBLIC void
 reset_descriptor (ODBC_DESC * desc)
@@ -1529,7 +1529,7 @@ reset_descriptor (ODBC_DESC * desc)
 
   odbc_set_desc_field (desc, 0, SQL_DESC_BIND_OFFSET_PTR, NULL, 0, 1);
   odbc_set_desc_field (desc, 0, SQL_DESC_BIND_TYPE,
-		       (void *) SQL_BIND_BY_COLUMN, 0, 1);
+           (void *) SQL_BIND_BY_COLUMN, 0, 1);
   odbc_set_desc_field (desc, 0, SQL_DESC_COUNT, 0, 0, 1);
   // odbc_set_desc_field(desc, 0, SQL_DESC_ROWS_PROCESSED_PTR, NULL, 0, 1);
   // odbc_set_desc_field(desc, 0, SQL_DESC_ARRAY_STATUS_PTR, NULL, 0, 1);
@@ -1629,17 +1629,17 @@ odbc_consistency_check (ODBC_RECORD * record)
       odbc_is_valid_interval_verbose_type (record->type))
     {
       if (!odbc_is_valid_code (record->datetime_interval_code))
-	{
-	  return FALSE;
-	}
+  {
+    return FALSE;
+  }
     }
   if (record->type == SQL_C_NUMERIC || record->type == SQL_NUMERIC)
     {
       if ((record->precision < 1 || record->precision > 38) ||
-	  record->scale > record->precision)
-	{
-	  return FALSE;
-	}
+    record->scale > record->precision)
+  {
+    return FALSE;
+  }
     }
 
   /* CHECK : check for date, interval type */
@@ -1653,11 +1653,11 @@ odbc_consistency_check (ODBC_RECORD * record)
  * arguments:
  * returns/side-effects:
  * description:
- *	if (field_id == READ ONLY desc field) then
- *		return B_TURE
+ *  if (field_id == READ ONLY desc field) then
+ *    return B_TURE
  *  else
- *		return _FALSE_
- *	endif
+ *    return _FALSE_
+ *  endif
  * NOTE:
  ************************************************************************/
 PRIVATE short
@@ -1727,7 +1727,7 @@ record_desc_field_copy (ODBC_DESC * source_desc, ODBC_DESC * dest_desc)
 
       src_record = find_record_from_desc (source_desc, i);
       if (src_record == NULL)
-	continue;
+  continue;
 
       odbc_alloc_record (dest_desc, &dest_record, i);
 
@@ -1736,11 +1736,11 @@ record_desc_field_copy (ODBC_DESC * source_desc, ODBC_DESC * dest_desc)
       dest_record->display_size = src_record->display_size;
       dest_record->fixed_prec_scale = src_record->fixed_prec_scale;
       dest_record->literal_prefix =
-	UT_MAKE_STRING (src_record->literal_prefix, -1);
+  UT_MAKE_STRING (src_record->literal_prefix, -1);
       dest_record->literal_suffix =
-	UT_MAKE_STRING (src_record->literal_suffix, -1);
+  UT_MAKE_STRING (src_record->literal_suffix, -1);
       dest_record->local_type_name =
-	UT_MAKE_STRING (src_record->local_type_name, -1);
+  UT_MAKE_STRING (src_record->local_type_name, -1);
       dest_record->nullable = src_record->nullable;
       dest_record->searchable = src_record->searchable;
       dest_record->table_name = UT_MAKE_STRING (src_record->table_name, -1);
@@ -1750,9 +1750,9 @@ record_desc_field_copy (ODBC_DESC * source_desc, ODBC_DESC * dest_desc)
       dest_record->concise_type = src_record->concise_type;
       dest_record->data_ptr = src_record->data_ptr;
       dest_record->datetime_interval_code =
-	src_record->datetime_interval_code;
+  src_record->datetime_interval_code;
       dest_record->datetime_interval_precision =
-	src_record->datetime_interval_precision;
+  src_record->datetime_interval_precision;
       dest_record->indicator_ptr = src_record->indicator_ptr;
       dest_record->length = src_record->length;
       dest_record->num_prec_radix = src_record->num_prec_radix;

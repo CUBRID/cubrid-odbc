@@ -28,13 +28,13 @@
 *
 */
 
-#ifndef	__ODBC_DESC_HEADER	/* to avoid multiple inclusion */
-#define	__ODBC_DESC_HEADER
+#ifndef __ODBC_DESC_HEADER  /* to avoid multiple inclusion */
+#define __ODBC_DESC_HEADER
 
-#include		"odbc_connection.h"
-#include		"odbc_portable.h"
-#include		"odbc_diag_record.h"
-#include		"odbc_statement.h"
+#include    "odbc_connection.h"
+#include    "odbc_portable.h"
+#include    "odbc_diag_record.h"
+#include    "odbc_statement.h"
 
 /*------------------------------------------------------------------------
 STRUCT : st_odbc_record (ODBC_RECORD)
@@ -93,8 +93,8 @@ typedef struct st_odbc_desc
   struct st_diag *diag;
 
   struct st_odbc_statement *stmt;
-  struct st_odbc_connection *conn;	// for explicitly allocated descriptor
-  struct st_odbc_desc *next;	// for explicitly allocated descriptor
+  struct st_odbc_connection *conn;  // for explicitly allocated descriptor
+  struct st_odbc_desc *next;  // for explicitly allocated descriptor
 
   /* header fields */
   short alloc_type;

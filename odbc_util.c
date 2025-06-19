@@ -28,16 +28,16 @@
  *
  */
 
-#include		<stdio.h>
-#include		<stdlib.h>
-#include		<string.h>
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
 
-#include		"odbc_portable.h"
-#include		"odbc_util.h"
-#include		"odbc_statement.h"
+#include    "odbc_portable.h"
+#include    "odbc_util.h"
+#include    "odbc_statement.h"
 
-#define		UNIT_MEMORY_SIZE		256
-#define		STK_SIZE        100
+#define   UNIT_MEMORY_SIZE    256
+#define   STK_SIZE        100
 #define           PARAM_POS_SIZE  1024
 
 #ifndef CP_EUC_KR
@@ -53,9 +53,9 @@ static int is_korean (unsigned char ch);
 /************************************************************************
 * name:  InitStr
 * arguments: 
-*	D_STRING str;
+* D_STRING str;
 * returns/side-effects: 
-*	
+* 
 * description: 
 * NOTE: 
 ************************************************************************/
@@ -71,15 +71,15 @@ InitStr (D_STRING * str)
 /************************************************************************
 * name: ReallocImproved
 * arguments: 
-*	dest - destination memory pointer
-*	destSize - total size of dest
-*	usedSize - used memory size of dest
-*	allocSize - realloc size 
+* dest - destination memory pointer
+* destSize - total size of dest
+* usedSize - used memory size of dest
+* allocSize - realloc size 
 * returns/side-effects: 
-*	destSize increased
+* destSize increased
 * description: 
-*	if remain size(destSize - usedSize)  < alloc size, 
-*	realloc a bunch of bytes  
+* if remain size(destSize - usedSize)  < alloc size, 
+* realloc a bunch of bytes  
 * NOTE: 
 ************************************************************************/
 PUBLIC ERR_CODE
@@ -93,31 +93,31 @@ ReallocImproved (char **dest, int *destSize, int usedSize, int allocSize)
   while (remainDestSize <= allocSize)
     {
       if (*dest == NULL)
-	{
-	  *dest = UT_ALLOC (UNIT_MEMORY_SIZE);
-	  if (*dest == NULL)
-	    {
-	      *destSize = 0;
-	      return -1;
-	    }
-	  memset (*dest, 0, UNIT_MEMORY_SIZE);
-	  *destSize = UNIT_MEMORY_SIZE;
-	  remainDestSize = UNIT_MEMORY_SIZE;
+  {
+    *dest = UT_ALLOC (UNIT_MEMORY_SIZE);
+    if (*dest == NULL)
+      {
+        *destSize = 0;
+        return -1;
+      }
+    memset (*dest, 0, UNIT_MEMORY_SIZE);
+    *destSize = UNIT_MEMORY_SIZE;
+    remainDestSize = UNIT_MEMORY_SIZE;
 
-	}
+  }
       else
-	{
-	  *dest = (char *) UT_REALLOC (*dest, *destSize + UNIT_MEMORY_SIZE);
-	  if (*dest == NULL)
-	    {
-	      *destSize = 0;
-	      return -1;
-	    }
-	  memset (*dest + *destSize, 0, UNIT_MEMORY_SIZE);
+  {
+    *dest = (char *) UT_REALLOC (*dest, *destSize + UNIT_MEMORY_SIZE);
+    if (*dest == NULL)
+      {
+        *destSize = 0;
+        return -1;
+      }
+    memset (*dest + *destSize, 0, UNIT_MEMORY_SIZE);
 
-	  *destSize += UNIT_MEMORY_SIZE;
-	  remainDestSize += UNIT_MEMORY_SIZE;
-	}
+    *destSize += UNIT_MEMORY_SIZE;
+    remainDestSize += UNIT_MEMORY_SIZE;
+  }
     }
   return 0;
 }
@@ -125,19 +125,19 @@ ReallocImproved (char **dest, int *destSize, int usedSize, int allocSize)
 /************************************************************************
 * name:  MemcatImproved
 * arguments: 
-*	dest - destination pointer
-*	usedSize - total alloc size = used size + remain size
-*	src  - source memory pointer,
-*	srcSize - source memory size
+* dest - destination pointer
+* usedSize - total alloc size = used size + remain size
+* src  - source memory pointer,
+* srcSize - source memory size
 * returns/side-effects: 
-*	OK, ERROR
+* OK, ERROR
 * description: 
-* 	Not string copy. 
-*	So this can copy memory stream including null char(\0)
+*   Not string copy. 
+* So this can copy memory stream including null char(\0)
 * NOTE: 
-*	Using this function, 
-*	initialize dest to null, usedSize to zero, remainSize to zero
-*	At least, dest to NULL -> InisStr()
+* Using this function, 
+* initialize dest to null, usedSize to zero, remainSize to zero
+* At least, dest to NULL -> InisStr()
 ************************************************************************/
 PUBLIC ERR_CODE
 MemcatImproved (D_STRING * dest, char *src, int srcSize)
@@ -149,7 +149,7 @@ MemcatImproved (D_STRING * dest, char *src, int srcSize)
       dest->usedSize = 0;
     }
   if (ReallocImproved (&(dest->value), &(dest->totalSize),
-		       dest->usedSize, srcSize) < 0)
+           dest->usedSize, srcSize) < 0)
     {
       return -1;
     }
@@ -163,7 +163,7 @@ MemcatImproved (D_STRING * dest, char *src, int srcSize)
 /************************************************************************
 * name:  FreeStr
 * arguments: 
-*	node of D_STRING
+* node of D_STRING
 * returns/side-effects: 
 * description: 
 * NOTE: 
@@ -183,9 +183,9 @@ FreeStr (D_STRING * str)
 /************************************************************************
 * name: sqlwcharlen
 * arguments:
-*		int wstr
+*   int wstr
 * returns/side-effects:
-*		len - the length of wstr
+*   len - the length of wstr
 * description:
 * NOTE:
 ************************************************************************/
@@ -200,9 +200,9 @@ sqlwcharlen(const WCHAR *wstr)
 /************************************************************************
 * name: ut_alloc_bstr
 * arguments:
-*		int size - size of allocated memory
+*   int size - size of allocated memory
 * returns/side-effects:
-*		void* - memory pointer
+*   void* - memory pointer
 * description:
 * NOTE:
 ************************************************************************/
@@ -254,9 +254,9 @@ ut_free_bstr  (WCHAR *ptr)
 /************************************************************************
 * name: ut_alloc
 * arguments:
-*		int size - size of allocated memory
+*   int size - size of allocated memory
 * returns/side-effects:
-*		void* - memory pointer
+*   void* - memory pointer
 * description:
 * NOTE:
 ************************************************************************/
@@ -340,12 +340,12 @@ ut_realloc (void *ptr, int size)
 /************************************************************************
 * name: ut_make_string
 * arguments:
-*		const char *src - source string ( not always null-terminated string)
-*		length -
-*			if length < 0, copy all src(null-term).
-*			else copy length characters and null-term.
+*   const char *src - source string ( not always null-terminated string)
+*   length -
+*     if length < 0, copy all src(null-term).
+*     else copy length characters and null-term.
 * returns/side-effects:
-*		char * - string pointer
+*   char * - string pointer
 * description:
 * NOTE:
 ************************************************************************/
@@ -357,16 +357,16 @@ ut_make_string (const char *src, int length)
   if (src != NULL)
     {
       if (length < 0)
-	{
-	  temp = UT_ALLOC (strlen (src) + 1);
-	  strcpy (temp, src);
-	}
+  {
+    temp = UT_ALLOC (strlen (src) + 1);
+    strcpy (temp, src);
+  }
       else
-	{
-	  temp = UT_ALLOC (length + 1);
-	  strncpy (temp, src, length);
-	  temp[length] = '\0';
-	}
+  {
+    temp = UT_ALLOC (length + 1);
+    strncpy (temp, src, length);
+    temp[length] = '\0';
+  }
     }
 
   return temp;
@@ -375,12 +375,12 @@ ut_make_string (const char *src, int length)
 /************************************************************************
 * name: ut_append_string
 * arguments:
-*		const char *src - source string ( not always null-terminated string)
-*		length -
-*			if length < 0, copy all src(null-term).
-*			else copy length characters and null-term.
+*   const char *src - source string ( not always null-terminated string)
+*   length -
+*     if length < 0, copy all src(null-term).
+*     else copy length characters and null-term.
 * returns/side-effects:
-*		char * - string pointer
+*   char * - string pointer
 * description:
 * NOTE:
 ************************************************************************/
@@ -393,17 +393,17 @@ ut_append_string (char *str1, char *str2, int len2)
   if (str1 != NULL)
     {
       if (len2 < 0)
-	{
-	  temp = UT_REALLOC (str1, strlen (str1) + strlen (str2) + 1);
-	  strcat (temp, str2);
-	}
+  {
+    temp = UT_REALLOC (str1, strlen (str1) + strlen (str2) + 1);
+    strcat (temp, str2);
+  }
       else
-	{
-	  str_size = strlen (str1) + len2;
-	  temp = UT_REALLOC (str1, str_size + 1);
-	  strncpy (temp + strlen (str1), str2, len2);
-	  temp[str_size] = '\0';
-	}
+  {
+    str_size = strlen (str1) + len2;
+    temp = UT_REALLOC (str1, str_size + 1);
+    strncpy (temp + strlen (str1), str2, len2);
+    temp[str_size] = '\0';
+  }
     }
   else
     {
@@ -416,12 +416,12 @@ ut_append_string (char *str1, char *str2, int len2)
 /************************************************************************
 * name: ut_make_binary
 * arguments:
-*		const char *src - source binary
-*		length -
-*			if length < 0, NULL
-*			else copy length binary
+*   const char *src - source binary
+*   length -
+*     if length < 0, NULL
+*     else copy length binary
 * returns/side-effects:
-*		char * - string pointer
+*   char * - string pointer
 * description:
 * NOTE:
 ************************************************************************/
@@ -453,7 +453,7 @@ add_element_to_setstring(char *setstring, char *element, int size)
     }
 
   if (setstring[0] == '\0')
-    {				// empty set string
+    {       // empty set string
       strcpy (setstring, element);
     }
   else
@@ -506,12 +506,12 @@ element_from_setstring (char **current, char *buf)
 }
 
 /*-----------------------------------------------------------------------
- *							Linked List
+ *              Linked List
  *----------------------------------------------------------------------*/
 
 PUBLIC ERR_CODE
 ListTailAdd (ST_LIST * head, void *key, void *val,
-	     ERR_CODE (*assignFunc) (ST_LIST *, void *, void *))
+       ERR_CODE (*assignFunc) (ST_LIST *, void *, void *))
 {
   ST_LIST *newNode;
   ST_LIST *temp;
@@ -532,7 +532,7 @@ ListTailAdd (ST_LIST * head, void *key, void *val,
   for (temp = head;; temp = temp->next)
     {
       if (temp->next == NULL)
-	break;
+  break;
     }
 
   temp->next = newNode;
@@ -542,20 +542,20 @@ ListTailAdd (ST_LIST * head, void *key, void *val,
 }
 
 /************************************************************************
- * name:        ListDelete - delete list				*
+ * name:        ListDelete - delete list        *
  *                                                                      *
- * arguments:   head    - list header					*
- *              nodeDelete - 'key', 'value' deallocation function	*
+ * arguments:   head    - list header         *
+ *              nodeDelete - 'key', 'value' deallocation function *
  *                                                                      *
  * returns/side-effects:                                                *
- *              (ST_LIST*) NULL						*
+ *              (ST_LIST*) NULL           *
  *                                                                      *
- * description: delete all nodes of list.				*
- *									*
- * NOTE:        							*
- *  If 'key' or 'value' has its own memory, the memory must be freed	*
- *  in 'nodeDelete' function. But, the node container is freed in	*
- *  this module.							*
+ * description: delete all nodes of list.       *
+ *                  *
+ * NOTE:                      *
+ *  If 'key' or 'value' has its own memory, the memory must be freed  *
+ *  in 'nodeDelete' function. But, the node container is freed in *
+ *  this module.              *
  *  dummy header포함하여 모두 지운다.
  ************************************************************************/
 
@@ -572,7 +572,7 @@ ListDelete (ST_LIST * head, void (*nodeDelete) (ST_LIST *))
       del = temp;
       temp = temp->next;
       if (nodeDelete)
-	(*nodeDelete) (del);
+  (*nodeDelete) (del);
       UT_FREE (del);
     }
 }
@@ -608,9 +608,9 @@ ListPrint (ST_LIST * head, void (*nodePrint) (ST_LIST *))
 /************************************************************************
 * name: NodeHead
 * arguments:
-*	ST_LIST head;
+* ST_LIST head;
 * returns/side-effects:
-* 	head node pointer - ST_LIST* 
+*   head node pointer - ST_LIST* 
 * description:
 * NOTE:
 ************************************************************************/
@@ -631,9 +631,9 @@ HeadNode (ST_LIST * dummyHead)
 /************************************************************************
 * name: NodeNext
 * arguments:
-*	this node - ST_LIST*
+* this node - ST_LIST*
 * returns/side-effects:
-*	next node - ST_LIST*
+* next node - ST_LIST*
 * description:
 * NOTE:
 ************************************************************************/
@@ -655,11 +655,11 @@ NextNode (ST_LIST * node)
 /************************************************************************
 * name:  NodeAssign
 * arguments: 
-*	node - data node
-*	key  - key as string
-*	value - value string
+* node - data node
+* key  - key as string
+* value - value string
 * returns/side-effects: 
-*	OK , ERROR if malloc error
+* OK , ERROR if malloc error
 * description: 
 * NOTE: 
 ************************************************************************/
@@ -671,7 +671,7 @@ NodeAssign (ST_LIST * node, void *key, void *value)
     {
       node->key = (char *) UT_ALLOC (strlen ((char *) key) + 1);
       if (node->key == NULL)
-	return -1;
+  return -1;
 
       strcpy ((char *) node->key, (char *) key);
     }
@@ -693,20 +693,20 @@ is_korean (unsigned char ch)
 
 
 /*-----------------------------------------------------------------------
- *						Connection string
+ *            Connection string
  *----------------------------------------------------------------------*/
 
 /************************************************************************
  * name: next_element
  * arguments:
  * returns/side-effects:
- *		더이상 value가 없을 때 NULL return
+ *    더이상 value가 없을 때 NULL return
  * description:
  * NOTE:
- *	element list structure
- *		KEY1=VALUE1\0KEY2=VALUE2\0KEY3=VALUE3\0\0
- *		\0 - end of attribute
- *		\0 - end of list
+ *  element list structure
+ *    KEY1=VALUE1\0KEY2=VALUE2\0KEY3=VALUE3\0\0
+ *    \0 - end of attribute
+ *    \0 - end of list
  ************************************************************************/
 PUBLIC const char *
 next_element (const char *element_list)
@@ -718,10 +718,10 @@ next_element (const char *element_list)
 
   pt = element_list;
 
-  pt += strlen (element_list) + 1;	// +1 is for '\0'
+  pt += strlen (element_list) + 1;  // +1 is for '\0'
 
   if (*pt == '\0')
-    return NULL;		// end of list
+    return NULL;    // end of list
 
   return pt;
 }
@@ -745,7 +745,7 @@ element_value (const char *element)
   if (pt == NULL)
     return NULL;
 
-  ++pt;				// for '='
+  ++pt;       // for '='
 
   return pt;
 }
@@ -770,10 +770,10 @@ element_value_by_key (const char *element_list, const char *key)
   do
     {
       if (_strnicmp (pt, key, strlen (key)) == 0)
-	{
-	  val = element_value (pt);
-	  return val;
-	}
+  {
+    val = element_value (pt);
+    return val;
+  }
       pt = next_element (pt);
     }
   while (pt != NULL);
@@ -787,7 +787,7 @@ element_value_by_key (const char *element_list, const char *key)
  * returns/side-effects:
  * description:
  * NOTE:
- *	앞뒤의 공백문자를 허용한다.
+ *  앞뒤의 공백문자를 허용한다.
  ************************************************************************/
 PUBLIC short
 is_oidstr_array (char **array, int size)
@@ -797,7 +797,7 @@ is_oidstr_array (char **array, int size)
   for (i = 0; i < size; ++i)
     {
       if (is_oidstr (array[i]) == _FALSE_)
-	return _FALSE_;
+  return _FALSE_;
     }
 
   return _TRUE_;
@@ -808,9 +808,9 @@ is_oidstr_array (char **array, int size)
  * arguments:
  * returns/side-effects:
  * description:
- *	string이 oid인지 판별한다. 
+ *  string이 oid인지 판별한다. 
  * NOTE:
- *	앞뒤의 공백문자를 허용한다.
+ *  앞뒤의 공백문자를 허용한다.
  ************************************************************************/
 PUBLIC short
 is_oidstr (char *str)
@@ -822,58 +822,58 @@ is_oidstr (char *str)
   for (pt = str, state = 0; *pt != '\0'; ++pt)
     {
       switch (state)
-	{
-	case 0:		// start
-	  if (*pt == '@')
-	    state = 1;
-	  else if (*pt == ' ' || *pt == '\t')
-	    break;
-	  else
-	    return _FALSE_;
+  {
+  case 0:   // start
+    if (*pt == '@')
+      state = 1;
+    else if (*pt == ' ' || *pt == '\t')
+      break;
+    else
+      return _FALSE_;
 
-	  break;
+    break;
 
-	case 1:		// first digit of page id
-	case 3:		// first digit of slot id
-	case 5:		// first digit of volume id
-	  if (*pt >= '0' && *pt <= '9')
-	    ++state;
-	  else
-	    {
-	      return _FALSE_;
-	    }
-	  break;
+  case 1:   // first digit of page id
+  case 3:   // first digit of slot id
+  case 5:   // first digit of volume id
+    if (*pt >= '0' && *pt <= '9')
+      ++state;
+    else
+      {
+        return _FALSE_;
+      }
+    break;
 
-	case 2:		// page id
-	case 4:		// slot id
-	  if (*pt == '|')
-	    ++state;
-	  else if (*pt < '0' || *pt > '9')
-	    {
-	      return _FALSE_;
-	    }
-	  break;
+  case 2:   // page id
+  case 4:   // slot id
+    if (*pt == '|')
+      ++state;
+    else if (*pt < '0' || *pt > '9')
+      {
+        return _FALSE_;
+      }
+    break;
 
-	case 6:
-	  if (*pt == ' ' || *pt == '\t')
-	    state = 7;
-	  else if (*pt < '0' || *pt > '9')
-	    {
-	      return _FALSE_;
-	    }
+  case 6:
+    if (*pt == ' ' || *pt == '\t')
+      state = 7;
+    else if (*pt < '0' || *pt > '9')
+      {
+        return _FALSE_;
+      }
 
-	  break;
-	case 7:
-	  if (*pt == ' ' || *pt == '\t')
-	    break;
-	  else
-	    return _FALSE_;
+    break;
+  case 7:
+    if (*pt == ' ' || *pt == '\t')
+      break;
+    else
+      return _FALSE_;
 
-	  break;
+    break;
 
-	default:
-	  return _FALSE_;
-	}
+  default:
+    return _FALSE_;
+  }
     }
 
   if (state != 6 && state != 7)
@@ -889,14 +889,14 @@ is_oidstr (char *str)
  * name:  replace_oid
  * arguments:
  * returns/side-effects:
- *		교체된 oid parameter 개수를 return한다.
+ *    교체된 oid parameter 개수를 return한다.
  * description:
  * NOTE:
- *		parameter number는 1을 base로 하고 있다고 가정했다.
+ *    parameter number는 1을 base로 하고 있다고 가정했다.
  ************************************************************************/
 PUBLIC int
 replace_oid (char *sql_text, char **org_param_pos_pt,
-	     char **oid_param_pos_pt, char **oid_param_val_pt)
+       char **oid_param_pos_pt, char **oid_param_val_pt)
 {
   char *oid_buf = NULL;
   char oid_param_pos[PARAM_POS_SIZE];
@@ -915,57 +915,57 @@ replace_oid (char *sql_text, char **org_param_pos_pt,
   for (pt = sql_text; *pt != '\0'; ++pt)
     {
       switch (*pt)
-	{
-	case '?':
-	  ++current_param_pos;
-	  sprintf (buf, "%d", current_param_pos);
-	  if (add_element_to_setstring(org_param_pos, buf, PARAM_POS_SIZE) < 0)
-	    {
-		return -1;
-	    }
-	  break;
+  {
+  case '?':
+    ++current_param_pos;
+    sprintf (buf, "%d", current_param_pos);
+    if (add_element_to_setstring(org_param_pos, buf, PARAM_POS_SIZE) < 0)
+      {
+    return -1;
+      }
+    break;
 
-	case '\'':
-	  // find the matched string marker
-	  pt_tmp = pt;
-	  while (pt_tmp = strchr (pt_tmp + 1, '\''))
-	    {
-	      if (pt_tmp == NULL || *(pt_tmp - 1) != '\\')
-		break;
+  case '\'':
+    // find the matched string marker
+    pt_tmp = pt;
+    while (pt_tmp = strchr (pt_tmp + 1, '\''))
+      {
+        if (pt_tmp == NULL || *(pt_tmp - 1) != '\\')
+    break;
 
-	    }
-	  if (pt_tmp == NULL)
-	    break;
+      }
+    if (pt_tmp == NULL)
+      break;
 
-	  oid_buf = UT_MAKE_STRING (pt + 1, (int) (pt_tmp - pt - 1));
-	  odbc_trim (oid_buf);
+    oid_buf = UT_MAKE_STRING (pt + 1, (int) (pt_tmp - pt - 1));
+    odbc_trim (oid_buf);
 
-	  if (is_oidstr (oid_buf) == _TRUE_)
-	    {
-	      ++current_param_pos;
+    if (is_oidstr (oid_buf) == _TRUE_)
+      {
+        ++current_param_pos;
 
-	      ++oid_param_num;
+        ++oid_param_num;
 
-	      sprintf (buf, "%d", current_param_pos);
-		if (add_element_to_setstring(oid_param_pos, buf, PARAM_POS_SIZE) < 0)
-		{
-		    return -1;
-		}
+        sprintf (buf, "%d", current_param_pos);
+    if (add_element_to_setstring(oid_param_pos, buf, PARAM_POS_SIZE) < 0)
+    {
+        return -1;
+    }
 
-	      sprintf (buf, "%s", oid_buf);
-		if (add_element_to_setstring(oid_param_val, buf, PARAM_POS_SIZE*4) < 0)
-		  {
-		    return -1;
-		  }
+        sprintf (buf, "%s", oid_buf);
+    if (add_element_to_setstring(oid_param_val, buf, PARAM_POS_SIZE*4) < 0)
+      {
+        return -1;
+      }
 
-	      // replace oid string value to parameter marker
-	      *pt = '?';
-	      memcpy (pt + 1, pt_tmp + 1, strlen (pt_tmp + 1) + 1);	// include Null terminator
-	    }
+        // replace oid string value to parameter marker
+        *pt = '?';
+        memcpy (pt + 1, pt_tmp + 1, strlen (pt_tmp + 1) + 1); // include Null terminator
+      }
 
-	  NA_FREE (oid_buf);
-	  break;
-	}
+    NA_FREE (oid_buf);
+    break;
+  }
     }
 
   if (org_param_pos_pt != NULL)
@@ -985,7 +985,7 @@ replace_oid (char *sql_text, char **org_param_pos_pt,
  * arguments:
  * returns/side-effects:
  * description:
- *	전후의 공백문자를 제거한 형태로 변형한다. (str의 내용이 변형됨)
+ *  전후의 공백문자를 제거한 형태로 변형한다. (str의 내용이 변형됨)
  * NOTE:
  ************************************************************************/
 PUBLIC char *
@@ -1029,7 +1029,7 @@ odbc_trim (char *str)
  ************************************************************************/
 PUBLIC RETCODE
 str_value_assign (const char *in_value,
-		  char *out_buf, SQLLEN out_buf_len, SQLLEN * val_len_ptr)
+      char *out_buf, SQLLEN out_buf_len, SQLLEN * val_len_ptr)
 {
   RETCODE rc = ODBC_SUCCESS;
 
@@ -1037,13 +1037,13 @@ str_value_assign (const char *in_value,
   if (in_value != NULL)
     {
       if (out_buf != NULL && out_buf_len > 0)
-	{
-	  strncpy (out_buf, in_value, out_buf_len - 1);
-	  out_buf[out_buf_len - 1] = '\0';
-	}
+  {
+    strncpy (out_buf, in_value, out_buf_len - 1);
+    out_buf[out_buf_len - 1] = '\0';
+  }
 
       if ((unsigned int) out_buf_len <= strlen (in_value))
-	rc = ODBC_SUCCESS_WITH_INFO;
+  rc = ODBC_SUCCESS_WITH_INFO;
     }
 
   if (val_len_ptr != NULL)
@@ -1058,45 +1058,45 @@ str_value_assign (const char *in_value,
 /************************************************************************
  * name: bin_value_assign
  * arguments:
- *		in_value - input binary start pointer
- *		in_val_len - input binary length
- *		out_buf - output binary start pointer
- *		out_buf_len - output binary length
- *		val_len_ptr - input binary length or null indicator
+ *    in_value - input binary start pointer
+ *    in_val_len - input binary length
+ *    out_buf - output binary start pointer
+ *    out_buf_len - output binary length
+ *    val_len_ptr - input binary length or null indicator
  * returns/side-effects:
  * description:
  * NOTE:
  ************************************************************************/
 PUBLIC RETCODE
 bin_value_assign (const void *in_value,
-		  SQLLEN in_val_len,
-		  char *out_buf, SQLLEN out_buf_len, SQLLEN * val_len_ptr)
+      SQLLEN in_val_len,
+      char *out_buf, SQLLEN out_buf_len, SQLLEN * val_len_ptr)
 {
   RETCODE rc = ODBC_SUCCESS;
 
   if (in_value != NULL)
     {
       if (out_buf != NULL)
-	{
-	  memcpy (out_buf, in_value, MIN (out_buf_len, in_val_len));
-	}
+  {
+    memcpy (out_buf, in_value, MIN (out_buf_len, in_val_len));
+  }
 
       if (out_buf_len < in_val_len)
-	{
-	  rc = ODBC_SUCCESS_WITH_INFO;
-	}
+  {
+    rc = ODBC_SUCCESS_WITH_INFO;
+  }
     }
 
   if (val_len_ptr != NULL)
     {
       if (in_value == NULL)
-	{
-	  *val_len_ptr = SQL_NULL_DATA;
-	}
+  {
+    *val_len_ptr = SQL_NULL_DATA;
+  }
       else
-	{
-	  *val_len_ptr = in_val_len;
-	}
+  {
+    *val_len_ptr = in_val_len;
+  }
     }
 
   return rc;
@@ -1104,12 +1104,12 @@ bin_value_assign (const void *in_value,
 /************************************************************************
  * name: bin_value_assign
  * arguments:
- *		stmt - ODBC_STATEMENT
- *		lob - pointer of lob
- *		type - SQL_BLOB or SQL_CLOB
- *		out_buf - output binary start pointer
- *		out_buf_len - output binary length
- *		val_len_ptr - input binary length or null indicator
+ *    stmt - ODBC_STATEMENT
+ *    lob - pointer of lob
+ *    type - SQL_BLOB or SQL_CLOB
+ *    out_buf - output binary start pointer
+ *    out_buf_len - output binary length
+ *    val_len_ptr - input binary length or null indicator
  * returns/side-effects:
  * description:
  * NOTE:
@@ -1383,7 +1383,7 @@ encode_string_to_utf8 (wchar_t *str, int size, char **target,  int* out_length)
   int wincode = CP_UTF8;
 
   nLength = WideCharToMultiByte (wincode, 0, str, -1, NULL, 0, NULL,
-				 NULL);
+         NULL);
   tmp_string = (char *) ut_alloc (sizeof (char) * (nLength + 1));
   if (tmp_string == NULL)
     {
@@ -1391,7 +1391,7 @@ encode_string_to_utf8 (wchar_t *str, int size, char **target,  int* out_length)
     }
 
   nLength = WideCharToMultiByte (wincode, 0, str, -1, tmp_string, nLength, NULL,
-		       NULL);
+           NULL);
   if (target)
     {
       *target = tmp_string;

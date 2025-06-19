@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,22 +29,22 @@
  */
 
 #if defined (_WINDOWS)
-#include		<windows.h>
+#include    <windows.h>
 #endif
-#include		<stdio.h>
+#include    <stdio.h>
 
-#include		"odbc_portable.h"
-#include		"sqlext.h"
-#include		"odbc_connection.h"
-#include		"odbc_env.h"
-#include		"odbc_statement.h"
-#include		"odbc_result.h"
-#include		"odbc_diag_record.h"
-#include		"odbc_util.h"
-#include		"odbc_catalog.h"
-#include		"odbc_descriptor.h"
-#include		"cas_cci.h"
-#include		"odbc_resource.h"
+#include    "odbc_portable.h"
+#include    "sqlext.h"
+#include    "odbc_connection.h"
+#include    "odbc_env.h"
+#include    "odbc_statement.h"
+#include    "odbc_result.h"
+#include    "odbc_diag_record.h"
+#include    "odbc_util.h"
+#include    "odbc_catalog.h"
+#include    "odbc_descriptor.h"
+#include    "cas_cci.h"
+#include    "odbc_resource.h"
 
 /************************************************************************
 * name: SQLDriverConnectW
@@ -175,7 +175,7 @@ SQLGetInfoW (SQLHDBC ConnectionHandle,
   SQLLEN tmp_StringLength;
   SQLLEN info_value_size;
   SQLWCHAR *wvalue;
-  char	*charset = ((ODBC_CONNECTION *)ConnectionHandle)->charset;
+  char  *charset = ((ODBC_CONNECTION *)ConnectionHandle)->charset;
 
   OutputDebugString ("SQLGetInfoW called\n");
 
@@ -303,9 +303,9 @@ SQLGetDiagRecW (SQLSMALLINT HandleType,
 
   if (Sqlstate && sql_state)
   {
-		int temp_buffer_length = MultiByteToWideChar (CP_ACP, 0, (LPCSTR) sql_state, strlen(sql_state), NULL, 0);
+    int temp_buffer_length = MultiByteToWideChar (CP_ACP, 0, (LPCSTR) sql_state, strlen(sql_state), NULL, 0);
 
-		MultiByteToWideChar (CP_ACP, 0, (LPCSTR) sql_state, strlen(sql_state), Sqlstate, temp_buffer_length);
+    MultiByteToWideChar (CP_ACP, 0, (LPCSTR) sql_state, strlen(sql_state), Sqlstate, temp_buffer_length);
   }
   
   bytes_to_wide_char (message_text_buffer, 
@@ -391,7 +391,7 @@ SQLColumnsW (SQLHSTMT hstmt,
 
   if (cb_column_len == 0)
     {
-	  NA_FREE(cb_column);
+    NA_FREE(cb_column);
     }
 
   ret = SQLColumns (hstmt,
@@ -488,12 +488,12 @@ SQLForeignKeysW (SQLHSTMT hstmt,
 
   if (cb_pk_table_len == 0)
   {
-	  NA_FREE(cb_pk_table);
+    NA_FREE(cb_pk_table);
   }
 
   if (cb_fk_table_len == 0)
   {
-	  NA_FREE(cb_fk_table);
+    NA_FREE(cb_fk_table);
   }
         
   ret = SQLForeignKeys(hstmt, 

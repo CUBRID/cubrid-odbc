@@ -28,11 +28,11 @@
 *
 */
 
-#ifndef	__ODBC_RESULT_HEADER	/* to avoid multiple inclusion */
-#define	__ODBC_RESULT_HEADER
+#ifndef __ODBC_RESULT_HEADER  /* to avoid multiple inclusion */
+#define __ODBC_RESULT_HEADER
 
-#include		"odbc_portable.h"
-#include		"odbc_statement.h"
+#include    "odbc_portable.h"
+#include    "odbc_statement.h"
 
 PUBLIC RETCODE odbc_bind_col (ODBC_STATEMENT * stmt,
                               SQLUSMALLINT column_num,

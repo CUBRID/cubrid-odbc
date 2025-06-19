@@ -444,15 +444,15 @@ PUBLIC int
 odbc_is_valid_type (short odbc_type)
 {
   return (odbc_is_valid_concise_type (odbc_type) ||
-	  odbc_is_valid_verbose_type (odbc_type) ||
-	  odbc_is_valid_lob_type (odbc_type));
+    odbc_is_valid_verbose_type (odbc_type) ||
+    odbc_is_valid_lob_type (odbc_type));
 }
 
 PUBLIC int
 odbc_is_valid_code (short code)
 {
   return (odbc_is_valid_date_code (code) ||
-	  odbc_is_valid_internal_code (code));
+    odbc_is_valid_internal_code (code));
 }
 
 PUBLIC int
@@ -470,20 +470,20 @@ PUBLIC int
 odbc_is_valid_c_type (short odbc_type)
 {
   return (odbc_is_valid_c_common_type (odbc_type) ||
-	  odbc_is_valid_c_date_type (odbc_type) ||
-	  odbc_is_valid_c_interval_type (odbc_type) ||
-	  odbc_is_valid_date_verbose_type (odbc_type) ||
-	  odbc_is_valid_interval_verbose_type (odbc_type));
+    odbc_is_valid_c_date_type (odbc_type) ||
+    odbc_is_valid_c_interval_type (odbc_type) ||
+    odbc_is_valid_date_verbose_type (odbc_type) ||
+    odbc_is_valid_interval_verbose_type (odbc_type));
 }
 
 PUBLIC int
 odbc_is_valid_sql_type (short odbc_type)
 {
   return (odbc_is_valid_sql_common_type (odbc_type) ||
-	  odbc_is_valid_sql_date_type (odbc_type) ||
-	  odbc_is_valid_sql_interval_type (odbc_type) ||
-	  odbc_is_valid_date_verbose_type (odbc_type) ||
-	  odbc_is_valid_interval_verbose_type (odbc_type));
+    odbc_is_valid_sql_date_type (odbc_type) ||
+    odbc_is_valid_sql_interval_type (odbc_type) ||
+    odbc_is_valid_date_verbose_type (odbc_type) ||
+    odbc_is_valid_interval_verbose_type (odbc_type));
 }
 
 PUBLIC int
@@ -495,9 +495,9 @@ odbc_is_valid_c_date_type (short c_type)
   for (i = 0; i < type_info_set_size; i++)
     {
       if (datetime_date_type_info_set[i].concise_c_type == c_type)
-	{
-	  return _TRUE_;
-	}
+  {
+    return _TRUE_;
+  }
     }
 
   return _FALSE_;
@@ -512,9 +512,9 @@ odbc_is_valid_sql_date_type (short sql_type)
   for (i = 0; i < type_info_set_size; i++)
     {
       if (datetime_date_type_info_set[i].concise_sql_type == sql_type)
-	{
-	  return _TRUE_;
-	}
+  {
+    return _TRUE_;
+  }
     }
 
   return _FALSE_;
@@ -529,9 +529,9 @@ odbc_is_valid_c_interval_type (short c_type)
   for (i = 0; i < type_info_set_size; i++)
     {
       if (datetime_internal_type_info_set[i].concise_c_type == c_type)
-	{
-	  return _TRUE_;
-	}
+  {
+    return _TRUE_;
+  }
     }
 
   return _FALSE_;
@@ -546,9 +546,9 @@ odbc_is_valid_sql_interval_type (short sql_type)
   for (i = 0; i < type_info_set_size; i++)
     {
       if (datetime_internal_type_info_set[i].concise_sql_type == sql_type)
-	{
-	  return _TRUE_;
-	}
+  {
+    return _TRUE_;
+  }
     }
 
   return _FALSE_;
@@ -567,17 +567,17 @@ odbc_concise_to_verbose_type (short type)
   for (i = 0; i < date_set_size; i++)
     {
       if (datetime_date_type_info_set[i].concise_sql_type == type)
-	{
-	  return datetime_date_type_info_set[i].verbose_type;
-	}
+  {
+    return datetime_date_type_info_set[i].verbose_type;
+  }
     }
 
   for (i = 0; i < date_set_size; i++)
     {
       if (datetime_internal_type_info_set[i].concise_sql_type == type)
-	{
-	  return datetime_internal_type_info_set[i].verbose_type;
-	}
+  {
+    return datetime_internal_type_info_set[i].verbose_type;
+  }
     }
 
   return type;
@@ -592,9 +592,9 @@ odbc_verbose_to_concise_type (short type, short code)
   for (i = 0; i < date_set_size; i++)
     {
       if (datetime_date_type_info_set[i].verbose_type == type)
-	{
-	  return datetime_date_type_info_set[i].concise_sql_type;
-	}
+  {
+    return datetime_date_type_info_set[i].concise_sql_type;
+  }
     }
 
   return type;
@@ -612,17 +612,17 @@ odbc_subcode_type (short type)
   for (i = 0; i < date_set_size; i++)
     {
       if (datetime_date_type_info_set[i].concise_sql_type == type)
-	{
-	  return datetime_date_type_info_set[i].type_subcode;
-	}
+  {
+    return datetime_date_type_info_set[i].type_subcode;
+  }
     }
 
   for (i = 0; i < date_set_size; i++)
     {
       if (datetime_internal_type_info_set[i].concise_sql_type == type)
-	{
-	  return datetime_internal_type_info_set[i].type_subcode;
-	}
+  {
+    return datetime_internal_type_info_set[i].type_subcode;
+  }
     }
 
   return 0;
@@ -630,7 +630,7 @@ odbc_subcode_type (short type)
 
 PUBLIC int
 odbc_type_default_info_by_name (char *type_name,
-				ODBC_DATA_TYPE_INFO * type_info)
+        ODBC_DATA_TYPE_INFO * type_info)
 {
   int i;
   int set_size = GET_SET_SIZE (odbc_data_type_info_set);
@@ -640,17 +640,17 @@ odbc_type_default_info_by_name (char *type_name,
     {
       type_info_in_set = odbc_data_type_info_set[i];
       if (strcmp (type_info_in_set.type_name, type_name) == 0)
-	{
-	  type_info->concise_c_type = type_info_in_set.concise_c_type;
-	  type_info->concise_sql_type = type_info_in_set.concise_sql_type;
+  {
+    type_info->concise_c_type = type_info_in_set.concise_c_type;
+    type_info->concise_sql_type = type_info_in_set.concise_sql_type;
 
-	  type_info->decimal_digits = type_info_in_set.default_decimal_digits;
-	  type_info->column_size = type_info_in_set.default_column_size;
-	  type_info->octet_length = type_info_in_set.default_octet_length;
-	  type_info->display_size = type_info_in_set.default_display_size;
+    type_info->decimal_digits = type_info_in_set.default_decimal_digits;
+    type_info->column_size = type_info_in_set.default_column_size;
+    type_info->octet_length = type_info_in_set.default_octet_length;
+    type_info->display_size = type_info_in_set.default_display_size;
 
-	  return 0;
-	}
+    return 0;
+  }
     }
 
   return -1;
@@ -665,9 +665,9 @@ odbc_default_c_type (short odbc_type)
   for (i = 0; i < set_size; i++)
     {
       if (odbc_data_type_info_set[i].concise_sql_type == odbc_type)
-	{
-	  return odbc_data_type_info_set[i].concise_c_type;
-	}
+  {
+    return odbc_data_type_info_set[i].concise_c_type;
+  }
     }
 
   return SQL_C_CHAR;
@@ -682,9 +682,9 @@ odbc_size_of_by_type_id (short odbc_type)
   for (i = 0; i < set_size; i++)
     {
       if (c_data_type_info_set[i].concise_c_type == odbc_type)
-	{
-	  return c_data_type_info_set[i].c_type_size;
-	}
+  {
+    return c_data_type_info_set[i].c_type_size;
+  }
     }
 
   return 0;
@@ -706,24 +706,24 @@ odbc_column_size (short odbc_type, int precision)
   for (i = 0; i < type_info_set_size; i++)
     {
       if (odbc_data_type_info_set[i].concise_sql_type == odbc_type)
-	{
-	  if (odbc_data_type_info_set[i].column_size == -1)
-	    {
-	      if (odbc_data_type_info_set[i].get_display_size != NULL)
-		{
-		  return odbc_data_type_info_set[i].
-		    get_column_size (precision);
-		}
-	      else
-		{
-		  break;
-		}
-	    }
-	  else
-	    {
-	      return odbc_data_type_info_set[i].column_size;
-	    }
-	}
+  {
+    if (odbc_data_type_info_set[i].column_size == -1)
+      {
+        if (odbc_data_type_info_set[i].get_display_size != NULL)
+    {
+      return odbc_data_type_info_set[i].
+        get_column_size (precision);
+    }
+        else
+    {
+      break;
+    }
+      }
+    else
+      {
+        return odbc_data_type_info_set[i].column_size;
+      }
+  }
     }
 
   return 0;
@@ -751,10 +751,10 @@ odbc_decimal_digits (short odbc_type, int scale)
   for (i = 0; i < type_info_set_size; i++)
     {
       if (odbc_data_type_info_set[i].concise_sql_type == odbc_type)
-	{
-	  return (odbc_data_type_info_set[i].decimal_digits != -1) ?
-	    odbc_data_type_info_set[i].decimal_digits : scale;
-	}
+  {
+    return (odbc_data_type_info_set[i].decimal_digits != -1) ?
+      odbc_data_type_info_set[i].decimal_digits : scale;
+  }
     }
 
   return 0;
@@ -776,25 +776,25 @@ odbc_octet_length (short odbc_type, int precision)
   for (i = 0; i < type_info_set_size; i++)
     {
       if (odbc_data_type_info_set[i].concise_sql_type == odbc_type ||
-	  odbc_data_type_info_set[i].concise_c_type == odbc_type)
-	{
-	  if (odbc_data_type_info_set[i].octet_length == -1)
-	    {
-	      if (odbc_data_type_info_set[i].get_octet_length != NULL)
-		{
-		  return odbc_data_type_info_set[i].
-		    get_octet_length (precision);
-		}
-	      else
-		{
-		  break;
-		}
-	    }
-	  else
-	    {
-	      return odbc_data_type_info_set[i].octet_length;
-	    }
-	}
+    odbc_data_type_info_set[i].concise_c_type == odbc_type)
+  {
+    if (odbc_data_type_info_set[i].octet_length == -1)
+      {
+        if (odbc_data_type_info_set[i].get_octet_length != NULL)
+    {
+      return odbc_data_type_info_set[i].
+        get_octet_length (precision);
+    }
+        else
+    {
+      break;
+    }
+      }
+    else
+      {
+        return odbc_data_type_info_set[i].octet_length;
+      }
+  }
     }
 
   return 0;
@@ -829,24 +829,24 @@ odbc_display_size (short odbc_type, int precision)
   for (i = 0; i < type_info_set_size; i++)
     {
       if (odbc_data_type_info_set[i].concise_sql_type == odbc_type)
-	{
-	  if (odbc_data_type_info_set[i].octet_length == -1)
-	    {
-	      if (odbc_data_type_info_set[i].get_display_size != NULL)
-		{
-		  return odbc_data_type_info_set[i].
-		    get_display_size (precision);
-		}
-	      else
-		{
-		  break;
-		}
-	    }
-	  else
-	    {
-	      return odbc_data_type_info_set[i].display_size;
-	    }
-	}
+  {
+    if (odbc_data_type_info_set[i].octet_length == -1)
+      {
+        if (odbc_data_type_info_set[i].get_display_size != NULL)
+    {
+      return odbc_data_type_info_set[i].
+        get_display_size (precision);
+    }
+        else
+    {
+      break;
+    }
+      }
+    else
+      {
+        return odbc_data_type_info_set[i].display_size;
+      }
+  }
     }
 
   return 0;
@@ -864,18 +864,18 @@ odbc_type_by_cci (T_CCI_U_TYPE cci_type, int precision)
     case CCI_U_TYPE_VARNCHAR:
 #ifdef DELPHI
       if (precision == MAX_CUBRID_CHAR_LEN)
-	{
-	  return SQL_LONGVARCHAR;
-	}
+  {
+    return SQL_LONGVARCHAR;
+  }
       else
-	{
-	  return SQL_VARCHAR;
-	}
+  {
+    return SQL_VARCHAR;
+  }
 #endif
-	  if(precision > 8000)
-	  {
-		  return SQL_LONGVARCHAR;
-	  }
+    if(precision > 8000)
+    {
+      return SQL_LONGVARCHAR;
+    }
       return SQL_VARCHAR;
     case CCI_U_TYPE_NCHAR:
       return SQL_CHAR;
@@ -931,9 +931,9 @@ odbc_type_name (short odbc_type)
   for (i = 0; i < type_info_set_size; i++)
     {
       if (odbc_data_type_info_set[i].concise_sql_type == odbc_type)
-	{
-	  return odbc_data_type_info_set[i].type_name;
-	}
+  {
+    return odbc_data_type_info_set[i].type_name;
+  }
     }
 
   return NULL;
@@ -948,9 +948,9 @@ odbc_type_to_cci_a_type (short c_type)
   for (i = 0; i < set_size; i++)
     {
       if (c_data_type_info_set[i].concise_c_type == c_type)
-	{
-	  return c_data_type_info_set[i].cci_a_type;
-	}
+  {
+    return c_data_type_info_set[i].cci_a_type;
+  }
     }
 
   return -1;
@@ -997,13 +997,13 @@ odbc_type_to_cci_u_type (short sql_type)
       return CCI_U_TYPE_DOUBLE;
 
     case SQL_TYPE_DATE:
-    case SQL_DATE:		// for 2.x backward compatibility
+    case SQL_DATE:    // for 2.x backward compatibility
       return CCI_U_TYPE_DATE;
     case SQL_TYPE_TIME:
-    case SQL_TIME:		// for 2.x backward compatibility
+    case SQL_TIME:    // for 2.x backward compatibility
       return CCI_U_TYPE_TIME;
     case SQL_TYPE_TIMESTAMP:
-    case SQL_TIMESTAMP:	// for 2.x backward compatibility
+    case SQL_TIMESTAMP: // for 2.x backward compatibility
       return CCI_U_TYPE_DATETIME;
     default:
       return CCI_U_TYPE_UNKNOWN;
@@ -1017,44 +1017,44 @@ odbc_type_to_cci_u_type (short sql_type)
  * returns/side-effects:
  * description:
  * NOTE:
- *		내부적으로 memory allocation이 일어나므로, 외부에서 free해줘야 한다.
+ *    내부적으로 memory allocation이 일어나므로, 외부에서 free해줘야 한다.
  *
- *			SQL_C_TYPE	|		T_CCI_A_TYPE
- *		----------------------------------------------
- *		SQL_C_SHORT		|			int
- *		SQL_C_SSHORT	|			int
- *		SQL_C_USRHOT	|			int
- *		SQL_C_STINYINT	|			int
- *		SQL_C_TINYINT	|			int
- *		SQL_C_UTINYINT	|			int
- *		SQL_C_LONG		|			int
- *		SQL_C_SLONG		|			int
- *		SQL_C_ULONG		|			int
- *		SQL_C_SBIGINT	|			int
- *		SQL_C_UBIGINT	|			int
- *		SQL_C_FLOAT		|			float
- *		SQL_C_DOUBLE	|			double
- *		SQL_C_CHAR		|			char*
- *		SQL_C_BINARY	|			T_CCI_BIT
- *		SQL_C_NUMERIC	|			char*
- *		SQL_C_DATE		|			T_CCI_DATE
- *		SQL_C_TIME		|			T_CCI_DATE
- *		SQL_C_TIMESTAMP |			T_CCI_DATE
+ *      SQL_C_TYPE  |   T_CCI_A_TYPE
+ *    ----------------------------------------------
+ *    SQL_C_SHORT   |     int
+ *    SQL_C_SSHORT  |     int
+ *    SQL_C_USRHOT  |     int
+ *    SQL_C_STINYINT  |     int
+ *    SQL_C_TINYINT |     int
+ *    SQL_C_UTINYINT  |     int
+ *    SQL_C_LONG    |     int
+ *    SQL_C_SLONG   |     int
+ *    SQL_C_ULONG   |     int
+ *    SQL_C_SBIGINT |     int
+ *    SQL_C_UBIGINT |     int
+ *    SQL_C_FLOAT   |     float
+ *    SQL_C_DOUBLE  |     double
+ *    SQL_C_CHAR    |     char*
+ *    SQL_C_BINARY  |     T_CCI_BIT
+ *    SQL_C_NUMERIC |     char*
+ *    SQL_C_DATE    |     T_CCI_DATE
+ *    SQL_C_TIME    |     T_CCI_DATE
+ *    SQL_C_TIMESTAMP |     T_CCI_DATE
  *
  ************************************************************************/
 PUBLIC void *
 odbc_value_to_cci (void *c_value, short c_type, long c_length,
-		   short c_precision, short c_scale)
+       short c_precision, short c_scale)
 {
   void *value = NULL;
 
   switch (c_type)
     {
 
-	/*---------------------------------------------------------------
-	 *					INTEGRAL TYPE
-	 *--------------------------------------------------------------*/
-    case SQL_C_SHORT:		// for 2.x backward compatibility
+  /*---------------------------------------------------------------
+   *          INTEGRAL TYPE
+   *--------------------------------------------------------------*/
+    case SQL_C_SHORT:   // for 2.x backward compatibility
     case SQL_C_SSHORT:
     case SQL_C_USHORT:
       value = UT_ALLOC (sizeof (int));
@@ -1063,12 +1063,12 @@ odbc_value_to_cci (void *c_value, short c_type, long c_length,
 
     case SQL_C_STINYINT:
     case SQL_C_UTINYINT:
-    case SQL_C_TINYINT:	// for 2.x backward compatibility
+    case SQL_C_TINYINT: // for 2.x backward compatibility
       value = UT_ALLOC (sizeof (int));
       *(int *) value = *(char *) c_value;
       break;
 
-    case SQL_C_LONG:		// for 2.x backward compatibility
+    case SQL_C_LONG:    // for 2.x backward compatibility
     case SQL_C_SLONG:
     case SQL_C_ULONG:
       value = UT_ALLOC (sizeof (int));
@@ -1080,9 +1080,9 @@ odbc_value_to_cci (void *c_value, short c_type, long c_length,
       *(__int64 *) value = *(__int64 *) c_value;
       break;
 
-	/*---------------------------------------------------------------
-	 *					floating point type
-	 *--------------------------------------------------------------*/
+  /*---------------------------------------------------------------
+   *          floating point type
+   *--------------------------------------------------------------*/
     case SQL_C_FLOAT:
       value = UT_ALLOC (sizeof (float));
       *(float *) value = *(float *) c_value;
@@ -1093,9 +1093,9 @@ odbc_value_to_cci (void *c_value, short c_type, long c_length,
       *(double *) value = *(double *) c_value;
       break;
 
-	/*---------------------------------------------------------------
-	 *					char & binary type
-	 *--------------------------------------------------------------*/
+  /*---------------------------------------------------------------
+   *          char & binary type
+   *--------------------------------------------------------------*/
     case SQL_C_CHAR:
       value = UT_MAKE_STRING (c_value, c_length);
       break;
@@ -1110,11 +1110,11 @@ odbc_value_to_cci (void *c_value, short c_type, long c_length,
       ((T_CCI_BIT *) value)->buf = UT_MAKE_BINARY (c_value, c_length);
       break;
 
-	/*---------------------------------------------------------------
-	 *					date & time type
-	 *--------------------------------------------------------------*/
+  /*---------------------------------------------------------------
+   *          date & time type
+   *--------------------------------------------------------------*/
     case SQL_C_TYPE_DATE:
-    case SQL_C_DATE:		// for 2.x backward compatibility
+    case SQL_C_DATE:    // for 2.x backward compatibility
       value = UT_ALLOC (sizeof (T_CCI_DATE));
       ((T_CCI_DATE *) value)->yr = ((SQL_DATE_STRUCT *) c_value)->year;
       ((T_CCI_DATE *) value)->mon = ((SQL_DATE_STRUCT *) c_value)->month;
@@ -1122,7 +1122,7 @@ odbc_value_to_cci (void *c_value, short c_type, long c_length,
       break;
 
     case SQL_C_TYPE_TIME:
-    case SQL_C_TIME:		// for 2.x backward compatibility
+    case SQL_C_TIME:    // for 2.x backward compatibility
       value = UT_ALLOC (sizeof (T_CCI_DATE));
       ((T_CCI_DATE *) value)->hh = ((SQL_TIME_STRUCT *) c_value)->hour;
       ((T_CCI_DATE *) value)->mm = ((SQL_TIME_STRUCT *) c_value)->minute;
@@ -1130,7 +1130,7 @@ odbc_value_to_cci (void *c_value, short c_type, long c_length,
       break;
 
     case SQL_C_TYPE_TIMESTAMP:
-    case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
+    case SQL_C_TIMESTAMP: // for 2.x backward compatibility
       value = UT_ALLOC (sizeof (T_CCI_DATE));
       ((T_CCI_DATE *) value)->yr = ((SQL_TIMESTAMP_STRUCT *) c_value)->year;
       ((T_CCI_DATE *) value)->mon = ((SQL_TIMESTAMP_STRUCT *) c_value)->month;
@@ -1141,64 +1141,64 @@ odbc_value_to_cci (void *c_value, short c_type, long c_length,
       ((T_CCI_DATE *) value)->ms = (short)(((SQL_TIMESTAMP_STRUCT *) c_value)->fraction);
       break;
 
-	/*---------------------------------------------------------------
-	 *					numeric type
-	 *--------------------------------------------------------------*/
+  /*---------------------------------------------------------------
+   *          numeric type
+   *--------------------------------------------------------------*/
     case SQL_C_NUMERIC:
       {
-	bc_num num1 = NULL, num2 = NULL, base = NULL, res_num =
-	  NULL, res_tmp = NULL;
-	unsigned char *pt;
-	char buf[16];
-	short i;
+  bc_num num1 = NULL, num2 = NULL, base = NULL, res_num =
+    NULL, res_tmp = NULL;
+  unsigned char *pt;
+  char buf[16];
+  short i;
 
-	init_numbers ();
+  init_numbers ();
 
-	str2num (&res_num, "0", 0);
-	str2num (&base, "256", 0);
+  str2num (&res_num, "0", 0);
+  str2num (&base, "256", 0);
 
-	for (pt =
-	     ((SQL_NUMERIC_STRUCT *) c_value)->val + (SQL_MAX_NUMERIC_LEN -
-						      1), i = 0;
-	     i < SQL_MAX_NUMERIC_LEN; --pt, ++i)
-	  {
-	    sprintf (buf, "%d", *pt);
-	    str2num (&num2, buf, 0);
+  for (pt =
+       ((SQL_NUMERIC_STRUCT *) c_value)->val + (SQL_MAX_NUMERIC_LEN -
+                  1), i = 0;
+       i < SQL_MAX_NUMERIC_LEN; --pt, ++i)
+    {
+      sprintf (buf, "%d", *pt);
+      str2num (&num2, buf, 0);
 
-	    num1 = res_num;
-	    res_num = NULL;
-	    bc_multiply (num1, base, &res_tmp, 0);
-	    bc_add (res_tmp, num2, &res_num, 0);
+      num1 = res_num;
+      res_num = NULL;
+      bc_multiply (num1, base, &res_tmp, 0);
+      bc_add (res_tmp, num2, &res_num, 0);
 
-	    free_num (&num1);	// free_num - assign null to num1
-	    free_num (&num2);
-	    free_num (&res_tmp);
-	  }
+      free_num (&num1); // free_num - assign null to num1
+      free_num (&num2);
+      free_num (&res_tmp);
+    }
 
-	value = num2str (res_num);
-	if (c_scale > 0)
-	  {
-	    value = UT_REALLOC (value, strlen (value) + 2);	// for period
-	    pt = value;
+  value = num2str (res_num);
+  if (c_scale > 0)
+    {
+      value = UT_REALLOC (value, strlen (value) + 2); // for period
+      pt = value;
 //                              pt += c_precision - c_scale;  // OR pt += strlen(value) - scale;
-	    pt += strlen (value) - c_scale;
-	    memmove (pt + 1, pt, c_scale + 1);
-	    *pt = '.';
-	  }
+      pt += strlen (value) - c_scale;
+      memmove (pt + 1, pt, c_scale + 1);
+      *pt = '.';
+    }
 
-	if (((SQL_NUMERIC_STRUCT *) c_value)->sign == 0)
-	  {			// negative
-	    value = UT_REALLOC (value, strlen ((char *) value) + 2);	// for sign
-	    memmove ((char *) value + 1, value, strlen ((char *) value) + 1);
-	    ((char *) value)[0] = '-';
-	  }
+  if (((SQL_NUMERIC_STRUCT *) c_value)->sign == 0)
+    {     // negative
+      value = UT_REALLOC (value, strlen ((char *) value) + 2);  // for sign
+      memmove ((char *) value + 1, value, strlen ((char *) value) + 1);
+      ((char *) value)[0] = '-';
+    }
 
-	free_num (&num1);
-	free_num (&num2);
-	free_num (&res_tmp);
-	free_num (&res_num);
-	free_num (&base);
-	break;
+  free_num (&num1);
+  free_num (&num2);
+  free_num (&res_tmp);
+  free_num (&res_num);
+  free_num (&base);
+  break;
       }
     }
 
@@ -1208,41 +1208,41 @@ odbc_value_to_cci (void *c_value, short c_type, long c_length,
 /************************************************************************
  * name: odbc_value_to_cci2
  * arguments:
- *		index - array index
- *		sql_value_root - void* type
+ *    index - array index
+ *    sql_value_root - void* type
  * returns/side-effects:
  * description:
  * NOTE:
- *		odbc_value_to_cci와 달리 argument에 값을 할당해준다.
- *		Binary와 String의 경우만 memory alloc이 일어난다.
+ *    odbc_value_to_cci와 달리 argument에 값을 할당해준다.
+ *    Binary와 String의 경우만 memory alloc이 일어난다.
  *
- *			SQL_C_TYPE	|		T_CCI_A_TYPE
- *		----------------------------------------------
- *		SQL_C_SHORT		|			int
- *		SQL_C_SSHORT	|			int
- *		SQL_C_USRHOT	|			int
- *		SQL_C_STINYINT	|			int
- *		SQL_C_TINYINT	|			int
- *		SQL_C_UTINYINT	|			int
- *		SQL_C_LONG		|			int
- *		SQL_C_SLONG		|			int
- *		SQL_C_ULONG		|			int
- *		SQL_C_SBIGINT	|			int
- *		SQL_C_UBIGINT	|			int
- *		SQL_C_FLOAT		|			float
- *		SQL_C_DOUBLE	|			double
- *		SQL_C_CHAR		|			char*
- *		SQL_C_BINARY	|			T_CCI_BIT
- *		SQL_C_NUMERIC	|			char*
- *		SQL_C_DATE		|			T_CCI_DATE
- *		SQL_C_TIME		|			T_CCI_DATE
- *		SQL_C_TIMESTAMP |			T_CCI_DATE
+ *      SQL_C_TYPE  |   T_CCI_A_TYPE
+ *    ----------------------------------------------
+ *    SQL_C_SHORT   |     int
+ *    SQL_C_SSHORT  |     int
+ *    SQL_C_USRHOT  |     int
+ *    SQL_C_STINYINT  |     int
+ *    SQL_C_TINYINT |     int
+ *    SQL_C_UTINYINT  |     int
+ *    SQL_C_LONG    |     int
+ *    SQL_C_SLONG   |     int
+ *    SQL_C_ULONG   |     int
+ *    SQL_C_SBIGINT |     int
+ *    SQL_C_UBIGINT |     int
+ *    SQL_C_FLOAT   |     float
+ *    SQL_C_DOUBLE  |     double
+ *    SQL_C_CHAR    |     char*
+ *    SQL_C_BINARY  |     T_CCI_BIT
+ *    SQL_C_NUMERIC |     char*
+ *    SQL_C_DATE    |     T_CCI_DATE
+ *    SQL_C_TIME    |     T_CCI_DATE
+ *    SQL_C_TIMESTAMP |     T_CCI_DATE
  *
  ************************************************************************/
 PUBLIC void
 odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
-		    short c_type, long c_length, short c_precision,
-		    short c_scale)
+        short c_type, long c_length, short c_precision,
+        short c_scale)
 {
 
 #if !defined (_WINDOWS)
@@ -1255,10 +1255,10 @@ odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
   switch (c_type)
     {
 
-	/*---------------------------------------------------------------
-	 *					INTEGRAL TYPE
-	 *--------------------------------------------------------------*/
-    case SQL_C_SHORT:		// for 2.x backward compatibility
+  /*---------------------------------------------------------------
+   *          INTEGRAL TYPE
+   *--------------------------------------------------------------*/
+    case SQL_C_SHORT:   // for 2.x backward compatibility
     case SQL_C_SSHORT:
     case SQL_C_USHORT:
       *((int *) sql_value_root + index) = *(short *) c_value;
@@ -1266,11 +1266,11 @@ odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
 
     case SQL_C_STINYINT:
     case SQL_C_UTINYINT:
-    case SQL_C_TINYINT:	// for 2.x backward compatibility
+    case SQL_C_TINYINT: // for 2.x backward compatibility
       *((int *) sql_value_root + index) = *(char *) c_value;
       break;
 
-    case SQL_C_LONG:		// for 2.x backward compatibility
+    case SQL_C_LONG:    // for 2.x backward compatibility
     case SQL_C_SLONG:
     case SQL_C_ULONG:
       *((int *) sql_value_root + index) = *(long *) c_value;
@@ -1280,9 +1280,9 @@ odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
       *((__int64 *) sql_value_root + index) = *(__int64 *) c_value;
       break;
 
-	/*---------------------------------------------------------------
-	 *					floating point type
-	 *--------------------------------------------------------------*/
+  /*---------------------------------------------------------------
+   *          floating point type
+   *--------------------------------------------------------------*/
     case SQL_C_FLOAT:
       *((float *) sql_value_root + index) = *(float *) c_value;
       break;
@@ -1291,134 +1291,134 @@ odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
       *((double *) sql_value_root + index) = *(double *) c_value;
       break;
 
-	/*---------------------------------------------------------------
-	 *					char & binary type
-	 *--------------------------------------------------------------*/
+  /*---------------------------------------------------------------
+   *          char & binary type
+   *--------------------------------------------------------------*/
     case SQL_C_CHAR:
 #if defined (_WINDOWS)
       *((char **) sql_value_root + index) =
-	UT_MAKE_STRING (c_value, c_length);
+  UT_MAKE_STRING (c_value, c_length);
 #else
-	{
-	  void *value_p;
+  {
+    void *value_p;
 
-	  wide_char_to_bytes ((void *)c_value, c_length, (char **)&value_p, NULL, NULL);
-	  *((char **) sql_value_root + index) = value_p;
-	}
+    wide_char_to_bytes ((void *)c_value, c_length, (char **)&value_p, NULL, NULL);
+    *((char **) sql_value_root + index) = value_p;
+  }
 #endif
       break;
 
     case SQL_C_WCHAR:
       *((char **) sql_value_root + index) =
-	UT_MAKE_BINARY (c_value, c_length + sizeof (wchar_t));
+  UT_MAKE_BINARY (c_value, c_length + sizeof (wchar_t));
       break;
 
     case SQL_C_BINARY:
       ((T_CCI_BIT *) sql_value_root + index)->size = c_length;
       ((T_CCI_BIT *) sql_value_root + index)->buf =
-	UT_MAKE_BINARY (c_value, c_length);
+  UT_MAKE_BINARY (c_value, c_length);
       break;
 
-	/*---------------------------------------------------------------
-	 *					date & time type
-	 *--------------------------------------------------------------*/
+  /*---------------------------------------------------------------
+   *          date & time type
+   *--------------------------------------------------------------*/
     case SQL_C_TYPE_DATE:
-    case SQL_C_DATE:		// for 2.x backward compatibility
+    case SQL_C_DATE:    // for 2.x backward compatibility
       ((T_CCI_DATE *) sql_value_root + index)->yr =
-	((SQL_DATE_STRUCT *) c_value)->year;
+  ((SQL_DATE_STRUCT *) c_value)->year;
       ((T_CCI_DATE *) sql_value_root + index)->mon =
-	((SQL_DATE_STRUCT *) c_value)->month;
+  ((SQL_DATE_STRUCT *) c_value)->month;
       ((T_CCI_DATE *) sql_value_root + index)->day =
-	((SQL_DATE_STRUCT *) c_value)->day;
+  ((SQL_DATE_STRUCT *) c_value)->day;
       break;
 
     case SQL_C_TYPE_TIME:
-    case SQL_C_TIME:		// for 2.x backward compatibility
+    case SQL_C_TIME:    // for 2.x backward compatibility
       ((T_CCI_DATE *) sql_value_root + index)->hh =
-	((SQL_TIME_STRUCT *) c_value)->hour;
+  ((SQL_TIME_STRUCT *) c_value)->hour;
       ((T_CCI_DATE *) sql_value_root + index)->mm =
-	((SQL_TIME_STRUCT *) c_value)->minute;
+  ((SQL_TIME_STRUCT *) c_value)->minute;
       ((T_CCI_DATE *) sql_value_root + index)->ss =
-	((SQL_TIME_STRUCT *) c_value)->second;
+  ((SQL_TIME_STRUCT *) c_value)->second;
       break;
 
     case SQL_C_TYPE_TIMESTAMP:
-    case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
+    case SQL_C_TIMESTAMP: // for 2.x backward compatibility
       ((T_CCI_DATE *) sql_value_root + index)->yr =
-	((SQL_TIMESTAMP_STRUCT *) c_value)->year;
+  ((SQL_TIMESTAMP_STRUCT *) c_value)->year;
       ((T_CCI_DATE *) sql_value_root + index)->mon =
-	((SQL_TIMESTAMP_STRUCT *) c_value)->month;
+  ((SQL_TIMESTAMP_STRUCT *) c_value)->month;
       ((T_CCI_DATE *) sql_value_root + index)->day =
-	((SQL_TIMESTAMP_STRUCT *) c_value)->day;
+  ((SQL_TIMESTAMP_STRUCT *) c_value)->day;
       ((T_CCI_DATE *) sql_value_root + index)->hh =
-	((SQL_TIMESTAMP_STRUCT *) c_value)->hour;
+  ((SQL_TIMESTAMP_STRUCT *) c_value)->hour;
       ((T_CCI_DATE *) sql_value_root + index)->mm =
-	((SQL_TIMESTAMP_STRUCT *) c_value)->minute;
+  ((SQL_TIMESTAMP_STRUCT *) c_value)->minute;
       ((T_CCI_DATE *) sql_value_root + index)->ss =
-	((SQL_TIMESTAMP_STRUCT *) c_value)->second;
+  ((SQL_TIMESTAMP_STRUCT *) c_value)->second;
       break;
 
-	/*---------------------------------------------------------------
-	 *					numeric type
-	 *--------------------------------------------------------------*/
+  /*---------------------------------------------------------------
+   *          numeric type
+   *--------------------------------------------------------------*/
     case SQL_C_NUMERIC:
       {
-	bc_num num1 = NULL, num2 = NULL, base = NULL, res_num =
-	  NULL, res_tmp = NULL;
-	unsigned char *pt;
-	char *value;
-	char buf[16];
-	short i;
+  bc_num num1 = NULL, num2 = NULL, base = NULL, res_num =
+    NULL, res_tmp = NULL;
+  unsigned char *pt;
+  char *value;
+  char buf[16];
+  short i;
 
-	init_numbers ();
+  init_numbers ();
 
-	str2num (&res_num, "0", 0);
-	str2num (&base, "256", 0);
+  str2num (&res_num, "0", 0);
+  str2num (&base, "256", 0);
 
-	for (pt =
-	     ((SQL_NUMERIC_STRUCT *) c_value)->val + (SQL_MAX_NUMERIC_LEN -
-						      1), i = 0;
-	     i < SQL_MAX_NUMERIC_LEN; ++pt, ++i)
-	  {
-	    sprintf (buf, "%d", *pt);
-	    str2num (&num2, buf, 0);
+  for (pt =
+       ((SQL_NUMERIC_STRUCT *) c_value)->val + (SQL_MAX_NUMERIC_LEN -
+                  1), i = 0;
+       i < SQL_MAX_NUMERIC_LEN; ++pt, ++i)
+    {
+      sprintf (buf, "%d", *pt);
+      str2num (&num2, buf, 0);
 
-	    num1 = res_num;
-	    res_num = NULL;
-	    bc_multiply (num1, base, &res_tmp, 0);
-	    bc_add (res_tmp, num2, &res_num, 0);
+      num1 = res_num;
+      res_num = NULL;
+      bc_multiply (num1, base, &res_tmp, 0);
+      bc_add (res_tmp, num2, &res_num, 0);
 
-	    free_num (&num1);	// free_num - assign null to num1
-	    free_num (&num2);
-	    free_num (&res_tmp);
-	  }
+      free_num (&num1); // free_num - assign null to num1
+      free_num (&num2);
+      free_num (&res_tmp);
+    }
 
-	value = num2str (res_num);
-	if (c_scale > 0)
-	  {
-	    value = UT_REALLOC (value, strlen (value) + 2);	// for period
-	    pt = value;
-	    pt += c_precision - c_scale;	// OR pt += strlen(value) - scale;
-	    memmove (pt + 1, pt, c_scale + 1);
-	    *pt = '.';
-	  }
+  value = num2str (res_num);
+  if (c_scale > 0)
+    {
+      value = UT_REALLOC (value, strlen (value) + 2); // for period
+      pt = value;
+      pt += c_precision - c_scale;  // OR pt += strlen(value) - scale;
+      memmove (pt + 1, pt, c_scale + 1);
+      *pt = '.';
+    }
 
-	if (((SQL_NUMERIC_STRUCT *) c_value)->sign == 0)
-	  {			// negative
-	    value = UT_REALLOC (value, strlen ((char *) value) + 2);	// for sign
-	    memmove ((char *) value + 1, value, strlen ((char *) value) + 1);
-	    ((char *) value)[0] = '-';
-	  }
+  if (((SQL_NUMERIC_STRUCT *) c_value)->sign == 0)
+    {     // negative
+      value = UT_REALLOC (value, strlen ((char *) value) + 2);  // for sign
+      memmove ((char *) value + 1, value, strlen ((char *) value) + 1);
+      ((char *) value)[0] = '-';
+    }
 
-	/* NUMERIC은 CCI_A_TYPE_STR로 conversion한다. */
-	*((char **) sql_value_root + index) = value;
+  /* NUMERIC은 CCI_A_TYPE_STR로 conversion한다. */
+  *((char **) sql_value_root + index) = value;
 
-	free_num (&num1);
-	free_num (&num2);
-	free_num (&res_tmp);
-	free_num (&res_num);
-	free_num (&base);
-	break;
+  free_num (&num1);
+  free_num (&num2);
+  free_num (&res_tmp);
+  free_num (&res_num);
+  free_num (&base);
+  break;
 
       }
 
@@ -1429,28 +1429,28 @@ odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
  * name: cci_value_to_odbc
  * arguments:
  * returns/side-effects:
- *		cci_value length
+ *    cci_value length
  * description:
  * NOTE:
- *		SQL_C_TYPE과 T_CCI_A_TYPE과의 관계는 odbc_value_to_cci()를 참조한다.
- *		value truncation에 대해서 고려되지 않았다.
- *		string type과 binary type은 실제로 발생하지 않는다.
+ *    SQL_C_TYPE과 T_CCI_A_TYPE과의 관계는 odbc_value_to_cci()를 참조한다.
+ *    value truncation에 대해서 고려되지 않았다.
+ *    string type과 binary type은 실제로 발생하지 않는다.
  ************************************************************************/
 PUBLIC SQLLEN
 cci_value_to_odbc (void *c_value, short concise_type,
-		   short precision, short scale,
-		   SQLLEN buffer_length, UNI_CCI_A_TYPE * cci_value,
-		   T_CCI_A_TYPE a_type,int* error_code)
+       short precision, short scale,
+       SQLLEN buffer_length, UNI_CCI_A_TYPE * cci_value,
+       T_CCI_A_TYPE a_type,int* error_code)
 {
   SQLLEN length = 0;
 
   switch (concise_type)
     {
 
-	/*---------------------------------------------------------------
-	 *					INTEGRAL TYPE
-	 *--------------------------------------------------------------*/
-    case SQL_C_SHORT:		// for 2.x backward compatibility
+  /*---------------------------------------------------------------
+   *          INTEGRAL TYPE
+   *--------------------------------------------------------------*/
+    case SQL_C_SHORT:   // for 2.x backward compatibility
     case SQL_C_SSHORT:
       if(cci_value->i>SHRT_MAX || cci_value->i<SHRT_MIN)
       {
@@ -1486,7 +1486,7 @@ cci_value_to_odbc (void *c_value, short concise_type,
       *(char *) c_value = cci_value->i;
       length = sizeof (char);
       break;
-    case SQL_C_UTINYINT:	// for 2.x backward compatibility
+    case SQL_C_UTINYINT:  // for 2.x backward compatibility
       if(cci_value->i>SCHAR_MAX || cci_value->i<SCHAR_MIN)
       {
           length = 0;
@@ -1498,7 +1498,7 @@ cci_value_to_odbc (void *c_value, short concise_type,
       length = sizeof (char);
       break;
 
-    case SQL_C_LONG:		// for 2.x backward compatibility
+    case SQL_C_LONG:    // for 2.x backward compatibility
     case SQL_C_SLONG:
      if(cci_value->i>LONG_MAX || cci_value->i<LONG_MIN)
       {
@@ -1544,9 +1544,9 @@ cci_value_to_odbc (void *c_value, short concise_type,
       break;
 
 
-	/*---------------------------------------------------------------
-	 *					floating point type
-	 *--------------------------------------------------------------*/
+  /*---------------------------------------------------------------
+   *          floating point type
+   *--------------------------------------------------------------*/
     case SQL_C_FLOAT:
       *(float *) c_value = cci_value->f;
       length = sizeof (float);
@@ -1557,23 +1557,23 @@ cci_value_to_odbc (void *c_value, short concise_type,
       length = sizeof (double);
       break;
 
-	/*---------------------------------------------------------------
-	 *					char & binary type
-	 *--------------------------------------------------------------*/
+  /*---------------------------------------------------------------
+   *          char & binary type
+   *--------------------------------------------------------------*/
     case SQL_C_CHAR:
       str_value_assign (cci_value->str, c_value, buffer_length, &length);
       break;
 
     case SQL_C_BINARY:
       bin_value_assign (cci_value->bit.buf, cci_value->bit.size,
-			c_value, buffer_length, &length);
+      c_value, buffer_length, &length);
       break;
 
-	/*---------------------------------------------------------------
-	 *					date & time type
-	 *--------------------------------------------------------------*/
+  /*---------------------------------------------------------------
+   *          date & time type
+   *--------------------------------------------------------------*/
     case SQL_C_TYPE_DATE:
-    case SQL_C_DATE:		// for 2.x backward compatibility
+    case SQL_C_DATE:    // for 2.x backward compatibility
       ((SQL_DATE_STRUCT *) c_value)->year = cci_value->date.yr;
       ((SQL_DATE_STRUCT *) c_value)->month = cci_value->date.mon;
       ((SQL_DATE_STRUCT *) c_value)->day = cci_value->date.day;
@@ -1581,7 +1581,7 @@ cci_value_to_odbc (void *c_value, short concise_type,
       break;
 
     case SQL_C_TYPE_TIME:
-    case SQL_C_TIME:		// for 2.x backward compatibility
+    case SQL_C_TIME:    // for 2.x backward compatibility
       ((SQL_TIME_STRUCT *) c_value)->hour = cci_value->date.hh;
       ((SQL_TIME_STRUCT *) c_value)->minute = cci_value->date.mm;
       ((SQL_TIME_STRUCT *) c_value)->second = cci_value->date.ss;
@@ -1589,7 +1589,7 @@ cci_value_to_odbc (void *c_value, short concise_type,
       break;
 
     case SQL_C_TYPE_TIMESTAMP:
-    case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
+    case SQL_C_TIMESTAMP: // for 2.x backward compatibility
       ((SQL_TIMESTAMP_STRUCT *) c_value)->year = cci_value->date.yr;
       ((SQL_TIMESTAMP_STRUCT *) c_value)->month = cci_value->date.mon;
       ((SQL_TIMESTAMP_STRUCT *) c_value)->day = cci_value->date.day;
@@ -1600,95 +1600,95 @@ cci_value_to_odbc (void *c_value, short concise_type,
       length = sizeof (SQL_TIMESTAMP_STRUCT);
       break;
 
-	/*---------------------------------------------------------------
-	 *					numeric type
-	 *--------------------------------------------------------------*/
+  /*---------------------------------------------------------------
+   *          numeric type
+   *--------------------------------------------------------------*/
     case SQL_C_NUMERIC:
       {
-	bc_num num1 = NULL, num2 = NULL, quot = NULL, rem = NULL, res_tmp =
-	  NULL;
-	char *pt, *pt2, *tmp_str_num = NULL;
-	char str[64];		/* numeric value that is removed a period
-				 * cf) The max precision of numeric is 38 in CUBRID
-				 */
-	short i;
-	int num_add_zero = 0;
+  bc_num num1 = NULL, num2 = NULL, quot = NULL, rem = NULL, res_tmp =
+    NULL;
+  char *pt, *pt2, *tmp_str_num = NULL;
+  char str[64];   /* numeric value that is removed a period
+         * cf) The max precision of numeric is 38 in CUBRID
+         */
+  short i;
+  int num_add_zero = 0;
 
 
-	((SQL_NUMERIC_STRUCT *) c_value)->precision =
-	  (unsigned char) precision;
-	((SQL_NUMERIC_STRUCT *) c_value)->scale = (unsigned char) scale;
+  ((SQL_NUMERIC_STRUCT *) c_value)->precision =
+    (unsigned char) precision;
+  ((SQL_NUMERIC_STRUCT *) c_value)->scale = (unsigned char) scale;
 
-	if (cci_value->str[0] == '-')
-	  {
-	    ((SQL_NUMERIC_STRUCT *) c_value)->sign = 0;	// negative
-	    pt = cci_value->str + 1;
-	  }
-	else
-	  {
-	    ((SQL_NUMERIC_STRUCT *) c_value)->sign = 1;	// positive
-	    pt = cci_value->str;
-	  }
-	// pt means the first vaild digit position
+  if (cci_value->str[0] == '-')
+    {
+      ((SQL_NUMERIC_STRUCT *) c_value)->sign = 0; // negative
+      pt = cci_value->str + 1;
+    }
+  else
+    {
+      ((SQL_NUMERIC_STRUCT *) c_value)->sign = 1; // positive
+      pt = cci_value->str;
+    }
+  // pt means the first vaild digit position
 
-	pt2 = strchr (pt, '.');
-	if (pt2 != NULL)
-	  {
-	    strncpy (str, pt, pt2 - pt);
-	    str[pt2 - pt] = '\0';
-	    ++pt2;
-	    strcat (str, pt2);
-	    ((SQL_NUMERIC_STRUCT *) c_value)->scale =  strlen (pt2);
-	    num_add_zero = ((SQL_NUMERIC_STRUCT *) c_value)->scale - strlen (pt2);
-		if (num_add_zero < 0)
-		{
-			str[strlen(str) + num_add_zero] = '\0';
-		}
-		else
-		{
-	    // add additional '0' for scale
-	    for (pt = str + strlen (str), i = 1; i <= num_add_zero; ++pt, ++i)
-	      {
-		*pt = '0';
-	      }
-	    *pt = '\0';
-		  }
-	  }
-	else
-	  {
-	    strcpy (str, pt);
-	  }
+  pt2 = strchr (pt, '.');
+  if (pt2 != NULL)
+    {
+      strncpy (str, pt, pt2 - pt);
+      str[pt2 - pt] = '\0';
+      ++pt2;
+      strcat (str, pt2);
+      ((SQL_NUMERIC_STRUCT *) c_value)->scale =  strlen (pt2);
+      num_add_zero = ((SQL_NUMERIC_STRUCT *) c_value)->scale - strlen (pt2);
+    if (num_add_zero < 0)
+    {
+      str[strlen(str) + num_add_zero] = '\0';
+    }
+    else
+    {
+      // add additional '0' for scale
+      for (pt = str + strlen (str), i = 1; i <= num_add_zero; ++pt, ++i)
+        {
+    *pt = '0';
+        }
+      *pt = '\0';
+      }
+    }
+  else
+    {
+      strcpy (str, pt);
+    }
 
-	init_numbers ();
+  init_numbers ();
 
-	str2num (&num1, str, 0);
-	str2num (&num2, "256", 0);
+  str2num (&num1, str, 0);
+  str2num (&num2, "256", 0);
 
 
-	for (i = 0, tmp_str_num = NULL; i < SQL_MAX_NUMERIC_LEN; ++i)
-	  {
-	    bc_divmod (num1, num2, &quot, &rem, 0);
+  for (i = 0, tmp_str_num = NULL; i < SQL_MAX_NUMERIC_LEN; ++i)
+    {
+      bc_divmod (num1, num2, &quot, &rem, 0);
 
-	    tmp_str_num = num2str (rem);
+      tmp_str_num = num2str (rem);
 
-	    ((SQL_NUMERIC_STRUCT *) c_value)->val[i] =
-	      (unsigned char) atoi (tmp_str_num);
+      ((SQL_NUMERIC_STRUCT *) c_value)->val[i] =
+        (unsigned char) atoi (tmp_str_num);
 
-	    NA_FREE (tmp_str_num);
-	    free_num (&rem);
-	    free_num (&num1);
-	    num1 = quot;
-	  }
+      NA_FREE (tmp_str_num);
+      free_num (&rem);
+      free_num (&num1);
+      num1 = quot;
+    }
 
-	//free_num (&num1);
-	free_num (&num2);
-	free_num (&quot);
-	free_num (&rem);
-	NA_FREE (tmp_str_num);
+  //free_num (&num1);
+  free_num (&num2);
+  free_num (&quot);
+  free_num (&rem);
+  NA_FREE (tmp_str_num);
 
-	length = sizeof (SQL_NUMERIC_STRUCT);
+  length = sizeof (SQL_NUMERIC_STRUCT);
 
-	break;
+  break;
       }
     }
 
@@ -1717,9 +1717,9 @@ clear_value_container (VALUE_CONTAINER * value)
   if (value->type == SQL_C_CHAR || value->type == SQL_C_BINARY)
     {
       if (value->value.dummy != NULL)
-	{
-	  UT_FREE (value->value.dummy);
-	}
+  {
+    UT_FREE (value->value.dummy);
+  }
     }
 }
 
@@ -1735,14 +1735,14 @@ free_value_container (VALUE_CONTAINER * value)
 }
 
 /*
- *	partially not implemented
- *			BINARY, date type
- *	Not implemented about
- *			BIT, NUMERIC, OBJECT, SET, TINYINT, BIGINT
+ *  partially not implemented
+ *      BINARY, date type
+ *  Not implemented about
+ *      BIT, NUMERIC, OBJECT, SET, TINYINT, BIGINT
  */
 PUBLIC RETCODE
 odbc_value_converter (VALUE_CONTAINER * target_value,
-		      VALUE_CONTAINER * src_value)
+          VALUE_CONTAINER * src_value)
 {
   char buf[BUF_SIZE];
 
@@ -1764,103 +1764,103 @@ odbc_value_converter (VALUE_CONTAINER * target_value,
     {
     case SQL_C_CHAR:
       switch (target_value->type)
-	{
-	case SQL_C_CHAR:
-	case SQL_C_BINARY:
-	  target_value->value.str = UT_MAKE_STRING (src_value->value.str, -1);
-	  target_value->length = src_value->length;
-	  break;
-	case SQL_C_SHORT:	// for 2.x backward compatibility
-	case SQL_C_SSHORT:
-	case SQL_C_USHORT:
-	  target_value->value.s = (short) atoi (src_value->value.str);
-	  target_value->length = sizeof (short);
-	  break;
-	case SQL_C_LONG:	// for 2.x backward compatibility
-	case SQL_C_SLONG:
-	case SQL_C_ULONG:
-	  target_value->value.l = atol (src_value->value.str);
-	  target_value->length = sizeof (long);
-	  break;
-	case SQL_C_SBIGINT:
-	case SQL_C_UBIGINT:
-	  target_value->value.bi = _atoi64 (src_value->value.str);
-	  target_value->length = sizeof (__int64);
-	  break;
-	case SQL_C_FLOAT:
-	  target_value->value.f = (float) atof (src_value->value.str);
-	  target_value->length = sizeof (float);
-	  break;
-	case SQL_C_DOUBLE:
-	  target_value->value.d = atof (src_value->value.str);
-	  target_value->length = sizeof (double);
-	  break;
-	case SQL_C_NUMERIC:
-	case SQL_C_BIT:
-	case SQL_C_TYPE_DATE:
-	case SQL_C_TYPE_TIME:
-	case SQL_C_TYPE_TIMESTAMP:
-	case SQL_C_DATE:	// for 2.x backward compatibility
-	case SQL_C_TIME:	// for 2.x backward compatibility
-	case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
-	  return ODBC_NOT_IMPLEMENTED;
-	default:
-	  return ODBC_UNKNOWN_TYPE;
-	}
+  {
+  case SQL_C_CHAR:
+  case SQL_C_BINARY:
+    target_value->value.str = UT_MAKE_STRING (src_value->value.str, -1);
+    target_value->length = src_value->length;
+    break;
+  case SQL_C_SHORT: // for 2.x backward compatibility
+  case SQL_C_SSHORT:
+  case SQL_C_USHORT:
+    target_value->value.s = (short) atoi (src_value->value.str);
+    target_value->length = sizeof (short);
+    break;
+  case SQL_C_LONG:  // for 2.x backward compatibility
+  case SQL_C_SLONG:
+  case SQL_C_ULONG:
+    target_value->value.l = atol (src_value->value.str);
+    target_value->length = sizeof (long);
+    break;
+  case SQL_C_SBIGINT:
+  case SQL_C_UBIGINT:
+    target_value->value.bi = _atoi64 (src_value->value.str);
+    target_value->length = sizeof (__int64);
+    break;
+  case SQL_C_FLOAT:
+    target_value->value.f = (float) atof (src_value->value.str);
+    target_value->length = sizeof (float);
+    break;
+  case SQL_C_DOUBLE:
+    target_value->value.d = atof (src_value->value.str);
+    target_value->length = sizeof (double);
+    break;
+  case SQL_C_NUMERIC:
+  case SQL_C_BIT:
+  case SQL_C_TYPE_DATE:
+  case SQL_C_TYPE_TIME:
+  case SQL_C_TYPE_TIMESTAMP:
+  case SQL_C_DATE:  // for 2.x backward compatibility
+  case SQL_C_TIME:  // for 2.x backward compatibility
+  case SQL_C_TIMESTAMP: // for 2.x backward compatibility
+    return ODBC_NOT_IMPLEMENTED;
+  default:
+    return ODBC_UNKNOWN_TYPE;
+  }
       break;
     case SQL_C_SHORT:
     case SQL_C_SSHORT:
     case SQL_C_USHORT:
       switch (target_value->type)
-	{
-	case SQL_C_CHAR:
-	  sprintf (buf, "%hd", src_value->value.s);
-	  target_value->value.str = UT_MAKE_STRING (buf, -1);
-	  target_value->length = strlen (buf) + 1;
-	  break;
-	case SQL_C_BINARY:
-	  target_value->value.bin = UT_ALLOC (sizeof (short));
-	  bin_value_assign (&src_value->value.s, sizeof (short),
-			    target_value->value.bin, sizeof (short),
-			    &(target_value->length));
-	  break;
-	case SQL_C_SHORT:
-	case SQL_C_SSHORT:
-	case SQL_C_USHORT:
-	  target_value->value.s = src_value->value.s;
-	  target_value->length = sizeof (short);
-	  break;
-	case SQL_C_LONG:
-	case SQL_C_SLONG:
-	case SQL_C_ULONG:
-	  target_value->value.l = (long) src_value->value.s;
-	  target_value->length = sizeof (long);
-	  break;
-	case SQL_C_SBIGINT:
-	case SQL_C_UBIGINT:
-	  target_value->value.bi = (__int64) src_value->value.s;
-	  target_value->length = sizeof (__int64);
-	  break;
-	case SQL_C_FLOAT:
-	  target_value->value.f = (float) src_value->value.s;
-	  target_value->length = sizeof (float);
-	  break;
-	case SQL_C_DOUBLE:
-	  target_value->value.d = (double) src_value->value.s;
-	  target_value->length = sizeof (double);
-	  break;
-	case SQL_C_NUMERIC:
-	case SQL_C_BIT:
-	case SQL_C_TYPE_DATE:
-	case SQL_C_TYPE_TIME:
-	case SQL_C_TYPE_TIMESTAMP:
-	case SQL_C_DATE:	// for 2.x backward compatibility
-	case SQL_C_TIME:	// for 2.x backward compatibility
-	case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
-	  return ODBC_NOT_IMPLEMENTED;
-	default:
-	  return ODBC_UNKNOWN_TYPE;
-	}
+  {
+  case SQL_C_CHAR:
+    sprintf (buf, "%hd", src_value->value.s);
+    target_value->value.str = UT_MAKE_STRING (buf, -1);
+    target_value->length = strlen (buf) + 1;
+    break;
+  case SQL_C_BINARY:
+    target_value->value.bin = UT_ALLOC (sizeof (short));
+    bin_value_assign (&src_value->value.s, sizeof (short),
+          target_value->value.bin, sizeof (short),
+          &(target_value->length));
+    break;
+  case SQL_C_SHORT:
+  case SQL_C_SSHORT:
+  case SQL_C_USHORT:
+    target_value->value.s = src_value->value.s;
+    target_value->length = sizeof (short);
+    break;
+  case SQL_C_LONG:
+  case SQL_C_SLONG:
+  case SQL_C_ULONG:
+    target_value->value.l = (long) src_value->value.s;
+    target_value->length = sizeof (long);
+    break;
+  case SQL_C_SBIGINT:
+  case SQL_C_UBIGINT:
+    target_value->value.bi = (__int64) src_value->value.s;
+    target_value->length = sizeof (__int64);
+    break;
+  case SQL_C_FLOAT:
+    target_value->value.f = (float) src_value->value.s;
+    target_value->length = sizeof (float);
+    break;
+  case SQL_C_DOUBLE:
+    target_value->value.d = (double) src_value->value.s;
+    target_value->length = sizeof (double);
+    break;
+  case SQL_C_NUMERIC:
+  case SQL_C_BIT:
+  case SQL_C_TYPE_DATE:
+  case SQL_C_TYPE_TIME:
+  case SQL_C_TYPE_TIMESTAMP:
+  case SQL_C_DATE:  // for 2.x backward compatibility
+  case SQL_C_TIME:  // for 2.x backward compatibility
+  case SQL_C_TIMESTAMP: // for 2.x backward compatibility
+    return ODBC_NOT_IMPLEMENTED;
+  default:
+    return ODBC_UNKNOWN_TYPE;
+  }
       break;
 
       ////////////////
@@ -1868,443 +1868,443 @@ odbc_value_converter (VALUE_CONTAINER * target_value,
     case SQL_C_SLONG:
     case SQL_C_ULONG:
       switch (target_value->type)
-	{
-	case SQL_C_CHAR:
-	  sprintf (buf, "%ld", src_value->value.l);
-	  target_value->value.str = UT_MAKE_STRING (buf, -1);
-	  target_value->length = strlen (buf) + 1;
-	  break;
-	case SQL_C_BINARY:
-	  target_value->value.bin = UT_ALLOC (sizeof (long));
-	  bin_value_assign (&src_value->value.l, sizeof (long),
-			    target_value->value.bin, sizeof (long),
-			    &(target_value->length));
-	  break;
-	case SQL_C_SHORT:
-	case SQL_C_SSHORT:
-	case SQL_C_USHORT:
-	  target_value->value.s = (short) src_value->value.l;
-	  target_value->length = sizeof (short);
-	  break;
-	case SQL_C_LONG:
-	case SQL_C_SLONG:
-	case SQL_C_ULONG:
-	  target_value->value.l = src_value->value.l;
-	  target_value->length = sizeof (long);
-	  break;
-	case SQL_C_SBIGINT:
-	case SQL_C_UBIGINT:
-	  target_value->value.bi = (__int64) src_value->value.l;
-	  target_value->length = sizeof (__int64);
-	  break;
-	case SQL_C_FLOAT:
-	  target_value->value.f = (float) src_value->value.l;
-	  target_value->length = sizeof (float);
-	  break;
-	case SQL_C_DOUBLE:
-	  target_value->value.d = (double) src_value->value.l;
-	  target_value->length = sizeof (double);
-	  break;
-	case SQL_C_NUMERIC:
-	case SQL_C_BIT:
-	case SQL_C_TYPE_DATE:
-	case SQL_C_TYPE_TIME:
-	case SQL_C_TYPE_TIMESTAMP:
-	case SQL_C_DATE:	// for 2.x backward compatibility
-	case SQL_C_TIME:	// for 2.x backward compatibility
-	case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
-	  return ODBC_NOT_IMPLEMENTED;
-	default:
-	  return ODBC_UNKNOWN_TYPE;
-	}
+  {
+  case SQL_C_CHAR:
+    sprintf (buf, "%ld", src_value->value.l);
+    target_value->value.str = UT_MAKE_STRING (buf, -1);
+    target_value->length = strlen (buf) + 1;
+    break;
+  case SQL_C_BINARY:
+    target_value->value.bin = UT_ALLOC (sizeof (long));
+    bin_value_assign (&src_value->value.l, sizeof (long),
+          target_value->value.bin, sizeof (long),
+          &(target_value->length));
+    break;
+  case SQL_C_SHORT:
+  case SQL_C_SSHORT:
+  case SQL_C_USHORT:
+    target_value->value.s = (short) src_value->value.l;
+    target_value->length = sizeof (short);
+    break;
+  case SQL_C_LONG:
+  case SQL_C_SLONG:
+  case SQL_C_ULONG:
+    target_value->value.l = src_value->value.l;
+    target_value->length = sizeof (long);
+    break;
+  case SQL_C_SBIGINT:
+  case SQL_C_UBIGINT:
+    target_value->value.bi = (__int64) src_value->value.l;
+    target_value->length = sizeof (__int64);
+    break;
+  case SQL_C_FLOAT:
+    target_value->value.f = (float) src_value->value.l;
+    target_value->length = sizeof (float);
+    break;
+  case SQL_C_DOUBLE:
+    target_value->value.d = (double) src_value->value.l;
+    target_value->length = sizeof (double);
+    break;
+  case SQL_C_NUMERIC:
+  case SQL_C_BIT:
+  case SQL_C_TYPE_DATE:
+  case SQL_C_TYPE_TIME:
+  case SQL_C_TYPE_TIMESTAMP:
+  case SQL_C_DATE:  // for 2.x backward compatibility
+  case SQL_C_TIME:  // for 2.x backward compatibility
+  case SQL_C_TIMESTAMP: // for 2.x backward compatibility
+    return ODBC_NOT_IMPLEMENTED;
+  default:
+    return ODBC_UNKNOWN_TYPE;
+  }
       break;
 
     case SQL_C_SBIGINT:
     case SQL_C_UBIGINT:
       switch (target_value->type)
-	{
-	case SQL_C_CHAR:
-	  sprintf (buf, "%lld", (long long) src_value->value.bi);
-	  target_value->value.str = UT_MAKE_STRING (buf, -1);
-	  target_value->length = strlen (buf) + 1;
-	  break;
-	case SQL_C_BINARY:
-	  target_value->value.bin = UT_ALLOC (sizeof (__int64));
-	  bin_value_assign (&src_value->value.bi, sizeof (__int64),
-			    target_value->value.bin, sizeof (__int64),
-			    &(target_value->length));
-	  break;
-	case SQL_C_SHORT:
-	case SQL_C_SSHORT:
-	case SQL_C_USHORT:
-	  target_value->value.s = (short) src_value->value.bi;
-	  target_value->length = sizeof (short);
-	  break;
-	case SQL_C_LONG:
-	case SQL_C_SLONG:
-	case SQL_C_ULONG:
-	  target_value->value.l = (long) src_value->value.bi;
-	  target_value->length = sizeof (long);
-	  break;
-	case SQL_C_FLOAT:
-	  target_value->value.f = (float) src_value->value.bi;
-	  target_value->length = sizeof (float);
-	  break;
-	case SQL_C_DOUBLE:
-	  target_value->value.d = (double) src_value->value.bi;
-	  target_value->length = sizeof (double);
-	  break;
-	case SQL_C_NUMERIC:
-	case SQL_C_BIT:
-	case SQL_C_TYPE_DATE:
-	case SQL_C_TYPE_TIME:
-	case SQL_C_TYPE_TIMESTAMP:
-	case SQL_C_DATE:	// for 2.x backward compatibility
-	case SQL_C_TIME:	// for 2.x backward compatibility
-	case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
-	  return ODBC_NOT_IMPLEMENTED;
-	default:
-	  return ODBC_UNKNOWN_TYPE;
-	}
+  {
+  case SQL_C_CHAR:
+    sprintf (buf, "%lld", (long long) src_value->value.bi);
+    target_value->value.str = UT_MAKE_STRING (buf, -1);
+    target_value->length = strlen (buf) + 1;
+    break;
+  case SQL_C_BINARY:
+    target_value->value.bin = UT_ALLOC (sizeof (__int64));
+    bin_value_assign (&src_value->value.bi, sizeof (__int64),
+          target_value->value.bin, sizeof (__int64),
+          &(target_value->length));
+    break;
+  case SQL_C_SHORT:
+  case SQL_C_SSHORT:
+  case SQL_C_USHORT:
+    target_value->value.s = (short) src_value->value.bi;
+    target_value->length = sizeof (short);
+    break;
+  case SQL_C_LONG:
+  case SQL_C_SLONG:
+  case SQL_C_ULONG:
+    target_value->value.l = (long) src_value->value.bi;
+    target_value->length = sizeof (long);
+    break;
+  case SQL_C_FLOAT:
+    target_value->value.f = (float) src_value->value.bi;
+    target_value->length = sizeof (float);
+    break;
+  case SQL_C_DOUBLE:
+    target_value->value.d = (double) src_value->value.bi;
+    target_value->length = sizeof (double);
+    break;
+  case SQL_C_NUMERIC:
+  case SQL_C_BIT:
+  case SQL_C_TYPE_DATE:
+  case SQL_C_TYPE_TIME:
+  case SQL_C_TYPE_TIMESTAMP:
+  case SQL_C_DATE:  // for 2.x backward compatibility
+  case SQL_C_TIME:  // for 2.x backward compatibility
+  case SQL_C_TIMESTAMP: // for 2.x backward compatibility
+    return ODBC_NOT_IMPLEMENTED;
+  default:
+    return ODBC_UNKNOWN_TYPE;
+  }
       break;
 
     case SQL_C_FLOAT:
       switch (target_value->type)
-	{
-	case SQL_C_CHAR:
-	  sprintf (buf, "%f", src_value->value.f);
-	  target_value->value.str = UT_MAKE_STRING (buf, -1);
-	  target_value->length = strlen (buf) + 1;
-	  break;
-	case SQL_C_BINARY:
-	  target_value->value.bin = UT_ALLOC (sizeof (float));
-	  target_value->length = sizeof (float);
-	  memcpy (target_value->value.bin, &src_value->value.s,
-		  sizeof (float));
-	  break;
-	case SQL_C_SHORT:
-	case SQL_C_SSHORT:
-	case SQL_C_USHORT:
-	  target_value->value.s = (short) src_value->value.f;
-	  target_value->length = sizeof (short);
-	  break;
-	case SQL_C_LONG:
-	case SQL_C_SLONG:
-	case SQL_C_ULONG:
-	  target_value->value.l = (long) src_value->value.f;
-	  target_value->length = sizeof (long);
-	  break;
-	case SQL_C_SBIGINT:
-	case SQL_C_UBIGINT:
-	  target_value->value.bi = (__int64) src_value->value.f;
-	  target_value->length = sizeof (__int64);
-	  break;
-	case SQL_C_FLOAT:
-	  target_value->value.f = src_value->value.f;
-	  target_value->length = sizeof (float);
-	  break;
-	case SQL_C_DOUBLE:
-	  target_value->value.d = (double) src_value->value.f;
-	  target_value->length = sizeof (double);
-	  break;
-	case SQL_C_NUMERIC:
-	case SQL_C_BIT:
-	case SQL_C_TYPE_DATE:
-	case SQL_C_TYPE_TIME:
-	case SQL_C_TYPE_TIMESTAMP:
-	case SQL_C_DATE:	// for 2.x backward compatibility
-	case SQL_C_TIME:	// for 2.x backward compatibility
-	case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
-	  return ODBC_NOT_IMPLEMENTED;
-	default:
-	  return ODBC_UNKNOWN_TYPE;
-	}
+  {
+  case SQL_C_CHAR:
+    sprintf (buf, "%f", src_value->value.f);
+    target_value->value.str = UT_MAKE_STRING (buf, -1);
+    target_value->length = strlen (buf) + 1;
+    break;
+  case SQL_C_BINARY:
+    target_value->value.bin = UT_ALLOC (sizeof (float));
+    target_value->length = sizeof (float);
+    memcpy (target_value->value.bin, &src_value->value.s,
+      sizeof (float));
+    break;
+  case SQL_C_SHORT:
+  case SQL_C_SSHORT:
+  case SQL_C_USHORT:
+    target_value->value.s = (short) src_value->value.f;
+    target_value->length = sizeof (short);
+    break;
+  case SQL_C_LONG:
+  case SQL_C_SLONG:
+  case SQL_C_ULONG:
+    target_value->value.l = (long) src_value->value.f;
+    target_value->length = sizeof (long);
+    break;
+  case SQL_C_SBIGINT:
+  case SQL_C_UBIGINT:
+    target_value->value.bi = (__int64) src_value->value.f;
+    target_value->length = sizeof (__int64);
+    break;
+  case SQL_C_FLOAT:
+    target_value->value.f = src_value->value.f;
+    target_value->length = sizeof (float);
+    break;
+  case SQL_C_DOUBLE:
+    target_value->value.d = (double) src_value->value.f;
+    target_value->length = sizeof (double);
+    break;
+  case SQL_C_NUMERIC:
+  case SQL_C_BIT:
+  case SQL_C_TYPE_DATE:
+  case SQL_C_TYPE_TIME:
+  case SQL_C_TYPE_TIMESTAMP:
+  case SQL_C_DATE:  // for 2.x backward compatibility
+  case SQL_C_TIME:  // for 2.x backward compatibility
+  case SQL_C_TIMESTAMP: // for 2.x backward compatibility
+    return ODBC_NOT_IMPLEMENTED;
+  default:
+    return ODBC_UNKNOWN_TYPE;
+  }
       break;
 
     case SQL_C_DOUBLE:
       switch (target_value->type)
-	{
-	case SQL_C_CHAR:
-	  sprintf (buf, "%lf", src_value->value.d);
-	  target_value->length = strlen (buf) + 1;
-	  break;
-	case SQL_C_BINARY:
-	  target_value->value.bin = UT_ALLOC (sizeof (double));
-	  bin_value_assign (&src_value->value.d, sizeof (double),
-			    target_value->value.bin, sizeof (double),
-			    &(target_value->length));
-	  break;
-	case SQL_C_SHORT:
-	case SQL_C_SSHORT:
-	case SQL_C_USHORT:
-	  target_value->value.s = (short) src_value->value.d;
-	  target_value->length = sizeof (short);
-	  break;
-	case SQL_C_LONG:
-	case SQL_C_SLONG:
-	case SQL_C_ULONG:
-	  target_value->value.l = (long) src_value->value.d;
-	  target_value->length = sizeof (long);
-	  break;
-	case SQL_C_SBIGINT:
-	case SQL_C_UBIGINT:
-	  target_value->value.bi = (__int64) src_value->value.d;
-	  target_value->length = sizeof (__int64);
-	  break;
-	case SQL_C_FLOAT:
-	  target_value->value.f = (float) src_value->value.d;
-	  target_value->length = sizeof (float);
-	  break;
-	case SQL_C_DOUBLE:
-	  target_value->value.d = src_value->value.d;
-	  target_value->length = sizeof (double);
-	  break;
-	case SQL_C_NUMERIC:
-	case SQL_C_BIT:
-	case SQL_C_TYPE_DATE:
-	case SQL_C_TYPE_TIME:
-	case SQL_C_TYPE_TIMESTAMP:
-	case SQL_C_DATE:	// for 2.x backward compatibility
-	case SQL_C_TIME:	// for 2.x backward compatibility
-	case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
-	  return ODBC_NOT_IMPLEMENTED;
-	default:
-	  return ODBC_UNKNOWN_TYPE;
-	}
+  {
+  case SQL_C_CHAR:
+    sprintf (buf, "%lf", src_value->value.d);
+    target_value->length = strlen (buf) + 1;
+    break;
+  case SQL_C_BINARY:
+    target_value->value.bin = UT_ALLOC (sizeof (double));
+    bin_value_assign (&src_value->value.d, sizeof (double),
+          target_value->value.bin, sizeof (double),
+          &(target_value->length));
+    break;
+  case SQL_C_SHORT:
+  case SQL_C_SSHORT:
+  case SQL_C_USHORT:
+    target_value->value.s = (short) src_value->value.d;
+    target_value->length = sizeof (short);
+    break;
+  case SQL_C_LONG:
+  case SQL_C_SLONG:
+  case SQL_C_ULONG:
+    target_value->value.l = (long) src_value->value.d;
+    target_value->length = sizeof (long);
+    break;
+  case SQL_C_SBIGINT:
+  case SQL_C_UBIGINT:
+    target_value->value.bi = (__int64) src_value->value.d;
+    target_value->length = sizeof (__int64);
+    break;
+  case SQL_C_FLOAT:
+    target_value->value.f = (float) src_value->value.d;
+    target_value->length = sizeof (float);
+    break;
+  case SQL_C_DOUBLE:
+    target_value->value.d = src_value->value.d;
+    target_value->length = sizeof (double);
+    break;
+  case SQL_C_NUMERIC:
+  case SQL_C_BIT:
+  case SQL_C_TYPE_DATE:
+  case SQL_C_TYPE_TIME:
+  case SQL_C_TYPE_TIMESTAMP:
+  case SQL_C_DATE:  // for 2.x backward compatibility
+  case SQL_C_TIME:  // for 2.x backward compatibility
+  case SQL_C_TIMESTAMP: // for 2.x backward compatibility
+    return ODBC_NOT_IMPLEMENTED;
+  default:
+    return ODBC_UNKNOWN_TYPE;
+  }
       break;
 
     case SQL_C_BINARY:
       switch (target_value->type)
-	{
-	case SQL_C_BINARY:
-	  target_value->value.bin = UT_ALLOC (src_value->length);
-	  memcpy (target_value->value.bin, src_value->value.bin,
-		  src_value->length);
-	  target_value->length = src_value->length;
-	  break;
-	case SQL_C_CHAR:
-	  target_value->value.str = UT_ALLOC (src_value->length + 1);
-	  memcpy (target_value->value.str, src_value->value.bin,
-		  src_value->length);
-	  target_value->value.str[src_value->length] = '\0';
-	  break;
+  {
+  case SQL_C_BINARY:
+    target_value->value.bin = UT_ALLOC (src_value->length);
+    memcpy (target_value->value.bin, src_value->value.bin,
+      src_value->length);
+    target_value->length = src_value->length;
+    break;
+  case SQL_C_CHAR:
+    target_value->value.str = UT_ALLOC (src_value->length + 1);
+    memcpy (target_value->value.str, src_value->value.bin,
+      src_value->length);
+    target_value->value.str[src_value->length] = '\0';
+    break;
 
-	case SQL_C_SHORT:
-	case SQL_C_SSHORT:
-	case SQL_C_USHORT:
-	  memcpy (&target_value->value.s, src_value->value.bin,
-		  sizeof (short));
-	  target_value->length = sizeof (short);
-	  break;
-	case SQL_C_LONG:
-	case SQL_C_SLONG:
-	case SQL_C_ULONG:
-	  memcpy (&target_value->value.l, src_value->value.bin,
-		  sizeof (long));
-	  target_value->length = sizeof (long);
-	  break;
-	case SQL_C_SBIGINT:
-	case SQL_C_UBIGINT:
-	  memcpy (&target_value->value.bi, src_value->value.bin,
-		  sizeof (__int64));
-	  target_value->length = sizeof (__int64);
-	  break;
-	case SQL_C_FLOAT:
-	  memcpy (&target_value->value.f, src_value->value.bin,
-		  sizeof (float));
-	  target_value->length = sizeof (float);
-	  break;
-	case SQL_C_DOUBLE:
-	  memcpy (&target_value->value.d, src_value->value.bin,
-		  sizeof (double));
-	  target_value->length = sizeof (double);
-	  break;
-	case SQL_C_NUMERIC:
-	case SQL_C_BIT:
-	case SQL_C_TYPE_DATE:
-	case SQL_C_TYPE_TIME:
-	case SQL_C_TYPE_TIMESTAMP:
-	case SQL_C_DATE:	// for 2.x backward compatibility
-	case SQL_C_TIME:	// for 2.x backward compatibility
-	case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
-	  return ODBC_NOT_IMPLEMENTED;
-	default:
-	  return ODBC_UNKNOWN_TYPE;
-	}
+  case SQL_C_SHORT:
+  case SQL_C_SSHORT:
+  case SQL_C_USHORT:
+    memcpy (&target_value->value.s, src_value->value.bin,
+      sizeof (short));
+    target_value->length = sizeof (short);
+    break;
+  case SQL_C_LONG:
+  case SQL_C_SLONG:
+  case SQL_C_ULONG:
+    memcpy (&target_value->value.l, src_value->value.bin,
+      sizeof (long));
+    target_value->length = sizeof (long);
+    break;
+  case SQL_C_SBIGINT:
+  case SQL_C_UBIGINT:
+    memcpy (&target_value->value.bi, src_value->value.bin,
+      sizeof (__int64));
+    target_value->length = sizeof (__int64);
+    break;
+  case SQL_C_FLOAT:
+    memcpy (&target_value->value.f, src_value->value.bin,
+      sizeof (float));
+    target_value->length = sizeof (float);
+    break;
+  case SQL_C_DOUBLE:
+    memcpy (&target_value->value.d, src_value->value.bin,
+      sizeof (double));
+    target_value->length = sizeof (double);
+    break;
+  case SQL_C_NUMERIC:
+  case SQL_C_BIT:
+  case SQL_C_TYPE_DATE:
+  case SQL_C_TYPE_TIME:
+  case SQL_C_TYPE_TIMESTAMP:
+  case SQL_C_DATE:  // for 2.x backward compatibility
+  case SQL_C_TIME:  // for 2.x backward compatibility
+  case SQL_C_TIMESTAMP: // for 2.x backward compatibility
+    return ODBC_NOT_IMPLEMENTED;
+  default:
+    return ODBC_UNKNOWN_TYPE;
+  }
       break;
 
     case SQL_C_TYPE_DATE:
-    case SQL_C_DATE:		// for 2.x backward compatibility
+    case SQL_C_DATE:    // for 2.x backward compatibility
       switch (target_value->type)
-	{
-	case SQL_C_CHAR:
-	  sprintf (buf, "%d-%d-%d", target_value->value.date.year,
-		   target_value->value.date.month,
-		   target_value->value.date.day);
-	  target_value->value.str = UT_MAKE_STRING (buf, -1);
-	  target_value->length = strlen (buf) + 1;
-	  break;
-	case SQL_C_BINARY:
-	  target_value->value.bin = UT_ALLOC (sizeof (SQL_DATE_STRUCT));
-	  bin_value_assign (&src_value->value.date, sizeof (SQL_DATE_STRUCT),
-			    target_value->value.bin, sizeof (SQL_DATE_STRUCT),
-			    &(target_value->length));
-	  break;
-	case SQL_C_TYPE_DATE:
-	case SQL_C_DATE:	// for 2.x backward compatibility
-	  target_value->value.date.year = src_value->value.date.year;
-	  target_value->value.date.month = src_value->value.date.month;
-	  target_value->value.date.day = src_value->value.date.day;
-	  target_value->length = sizeof (SQL_DATE_STRUCT);
-	  break;
-	case SQL_C_TYPE_TIMESTAMP:
-	case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
-	  target_value->value.ts.year = src_value->value.date.year;
-	  target_value->value.ts.month = src_value->value.date.month;
-	  target_value->value.ts.day = src_value->value.date.day;
-	  target_value->value.ts.hour = 0;
-	  target_value->value.ts.minute = 0;
-	  target_value->value.ts.second = 0;
-	  target_value->value.ts.fraction = 0;
-	  target_value->length = sizeof (SQL_TIMESTAMP_STRUCT);
-	  break;
-	case SQL_C_SHORT:
-	case SQL_C_SSHORT:
-	case SQL_C_USHORT:
-	case SQL_C_LONG:
-	case SQL_C_SLONG:
-	case SQL_C_ULONG:
-	case SQL_C_SBIGINT:
-	case SQL_C_UBIGINT:
-	case SQL_C_FLOAT:
-	case SQL_C_DOUBLE:
-	case SQL_C_TYPE_TIME:
-	case SQL_C_NUMERIC:
-	case SQL_C_BIT:
-	  return ODBC_INVALID_TYPE_CONVERSION;
-	default:
-	  return ODBC_UNKNOWN_TYPE;
-	}
+  {
+  case SQL_C_CHAR:
+    sprintf (buf, "%d-%d-%d", target_value->value.date.year,
+       target_value->value.date.month,
+       target_value->value.date.day);
+    target_value->value.str = UT_MAKE_STRING (buf, -1);
+    target_value->length = strlen (buf) + 1;
+    break;
+  case SQL_C_BINARY:
+    target_value->value.bin = UT_ALLOC (sizeof (SQL_DATE_STRUCT));
+    bin_value_assign (&src_value->value.date, sizeof (SQL_DATE_STRUCT),
+          target_value->value.bin, sizeof (SQL_DATE_STRUCT),
+          &(target_value->length));
+    break;
+  case SQL_C_TYPE_DATE:
+  case SQL_C_DATE:  // for 2.x backward compatibility
+    target_value->value.date.year = src_value->value.date.year;
+    target_value->value.date.month = src_value->value.date.month;
+    target_value->value.date.day = src_value->value.date.day;
+    target_value->length = sizeof (SQL_DATE_STRUCT);
+    break;
+  case SQL_C_TYPE_TIMESTAMP:
+  case SQL_C_TIMESTAMP: // for 2.x backward compatibility
+    target_value->value.ts.year = src_value->value.date.year;
+    target_value->value.ts.month = src_value->value.date.month;
+    target_value->value.ts.day = src_value->value.date.day;
+    target_value->value.ts.hour = 0;
+    target_value->value.ts.minute = 0;
+    target_value->value.ts.second = 0;
+    target_value->value.ts.fraction = 0;
+    target_value->length = sizeof (SQL_TIMESTAMP_STRUCT);
+    break;
+  case SQL_C_SHORT:
+  case SQL_C_SSHORT:
+  case SQL_C_USHORT:
+  case SQL_C_LONG:
+  case SQL_C_SLONG:
+  case SQL_C_ULONG:
+  case SQL_C_SBIGINT:
+  case SQL_C_UBIGINT:
+  case SQL_C_FLOAT:
+  case SQL_C_DOUBLE:
+  case SQL_C_TYPE_TIME:
+  case SQL_C_NUMERIC:
+  case SQL_C_BIT:
+    return ODBC_INVALID_TYPE_CONVERSION;
+  default:
+    return ODBC_UNKNOWN_TYPE;
+  }
       break;
 
     case SQL_C_TYPE_TIME:
-    case SQL_C_TIME:		// for 2.x backward compatibility
+    case SQL_C_TIME:    // for 2.x backward compatibility
       switch (target_value->type)
-	{
-	case SQL_C_CHAR:
-	  sprintf (buf, "%d:%d:%d", src_value->value.time.hour,
-		   src_value->value.time.minute,
-		   src_value->value.time.second);
+  {
+  case SQL_C_CHAR:
+    sprintf (buf, "%d:%d:%d", src_value->value.time.hour,
+       src_value->value.time.minute,
+       src_value->value.time.second);
 
-	  target_value->value.str = UT_MAKE_STRING (buf, -1);
-	  target_value->length = strlen (buf) + 1;
-	  break;
-	case SQL_C_BINARY:
-	  target_value->value.bin = UT_ALLOC (sizeof (SQL_TIME_STRUCT));
-	  bin_value_assign (&src_value->value.time, sizeof (SQL_TIME_STRUCT),
-			    target_value->value.bin, sizeof (SQL_TIME_STRUCT),
-			    &(target_value->length));
-	  break;
-	case SQL_C_TYPE_TIME:
-	case SQL_C_TIME:	// for 2.x backward compatibility
-	  target_value->value.time.hour = src_value->value.time.hour;
-	  target_value->value.time.minute = src_value->value.time.minute;
-	  target_value->value.time.second = src_value->value.time.second;
-	  target_value->length = sizeof (SQL_TIME_STRUCT);
-	  break;
-	case SQL_C_TYPE_TIMESTAMP:
-	case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
-	  target_value->value.ts.year = 0;
-	  target_value->value.ts.month = 0;
-	  target_value->value.ts.day = 0;
-	  target_value->value.ts.hour = src_value->value.time.hour;
-	  target_value->value.ts.minute = src_value->value.time.minute;
-	  target_value->value.ts.second = src_value->value.time.second;
-	  target_value->value.ts.fraction = 0;
-	  target_value->length = sizeof (SQL_TIMESTAMP_STRUCT);
-	  break;
-	case SQL_C_SHORT:
-	case SQL_C_SSHORT:
-	case SQL_C_USHORT:
-	case SQL_C_LONG:
-	case SQL_C_SLONG:
-	case SQL_C_ULONG:
-	case SQL_C_SBIGINT:
-	case SQL_C_UBIGINT:
-	case SQL_C_FLOAT:
-	case SQL_C_DOUBLE:
-	case SQL_C_NUMERIC:
-	case SQL_C_BIT:
-	case SQL_C_TYPE_DATE:
-	case SQL_C_DATE:	// for 2.x backward compatibility
-	  return ODBC_INVALID_TYPE_CONVERSION;
-	default:
-	  return ODBC_UNKNOWN_TYPE;
-	}
+    target_value->value.str = UT_MAKE_STRING (buf, -1);
+    target_value->length = strlen (buf) + 1;
+    break;
+  case SQL_C_BINARY:
+    target_value->value.bin = UT_ALLOC (sizeof (SQL_TIME_STRUCT));
+    bin_value_assign (&src_value->value.time, sizeof (SQL_TIME_STRUCT),
+          target_value->value.bin, sizeof (SQL_TIME_STRUCT),
+          &(target_value->length));
+    break;
+  case SQL_C_TYPE_TIME:
+  case SQL_C_TIME:  // for 2.x backward compatibility
+    target_value->value.time.hour = src_value->value.time.hour;
+    target_value->value.time.minute = src_value->value.time.minute;
+    target_value->value.time.second = src_value->value.time.second;
+    target_value->length = sizeof (SQL_TIME_STRUCT);
+    break;
+  case SQL_C_TYPE_TIMESTAMP:
+  case SQL_C_TIMESTAMP: // for 2.x backward compatibility
+    target_value->value.ts.year = 0;
+    target_value->value.ts.month = 0;
+    target_value->value.ts.day = 0;
+    target_value->value.ts.hour = src_value->value.time.hour;
+    target_value->value.ts.minute = src_value->value.time.minute;
+    target_value->value.ts.second = src_value->value.time.second;
+    target_value->value.ts.fraction = 0;
+    target_value->length = sizeof (SQL_TIMESTAMP_STRUCT);
+    break;
+  case SQL_C_SHORT:
+  case SQL_C_SSHORT:
+  case SQL_C_USHORT:
+  case SQL_C_LONG:
+  case SQL_C_SLONG:
+  case SQL_C_ULONG:
+  case SQL_C_SBIGINT:
+  case SQL_C_UBIGINT:
+  case SQL_C_FLOAT:
+  case SQL_C_DOUBLE:
+  case SQL_C_NUMERIC:
+  case SQL_C_BIT:
+  case SQL_C_TYPE_DATE:
+  case SQL_C_DATE:  // for 2.x backward compatibility
+    return ODBC_INVALID_TYPE_CONVERSION;
+  default:
+    return ODBC_UNKNOWN_TYPE;
+  }
       break;
 
     case SQL_C_TYPE_TIMESTAMP:
-    case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
+    case SQL_C_TIMESTAMP: // for 2.x backward compatibility
       switch (target_value->type)
-	{
-	case SQL_C_CHAR:
-	  sprintf (buf, "%d-%d-%d %d:%d:%d", src_value->value.ts.year,
-		   src_value->value.ts.month,
-		   src_value->value.ts.day,
-		   src_value->value.ts.hour,
-		   src_value->value.ts.minute, src_value->value.ts.second);
-	  target_value->value.str = UT_MAKE_STRING (buf, -1);
-	  target_value->length = strlen (buf) + 1;
-	  break;
-	case SQL_C_BINARY:
-	  target_value->value.bin = UT_ALLOC (sizeof (SQL_TIMESTAMP_STRUCT));
-	  bin_value_assign (&src_value->value.ts,
-			    sizeof (SQL_TIMESTAMP_STRUCT),
-			    target_value->value.bin,
-			    sizeof (SQL_TIMESTAMP_STRUCT),
-			    &(target_value->length));
-	  break;
-	case SQL_C_TYPE_DATE:
-	case SQL_C_DATE:	// for 2.x backward compatibility
-	  target_value->value.date.year = src_value->value.ts.year;
-	  target_value->value.date.month = src_value->value.ts.month;
-	  target_value->value.date.day = src_value->value.ts.day;
-	  target_value->length = sizeof (SQL_DATE_STRUCT);
-	  break;
-	case SQL_C_TYPE_TIME:
-	case SQL_C_TIME:	// for 2.x backward compatibility
-	  target_value->value.time.hour = src_value->value.ts.hour;
-	  target_value->value.time.minute = src_value->value.ts.minute;
-	  target_value->value.time.second = src_value->value.ts.second;
-	  target_value->length = sizeof (SQL_TIME_STRUCT);
-	  break;
-	case SQL_C_TYPE_TIMESTAMP:
-	case SQL_C_TIMESTAMP:	// for 2.x backward compatibility
-	  target_value->value.ts.year = src_value->value.ts.year;
-	  target_value->value.ts.month = src_value->value.ts.month;
-	  target_value->value.ts.day = src_value->value.ts.day;
-	  target_value->value.ts.hour = src_value->value.ts.hour;
-	  target_value->value.ts.minute = src_value->value.ts.minute;
-	  target_value->value.ts.second = src_value->value.ts.second;
-	  target_value->value.ts.fraction = 0;
-	  target_value->length = sizeof (SQL_TIMESTAMP_STRUCT);
-	  break;
-	case SQL_C_SHORT:
-	case SQL_C_SSHORT:
-	case SQL_C_USHORT:
-	case SQL_C_LONG:
-	case SQL_C_SLONG:
-	case SQL_C_ULONG:
-	case SQL_C_SBIGINT:
-	case SQL_C_UBIGINT:
-	case SQL_C_FLOAT:
-	case SQL_C_DOUBLE:
-	case SQL_C_NUMERIC:
-	case SQL_C_BIT:
-	  return ODBC_INVALID_TYPE_CONVERSION;
-	default:
-	  return ODBC_UNKNOWN_TYPE;
-	}
+  {
+  case SQL_C_CHAR:
+    sprintf (buf, "%d-%d-%d %d:%d:%d", src_value->value.ts.year,
+       src_value->value.ts.month,
+       src_value->value.ts.day,
+       src_value->value.ts.hour,
+       src_value->value.ts.minute, src_value->value.ts.second);
+    target_value->value.str = UT_MAKE_STRING (buf, -1);
+    target_value->length = strlen (buf) + 1;
+    break;
+  case SQL_C_BINARY:
+    target_value->value.bin = UT_ALLOC (sizeof (SQL_TIMESTAMP_STRUCT));
+    bin_value_assign (&src_value->value.ts,
+          sizeof (SQL_TIMESTAMP_STRUCT),
+          target_value->value.bin,
+          sizeof (SQL_TIMESTAMP_STRUCT),
+          &(target_value->length));
+    break;
+  case SQL_C_TYPE_DATE:
+  case SQL_C_DATE:  // for 2.x backward compatibility
+    target_value->value.date.year = src_value->value.ts.year;
+    target_value->value.date.month = src_value->value.ts.month;
+    target_value->value.date.day = src_value->value.ts.day;
+    target_value->length = sizeof (SQL_DATE_STRUCT);
+    break;
+  case SQL_C_TYPE_TIME:
+  case SQL_C_TIME:  // for 2.x backward compatibility
+    target_value->value.time.hour = src_value->value.ts.hour;
+    target_value->value.time.minute = src_value->value.ts.minute;
+    target_value->value.time.second = src_value->value.ts.second;
+    target_value->length = sizeof (SQL_TIME_STRUCT);
+    break;
+  case SQL_C_TYPE_TIMESTAMP:
+  case SQL_C_TIMESTAMP: // for 2.x backward compatibility
+    target_value->value.ts.year = src_value->value.ts.year;
+    target_value->value.ts.month = src_value->value.ts.month;
+    target_value->value.ts.day = src_value->value.ts.day;
+    target_value->value.ts.hour = src_value->value.ts.hour;
+    target_value->value.ts.minute = src_value->value.ts.minute;
+    target_value->value.ts.second = src_value->value.ts.second;
+    target_value->value.ts.fraction = 0;
+    target_value->length = sizeof (SQL_TIMESTAMP_STRUCT);
+    break;
+  case SQL_C_SHORT:
+  case SQL_C_SSHORT:
+  case SQL_C_USHORT:
+  case SQL_C_LONG:
+  case SQL_C_SLONG:
+  case SQL_C_ULONG:
+  case SQL_C_SBIGINT:
+  case SQL_C_UBIGINT:
+  case SQL_C_FLOAT:
+  case SQL_C_DOUBLE:
+  case SQL_C_NUMERIC:
+  case SQL_C_BIT:
+    return ODBC_INVALID_TYPE_CONVERSION;
+  default:
+    return ODBC_UNKNOWN_TYPE;
+  }
       break;
 
     case SQL_C_BIT:
@@ -2326,9 +2326,9 @@ odbc_date_type_backward (short type)
   for (i = 0; i < set_size; i++)
     {
       if (datetime_c_type_backward_set[i].current_type == type)
-	{
-	  return datetime_c_type_backward_set[i].backward_type;
-	}
+  {
+    return datetime_c_type_backward_set[i].backward_type;
+  }
     }
 
   return type;
@@ -2338,46 +2338,46 @@ PRIVATE int
 odbc_is_valid_concise_type (short odbc_type)
 {
   return (odbc_is_valid_c_concise_type (odbc_type) ||
-	  odbc_is_valid_sql_concise_type (odbc_type));
+    odbc_is_valid_sql_concise_type (odbc_type));
 }
 
 PRIVATE int
 odbc_is_valid_c_concise_type (short odbc_type)
 {
   return (odbc_is_valid_c_common_type (odbc_type) ||
-	  odbc_is_valid_c_date_type (odbc_type) ||
-	  odbc_is_valid_c_interval_type (odbc_type));
+    odbc_is_valid_c_date_type (odbc_type) ||
+    odbc_is_valid_c_interval_type (odbc_type));
 }
 
 PRIVATE int
 odbc_is_valid_sql_concise_type (short odbc_type)
 {
   return (odbc_is_valid_sql_common_type (odbc_type) ||
-	  odbc_is_valid_sql_date_type (odbc_type) ||
-	  odbc_is_valid_sql_interval_type (odbc_type));
+    odbc_is_valid_sql_date_type (odbc_type) ||
+    odbc_is_valid_sql_interval_type (odbc_type));
 }
 
 PRIVATE int
 odbc_is_valid_verbose_type (short odbc_type)
 {
   return (odbc_is_valid_c_verbose_type (odbc_type) ||
-	  odbc_is_valid_sql_verbose_type (odbc_type));
+    odbc_is_valid_sql_verbose_type (odbc_type));
 }
 
 PRIVATE int
 odbc_is_valid_c_verbose_type (short odbc_type)
 {
   return (odbc_is_valid_c_common_type (odbc_type) ||
-	  odbc_is_valid_date_verbose_type (odbc_type) ||
-	  odbc_is_valid_interval_verbose_type (odbc_type));
+    odbc_is_valid_date_verbose_type (odbc_type) ||
+    odbc_is_valid_interval_verbose_type (odbc_type));
 }
 
 PRIVATE int
 odbc_is_valid_sql_verbose_type (short odbc_type)
 {
   return (odbc_is_valid_sql_common_type (odbc_type) ||
-	  odbc_is_valid_date_verbose_type (odbc_type) ||
-	  odbc_is_valid_interval_verbose_type (odbc_type));
+    odbc_is_valid_date_verbose_type (odbc_type) ||
+    odbc_is_valid_interval_verbose_type (odbc_type));
 }
 
 PRIVATE int
@@ -2417,9 +2417,9 @@ odbc_is_valid_date_code (short code)
   for (i = 0; i < type_info_set_size; i++)
     {
       if (datetime_date_type_info_set[i].type_subcode == code)
-	{
-	  return _TRUE_;
-	}
+  {
+    return _TRUE_;
+  }
     }
 
   return _FALSE_;
@@ -2434,9 +2434,9 @@ odbc_is_valid_internal_code (short code)
   for (i = 0; i < type_info_set_size; i++)
     {
       if (datetime_internal_type_info_set[i].type_subcode == code)
-	{
-	  return _TRUE_;
-	}
+  {
+    return _TRUE_;
+  }
     }
 
   return _FALSE_;
@@ -2496,9 +2496,9 @@ seek_in_common_type_set (int *set, int set_size, short id)
   for (i = 0; i < set_size; i++)
     {
       if (id == set[i])
-	{
-	  return _TRUE_;
-	}
+  {
+    return _TRUE_;
+  }
     }
 
   return _FALSE_;

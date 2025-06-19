@@ -16,30 +16,30 @@
  *
  */
 
-#include	<stdio.h>
-#include	<fcntl.h>
-#include	<stdlib.h>
-#include	<iconv.h>
-#include	<locale.h>
-#include	<wchar.h>
-#include	<errno.h>
-#include	<stdarg.h>
-#include	<string.h>
-#include	"odbc_portable.h"
-#include	"odbcinst.h"
-#include	"odbc_resource.h"
-#include	"odbc_connection.h"
-#include	"odbc_util.h"
+#include  <stdio.h>
+#include  <fcntl.h>
+#include  <stdlib.h>
+#include  <iconv.h>
+#include  <locale.h>
+#include  <wchar.h>
+#include  <errno.h>
+#include  <stdarg.h>
+#include  <string.h>
+#include  "odbc_portable.h"
+#include  "odbcinst.h"
+#include  "odbc_resource.h"
+#include  "odbc_connection.h"
+#include  "odbc_util.h"
 
 static int get_section_from_file (const char *ini, const char *section, char *value_p, int size);
 
 PUBLIC INT_PTR CALLBACK
 ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam,
-		                  LPARAM lParam);
+                      LPARAM lParam);
 
-#define LINE_SIZE	512
-#define TBUF_SIZE	8192
-#define PROF_BUF_SIZE	4096
+#define LINE_SIZE 512
+#define TBUF_SIZE 8192
+#define PROF_BUF_SIZE 4096
 
 /*
  * ODBC Driver function not supported
@@ -82,17 +82,17 @@ SQLSetConfigMode (UWORD mode)
 
 int INSTAPI
 SQLGetPrivateProfileString (
-	LPCSTR lpszSection,
-	LPCSTR lpszEntry,
-	LPCSTR lpszDefault,
-	LPSTR lpszRetBuffer,
-	int cbRetBuffer,
-	LPCSTR lpszFilename)
+  LPCSTR lpszSection,
+  LPCSTR lpszEntry,
+  LPCSTR lpszDefault,
+  LPSTR lpszRetBuffer,
+  int cbRetBuffer,
+  LPCSTR lpszFilename)
 {
   int rc = SQL_ERROR;
-  char	inifile[_MAX_PATH];
-  char	filename[_MAX_PATH];
-  char	element_list[PROF_BUF_SIZE];
+  char  inifile[_MAX_PATH];
+  char  filename[_MAX_PATH];
+  char  element_list[PROF_BUF_SIZE];
   char *envp, *p;
 
   OutputDebugString ("SQLGetPrivateProfileString called");
@@ -128,9 +128,9 @@ SQLGetPrivateProfileString (
  * Version Introduced: ODBC 1.0 Standards Compliance: Deprecated
  */
 SQLRETURN SQL_API SQLSetConnectOption (
-	SQLHDBC ConnectionHandle,
+  SQLHDBC ConnectionHandle,
         SQLUSMALLINT Option,
-	SQLULEN Value)
+  SQLULEN Value)
 {
   return SQL_ERROR;
 }
@@ -205,25 +205,25 @@ get_section_from_file (const char *ini, const char *section, char *value_p, int 
   while (!feof (fp))
     {
       if (fgets (buf, LINE_SIZE, fp))
-	{
-	  if (buf[0] == '[')
-	    {
-	      p = strchr (buf, ']');
-	      if (p != NULL)
-		{
-		  *p = '\0';
-		  if (strcasecmp (&buf[1], section) == 0)
-		    {
-		      found = 1;
-		      break;
-		    }
-		}
-	    }
-	  else
-	    {
-	      continue;
-	    }
-	}
+  {
+    if (buf[0] == '[')
+      {
+        p = strchr (buf, ']');
+        if (p != NULL)
+    {
+      *p = '\0';
+      if (strcasecmp (&buf[1], section) == 0)
+        {
+          found = 1;
+          break;
+        }
+    }
+      }
+    else
+      {
+        continue;
+      }
+  }
     }
 
   if (!found)
@@ -234,30 +234,30 @@ get_section_from_file (const char *ini, const char *section, char *value_p, int 
   while (!feof (fp))
     {
       if (fgets (buf, LINE_SIZE, fp))
-	{
-	  p = strchr (buf, '\n');
-	  if (p)
-	    {
-	      *p = '\0';
-	    }
+  {
+    p = strchr (buf, '\n');
+    if (p)
+      {
+        *p = '\0';
+      }
 
-	  if (buf[0] == '\0' || buf[0] == '#' || buf[0] == '[')
-	    {
-	      rc = 0;
-	      break;
-	    }
+    if (buf[0] == '\0' || buf[0] == '#' || buf[0] == '[')
+      {
+        rc = 0;
+        break;
+      }
 
-	  strcat (value_p, buf);
-	  strcat (value_p, ";");
-	  rc = 0;
-	}
+    strcat (value_p, buf);
+    strcat (value_p, ";");
+    rc = 0;
+  }
     }
 
   fclose (fp);
   for (pt = value_p; *pt != '\0'; ++pt)
     {
-      if (*pt == ';')		// connection string delimiter
-	*pt = '\0';
+      if (*pt == ';')   // connection string delimiter
+  *pt = '\0';
     }
 
   return rc;
@@ -332,7 +332,7 @@ itoa (int value, char *string, int radix)
 
 int
 MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int cbMultiByte, 
-		wchar_t *lpWideCharStr, int cchWideChar)
+    wchar_t *lpWideCharStr, int cchWideChar)
 {
   char *default_unicode_charset = "UTF-16LE";
   char *charset = "UTF-8";
@@ -357,15 +357,15 @@ MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int cbMu
   switch (codepage)
     {
     case CP_EUC_KR:
-	charset = "EUCKR";
-	break;
+  charset = "EUCKR";
+  break;
     case CP_UTF8:
     case CP_ACP:
-	charset = "UTF-8";
-	break;
+  charset = "UTF-8";
+  break;
     default:
-	charset = "UTF-8";
-	break;
+  charset = "UTF-8";
+  break;
     }
 
   if ((cd = iconv_open (default_unicode_charset, charset)) < 0)
@@ -393,16 +393,16 @@ MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int cbMu
 
 
 int WideCharToMultiByte (int wincode,
-				 int dw, 
-				 wchar_t *str, 
-				 int size, 
-				 char *out_buffer, 
-				 int cbMultiByte, 
-				 char *lpdefaultchar, 
-				 char *lpusedfdefaultchar)
+         int dw, 
+         wchar_t *str, 
+         int size, 
+         char *out_buffer, 
+         int cbMultiByte, 
+         char *lpdefaultchar, 
+         char *lpusedfdefaultchar)
 {
   char *charset;
-  char *default_unicode_charset = "UTF-16";	// UCS2, UCS2-LE
+  char *default_unicode_charset = "UTF-16"; // UCS2, UCS2-LE
   iconv_t cd;
   char *iconv_out = out_buffer;
   unsigned char *iconv_in = (unsigned char *) str;

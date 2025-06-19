@@ -69,7 +69,7 @@ static void _rm_leading_zeros (bc_num num);
 static bc_num _do_add (bc_num n1, bc_num n2, int scale_min);
 static bc_num _do_sub (bc_num n1, bc_num n2, int scale_min);
 static void _one_mult (unsigned char *num, int size, int digit,
-		       unsigned char *result);
+           unsigned char *result);
 
 /* Storage used for special numbers. */
 static bc_num _zero_ = NULL;
@@ -87,20 +87,20 @@ init_numbers ()
     {
       _zero_ = new_num (1, 0);
       if (_zero_ == NULL)
-	return -1;
+  return -1;
     }
   if (_one_ == NULL)
     {
       _one_ = new_num (1, 0);
       if (_one_ == NULL)
-	return -1;
+  return -1;
       _one_->n_value[0] = 1;
     }
   if (_two_ == NULL)
     {
       _two_ = new_num (1, 0);
       if (_two_ == NULL)
-	return -1;
+  return -1;
       _two_->n_value[0] = 2;
     }
   return 0;
@@ -124,37 +124,37 @@ bc_add (n1, n2, result, scale_min)
     {
       sum = _do_add (n1, n2, scale_min);
       if (sum == NULL)
-	return -1;
+  return -1;
       sum->n_sign = n1->n_sign;
     }
   else
     {
       /* subtraction must be done. */
-      cmp_res = _do_compare (n1, n2, FALSE, FALSE);	/* Compare magnitudes. */
+      cmp_res = _do_compare (n1, n2, FALSE, FALSE); /* Compare magnitudes. */
       switch (cmp_res)
-	{
-	case -1:
-	  /* n1 is less than n2, subtract n1 from n2. */
-	  sum = _do_sub (n2, n1, scale_min);
-	  if (sum == NULL)
-	    return -1;
-	  sum->n_sign = n2->n_sign;
-	  break;
-	case 0:
-	  /* They are equal! return zero with the correct scale! */
-	  res_scale = MAX (scale_min, MAX (n1->n_scale, n2->n_scale));
-	  sum = new_num (1, res_scale);
-	  if (sum == NULL)
-	    return -1;
-	  memset (sum->n_value, 0, res_scale + 1);
-	  break;
-	case 1:
-	  /* n2 is less than n1, subtract n2 from n1. */
-	  sum = _do_sub (n1, n2, scale_min);
-	  if (sum == NULL)
-	    return -1;
-	  sum->n_sign = n1->n_sign;
-	}
+  {
+  case -1:
+    /* n1 is less than n2, subtract n1 from n2. */
+    sum = _do_sub (n2, n1, scale_min);
+    if (sum == NULL)
+      return -1;
+    sum->n_sign = n2->n_sign;
+    break;
+  case 0:
+    /* They are equal! return zero with the correct scale! */
+    res_scale = MAX (scale_min, MAX (n1->n_scale, n2->n_scale));
+    sum = new_num (1, res_scale);
+    if (sum == NULL)
+      return -1;
+    memset (sum->n_value, 0, res_scale + 1);
+    break;
+  case 1:
+    /* n2 is less than n1, subtract n2 from n1. */
+    sum = _do_sub (n1, n2, scale_min);
+    if (sum == NULL)
+      return -1;
+    sum->n_sign = n1->n_sign;
+  }
     }
 
   /* Clean up and return. */
@@ -182,38 +182,38 @@ bc_sub (n1, n2, result, scale_min)
     {
       diff = _do_add (n1, n2, scale_min);
       if (diff == NULL)
-	return -1;
+  return -1;
       diff->n_sign = n1->n_sign;
     }
   else
     {
       /* subtraction must be done. */
-      cmp_res = _do_compare (n1, n2, FALSE, FALSE);	/* Compare magnitudes. */
+      cmp_res = _do_compare (n1, n2, FALSE, FALSE); /* Compare magnitudes. */
       switch (cmp_res)
-	{
-	case -1:
-	  /* n1 is less than n2, subtract n1 from n2. */
-	  diff = _do_sub (n2, n1, scale_min);
-	  if (diff == NULL)
-	    return -1;
-	  diff->n_sign = (n2->n_sign == PLUS ? MINUS : PLUS);
-	  break;
-	case 0:
-	  /* They are equal! return zero! */
-	  res_scale = MAX (scale_min, MAX (n1->n_scale, n2->n_scale));
-	  diff = new_num (1, res_scale);
-	  if (diff == NULL)
-	    return -1;
-	  memset (diff->n_value, 0, res_scale + 1);
-	  break;
-	case 1:
-	  /* n2 is less than n1, subtract n2 from n1. */
-	  diff = _do_sub (n1, n2, scale_min);
-	  if (diff == NULL)
-	    return -1;
-	  diff->n_sign = n1->n_sign;
-	  break;
-	}
+  {
+  case -1:
+    /* n1 is less than n2, subtract n1 from n2. */
+    diff = _do_sub (n2, n1, scale_min);
+    if (diff == NULL)
+      return -1;
+    diff->n_sign = (n2->n_sign == PLUS ? MINUS : PLUS);
+    break;
+  case 0:
+    /* They are equal! return zero! */
+    res_scale = MAX (scale_min, MAX (n1->n_scale, n2->n_scale));
+    diff = new_num (1, res_scale);
+    if (diff == NULL)
+      return -1;
+    memset (diff->n_value, 0, res_scale + 1);
+    break;
+  case 1:
+    /* n2 is less than n1, subtract n2 from n1. */
+    diff = _do_sub (n1, n2, scale_min);
+    if (diff == NULL)
+      return -1;
+    diff->n_sign = n1->n_sign;
+    break;
+  }
     }
 
   /* Clean up and return. */
@@ -233,9 +233,9 @@ bc_multiply (n1, n2, prod, scale)
      bc_num n1, n2, *prod;
      int scale;
 {
-  bc_num pval;			/* For the working storage. */
-  char *n1ptr, *n2ptr, *pvptr;	/* Work pointers. */
-  char *n1end, *n2end;		/* To the end of n1 and n2. */
+  bc_num pval;      /* For the working storage. */
+  char *n1ptr, *n2ptr, *pvptr;  /* Work pointers. */
+  char *n1end, *n2end;    /* To the end of n1 and n2. */
 
   int indx;
   int len1, len2, total_digits;
@@ -265,7 +265,7 @@ bc_multiply (n1, n2, prod, scale)
       n1ptr = (char *) (n1end - MAX (0, indx - len2 + 1));
       n2ptr = (char *) (n2end - MIN (indx, len2 - 1));
       while ((n1ptr >= n1->n_value) && (n2ptr <= n2end))
-	sum += *n1ptr-- * *n2ptr++;
+  sum += *n1ptr-- * *n2ptr++;
       sum = sum / BASE;
     }
   for (; indx < total_digits - 1; indx++)
@@ -273,7 +273,7 @@ bc_multiply (n1, n2, prod, scale)
       n1ptr = (char *) (n1end - MAX (0, indx - len2 + 1));
       n2ptr = (char *) (n2end - MIN (indx, len2 - 1));
       while ((n1ptr >= n1->n_value) && (n2ptr <= n2end))
-	sum += *n1ptr-- * *n2ptr++;
+  sum += *n1ptr-- * *n2ptr++;
       *pvptr-- = sum % BASE;
       sum = sum / BASE;
     }
@@ -318,17 +318,17 @@ bc_divide (n1, n2, quot, scale)
   if (n2->n_scale == 0)
     {
       if (n2->n_len == 1 && *n2->n_value == 1)
-	{
-	  qval = new_num (n1->n_len, scale);
-	  if (qval == NULL)
-	    return -1;
-	  qval->n_sign = (n1->n_sign == n2->n_sign ? PLUS : MINUS);
-	  memset (&qval->n_value[n1->n_len], 0, scale);
-	  memcpy (qval->n_value, n1->n_value,
-		  n1->n_len + MIN (n1->n_scale, scale));
-	  free_num (quot);
-	  *quot = qval;
-	}
+  {
+    qval = new_num (n1->n_len, scale);
+    if (qval == NULL)
+      return -1;
+    qval->n_sign = (n1->n_sign == n2->n_sign ? PLUS : MINUS);
+    memset (&qval->n_value[n1->n_len], 0, scale);
+    memcpy (qval->n_value, n1->n_value,
+      n1->n_len + MIN (n1->n_scale, scale));
+    free_num (quot);
+    *quot = qval;
+  }
     }
 
   /* Set up the divide.  Move the decimal point on n1 by n2's scale.
@@ -373,9 +373,9 @@ bc_divide (n1, n2, quot, scale)
     {
       zero = FALSE;
       if (len2 > len1)
-	qdigits = scale + 1;	/* One for the zero integer part. */
+  qdigits = scale + 1;  /* One for the zero integer part. */
       else
-	qdigits = len1 - len2 + scale + 1;
+  qdigits = len1 - len2 + scale + 1;
     }
 
   /* Allocate and zero the storage for the quotient. */
@@ -395,90 +395,90 @@ bc_divide (n1, n2, quot, scale)
       /* Normalize */
       norm = 10 / ((int) *n2ptr + 1);
       if (norm != 1)
-	{
-	  _one_mult (num1, len1 + scale1 + extra + 1, norm, num1);
-	  _one_mult (n2ptr, len2, norm, n2ptr);
-	}
+  {
+    _one_mult (num1, len1 + scale1 + extra + 1, norm, num1);
+    _one_mult (n2ptr, len2, norm, n2ptr);
+  }
 
       /* Initialize divide loop. */
       qdig = 0;
       if (len2 > len1)
-	qptr = (unsigned char *) qval->n_value + len2 - len1;
+  qptr = (unsigned char *) qval->n_value + len2 - len1;
       else
-	qptr = (unsigned char *) qval->n_value;
+  qptr = (unsigned char *) qval->n_value;
 
       /* Loop */
       while (qdig <= len1 + scale - len2)
-	{
-	  /* Calculate the quotient digit guess. */
-	  if (*n2ptr == num1[qdig])
-	    qguess = 9;
-	  else
-	    qguess =
-	      (num1[qdig] * 10 + num1[qdig + 1]) / (unsigned int) (*n2ptr);
+  {
+    /* Calculate the quotient digit guess. */
+    if (*n2ptr == num1[qdig])
+      qguess = 9;
+    else
+      qguess =
+        (num1[qdig] * 10 + num1[qdig + 1]) / (unsigned int) (*n2ptr);
 
-	  /* Test qguess. */
-	  if (n2ptr[1] * qguess >
-	      (num1[qdig] * 10 + num1[qdig + 1] - *n2ptr * qguess) * 10
-	      + num1[qdig + 2])
-	    {
-	      qguess--;
-	      /* And again. */
-	      if (n2ptr[1] * qguess >
-		  (num1[qdig] * 10 + num1[qdig + 1] - *n2ptr * qguess) * 10
-		  + num1[qdig + 2])
-		qguess--;
-	    }
+    /* Test qguess. */
+    if (n2ptr[1] * qguess >
+        (num1[qdig] * 10 + num1[qdig + 1] - *n2ptr * qguess) * 10
+        + num1[qdig + 2])
+      {
+        qguess--;
+        /* And again. */
+        if (n2ptr[1] * qguess >
+      (num1[qdig] * 10 + num1[qdig + 1] - *n2ptr * qguess) * 10
+      + num1[qdig + 2])
+    qguess--;
+      }
 
-	  /* Multiply and subtract. */
-	  borrow = 0;
-	  if (qguess != 0)
-	    {
-	      *mval = 0;
-	      _one_mult (n2ptr, len2, qguess, mval + 1);
-	      ptr1 = (unsigned char *) num1 + qdig + len2;
-	      ptr2 = (unsigned char *) mval + len2;
-	      for (count = 0; count < len2 + 1; count++)
-		{
-		  val = (int) *ptr1 - (int) *ptr2-- - borrow;
-		  if (val < 0)
-		    {
-		      val += 10;
-		      borrow = 1;
-		    }
-		  else
-		    borrow = 0;
-		  *ptr1-- = val;
-		}
-	    }
+    /* Multiply and subtract. */
+    borrow = 0;
+    if (qguess != 0)
+      {
+        *mval = 0;
+        _one_mult (n2ptr, len2, qguess, mval + 1);
+        ptr1 = (unsigned char *) num1 + qdig + len2;
+        ptr2 = (unsigned char *) mval + len2;
+        for (count = 0; count < len2 + 1; count++)
+    {
+      val = (int) *ptr1 - (int) *ptr2-- - borrow;
+      if (val < 0)
+        {
+          val += 10;
+          borrow = 1;
+        }
+      else
+        borrow = 0;
+      *ptr1-- = val;
+    }
+      }
 
-	  /* Test for negative result. */
-	  if (borrow == 1)
-	    {
-	      qguess--;
-	      ptr1 = (unsigned char *) num1 + qdig + len2;
-	      ptr2 = (unsigned char *) n2ptr + len2 - 1;
-	      carry = 0;
-	      for (count = 0; count < len2; count++)
-		{
-		  val = (int) *ptr1 + (int) *ptr2-- + carry;
-		  if (val > 9)
-		    {
-		      val -= 10;
-		      carry = 1;
-		    }
-		  else
-		    carry = 0;
-		  *ptr1-- = val;
-		}
-	      if (carry == 1)
-		*ptr1 = (unsigned char) ((*ptr1) + 1) % 10;
-	    }
+    /* Test for negative result. */
+    if (borrow == 1)
+      {
+        qguess--;
+        ptr1 = (unsigned char *) num1 + qdig + len2;
+        ptr2 = (unsigned char *) n2ptr + len2 - 1;
+        carry = 0;
+        for (count = 0; count < len2; count++)
+    {
+      val = (int) *ptr1 + (int) *ptr2-- + carry;
+      if (val > 9)
+        {
+          val -= 10;
+          carry = 1;
+        }
+      else
+        carry = 0;
+      *ptr1-- = val;
+    }
+        if (carry == 1)
+    *ptr1 = (unsigned char) ((*ptr1) + 1) % 10;
+      }
 
-	  /* We now know the quotient digit. */
-	  *qptr++ = qguess;
-	  qdig++;
-	}
+    /* We now know the quotient digit. */
+    *qptr++ = qguess;
+    qdig++;
+  }
     }
 
   /* Clean up and return the number. */
@@ -494,7 +494,7 @@ bc_divide (n1, n2, quot, scale)
   free (num1);
   free (num2);
 
-  return 0;			/* Everything is OK. */
+  return 0;     /* Everything is OK. */
 }
 
 
@@ -534,7 +534,7 @@ bc_divmod (num1, num2, quot, rem, scale)
       *quot = quotient;
     }
 
-  return 0;			/* Everything is OK. */
+  return 0;     /* Everything is OK. */
 }
 
 /* "Frees" a bc_num NUM.  Actually decreases reference count and only
@@ -574,22 +574,22 @@ str2num (num, str, scale)
   strscale = 0;
   zero_int = FALSE;
   if ((*ptr == '+') || (*ptr == '-'))
-    ptr++;			/* Sign */
+    ptr++;      /* Sign */
   while (*ptr == '0')
-    {				/* Skip leading zeros */
+    {       /* Skip leading zeros */
       ptr++;
       if (*ptr == '\0')
-	{
-	  ptr--;
-	  break;
-	}
+  {
+    ptr--;
+    break;
+  }
     }
   while (isdigit (*ptr))
-    ptr++, digits++;		/* digits */
+    ptr++, digits++;    /* digits */
   if (*ptr == '.')
-    ptr++;			/* decimal point */
+    ptr++;      /* decimal point */
   while (isdigit (*ptr))
-    ptr++, strscale++;		/* digits */
+    ptr++, strscale++;    /* digits */
   if ((*ptr != '\0') || (digits + strscale == 0))
     {
       *num = copy_num (_zero_);
@@ -618,16 +618,16 @@ str2num (num, str, scale)
     {
       (*num)->n_sign = PLUS;
       if (*ptr == '+')
-	ptr++;
+  ptr++;
     }
   while (*ptr == '0')
-    {				/* Skip leading zeros. */
+    {       /* Skip leading zeros. */
       ptr++;
       if (*ptr == '\0')
-	{
-	  ptr--;
-	  break;
-	}
+  {
+    ptr--;
+    break;
+  }
     }
   nptr = (*num)->n_value;
   if (zero_int)
@@ -642,9 +642,9 @@ str2num (num, str, scale)
   /* Build the fractional part. */
   if (strscale > 0)
     {
-      ptr++;			/* skip the decimal point! */
+      ptr++;      /* skip the decimal point! */
       for (; strscale > 0; strscale--)
-	*nptr++ = CH_VAL (*ptr++);
+  *nptr++ = CH_VAL (*ptr++);
     }
 
   return 0;
@@ -661,7 +661,7 @@ num2str (num)
   int index, signch;
 
   /* Allocate the string memory. */
-  signch = (num->n_sign == PLUS ? 0 : 1);	/* Number of sign chars. */
+  signch = (num->n_sign == PLUS ? 0 : 1); /* Number of sign chars. */
   if (num->n_scale > 0)
     str = (char *) malloc (num->n_len + num->n_scale + 2 + signch);
   else
@@ -684,7 +684,7 @@ num2str (num)
     {
       *sptr++ = '.';
       for (index = 0; index < num->n_scale; index++)
-	*sptr++ = BCD_CHAR (*nptr++);
+  *sptr++ = BCD_CHAR (*nptr++);
     }
 
   /* Terminate the string and return it! */
@@ -752,30 +752,30 @@ _do_compare (n1, n2, use_sign, ignore_last)
   if (use_sign && n1->n_sign != n2->n_sign)
     {
       if (n1->n_sign == PLUS)
-	return (1);		/* Positive N1 > Negative N2 */
+  return (1);   /* Positive N1 > Negative N2 */
       else
-	return (-1);		/* Negative N1 < Positive N1 */
+  return (-1);    /* Negative N1 < Positive N1 */
     }
 
   /* Now compare the magnitude. */
   if (n1->n_len != n2->n_len)
     {
       if (n1->n_len > n2->n_len)
-	{
-	  /* Magnitude of n1 > n2. */
-	  if (!use_sign || n1->n_sign == PLUS)
-	    return (1);
-	  else
-	    return (-1);
-	}
+  {
+    /* Magnitude of n1 > n2. */
+    if (!use_sign || n1->n_sign == PLUS)
+      return (1);
+    else
+      return (-1);
+  }
       else
-	{
-	  /* Magnitude of n1 < n2. */
-	  if (!use_sign || n1->n_sign == PLUS)
-	    return (-1);
-	  else
-	    return (1);
-	}
+  {
+    /* Magnitude of n1 < n2. */
+    if (!use_sign || n1->n_sign == PLUS)
+      return (-1);
+    else
+      return (1);
+  }
     }
 
   /* If we get here, they have the same number of integer digits.
@@ -795,48 +795,48 @@ _do_compare (n1, n2, use_sign, ignore_last)
   if (count != 0)
     {
       if (*n1ptr > *n2ptr)
-	{
-	  /* Magnitude of n1 > n2. */
-	  if (!use_sign || n1->n_sign == PLUS)
-	    return (1);
-	  else
-	    return (-1);
-	}
+  {
+    /* Magnitude of n1 > n2. */
+    if (!use_sign || n1->n_sign == PLUS)
+      return (1);
+    else
+      return (-1);
+  }
       else
-	{
-	  /* Magnitude of n1 < n2. */
-	  if (!use_sign || n1->n_sign == PLUS)
-	    return (-1);
-	  else
-	    return (1);
-	}
+  {
+    /* Magnitude of n1 < n2. */
+    if (!use_sign || n1->n_sign == PLUS)
+      return (-1);
+    else
+      return (1);
+  }
     }
 
   /* They are equal up to the last part of the equal part of the fraction. */
   if (n1->n_scale != n2->n_scale)
     if (n1->n_scale > n2->n_scale)
       {
-	for (count = n1->n_scale - n2->n_scale; count > 0; count--)
-	  if (*n1ptr++ != 0)
-	    {
-	      /* Magnitude of n1 > n2. */
-	      if (!use_sign || n1->n_sign == PLUS)
-		return (1);
-	      else
-		return (-1);
-	    }
+  for (count = n1->n_scale - n2->n_scale; count > 0; count--)
+    if (*n1ptr++ != 0)
+      {
+        /* Magnitude of n1 > n2. */
+        if (!use_sign || n1->n_sign == PLUS)
+    return (1);
+        else
+    return (-1);
+      }
       }
     else
       {
-	for (count = n2->n_scale - n1->n_scale; count > 0; count--)
-	  if (*n2ptr++ != 0)
-	    {
-	      /* Magnitude of n1 < n2. */
-	      if (!use_sign || n1->n_sign == PLUS)
-		return (-1);
-	      else
-		return (1);
-	    }
+  for (count = n2->n_scale - n1->n_scale; count > 0; count--)
+    if (*n2ptr++ != 0)
+      {
+        /* Magnitude of n1 < n2. */
+        if (!use_sign || n1->n_sign == PLUS)
+    return (-1);
+        else
+    return (1);
+      }
       }
 
   /* They must be equal! */
@@ -949,7 +949,7 @@ _do_add (n1, n2, scale_min)
     {
       sumptr = (char *) (sum->n_value + sum_scale + sum_digits);
       for (count = scale_min - sum_scale; count > 0; count--)
-	*sumptr++ = 0;
+  *sumptr++ = 0;
     }
 
   /* Start with the fraction part.  Initialize the pointers. */
@@ -963,17 +963,17 @@ _do_add (n1, n2, scale_min)
   if (n1bytes != n2bytes)
     {
       if (n1bytes > n2bytes)
-	while (n1bytes > n2bytes)
-	  {
-	    *sumptr-- = *n1ptr--;
-	    n1bytes--;
-	  }
+  while (n1bytes > n2bytes)
+    {
+      *sumptr-- = *n1ptr--;
+      n1bytes--;
+    }
       else
-	while (n2bytes > n1bytes)
-	  {
-	    *sumptr-- = *n2ptr--;
-	    n2bytes--;
-	  }
+  while (n2bytes > n1bytes)
+    {
+      *sumptr-- = *n2ptr--;
+      n2bytes--;
+    }
     }
 
   /* Now add the remaining fraction part and equal size integer parts. */
@@ -984,12 +984,12 @@ _do_add (n1, n2, scale_min)
     {
       *sumptr = *n1ptr-- + *n2ptr-- + carry;
       if (*sumptr > (BASE - 1))
-	{
-	  carry = 1;
-	  *sumptr -= BASE;
-	}
+  {
+    carry = 1;
+    *sumptr -= BASE;
+  }
       else
-	carry = 0;
+  carry = 0;
       sumptr--;
       n1bytes--;
       n2bytes--;
@@ -1005,12 +1005,12 @@ _do_add (n1, n2, scale_min)
     {
       *sumptr = *n1ptr-- + carry;
       if (*sumptr > (BASE - 1))
-	{
-	  carry = 1;
-	  *sumptr -= BASE;
-	}
+  {
+    carry = 1;
+    *sumptr -= BASE;
+  }
       else
-	carry = 0;
+  carry = 0;
       sumptr--;
     }
 
@@ -1054,7 +1054,7 @@ _do_sub (n1, n2, scale_min)
     {
       diffptr = (char *) (diff->n_value + diff_len + diff_scale);
       for (count = scale_min - diff_scale; count > 0; count--)
-	*diffptr++ = 0;
+  *diffptr++ = 0;
     }
 
   /* Initialize the subtract. */
@@ -1070,23 +1070,23 @@ _do_sub (n1, n2, scale_min)
     {
       /* n1 has the longer scale */
       for (count = n1->n_scale - min_scale; count > 0; count--)
-	*diffptr-- = *n1ptr--;
+  *diffptr-- = *n1ptr--;
     }
   else
     {
       /* n2 has the longer scale */
       for (count = n2->n_scale - min_scale; count > 0; count--)
-	{
-	  val = -*n2ptr-- - borrow;
-	  if (val < 0)
-	    {
-	      val += BASE;
-	      borrow = 1;
-	    }
-	  else
-	    borrow = 0;
-	  *diffptr-- = val;
-	}
+  {
+    val = -*n2ptr-- - borrow;
+    if (val < 0)
+      {
+        val += BASE;
+        borrow = 1;
+      }
+    else
+      borrow = 0;
+    *diffptr-- = val;
+  }
     }
 
   /* Now do the equal length scale and integer parts. */
@@ -1095,12 +1095,12 @@ _do_sub (n1, n2, scale_min)
     {
       val = *n1ptr-- - *n2ptr-- - borrow;
       if (val < 0)
-	{
-	  val += BASE;
-	  borrow = 1;
-	}
+  {
+    val += BASE;
+    borrow = 1;
+  }
       else
-	borrow = 0;
+  borrow = 0;
       *diffptr-- = val;
     }
 
@@ -1108,17 +1108,17 @@ _do_sub (n1, n2, scale_min)
   if (diff_len != min_len)
     {
       for (count = diff_len - min_len; count > 0; count--)
-	{
-	  val = *n1ptr-- - borrow;
-	  if (val < 0)
-	    {
-	      val += BASE;
-	      borrow = 1;
-	    }
-	  else
-	    borrow = 0;
-	  *diffptr-- = val;
-	}
+  {
+    val = *n1ptr-- - borrow;
+    if (val < 0)
+      {
+        val += BASE;
+        borrow = 1;
+      }
+    else
+      borrow = 0;
+    *diffptr-- = val;
+  }
     }
 
   /* Clean up and return. */
@@ -1145,24 +1145,24 @@ _one_mult (num, size, digit, result)
   else
     {
       if (digit == 1)
-	memcpy (result, num, size);
+  memcpy (result, num, size);
       else
-	{
-	  /* Initialize */
-	  nptr = (unsigned char *) (num + size - 1);
-	  rptr = (unsigned char *) (result + size - 1);
-	  carry = 0;
+  {
+    /* Initialize */
+    nptr = (unsigned char *) (num + size - 1);
+    rptr = (unsigned char *) (result + size - 1);
+    carry = 0;
 
-	  while (size-- > 0)
-	    {
-	      value = *nptr-- * digit + carry;
-	      *rptr-- = value % BASE;
-	      carry = value / BASE;
-	    }
+    while (size-- > 0)
+      {
+        value = *nptr-- * digit + carry;
+        *rptr-- = value % BASE;
+        carry = value / BASE;
+      }
 
-	  if (carry != 0)
-	    *rptr = carry;
-	}
+    if (carry != 0)
+      *rptr = carry;
+  }
     }
 }
 
