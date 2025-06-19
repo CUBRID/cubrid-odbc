@@ -28,28 +28,27 @@
  *
  */
 
-#include		"odbc_portable.h"
-#include		"odbc_env.h"
-#include		"sqlext.h"
-#include		"odbc_diag_record.h"
-#include		"odbc_connection.h"
-#include		"odbc_util.h"
-#include		"cas_cci.h"
+#include    "odbc_portable.h"
+#include    "odbc_env.h"
+#include    "sqlext.h"
+#include    "odbc_diag_record.h"
+#include    "odbc_connection.h"
+#include    "odbc_util.h"
+#include    "cas_cci.h"
 
-PRIVATE RETCODE connection_end_tran (ODBC_CONNECTION * conn,
-				     short completion_type);
+PRIVATE RETCODE connection_end_tran (ODBC_CONNECTION * conn, short completion_type);
 
 /* odbc_environments :
- *		global enviroment handle list head
+ *    global enviroment handle list head
  */
 static ODBC_ENV *odbc_environments = NULL;
 
 /************************************************************************
 * name:  odbc_alloc_env
 * arguments:
-*		ODBC_ENV **envptr
+*   ODBC_ENV **envptr
 * returns/side-effects:
-*		RETCODE - odbc api return code
+*   RETCODE - odbc api return code
 * description:
 * NOTE:
 ************************************************************************/
@@ -92,9 +91,9 @@ odbc_alloc_env (ODBC_ENV ** envptr)
 /************************************************************************
 * name:  odbc_free_env
 * arguments:
-*		ODBC_ENV *env 
+*   ODBC_ENV *env 
 * returns/side-effects:
-*		RETCODE - odbc api return code
+*   RETCODE - odbc api return code
 * description:
 * NOTE:
 ************************************************************************/
@@ -140,22 +139,21 @@ odbc_free_env (ODBC_ENV * env)
 /************************************************************************
 * name: odbc_set_env_attr
 * arguments:
-*		ODBC_ENV *env - environment handle
-*		attribute - attribute type
-*		valueptr - generic value pointer
-*		stringlength - SQL_IS_INTEGER(-6) or string length
+*   ODBC_ENV *env - environment handle
+*   attribute - attribute type
+*   valueptr - generic value pointer
+*   stringlength - SQL_IS_INTEGER(-6) or string length
 * returns/side-effects:
-*		RETCODE
+*   RETCODE
 * description:
-*		
+*   
 * NOTE:
-*		diagnostic¿¡ ´ëÇØ¼­ ¾ÆÁ÷ structure°¡ ¼³Á¤ÀÌ µÇÁö ¾Ê¾Æ¼­ SQLSTATE¸¦ 
-*		¼³Á¤ÇÏÁö ¸øÇÑ´Ù.  structure¿¡ ¹Ý¿µÇÑ ÈÄ °¢ state °ªÀ» ¼³Á¤ÇÏµµ·Ï 
-*		ÇÑ´Ù.
+*   diagnosticì— ëŒ€í•´ì„œ ì•„ì§ structureê°€ ì„¤ì •ì´ ë˜ì§€ ì•Šì•„ì„œ SQLSTATEë¥¼ 
+*   ì„¤ì •í•˜ì§€ ëª»í•œë‹¤.  structureì— ë°˜ì˜í•œ í›„ ê° state ê°’ì„ ì„¤ì •í•˜ë„ë¡ 
+*   í•œë‹¤.
 ************************************************************************/
 PUBLIC RETCODE
-odbc_set_env_attr (ODBC_ENV * env,
-		   long attribute, void *valueptr, long stringlength)
+odbc_set_env_attr (ODBC_ENV * env, long attribute, void *valueptr, long stringlength)
 {
 
   if (valueptr == NULL)
@@ -226,17 +224,14 @@ odbc_set_env_attr (ODBC_ENV * env,
 /************************************************************************
 * name:  odbc_get_env_attr
 * arguments:
-*		ODBC_ENV *env 
+*   ODBC_ENV *env 
 * returns/side-effects:
-*		RETCODE - odbc api return code
+*   RETCODE - odbc api return code
 * description:
 * NOTE:
 ************************************************************************/
 PUBLIC
-odbc_get_env_attr (ODBC_ENV * env,
-		   long attribute,
-		   void *value_ptr,
-		   long buffer_length, long *string_length_ptr)
+odbc_get_env_attr (ODBC_ENV * env, long attribute, void *value_ptr, long buffer_length, long *string_length_ptr)
 {
   switch (attribute)
     {
@@ -281,19 +276,16 @@ odbc_end_tran (short handle_type, void *handle, short completion_type)
   if ((handle_type != SQL_HANDLE_ENV && handle_type != SQL_HANDLE_DBC) ||
       (handle_type == SQL_HANDLE_ENV
        && ((ODBC_ENV *) handle)->handle_type != SQL_HANDLE_ENV)
-      || (handle_type == SQL_HANDLE_DBC
-	  && ((ODBC_CONNECTION *) handle)->handle_type != SQL_HANDLE_DBC))
+      || (handle_type == SQL_HANDLE_DBC && ((ODBC_CONNECTION *) handle)->handle_type != SQL_HANDLE_DBC))
     {
       return ODBC_INVALID_HANDLE;
     }
 
   if (handle_type == SQL_HANDLE_ENV)
     {
-      for (conn = ((ODBC_ENV *) handle)->conn; conn;
-	   conn = ((ODBC_CONNECTION *) conn)->next)
+      for (conn = ((ODBC_ENV *) handle)->conn; conn; conn = ((ODBC_CONNECTION *) conn)->next)
 	{
-	  rc =
-	    connection_end_tran ((ODBC_CONNECTION *) conn, completion_type);
+	  rc = connection_end_tran ((ODBC_CONNECTION *) conn, completion_type);
 	  if (rc < 0)
 	    {
 	      return ODBC_ERROR;

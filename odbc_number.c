@@ -68,8 +68,7 @@ static int _do_compare (bc_num n1, bc_num n2, int use_sign, int ignore_last);
 static void _rm_leading_zeros (bc_num num);
 static bc_num _do_add (bc_num n1, bc_num n2, int scale_min);
 static bc_num _do_sub (bc_num n1, bc_num n2, int scale_min);
-static void _one_mult (unsigned char *num, int size, int digit,
-		       unsigned char *result);
+static void _one_mult (unsigned char *num, int size, int digit, unsigned char *result);
 
 /* Storage used for special numbers. */
 static bc_num _zero_ = NULL;
@@ -277,7 +276,7 @@ bc_multiply (n1, n2, prod, scale)
       *pvptr-- = sum % BASE;
       sum = sum / BASE;
     }
-  *pvptr-- = (char)sum;
+  *pvptr-- = (char) sum;
 
   /* Assign to prod and clean up the number. */
   free_num (prod);
@@ -324,8 +323,7 @@ bc_divide (n1, n2, quot, scale)
 	    return -1;
 	  qval->n_sign = (n1->n_sign == n2->n_sign ? PLUS : MINUS);
 	  memset (&qval->n_value[n1->n_len], 0, scale);
-	  memcpy (qval->n_value, n1->n_value,
-		  n1->n_len + MIN (n1->n_scale, scale));
+	  memcpy (qval->n_value, n1->n_value, n1->n_len + MIN (n1->n_scale, scale));
 	  free_num (quot);
 	  *quot = qval;
 	}
@@ -414,19 +412,14 @@ bc_divide (n1, n2, quot, scale)
 	  if (*n2ptr == num1[qdig])
 	    qguess = 9;
 	  else
-	    qguess =
-	      (num1[qdig] * 10 + num1[qdig + 1]) / (unsigned int) (*n2ptr);
+	    qguess = (num1[qdig] * 10 + num1[qdig + 1]) / (unsigned int) (*n2ptr);
 
 	  /* Test qguess. */
-	  if (n2ptr[1] * qguess >
-	      (num1[qdig] * 10 + num1[qdig + 1] - *n2ptr * qguess) * 10
-	      + num1[qdig + 2])
+	  if (n2ptr[1] * qguess > (num1[qdig] * 10 + num1[qdig + 1] - *n2ptr * qguess) * 10 + num1[qdig + 2])
 	    {
 	      qguess--;
 	      /* And again. */
-	      if (n2ptr[1] * qguess >
-		  (num1[qdig] * 10 + num1[qdig + 1] - *n2ptr * qguess) * 10
-		  + num1[qdig + 2])
+	      if (n2ptr[1] * qguess > (num1[qdig] * 10 + num1[qdig + 1] - *n2ptr * qguess) * 10 + num1[qdig + 2])
 		qguess--;
 	    }
 

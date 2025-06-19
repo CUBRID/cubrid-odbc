@@ -28,21 +28,21 @@
  *
  */
 
-#ifndef	__CUBRID_ODBC_UTIL_HEADER	/* to avoid multiple inclusion */
-#define	__CUBRID_ODBC_UTIL_HEADER
+#ifndef __CUBRID_ODBC_UTIL_HEADER /* to avoid multiple inclusion */
+#define __CUBRID_ODBC_UTIL_HEADER
 
-#include		"odbc_portable.h"
+#include    "odbc_portable.h"
 
-#define		UT_ALLOC(size)				ut_alloc(size)
-#define		UT_REALLOC(ptr, size)		ut_realloc(ptr, size)
-#define		UT_FREE(ptr)				ut_free(ptr)
-#define		UT_MAKE_STRING(ptr, length)	ut_make_string(ptr, length)
-#define		UT_MAKE_BINARY(ptr, length) ut_make_binary(ptr, length)
-#define		UT_APPEND_STRING(str1, str2, len2)	ut_append_string(str1, str2, len2)
+#define   UT_ALLOC(size)        ut_alloc(size)
+#define   UT_REALLOC(ptr, size)   ut_realloc(ptr, size)
+#define   UT_FREE(ptr)        ut_free(ptr)
+#define   UT_MAKE_STRING(ptr, length) ut_make_string(ptr, length)
+#define   UT_MAKE_BINARY(ptr, length) ut_make_binary(ptr, length)
+#define   UT_APPEND_STRING(str1, str2, len2)  ut_append_string(str1, str2, len2)
 
 #define           UT_ALLOC_BSTR(size)   ut_alloc_bstr(size)
 #define           UT_FREE_BSTR(ptr)     ut_free_bstr(ptr) 
-#define		UT_SET_DELIMITER			";;"
+#define   UT_SET_DELIMITER      ";;"
 
 /* NC_FREE - NULL check free 
  * NA_FREE - NULL assign free
@@ -52,36 +52,36 @@
  * NC_FREE_WHO - NULL check free with handler, option
  * NA_FREE_WHO - NULL assign free with handler, option
  */
-#define		NC_FREE(ptr)	if ( ptr != NULL ) UT_FREE(ptr)
-#define		NA_FREE(ptr)									\
-	do {													\
-		if ( ptr != NULL ) {								\
-			UT_FREE(ptr);									\
-			ptr= NULL;										\
-		}													\
-	} while (0)
+#define   NC_FREE(ptr)  if ( ptr != NULL ) UT_FREE(ptr)
+#define   NA_FREE(ptr)                  \
+  do {                          \
+    if ( ptr != NULL ) {                \
+      UT_FREE(ptr);                 \
+      ptr= NULL;                    \
+    }                         \
+  } while (0)
 
-#define		NC_FREE_WH(handle, ptr)  if ( ptr != NULL ) handle(ptr)
-#define		NA_FREE_WH(handle, ptr)							\
-	do {													\
-		if ( ptr != NULL ) {								\
-			handle(ptr);									\
-			ptr = NULL;										\
-		}													\
-	} while (0)												\
+#define   NC_FREE_WH(handle, ptr)  if ( ptr != NULL ) handle(ptr)
+#define   NA_FREE_WH(handle, ptr)             \
+  do {                          \
+    if ( ptr != NULL ) {                \
+      handle(ptr);                  \
+      ptr = NULL;                   \
+    }                         \
+  } while (0)                       \
 
-#define		NC_FREE_WHO(handle, ptr, opt)  if ( ptr != NULL ) handle(ptr, opt)
-#define		NA_FREE_WHO(handle, ptr, opt)					\
-	do {													\
-		if ( ptr != NULL ) {								\
-			handle(ptr, opt);								\
-			ptr = NULL;										\
-		}													\
-	} while (0)												\
+#define   NC_FREE_WHO(handle, ptr, opt)  if ( ptr != NULL ) handle(ptr, opt)
+#define   NA_FREE_WHO(handle, ptr, opt)         \
+  do {                          \
+    if ( ptr != NULL ) {                \
+      handle(ptr, opt);               \
+      ptr = NULL;                   \
+    }                         \
+  } while (0)                       \
 
-#define		UT_COPY_STRING(target, value)						\
-	NC_FREE(target);										\
-	target = UT_MAKE_STRING(value, -1)
+#define   UT_COPY_STRING(target, value)           \
+  NC_FREE(target);                    \
+  target = UT_MAKE_STRING(value, -1)
 
 #define SET_OPTION(value, option)       ((value) |= (option))
 #define UNSET_OPTION(value, option)     ((value) ^= (option))
@@ -98,12 +98,12 @@
                         do {                                            \
                             struct timeval now;                         \
                             FILE        *fp = NULL;                     \
-                            char        *pt = NULL;						\
-							pt = getenv(DEBUG_FILE_KEY)					\
+                            char        *pt = NULL;           \
+              pt = getenv(DEBUG_FILE_KEY)         \
                             if ( pt != NULL ) {                         \
                                 fp = fopen(pt, "a+");                   \
                                 gettimeofday(&now, NULL);               \
-                                fprintf(fp,#value "	%ld.%07ld	%s	%d\n", now.tv_sec, now.tv_usec, __FILE__, __LINE__);                         \
+                                fprintf(fp,#value " %ld.%07ld %s  %d\n", now.tv_sec, now.tv_usec, __FILE__, __LINE__);                         \
                                 fclose(fp);                             \
                             }                                           \
                         } while(0)
@@ -112,14 +112,14 @@
 #include <sys/timeb.h>
 
 #define DEBUG_DETAIL(value) \
-		do {\
-			struct _timeb now;                          \
-			FILE        *fp = NULL;                     \
-			fp = fopen(DEBUG_FILE_KEY, "a+");           \
-			_ftime(&now);                       \
-			fprintf(fp, "### [%d] %ld.%07ld	%s	%d\n", value, now.time, now.millitm, __FILE__, __LINE__);                           \
-			fclose(fp);                         \
-		} while (0)
+    do {\
+      struct _timeb now;                          \
+      FILE        *fp = NULL;                     \
+      fp = fopen(DEBUG_FILE_KEY, "a+");           \
+      _ftime(&now);                       \
+      fprintf(fp, "### [%d] %ld.%07ld %s  %d\n", value, now.time, now.millitm, __FILE__, __LINE__);                           \
+      fclose(fp);                         \
+    } while (0)
 
 #define DEBUG_FILE_KEY          "c:\\temp\\time_log.txt"
 #define DEBUG_TIMESTAMP(value)
@@ -130,7 +130,7 @@
                             FILE        *fp = NULL;                     \
                             fp = fopen(DEBUG_FILE_KEY, "a+");           \
                             _ftime(&now);                       \
-                            fprintf(fp,#value "	%ld.%07ld	%s	%d\n", now.time, now.millitm, __FILE__, __LINE__);                           \
+                            fprintf(fp,#value " %ld.%07ld %s  %d\n", now.time, now.millitm, __FILE__, __LINE__);                           \
                             fclose(fp);                         \
                         } while(0)
 #endif
@@ -210,23 +210,23 @@ PUBLIC int add_element_to_setstring (char *setstring, char *element, int size);
 
 PUBLIC char *odbc_trim (char *str);
 PUBLIC RETCODE str_value_assign (const char *in_value,
-				 char *out_buf,
-				 SQLLEN out_buf_len, SQLLEN * val_len_ptr);
+         char *out_buf,
+         SQLLEN out_buf_len, SQLLEN * val_len_ptr);
 PUBLIC RETCODE bin_value_assign (const void *in_value,
-				 SQLLEN in_val_len,
-				 char *out_buf,
-				 SQLLEN out_buf_len, SQLLEN * val_len_ptr);
+         SQLLEN in_val_len,
+         char *out_buf,
+         SQLLEN out_buf_len, SQLLEN * val_len_ptr);
 
 PUBLIC short is_oidstr (char *str);
 PUBLIC short is_oidstr_array (char **array, int size);
 PUBLIC int replace_oid (char *sql_text, char **org_param_pos_pt,
-			char **oid_param_pos_pt, char **oid_param_val_pt);
+      char **oid_param_pos_pt, char **oid_param_val_pt);
 
 PUBLIC char *remove_owner_name (char *tablename);
 
 extern ERR_CODE ListTailAdd (ST_LIST * head, void *key, void *val,
-			     ERR_CODE (*assignFunc) (ST_LIST *, void *,
-						     void *));
+           ERR_CODE (*assignFunc) (ST_LIST *, void *,
+                 void *));
 
 extern void ListDelete (ST_LIST * head, void (*nodeDelete) (ST_LIST *));
 extern ERR_CODE ListCreate (ST_LIST ** head);
@@ -241,11 +241,11 @@ extern void ListPrint (ST_LIST * head, void (*nodePrint) (ST_LIST *));
 /* node assign function */
 extern ERR_CODE NodeAssign (ST_LIST * node, void *key, void *value);
 
-/*-------------  connection string util	------------------------*/
+/*-------------  connection string util ------------------------*/
 PUBLIC const char *next_element (const char *element_list);
 PUBLIC const char *element_value (const char *element);
 PUBLIC const char *element_value_by_key (const char *element_list,
-					 const char *key);
+           const char *key);
 #if defined (WINDOWS)
 PUBLIC void get_connect_attr (struct st_odbc_connection_attr* attr, 
                            const char* ConnStrIn, char* buffer);
@@ -262,11 +262,11 @@ PUBLIC int bytes_to_wide_char (char *str,
                        int* out_length, 
                        char* characterset);
 PUBLIC int get_wide_char_result (char *str, 
-					   int size, 
-					   wchar_t **buffer, 
-					   int buffer_length, 
-					   int* out_length, 
-					   char* characterset);
+             int size, 
+             wchar_t **buffer, 
+             int buffer_length, 
+             int* out_length, 
+             char* characterset);
 /*--------------------------------------------------------------*/
 PUBLIC _BOOL_ is_odd_number(int num);
 

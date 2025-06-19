@@ -28,24 +28,24 @@
 *
 */
 
-#ifndef	__ODBC_STMT_HEADER	/* to avoid multiple inclusion */
-#define	__ODBC_STMT_HEADER
+#ifndef __ODBC_STMT_HEADER  /* to avoid multiple inclusion */
+#define __ODBC_STMT_HEADER
 
-#include		"odbc_portable.h"
-#include		"sqlext.h"
-#include		"odbc_descriptor.h"
-#include		"odbc_util.h"
-#include		"odbc_type.h"
+#include    "odbc_portable.h"
+#include    "sqlext.h"
+#include    "odbc_descriptor.h"
+#include    "odbc_util.h"
+#include    "odbc_type.h"
 
-#define   IND_IS_DATA_AT_EXEC(value)	( (value) == SQL_DATA_AT_EXEC || \
+#define   IND_IS_DATA_AT_EXEC(value)  ( (value) == SQL_DATA_AT_EXEC || \
   (value) <= SQL_LEN_DATA_AT_EXEC_OFFSET )
 
-#define		METHOD_STMT_TYPE(stmt_type)		\
+#define   METHOD_STMT_TYPE(stmt_type)   \
   ( stmt_type == CUBRID_STMT_CALL || stmt_type == CUBRID_STMT_EVALUATE )
 // Does stmt_type create result set?
-#define		RESULTSET_STMT_TYPE(stmt_type)	\
+#define   RESULTSET_STMT_TYPE(stmt_type)  \
   ( stmt_type == CUBRID_STMT_SELECT || METHOD_STMT_TYPE(stmt_type) || GET_STAT_STMT_TYPE(stmt_type))
-#define		GET_STAT_STMT_TYPE(stmt_type)	\
+#define   GET_STAT_STMT_TYPE(stmt_type) \
   ( stmt_type == CUBRID_STMT_GET_STATS )
 
 typedef enum
@@ -64,7 +64,7 @@ typedef enum
   PROCEDURE_COLUMNS
 } RESULT_TYPE;
 
-typedef long SQL_STMT_OPTION;	/* SQL_CLOSE, etc */
+typedef long SQL_STMT_OPTION; /* SQL_CLOSE, etc */
 
 
 typedef struct tagPARAM_DATA
@@ -76,27 +76,27 @@ typedef struct tagPARAM_DATA
 typedef struct tagCATALOG_RESULT
 {
   ST_LIST *value;
-  void *current;		// catalog result set cursor
+  void *current;    // catalog result set cursor
 } CATALOG_RESULT;
 
 /* COLUMN_DATA
-*		large data¿¡ ´ëÇØ¼­ ºĞÇÒÇÏ¿© °¡Á®¿Ã ¼ö ÀÖµµ·Ï ÇÏ´Â SQLGetData¸¦
-*		Áö¿øÇÏ±â À§ÇØ¼­ °í¾ÈµÇ¾ú´Ù.
-*		column_no : column_no°¡ °°À¸¸é sequential call·Î ÀÎ½ÄÇÑ´Ù.
-*		current_pt : ³²Àº dataÀÇ start pointer
-*		remain_length :	³²Àº dataÀÇ length, ¹®Á¦´Â remain_length°¡ 0ÀÌ¶ó°í ÇØ¼­
-*			SQL_NO_DATA¸¦ returnÇÒ ¼ö ¾ú´Ù.  empty string¿¡ ´ëÇØ¼­ buffer length°¡ 0ÀÌ¸é
-*			¿¹¿Ü »óÈ²ÀÌ ¹ß»ıÇÑ´Ù.  ÀÌ¸¦ ¸·±â À§ÇØ¼­ µµÀÔÇÑ°Ô fetch_statusÀÌ´Ù.
-*		fetch_status :  
-*				ÃÖÃÊÀÇ function call¿¡¼­ SQL_NO_DATA°¡ ¹ß»ıÇÒ ¼ö ¾øÀ¸¸ç, SQL_SUCCESS_WITH_INFO
-*				´ÙÀ½¿¡ SQL_NO_DATA·Î °Ç³Ê ¶Û ¼ö ¾ø´Ù. ÀÌ°ÍÀ» ÀÌ¿ëÇØ¼­ Àú¹ø return status¸¦
-*				ÀúÀåÇØ¼­ buffer length°¡ 0¿¡ ´ëÇØ¼­ SQL_NO_DATA¸¦ returnÇÒ °ÇÁö °áÁ¤ÇÑ´Ù.
-*					
-*					->		SQL_SUCCESS_WITH_INFO
+*   large dataì— ëŒ€í•´ì„œ ë¶„í• í•˜ì—¬ ê°€ì ¸ì˜¬ ìˆ˜ ìˆë„ë¡ í•˜ëŠ” SQLGetDataë¥¼
+*   ì§€ì›í•˜ê¸° ìœ„í•´ì„œ ê³ ì•ˆë˜ì—ˆë‹¤.
+*   column_no : column_noê°€ ê°™ìœ¼ë©´ sequential callë¡œ ì¸ì‹í•œë‹¤.
+*   current_pt : ë‚¨ì€ dataì˜ start pointer
+*   remain_length : ë‚¨ì€ dataì˜ length, ë¬¸ì œëŠ” remain_lengthê°€ 0ì´ë¼ê³  í•´ì„œ
+*     SQL_NO_DATAë¥¼ returní•  ìˆ˜ ì—ˆë‹¤.  empty stringì— ëŒ€í•´ì„œ buffer lengthê°€ 0ì´ë©´
+*     ì˜ˆì™¸ ìƒí™©ì´ ë°œìƒí•œë‹¤.  ì´ë¥¼ ë§‰ê¸° ìœ„í•´ì„œ ë„ì…í•œê²Œ fetch_statusì´ë‹¤.
+*   fetch_status :  
+*       ìµœì´ˆì˜ function callì—ì„œ SQL_NO_DATAê°€ ë°œìƒí•  ìˆ˜ ì—†ìœ¼ë©°, SQL_SUCCESS_WITH_INFO
+*       ë‹¤ìŒì— SQL_NO_DATAë¡œ ê±´ë„ˆ ë›¸ ìˆ˜ ì—†ë‹¤. ì´ê²ƒì„ ì´ìš©í•´ì„œ ì €ë²ˆ return statusë¥¼
+*       ì €ì¥í•´ì„œ buffer lengthê°€ 0ì— ëŒ€í•´ì„œ SQL_NO_DATAë¥¼ returní•  ê±´ì§€ ê²°ì •í•œë‹¤.
+*         
+*         ->    SQL_SUCCESS_WITH_INFO
 *
-*					->		SQL_SUCCESS
+*         ->    SQL_SUCCESS
 *
-*					X		SQL_NO_DATA
+*         X   SQL_NO_DATA
 */
 typedef struct tagCOLUMN_DATA
 {
@@ -110,10 +110,10 @@ typedef struct tagCOLUMN_DATA
 
 typedef struct tagREVISED_SQL
 {
-  char *sql_text;		// revised sql text
-  char *org_param_pos;		// original param pos in revised sql text
-  char *oid_param_pos;		// oid param pos in revised sql text
-  char *oid_param_val;		// oid param val
+  char *sql_text;   // revised sql text
+  char *org_param_pos;    // original param pos in revised sql text
+  char *oid_param_pos;    // oid param pos in revised sql text
+  char *oid_param_val;    // oid param val
   short oid_param_num;
 } REVISED_SQL;
 
@@ -125,57 +125,57 @@ typedef struct st_odbc_statement
 
   struct st_odbc_statement *next;
   struct st_odbc_connection *conn;
-  int stmthd;			/* internal handle for CAS */
+  int stmthd;     /* internal handle for CAS */
   CATALOG_RESULT catalog_result;
   struct tagCOLUMN_DATA column_data;
 
-  RESULT_TYPE result_type;	/* if NULL_RESULT, no result set. */
-  char *sql_text;		/* origianl SQL statement */
+  RESULT_TYPE result_type;  /* if NULL_RESULT, no result set. */
+  char *sql_text;   /* origianl SQL statement */
   struct tagREVISED_SQL revised_sql;
-  char *cursor;			/* cursor name */
-  short data_at_exec_state;	/*      > 0ÀÏ ¶§´Â ÇöÀç º¸³»¾ßÇÒ bind parameter,
-				   STMT_NEED_DATA ¾ÆÁ÷ º¸³»±â Á÷Àü,
-				   STMT_NEED_NO_MORE_DATA º¸³¾ data°¡ ¾ø°Å³ª,
-				   ¸ğµÎ º¸³½ ÀÌÈÄ */
-  unsigned long tpl_number;	/* tpl_number - result setÀÇ tuple °³¼ö, ¶Ç´Â
-				 * update°¡ ¹İ¿µµÈ row ¼ö
-				 * row_number - currunt row position */
-  unsigned long current_tpl_pos;	/* result set¿¡¼­ cursorÀÇ À§Ä¡,
-					 * attr_row_number¿Í ÀÇ¹Ì»ó °°´Ù. 
-					 * 0 Befor start, -1 After end */
+  char *cursor;     /* cursor name */
+  short data_at_exec_state; /*      > 0ì¼ ë•ŒëŠ” í˜„ì¬ ë³´ë‚´ì•¼í•  bind parameter,
+           STMT_NEED_DATA ì•„ì§ ë³´ë‚´ê¸° ì§ì „,
+           STMT_NEED_NO_MORE_DATA ë³´ë‚¼ dataê°€ ì—†ê±°ë‚˜,
+           ëª¨ë‘ ë³´ë‚¸ ì´í›„ */
+  unsigned long tpl_number; /* tpl_number - result setì˜ tuple ê°œìˆ˜, ë˜ëŠ”
+         * updateê°€ ë°˜ì˜ëœ row ìˆ˜
+         * row_number - currunt row position */
+  unsigned long current_tpl_pos;  /* result setì—ì„œ cursorì˜ ìœ„ì¹˜,
+           * attr_row_numberì™€ ì˜ë¯¸ìƒ ê°™ë‹¤. 
+           * 0 Befor start, -1 After end */
 
-  // param number´Â column number¿Í´Â ´Ş¸® ipdÀÇ record°³¼ö°¡ ¾Æ´Ï´Ù.
-  // ¿Ö³Ä¸é ird¿Í ´Ş¸® auto ipd°¡ ¾Æ´Ï±â ¶§¹®ÀÌ´Ù.
+  // param numberëŠ” column numberì™€ëŠ” ë‹¬ë¦¬ ipdì˜ recordê°œìˆ˜ê°€ ì•„ë‹ˆë‹¤.
+  // ì™œëƒë©´ irdì™€ ë‹¬ë¦¬ auto ipdê°€ ì•„ë‹ˆê¸° ë•Œë¬¸ì´ë‹¤.
   unsigned short param_number;
   T_CCI_CUBRID_STMT stmt_type;
-  PARAM_DATA param_data;	/* For data at exec */
-  char is_prepared;		// SQLPrepare¿¡ ÀÇÇØ¼­¸¸ prepare»óÅÂ¿¡ ³õÀÎ´Ù.
+  PARAM_DATA param_data;  /* For data at exec */
+  char is_prepared;   // SQLPrepareì— ì˜í•´ì„œë§Œ prepareìƒíƒœì— ë†“ì¸ë‹¤.
   char query_plan;
 
   /* Supported attributes */
-  unsigned long attr_metadata_id;	// Core
-  unsigned long attr_cursor_scrollable;	// 1
-  unsigned long attr_cursor_type;	// core, 2
-  unsigned long attr_async_enable;	// 1, 2
-  unsigned long attr_use_bookmark;	/* 2    
-					 * bookmark°¡ okÀÎ °æ¿ì 
-					 * prepare½Ã 0¹ø record¸¦ Ãß°¡·Î
-					 * »ı¼ºÇÑ´Ù. */
+  unsigned long attr_metadata_id; // Core
+  unsigned long attr_cursor_scrollable; // 1
+  unsigned long attr_cursor_type; // core, 2
+  unsigned long attr_async_enable;  // 1, 2
+  unsigned long attr_use_bookmark;  /* 2    
+           * bookmarkê°€ okì¸ ê²½ìš° 
+           * prepareì‹œ 0ë²ˆ recordë¥¼ ì¶”ê°€ë¡œ
+           * ìƒì„±í•œë‹¤. */
 
 
   /* Not supported attributes */
-  unsigned long attr_noscan;	// Core
-  unsigned long attr_concurrency;	// 1, 2
-  unsigned long attr_cursor_sensitivity;	// 2
-  unsigned long attr_enable_auto_ipd;	// 2
-  void *attr_fetch_bookmark_ptr;	// 2
-  unsigned long attr_keyset_size;	// 2
-  unsigned long attr_max_length;	// 1
-  unsigned long attr_max_rows;	// 1
-  unsigned long attr_query_timeout;	// 2
-  unsigned long attr_retrieve_data;	// 1
-  unsigned short *attr_row_operation_ptr;	// 1
-  unsigned long attr_simulate_cursor;	// 2
+  unsigned long attr_noscan;  // Core
+  unsigned long attr_concurrency; // 1, 2
+  unsigned long attr_cursor_sensitivity;  // 2
+  unsigned long attr_enable_auto_ipd; // 2
+  void *attr_fetch_bookmark_ptr;  // 2
+  unsigned long attr_keyset_size; // 2
+  unsigned long attr_max_length;  // 1
+  unsigned long attr_max_rows;  // 1
+  unsigned long attr_query_timeout; // 2
+  unsigned long attr_retrieve_data; // 1
+  unsigned short *attr_row_operation_ptr; // 1
+  unsigned long attr_simulate_cursor; // 2
 
   char canceled;
 
@@ -194,19 +194,19 @@ typedef struct st_odbc_statement
 } ODBC_STATEMENT;
 
 PUBLIC RETCODE odbc_alloc_statement (struct st_odbc_connection *conn,
-				     ODBC_STATEMENT ** stmt_ptr);
+             ODBC_STATEMENT ** stmt_ptr);
 PUBLIC RETCODE odbc_free_statement (ODBC_STATEMENT * stmt);
 PUBLIC RETCODE odbc_reset_statement (ODBC_STATEMENT * stmt,
-				     unsigned short option);
+             unsigned short option);
 PUBLIC RETCODE odbc_set_stmt_attr (ODBC_STATEMENT * stmt,
-				   long attribute,
-				   void *valueptr,
-				   long stringlength, short is_driver);
+           long attribute,
+           void *valueptr,
+           long stringlength, short is_driver);
 #if defined(_WINDOWS)
 PUBLIC RETCODE odbc_get_stmt_attr (ODBC_STATEMENT * stmt,
-				   long attr,
-				   void *value_ptr,
-				   long buffer_length, long *length_ptr);
+           long attr,
+           void *value_ptr,
+           long buffer_length, long *length_ptr);
 #else
 PUBLIC RETCODE odbc_get_stmt_attr (ODBC_STATEMENT * stmt,
            long attr,
@@ -214,37 +214,37 @@ PUBLIC RETCODE odbc_get_stmt_attr (ODBC_STATEMENT * stmt,
            SQLINTEGER buffer_length, SQLINTEGER *length_ptr);
 #endif
 PUBLIC RETCODE odbc_set_cursor_name (ODBC_STATEMENT * stmt,
-				     char *cursor_name, short name_length);
+             char *cursor_name, short name_length);
 PUBLIC RETCODE odbc_get_cursor_name (ODBC_STATEMENT * stmt,
-				     SQLCHAR * cursor_name,
-				     SQLSMALLINT buffer_length,
-				     SQLLEN * name_length_ptr);
+             SQLCHAR * cursor_name,
+             SQLSMALLINT buffer_length,
+             SQLLEN * name_length_ptr);
 PUBLIC RETCODE odbc_bind_parameter (ODBC_STATEMENT * stmt,
-				    SQLUSMALLINT parameter_num,
-				    SQLSMALLINT input_output_type,
-				    SQLSMALLINT value_type,
-				    SQLSMALLINT parameter_type,
-				    SQLULEN column_size,
-				    SQLSMALLINT decimal_digits,
-				    SQLPOINTER parameter_value_ptr,
-				    SQLLEN buffer_length,
-				    SQLLEN * strlen_ind_ptr);
+            SQLUSMALLINT parameter_num,
+            SQLSMALLINT input_output_type,
+            SQLSMALLINT value_type,
+            SQLSMALLINT parameter_type,
+            SQLULEN column_size,
+            SQLSMALLINT decimal_digits,
+            SQLPOINTER parameter_value_ptr,
+            SQLLEN buffer_length,
+            SQLLEN * strlen_ind_ptr);
 PUBLIC RETCODE odbc_num_params (ODBC_STATEMENT * stmt,
-				short *parameter_count);
+        short *parameter_count);
 PUBLIC RETCODE odbc_prepare (ODBC_STATEMENT * stmt, char *statement_text);
 PUBLIC RETCODE odbc_execute (ODBC_STATEMENT * stmt);
 PUBLIC RETCODE odbc_param_data (ODBC_STATEMENT * stmt, void **valueptr_ptr);
 PUBLIC RETCODE odbc_put_data (ODBC_STATEMENT * stmt,
-			      void *data_ptr, SQLLEN strlen_or_ind);
+            void *data_ptr, SQLLEN strlen_or_ind);
 PUBLIC RETCODE odbc_close_cursor (ODBC_STATEMENT * stmt);
 PUBLIC RETCODE odbc_cancel (ODBC_STATEMENT * stmt);
 PUBLIC RETCODE odbc_bulk_operations (ODBC_STATEMENT * stmt, short pperation);
 PUBLIC RETCODE odbc_set_pos (ODBC_STATEMENT * stmt,
-			     SQLSETPOSIROW row_number,
-			     SQLUSMALLINT operation, SQLUSMALLINT lock_type);
+           SQLSETPOSIROW row_number,
+           SQLUSMALLINT operation, SQLUSMALLINT lock_type);
 PUBLIC void free_column_data (COLUMN_DATA * data, int option);
 PUBLIC void reset_result_set (ODBC_STATEMENT * stmt);
 PUBLIC void create_ird (ODBC_STATEMENT * stmt, T_CCI_COL_INFO * cci_col_info,
-			int column_number);
+      int column_number);
 
 #endif /* ! __ODBC_STMT_HEADER */

@@ -28,20 +28,20 @@
  *
  */
 
-#include		<stdio.h>
-#include		<stdlib.h>
-#include		<string.h>
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
 
-#include		"odbc_portable.h"
-#include		"odbc_util.h"
-#include		"odbc_statement.h"
+#include    "odbc_portable.h"
+#include    "odbc_util.h"
+#include    "odbc_statement.h"
 
-#define		UNIT_MEMORY_SIZE		256
-#define		STK_SIZE        100
+#define   UNIT_MEMORY_SIZE    256
+#define   STK_SIZE        100
 #define           PARAM_POS_SIZE  1024
 
 #ifndef CP_EUC_KR
-#define CP_EUC_KR 51949 
+#define CP_EUC_KR 51949
 #endif
 
 static int is_korean (unsigned char ch);
@@ -53,9 +53,9 @@ static int is_korean (unsigned char ch);
 /************************************************************************
 * name:  InitStr
 * arguments: 
-*	D_STRING str;
+* D_STRING str;
 * returns/side-effects: 
-*	
+* 
 * description: 
 * NOTE: 
 ************************************************************************/
@@ -71,15 +71,15 @@ InitStr (D_STRING * str)
 /************************************************************************
 * name: ReallocImproved
 * arguments: 
-*	dest - destination memory pointer
-*	destSize - total size of dest
-*	usedSize - used memory size of dest
-*	allocSize - realloc size 
+* dest - destination memory pointer
+* destSize - total size of dest
+* usedSize - used memory size of dest
+* allocSize - realloc size 
 * returns/side-effects: 
-*	destSize increased
+* destSize increased
 * description: 
-*	if remain size(destSize - usedSize)  < alloc size, 
-*	realloc a bunch of bytes  
+* if remain size(destSize - usedSize)  < alloc size, 
+* realloc a bunch of bytes  
 * NOTE: 
 ************************************************************************/
 PUBLIC ERR_CODE
@@ -125,19 +125,19 @@ ReallocImproved (char **dest, int *destSize, int usedSize, int allocSize)
 /************************************************************************
 * name:  MemcatImproved
 * arguments: 
-*	dest - destination pointer
-*	usedSize - total alloc size = used size + remain size
-*	src  - source memory pointer,
-*	srcSize - source memory size
+* dest - destination pointer
+* usedSize - total alloc size = used size + remain size
+* src  - source memory pointer,
+* srcSize - source memory size
 * returns/side-effects: 
-*	OK, ERROR
+* OK, ERROR
 * description: 
-* 	Not string copy. 
-*	So this can copy memory stream including null char(\0)
+*   Not string copy. 
+* So this can copy memory stream including null char(\0)
 * NOTE: 
-*	Using this function, 
-*	initialize dest to null, usedSize to zero, remainSize to zero
-*	At least, dest to NULL -> InisStr()
+* Using this function, 
+* initialize dest to null, usedSize to zero, remainSize to zero
+* At least, dest to NULL -> InisStr()
 ************************************************************************/
 PUBLIC ERR_CODE
 MemcatImproved (D_STRING * dest, char *src, int srcSize)
@@ -148,8 +148,7 @@ MemcatImproved (D_STRING * dest, char *src, int srcSize)
       dest->totalSize = 0;
       dest->usedSize = 0;
     }
-  if (ReallocImproved (&(dest->value), &(dest->totalSize),
-		       dest->usedSize, srcSize) < 0)
+  if (ReallocImproved (&(dest->value), &(dest->totalSize), dest->usedSize, srcSize) < 0)
     {
       return -1;
     }
@@ -163,7 +162,7 @@ MemcatImproved (D_STRING * dest, char *src, int srcSize)
 /************************************************************************
 * name:  FreeStr
 * arguments: 
-*	node of D_STRING
+* node of D_STRING
 * returns/side-effects: 
 * description: 
 * NOTE: 
@@ -183,33 +182,34 @@ FreeStr (D_STRING * str)
 /************************************************************************
 * name: sqlwcharlen
 * arguments:
-*		int wstr
+*   int wstr
 * returns/side-effects:
-*		len - the length of wstr
+*   len - the length of wstr
 * description:
 * NOTE:
 ************************************************************************/
-PUBLIC int 
-sqlwcharlen(const WCHAR *wstr)
+PUBLIC int
+sqlwcharlen (const WCHAR * wstr)
 {
-  int len= 0;
+  int len = 0;
   while (wstr && *wstr++)
     ++len;
   return len;
 }
+
 /************************************************************************
 * name: ut_alloc_bstr
 * arguments:
-*		int size - size of allocated memory
+*   int size - size of allocated memory
 * returns/side-effects:
-*		void* - memory pointer
+*   void* - memory pointer
 * description:
 * NOTE:
 ************************************************************************/
-PUBLIC WCHAR* 
+PUBLIC WCHAR *
 ut_alloc_bstr (SQLLEN size)
 {
- WCHAR *new = NULL;
+  WCHAR *new = NULL;
 
   new = SysAllocStringLen (NULL, size);
 
@@ -235,7 +235,7 @@ ut_alloc_bstr (SQLLEN size)
 * NOTE:
 ************************************************************************/
 PUBLIC void
-ut_free_bstr  (WCHAR *ptr)
+ut_free_bstr (WCHAR * ptr)
 {
 #ifdef _MEM_DEBUG
   if (ptr == NULL)
@@ -254,9 +254,9 @@ ut_free_bstr  (WCHAR *ptr)
 /************************************************************************
 * name: ut_alloc
 * arguments:
-*		int size - size of allocated memory
+*   int size - size of allocated memory
 * returns/side-effects:
-*		void* - memory pointer
+*   void* - memory pointer
 * description:
 * NOTE:
 ************************************************************************/
@@ -264,10 +264,10 @@ PUBLIC void *
 ut_alloc (SQLLEN size)
 {
   char *new = NULL;
-  if(size == 0)
-   {
-     return NULL;
-   }
+  if (size == 0)
+    {
+      return NULL;
+    }
   new = malloc (size);
 
 #ifdef _MEM_DEBUG
@@ -340,12 +340,12 @@ ut_realloc (void *ptr, int size)
 /************************************************************************
 * name: ut_make_string
 * arguments:
-*		const char *src - source string ( not always null-terminated string)
-*		length -
-*			if length < 0, copy all src(null-term).
-*			else copy length characters and null-term.
+*   const char *src - source string ( not always null-terminated string)
+*   length -
+*     if length < 0, copy all src(null-term).
+*     else copy length characters and null-term.
 * returns/side-effects:
-*		char * - string pointer
+*   char * - string pointer
 * description:
 * NOTE:
 ************************************************************************/
@@ -375,12 +375,12 @@ ut_make_string (const char *src, int length)
 /************************************************************************
 * name: ut_append_string
 * arguments:
-*		const char *src - source string ( not always null-terminated string)
-*		length -
-*			if length < 0, copy all src(null-term).
-*			else copy length characters and null-term.
+*   const char *src - source string ( not always null-terminated string)
+*   length -
+*     if length < 0, copy all src(null-term).
+*     else copy length characters and null-term.
 * returns/side-effects:
-*		char * - string pointer
+*   char * - string pointer
 * description:
 * NOTE:
 ************************************************************************/
@@ -416,12 +416,12 @@ ut_append_string (char *str1, char *str2, int len2)
 /************************************************************************
 * name: ut_make_binary
 * arguments:
-*		const char *src - source binary
-*		length -
-*			if length < 0, NULL
-*			else copy length binary
+*   const char *src - source binary
+*   length -
+*     if length < 0, NULL
+*     else copy length binary
 * returns/side-effects:
-*		char * - string pointer
+*   char * - string pointer
 * description:
 * NOTE:
 ************************************************************************/
@@ -445,9 +445,9 @@ ut_make_binary (const char *src, int length)
 * NOTE:
 ************************************************************************/
 PUBLIC int
-add_element_to_setstring(char *setstring, char *element, int size)
+add_element_to_setstring (char *setstring, char *element, int size)
 {
-    if (setstring == NULL || element == NULL || (strlen(setstring) + strlen(element)) >= size)
+  if (setstring == NULL || element == NULL || (strlen (setstring) + strlen (element)) >= size)
     {
       return -1;
     }
@@ -506,12 +506,11 @@ element_from_setstring (char **current, char *buf)
 }
 
 /*-----------------------------------------------------------------------
- *							Linked List
+ *              Linked List
  *----------------------------------------------------------------------*/
 
 PUBLIC ERR_CODE
-ListTailAdd (ST_LIST * head, void *key, void *val,
-	     ERR_CODE (*assignFunc) (ST_LIST *, void *, void *))
+ListTailAdd (ST_LIST * head, void *key, void *val, ERR_CODE (*assignFunc) (ST_LIST *, void *, void *))
 {
   ST_LIST *newNode;
   ST_LIST *temp;
@@ -542,21 +541,21 @@ ListTailAdd (ST_LIST * head, void *key, void *val,
 }
 
 /************************************************************************
- * name:        ListDelete - delete list				*
+ * name:        ListDelete - delete list        *
  *                                                                      *
- * arguments:   head    - list header					*
- *              nodeDelete - 'key', 'value' deallocation function	*
+ * arguments:   head    - list header         *
+ *              nodeDelete - 'key', 'value' deallocation function *
  *                                                                      *
  * returns/side-effects:                                                *
- *              (ST_LIST*) NULL						*
+ *              (ST_LIST*) NULL           *
  *                                                                      *
- * description: delete all nodes of list.				*
- *									*
- * NOTE:        							*
- *  If 'key' or 'value' has its own memory, the memory must be freed	*
- *  in 'nodeDelete' function. But, the node container is freed in	*
- *  this module.							*
- *  dummy header∆˜«‘«œø© ∏µŒ ¡ˆøÓ¥Ÿ.
+ * description: delete all nodes of list.       *
+ *                  *
+ * NOTE:                      *
+ *  If 'key' or 'value' has its own memory, the memory must be freed  *
+ *  in 'nodeDelete' function. But, the node container is freed in *
+ *  this module.              *
+ *  dummy headerÌè¨Ìï®ÌïòÏó¨ Î™®Îëê ÏßÄÏö¥Îã§.
  ************************************************************************/
 
 PUBLIC void
@@ -608,9 +607,9 @@ ListPrint (ST_LIST * head, void (*nodePrint) (ST_LIST *))
 /************************************************************************
 * name: NodeHead
 * arguments:
-*	ST_LIST head;
+* ST_LIST head;
 * returns/side-effects:
-* 	head node pointer - ST_LIST* 
+*   head node pointer - ST_LIST* 
 * description:
 * NOTE:
 ************************************************************************/
@@ -631,9 +630,9 @@ HeadNode (ST_LIST * dummyHead)
 /************************************************************************
 * name: NodeNext
 * arguments:
-*	this node - ST_LIST*
+* this node - ST_LIST*
 * returns/side-effects:
-*	next node - ST_LIST*
+* next node - ST_LIST*
 * description:
 * NOTE:
 ************************************************************************/
@@ -655,11 +654,11 @@ NextNode (ST_LIST * node)
 /************************************************************************
 * name:  NodeAssign
 * arguments: 
-*	node - data node
-*	key  - key as string
-*	value - value string
+* node - data node
+* key  - key as string
+* value - value string
 * returns/side-effects: 
-*	OK , ERROR if malloc error
+* OK , ERROR if malloc error
 * description: 
 * NOTE: 
 ************************************************************************/
@@ -693,20 +692,20 @@ is_korean (unsigned char ch)
 
 
 /*-----------------------------------------------------------------------
- *						Connection string
+ *            Connection string
  *----------------------------------------------------------------------*/
 
 /************************************************************************
  * name: next_element
  * arguments:
  * returns/side-effects:
- *		¥ı¿ÃªÛ value∞° æ¯¿ª ∂ß NULL return
+ *    ÎçîÏù¥ÏÉÅ valueÍ∞Ä ÏóÜÏùÑ Îïå NULL return
  * description:
  * NOTE:
- *	element list structure
- *		KEY1=VALUE1\0KEY2=VALUE2\0KEY3=VALUE3\0\0
- *		\0 - end of attribute
- *		\0 - end of list
+ *  element list structure
+ *    KEY1=VALUE1\0KEY2=VALUE2\0KEY3=VALUE3\0\0
+ *    \0 - end of attribute
+ *    \0 - end of list
  ************************************************************************/
 PUBLIC const char *
 next_element (const char *element_list)
@@ -787,7 +786,7 @@ element_value_by_key (const char *element_list, const char *key)
  * returns/side-effects:
  * description:
  * NOTE:
- *	æ’µ⁄¿« ∞¯πÈπÆ¿⁄∏¶ «„øÎ«—¥Ÿ.
+ *  ÏïûÎí§Ïùò Í≥µÎ∞±Î¨∏ÏûêÎ•º ÌóàÏö©ÌïúÎã§.
  ************************************************************************/
 PUBLIC short
 is_oidstr_array (char **array, int size)
@@ -808,9 +807,9 @@ is_oidstr_array (char **array, int size)
  * arguments:
  * returns/side-effects:
  * description:
- *	string¿Ã oid¿Œ¡ˆ ∆«∫∞«—¥Ÿ. 
+ *  stringÏù¥ oidÏù∏ÏßÄ ÌåêÎ≥ÑÌïúÎã§. 
  * NOTE:
- *	æ’µ⁄¿« ∞¯πÈπÆ¿⁄∏¶ «„øÎ«—¥Ÿ.
+ *  ÏïûÎí§Ïùò Í≥µÎ∞±Î¨∏ÏûêÎ•º ÌóàÏö©ÌïúÎã§.
  ************************************************************************/
 PUBLIC short
 is_oidstr (char *str)
@@ -889,19 +888,18 @@ is_oidstr (char *str)
  * name:  replace_oid
  * arguments:
  * returns/side-effects:
- *		±≥√ºµ» oid parameter ∞≥ºˆ∏¶ return«—¥Ÿ.
+ *    ÍµêÏ≤¥Îêú oid parameter Í∞úÏàòÎ•º returnÌïúÎã§.
  * description:
  * NOTE:
- *		parameter number¥¬ 1¿ª base∑Œ «œ∞Ì ¿÷¥Ÿ∞Ì ∞°¡§«ﬂ¥Ÿ.
+ *    parameter numberÎäî 1ÏùÑ baseÎ°ú ÌïòÍ≥† ÏûàÎã§Í≥† Í∞ÄÏ†ïÌñàÎã§.
  ************************************************************************/
 PUBLIC int
-replace_oid (char *sql_text, char **org_param_pos_pt,
-	     char **oid_param_pos_pt, char **oid_param_val_pt)
+replace_oid (char *sql_text, char **org_param_pos_pt, char **oid_param_pos_pt, char **oid_param_val_pt)
 {
   char *oid_buf = NULL;
   char oid_param_pos[PARAM_POS_SIZE];
   char org_param_pos[PARAM_POS_SIZE];
-  char oid_param_val[PARAM_POS_SIZE*4];
+  char oid_param_val[PARAM_POS_SIZE * 4];
   char buf[126];
   char *pt;
   char *pt_tmp;
@@ -919,9 +917,9 @@ replace_oid (char *sql_text, char **org_param_pos_pt,
 	case '?':
 	  ++current_param_pos;
 	  sprintf (buf, "%d", current_param_pos);
-	  if (add_element_to_setstring(org_param_pos, buf, PARAM_POS_SIZE) < 0)
+	  if (add_element_to_setstring (org_param_pos, buf, PARAM_POS_SIZE) < 0)
 	    {
-		return -1;
+	      return -1;
 	    }
 	  break;
 
@@ -947,16 +945,16 @@ replace_oid (char *sql_text, char **org_param_pos_pt,
 	      ++oid_param_num;
 
 	      sprintf (buf, "%d", current_param_pos);
-		if (add_element_to_setstring(oid_param_pos, buf, PARAM_POS_SIZE) < 0)
+	      if (add_element_to_setstring (oid_param_pos, buf, PARAM_POS_SIZE) < 0)
 		{
-		    return -1;
+		  return -1;
 		}
 
 	      sprintf (buf, "%s", oid_buf);
-		if (add_element_to_setstring(oid_param_val, buf, PARAM_POS_SIZE*4) < 0)
-		  {
-		    return -1;
-		  }
+	      if (add_element_to_setstring (oid_param_val, buf, PARAM_POS_SIZE * 4) < 0)
+		{
+		  return -1;
+		}
 
 	      // replace oid string value to parameter marker
 	      *pt = '?';
@@ -985,7 +983,7 @@ replace_oid (char *sql_text, char **org_param_pos_pt,
  * arguments:
  * returns/side-effects:
  * description:
- *	¿¸»ƒ¿« ∞¯πÈπÆ¿⁄∏¶ ¡¶∞≈«— «¸≈¬∑Œ ∫Ø«¸«—¥Ÿ. (str¿« ≥ªøÎ¿Ã ∫Ø«¸µ )
+ *  Ï†ÑÌõÑÏùò Í≥µÎ∞±Î¨∏ÏûêÎ•º Ï†úÍ±∞Ìïú ÌòïÌÉúÎ°ú Î≥ÄÌòïÌïúÎã§. (strÏùò ÎÇ¥Ïö©Ïù¥ Î≥ÄÌòïÎê®)
  * NOTE:
  ************************************************************************/
 PUBLIC char *
@@ -997,9 +995,7 @@ odbc_trim (char *str)
   if (str == NULL)
     return (str);
 
-  for (s = str;
-       *s != '\0' && (*s == ' ' || *s == '\t' || *s == 0x0d || *s == 0x0a);
-       s++)
+  for (s = str; *s != '\0' && (*s == ' ' || *s == '\t' || *s == 0x0d || *s == 0x0a); s++)
     ;
   if (*s == '\0')
     {
@@ -1028,8 +1024,7 @@ odbc_trim (char *str)
  * NOTE:
  ************************************************************************/
 PUBLIC RETCODE
-str_value_assign (const char *in_value,
-		  char *out_buf, SQLLEN out_buf_len, SQLLEN * val_len_ptr)
+str_value_assign (const char *in_value, char *out_buf, SQLLEN out_buf_len, SQLLEN * val_len_ptr)
 {
   RETCODE rc = ODBC_SUCCESS;
 
@@ -1058,19 +1053,17 @@ str_value_assign (const char *in_value,
 /************************************************************************
  * name: bin_value_assign
  * arguments:
- *		in_value - input binary start pointer
- *		in_val_len - input binary length
- *		out_buf - output binary start pointer
- *		out_buf_len - output binary length
- *		val_len_ptr - input binary length or null indicator
+ *    in_value - input binary start pointer
+ *    in_val_len - input binary length
+ *    out_buf - output binary start pointer
+ *    out_buf_len - output binary length
+ *    val_len_ptr - input binary length or null indicator
  * returns/side-effects:
  * description:
  * NOTE:
  ************************************************************************/
 PUBLIC RETCODE
-bin_value_assign (const void *in_value,
-		  SQLLEN in_val_len,
-		  char *out_buf, SQLLEN out_buf_len, SQLLEN * val_len_ptr)
+bin_value_assign (const void *in_value, SQLLEN in_val_len, char *out_buf, SQLLEN out_buf_len, SQLLEN * val_len_ptr)
 {
   RETCODE rc = ODBC_SUCCESS;
 
@@ -1101,71 +1094,60 @@ bin_value_assign (const void *in_value,
 
   return rc;
 }
+
 /************************************************************************
  * name: bin_value_assign
  * arguments:
- *		stmt - ODBC_STATEMENT
- *		lob - pointer of lob
- *		type - SQL_BLOB or SQL_CLOB
- *		out_buf - output binary start pointer
- *		out_buf_len - output binary length
- *		val_len_ptr - input binary length or null indicator
+ *    stmt - ODBC_STATEMENT
+ *    lob - pointer of lob
+ *    type - SQL_BLOB or SQL_CLOB
+ *    out_buf - output binary start pointer
+ *    out_buf_len - output binary length
+ *    val_len_ptr - input binary length or null indicator
  * returns/side-effects:
  * description:
  * NOTE:
  ************************************************************************/
 PUBLIC RETCODE
-lob_value_assign (
-                   ODBC_STATEMENT * stmt,
-                   UNI_CCI_A_TYPE lob,
-                   SQLSMALLINT type,
-                   char *out_buf, 
-                   SQLLEN out_buf_len, 
-                   SQLLEN * val_len_ptr
-                   )
+lob_value_assign (ODBC_STATEMENT * stmt,
+		  UNI_CCI_A_TYPE lob, SQLSMALLINT type, char *out_buf, SQLLEN out_buf_len, SQLLEN * val_len_ptr)
 {
   RETCODE rc = ODBC_SUCCESS;
   SQLLEN in_val_len = 0;
   T_CCI_ERROR error;
-  long pos=stmt->column_data.offset;
-  
-  if(type == SQL_BLOB)
-  {
-    in_val_len = (SQLLEN)cci_blob_size(lob.blob);
-    if (out_buf != NULL && out_buf_len != 0)
-     {
-       cci_blob_read(stmt->conn->connhd,
-                     lob.blob,pos,
-                     (int)MIN (out_buf_len, in_val_len-pos),
-                     out_buf,&error);
-       if(error.err_code < 0)
-       {
-         rc = SQL_ERROR;
-       }
-     }
-     else
-     {
-       pos=stmt->column_data.offset=0;
-     }
-  }
-  else if(type == SQL_CLOB)
-  {
-    in_val_len = (SQLLEN)cci_clob_size(lob.clob);
-    if (out_buf != NULL && out_buf_len > 0)
-     {
-       cci_clob_read(stmt->conn->connhd,
-                     lob.clob,pos,
-                     (int)MIN (out_buf_len, in_val_len-pos),
-                     out_buf,&error);
-       if(error.err_code < 0)
-       {
-         rc = SQL_ERROR;
-       }
-     } 
+  long pos = stmt->column_data.offset;
+
+  if (type == SQL_BLOB)
+    {
+      in_val_len = (SQLLEN) cci_blob_size (lob.blob);
+      if (out_buf != NULL && out_buf_len != 0)
+	{
+	  cci_blob_read (stmt->conn->connhd, lob.blob, pos, (int) MIN (out_buf_len, in_val_len - pos), out_buf, &error);
+	  if (error.err_code < 0)
+	    {
+	      rc = SQL_ERROR;
+	    }
+	}
       else
-        {
-          pos = stmt->column_data.offset = 0;
-        }
+	{
+	  pos = stmt->column_data.offset = 0;
+	}
+    }
+  else if (type == SQL_CLOB)
+    {
+      in_val_len = (SQLLEN) cci_clob_size (lob.clob);
+      if (out_buf != NULL && out_buf_len > 0)
+	{
+	  cci_clob_read (stmt->conn->connhd, lob.clob, pos, (int) MIN (out_buf_len, in_val_len - pos), out_buf, &error);
+	  if (error.err_code < 0)
+	    {
+	      rc = SQL_ERROR;
+	    }
+	}
+      else
+	{
+	  pos = stmt->column_data.offset = 0;
+	}
     }
 
   if (out_buf_len < in_val_len - pos)
@@ -1176,26 +1158,26 @@ lob_value_assign (
   if (val_len_ptr != NULL)
     {
       if (lob.blob == NULL)
-        {
-          *val_len_ptr = SQL_NULL_DATA;
-        }
+	{
+	  *val_len_ptr = SQL_NULL_DATA;
+	}
       else
-        {
-          *val_len_ptr = in_val_len-pos;
-        }
+	{
+	  *val_len_ptr = in_val_len - pos;
+	}
     }
 
-    if (rc == ODBC_SUCCESS_WITH_INFO)
-      {
-        if (out_buf_len > 0)
-         {
-           pos += (long) out_buf_len;
-         }
+  if (rc == ODBC_SUCCESS_WITH_INFO)
+    {
+      if (out_buf_len > 0)
+	{
+	  pos += (long) out_buf_len;
+	}
 
       stmt->column_data.current_pt = out_buf + pos;
       stmt->column_data.remain_length = (int) (in_val_len - pos);
       stmt->column_data.lob = lob;
-      stmt->column_data.offset = (int)pos;
+      stmt->column_data.offset = (int) pos;
 
       odbc_set_diag (stmt->diag, "01004", 0, NULL);
     }
@@ -1203,13 +1185,13 @@ lob_value_assign (
     {
       stmt->column_data.remain_length = 0;
       if (type == SQL_BLOB)
-        {
-          cci_blob_free (lob.blob);
-        }
+	{
+	  cci_blob_free (lob.blob);
+	}
       else if (type == SQL_CLOB)
-        {
-          cci_clob_free (lob.clob);
-        }
+	{
+	  cci_clob_free (lob.clob);
+	}
     }
 
   return rc;
@@ -1247,12 +1229,10 @@ tolower_str (char *dst, const char *src)
  * description:
  * NOTE:
  ************************************************************************/
-PUBLIC char*
-assemble_conn_attr (const char *conn_str_in,
-                    const char *key,
-                    char *buffer)
+PUBLIC char *
+assemble_conn_attr (const char *conn_str_in, const char *key, char *buffer)
 {
-  const char* value =  element_value_by_key (conn_str_in, key);
+  const char *value = element_value_by_key (conn_str_in, key);
   if (value != NULL)
     {
       tolower_str (buffer + strlen (buffer), key);
@@ -1271,23 +1251,21 @@ assemble_conn_attr (const char *conn_str_in,
  * NOTE:
  ************************************************************************/
 PUBLIC void
-get_connect_attr (ODBC_CONNECTION_ATTR *attr, const char *conn_str_in, char *buffer)
+get_connect_attr (ODBC_CONNECTION_ATTR * attr, const char *conn_str_in, char *buffer)
 {
   if (conn_str_in == NULL || buffer == NULL || attr == NULL)
     {
       return;
     }
-    
+
   attr->altHosts = assemble_conn_attr (conn_str_in, KEYWORD_ALTHOSTS, buffer);
-  
-  attr->disconnect_on_query_timeout =
-    assemble_conn_attr (conn_str_in, KEYWORD_DISCONNECTONQUERYTIMEOUT, buffer);
+
+  attr->disconnect_on_query_timeout = assemble_conn_attr (conn_str_in, KEYWORD_DISCONNECTONQUERYTIMEOUT, buffer);
   if (attr->disconnect_on_query_timeout == NULL)
     {
-      attr->disconnect_on_query_timeout =
-        assemble_conn_attr (conn_str_in, KEYWORD_DISCONNECT_ON_QUERY_TIMEOUT, buffer);
+      attr->disconnect_on_query_timeout = assemble_conn_attr (conn_str_in, KEYWORD_DISCONNECT_ON_QUERY_TIMEOUT, buffer);
     }
-    
+
   attr->loadBalance = assemble_conn_attr (conn_str_in, KEYWORD_LOADBALANCE, buffer);
   attr->logBaseDir = assemble_conn_attr (conn_str_in, KEYWORD_LOGBASEDIR, buffer);
   attr->logFile = assemble_conn_attr (conn_str_in, KEYWORD_LOGFILE, buffer);
@@ -1308,8 +1286,7 @@ get_connect_attr (ODBC_CONNECTION_ATTR *attr, const char *conn_str_in, char *buf
     }
 
   attr->rcTime = assemble_conn_attr (conn_str_in, KEYWORD_RCTIME, buffer);
-  attr->slowQueryThresholdMillis =
-    assemble_conn_attr (conn_str_in, KEYWORD_SLOWQUERYTHRESHOLDMILLIS, buffer);
+  attr->slowQueryThresholdMillis = assemble_conn_attr (conn_str_in, KEYWORD_SLOWQUERYTHRESHOLDMILLIS, buffer);
 
   if (buffer[strlen (buffer) - 1] == '&')
     {
@@ -1325,47 +1302,47 @@ get_connect_attr (ODBC_CONNECTION_ATTR *attr, const char *conn_str_in, char *buf
 * NOTE:
 ************************************************************************/
 int
-encode_string_to_charset(wchar_t *str, int size, char **target, int* out_length, char *charset)
+encode_string_to_charset (wchar_t * str, int size, char **target, int *out_length, char *charset)
 {
-    int nLength;
-    char *tmp_string;
-    int wincode = CP_ACP;
-    int num_wchars = -1;
+  int nLength;
+  char *tmp_string;
+  int wincode = CP_ACP;
+  int num_wchars = -1;
 
-    if (size > 0)
-      {
-         num_wchars = size;
-      }
+  if (size > 0)
+    {
+      num_wchars = size;
+    }
 
-    if (charset == NULL || _stricmp(charset, "utf-8") == 0 || _stricmp(charset, "utf8") == 0)
-      {
-        wincode = CP_UTF8;
-      }
-    else if (_stricmp(charset, "euc-kr") == 0)
-      {
-        wincode = CP_EUC_KR;
-      }
+  if (charset == NULL || _stricmp (charset, "utf-8") == 0 || _stricmp (charset, "utf8") == 0)
+    {
+      wincode = CP_UTF8;
+    }
+  else if (_stricmp (charset, "euc-kr") == 0)
+    {
+      wincode = CP_EUC_KR;
+    }
 
-    nLength = WideCharToMultiByte(wincode, 0, str, num_wchars, NULL, 0, NULL, NULL);
-    tmp_string = (char *)ut_alloc(sizeof(char) * (nLength + 1));
-    if (tmp_string == NULL)
-      {
-        return CCI_ER_NO_MORE_MEMORY;
-      }
+  nLength = WideCharToMultiByte (wincode, 0, str, num_wchars, NULL, 0, NULL, NULL);
+  tmp_string = (char *) ut_alloc (sizeof (char) * (nLength + 1));
+  if (tmp_string == NULL)
+    {
+      return CCI_ER_NO_MORE_MEMORY;
+    }
 
-    memset(tmp_string, 0, nLength + 1);
-    nLength = WideCharToMultiByte(wincode, 0, str, num_wchars, tmp_string, nLength, NULL, NULL);
-    if (target)
-      {
-        *target = tmp_string;
-      }
+  memset (tmp_string, 0, nLength + 1);
+  nLength = WideCharToMultiByte (wincode, 0, str, num_wchars, tmp_string, nLength, NULL, NULL);
+  if (target)
+    {
+      *target = tmp_string;
+    }
 
-    if (out_length)
-      {
-        *out_length = nLength;
-      }
+  if (out_length)
+    {
+      *out_length = nLength;
+    }
 
-    return ODBC_SUCCESS;
+  return ODBC_SUCCESS;
 }
 
 /************************************************************************
@@ -1376,32 +1353,30 @@ encode_string_to_charset(wchar_t *str, int size, char **target, int* out_length,
  * NOTE:
  ************************************************************************/
 int
-encode_string_to_utf8 (wchar_t *str, int size, char **target,  int* out_length)
+encode_string_to_utf8 (wchar_t * str, int size, char **target, int *out_length)
 {
   int nLength;
   char *tmp_string;
   int wincode = CP_UTF8;
 
-  nLength = WideCharToMultiByte (wincode, 0, str, -1, NULL, 0, NULL,
-				 NULL);
+  nLength = WideCharToMultiByte (wincode, 0, str, -1, NULL, 0, NULL, NULL);
   tmp_string = (char *) ut_alloc (sizeof (char) * (nLength + 1));
   if (tmp_string == NULL)
     {
       return CCI_ER_NO_MORE_MEMORY;
     }
 
-  nLength = WideCharToMultiByte (wincode, 0, str, -1, tmp_string, nLength, NULL,
-		       NULL);
+  nLength = WideCharToMultiByte (wincode, 0, str, -1, tmp_string, nLength, NULL, NULL);
   if (target)
     {
       *target = tmp_string;
     }
-    
-    if(out_length)
-     {
-       * out_length = nLength;
-     }
-    
+
+  if (out_length)
+    {
+      *out_length = nLength;
+    }
+
   return ODBC_SUCCESS;
 }
 
@@ -1413,14 +1388,14 @@ encode_string_to_utf8 (wchar_t *str, int size, char **target,  int* out_length)
  * NOTE:
  ************************************************************************/
 int
-wide_char_to_bytes (wchar_t *str, int size, char **target, int* out_length, char* characterset)
+wide_char_to_bytes (wchar_t * str, int size, char **target, int *out_length, char *characterset)
 {
-  if(size <= 0)
-    { 
-      size = sqlwcharlen(str);
+  if (size <= 0)
+    {
+      size = sqlwcharlen (str);
     }
 
-  return encode_string_to_charset(str, size, target, out_length, characterset);
+  return encode_string_to_charset (str, size, target, out_length, characterset);
 }
 
 /************************************************************************
@@ -1431,50 +1406,50 @@ wide_char_to_bytes (wchar_t *str, int size, char **target, int* out_length, char
  * NOTE:
  ************************************************************************/
 int
-bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, int* out_length, char* characterset)
+bytes_to_wide_char (char *str, int size, wchar_t ** buffer, int buffer_length, int *out_length, char *characterset)
 {
   int nLength;
   int wincode = CP_ACP;
-  wchar_t* temp_buffer = *buffer;
+  wchar_t *temp_buffer = *buffer;
   int temp_buffer_length = buffer_length;
-  
-  if (characterset == NULL || _stricmp(characterset, "utf-8") == 0 || _stricmp(characterset, "utf8") == 0)
+
+  if (characterset == NULL || _stricmp (characterset, "utf-8") == 0 || _stricmp (characterset, "utf8") == 0)
     {
       wincode = CP_UTF8;
     }
-  else if (_stricmp(characterset, "euc-kr") == 0)
+  else if (_stricmp (characterset, "euc-kr") == 0)
     {
       wincode = CP_EUC_KR;
     }
 
-  if(str == NULL || buffer == NULL)
-   {
-     return ODBC_SUCCESS;
-   }
-  
+  if (str == NULL || buffer == NULL)
+    {
+      return ODBC_SUCCESS;
+    }
+
   temp_buffer_length = MultiByteToWideChar (wincode, 0, (LPCSTR) str, size, NULL, 0);
-  if(buffer_length==0) // need to malloc buffer
+  if (buffer_length == 0)	// need to malloc buffer
     {
       temp_buffer = UT_ALLOC_BSTR (temp_buffer_length);
       if (temp_buffer == NULL)
-        {
-          return CCI_ER_NO_MORE_MEMORY;
-        }
+	{
+	  return CCI_ER_NO_MORE_MEMORY;
+	}
       buffer_length = temp_buffer_length;
-   } 
-   
+    }
+
   nLength = MultiByteToWideChar (wincode, 0, (LPCSTR) str, size, temp_buffer, buffer_length);
   temp_buffer[nLength] = '\0';
   *buffer = temp_buffer;
   //SysFreeString (bstrCode);
-  if(out_length != NULL)
+  if (out_length != NULL)
     {
-      *out_length = nLength * sizeof(wchar_t);
+      *out_length = nLength * sizeof (wchar_t);
     }
-  if ( buffer_length < temp_buffer_length)
+  if (buffer_length < temp_buffer_length)
     {
       return ODBC_SUCCESS_WITH_INFO;
-    }  
+    }
   return ODBC_SUCCESS;
 }
 
@@ -1486,54 +1461,56 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
  * NOTE:
  ************************************************************************/
 int
-get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, int* out_length, char* characterset)
+get_wide_char_result (char *str, int size, wchar_t ** buffer, int buffer_length, int *out_length, char *characterset)
 {
   int nLength;
   int wincode = CP_ACP;
   int temp_buffer_length = buffer_length;
   int rc = ODBC_SUCCESS;
-  
+
   if (characterset == NULL || _stricmp (characterset, "utf-8") == 0 || _stricmp (characterset, "utf8") == 0)
     {
       wincode = CP_UTF8;
     }
-  else if (_stricmp(characterset, "euc-kr") == 0)
+  else if (_stricmp (characterset, "euc-kr") == 0)
     {
       wincode = CP_EUC_KR;
     }
 
-  if(str == NULL || buffer == NULL)
-   {
-     return ODBC_SUCCESS;
-   }
-  
+  if (str == NULL || buffer == NULL)
+    {
+      return ODBC_SUCCESS;
+    }
+
   temp_buffer_length = MultiByteToWideChar (wincode, 0, (LPCSTR) str, size, NULL, 0);
-  if(buffer_length == 0)
-   {
-     *out_length = temp_buffer_length * sizeof(wchar_t);
-     return ODBC_SUCCESS_WITH_INFO;
-   }
-   
+  if (buffer_length == 0)
+    {
+      *out_length = temp_buffer_length * sizeof (wchar_t);
+      return ODBC_SUCCESS_WITH_INFO;
+    }
+
   nLength = MultiByteToWideChar (wincode, 0, (LPCSTR) str, size, *buffer, buffer_length);
   //SysFreeString (bstrCode);
-  if(out_length != NULL)
-   {
-     *out_length = nLength * sizeof(wchar_t);
-   }
-  if ( buffer_length < temp_buffer_length)
-   {
+  if (out_length != NULL)
+    {
+      *out_length = nLength * sizeof (wchar_t);
+    }
+  if (buffer_length < temp_buffer_length)
+    {
       return ODBC_SUCCESS_WITH_INFO;
-   }  
+    }
   return ODBC_SUCCESS;
 }
 
-PUBLIC _BOOL_ is_odd_number (int num)
+PUBLIC _BOOL_
+is_odd_number (int num)
 {
   return (num & 1) ? _TRUE_ : _FALSE_;
 }
 
 #ifdef CUBRID_ODBC_UNICODE
-PUBLIC int check_if_even_number (SQLUSMALLINT info_type, SQLSMALLINT buffer_length)
+PUBLIC int
+check_if_even_number (SQLUSMALLINT info_type, SQLSMALLINT buffer_length)
 {
   if (buffer_length < 0)
     {
@@ -1544,106 +1521,107 @@ PUBLIC int check_if_even_number (SQLUSMALLINT info_type, SQLSMALLINT buffer_leng
   switch (info_type)
     {
       /* info_type that returns a string */
-      case SQL_ACCESSIBLE_PROCEDURES:
-      case SQL_ACCESSIBLE_TABLES:
-      case SQL_CATALOG_NAME:
-      case SQL_CATALOG_NAME_SEPARATOR:
-      case SQL_CATALOG_TERM:
-      case SQL_COLLATION_SEQ:
-      case SQL_COLUMN_ALIAS:
-      case SQL_DATA_SOURCE_NAME:
-      case SQL_DATA_SOURCE_READ_ONLY:
-      case SQL_DATABASE_NAME:
-      case SQL_DBMS_NAME:
-      case SQL_DBMS_VER:
-      case SQL_DESCRIBE_PARAMETER:
-      case SQL_DRIVER_NAME:
-      case SQL_DRIVER_ODBC_VER:
-      case SQL_DRIVER_VER:
-      case SQL_EXPRESSIONS_IN_ORDERBY:
-      case SQL_IDENTIFIER_QUOTE_CHAR:
-      case SQL_INTEGRITY:
-      case SQL_KEYWORDS:
-      case SQL_LIKE_ESCAPE_CLAUSE:
-      case SQL_MAX_ROW_SIZE_INCLUDES_LONG:
-      case SQL_MULT_RESULT_SETS:
-      case SQL_MULTIPLE_ACTIVE_TXN:
-      case SQL_NEED_LONG_DATA_LEN:
-      case SQL_ORDER_BY_COLUMNS_IN_SELECT:
-      case SQL_PROCEDURE_TERM:
-      case SQL_PROCEDURES:
-      case SQL_ROW_UPDATES:
-      case SQL_SCHEMA_TERM:
-      case SQL_SEARCH_PATTERN_ESCAPE:
-      case SQL_SERVER_NAME:
-      case SQL_SPECIAL_CHARACTERS:
-      case SQL_TABLE_TERM:
-      case SQL_USER_NAME:
-      case SQL_XOPEN_CLI_YEAR:
-        if (is_odd_number (buffer_length))
-          {
-            return ODBC_ERROR;
-          }
+    case SQL_ACCESSIBLE_PROCEDURES:
+    case SQL_ACCESSIBLE_TABLES:
+    case SQL_CATALOG_NAME:
+    case SQL_CATALOG_NAME_SEPARATOR:
+    case SQL_CATALOG_TERM:
+    case SQL_COLLATION_SEQ:
+    case SQL_COLUMN_ALIAS:
+    case SQL_DATA_SOURCE_NAME:
+    case SQL_DATA_SOURCE_READ_ONLY:
+    case SQL_DATABASE_NAME:
+    case SQL_DBMS_NAME:
+    case SQL_DBMS_VER:
+    case SQL_DESCRIBE_PARAMETER:
+    case SQL_DRIVER_NAME:
+    case SQL_DRIVER_ODBC_VER:
+    case SQL_DRIVER_VER:
+    case SQL_EXPRESSIONS_IN_ORDERBY:
+    case SQL_IDENTIFIER_QUOTE_CHAR:
+    case SQL_INTEGRITY:
+    case SQL_KEYWORDS:
+    case SQL_LIKE_ESCAPE_CLAUSE:
+    case SQL_MAX_ROW_SIZE_INCLUDES_LONG:
+    case SQL_MULT_RESULT_SETS:
+    case SQL_MULTIPLE_ACTIVE_TXN:
+    case SQL_NEED_LONG_DATA_LEN:
+    case SQL_ORDER_BY_COLUMNS_IN_SELECT:
+    case SQL_PROCEDURE_TERM:
+    case SQL_PROCEDURES:
+    case SQL_ROW_UPDATES:
+    case SQL_SCHEMA_TERM:
+    case SQL_SEARCH_PATTERN_ESCAPE:
+    case SQL_SERVER_NAME:
+    case SQL_SPECIAL_CHARACTERS:
+    case SQL_TABLE_TERM:
+    case SQL_USER_NAME:
+    case SQL_XOPEN_CLI_YEAR:
+      if (is_odd_number (buffer_length))
+	{
+	  return ODBC_ERROR;
+	}
 
-        break;
+      break;
 
-      default:
-        break;
+    default:
+      break;
     }
 
   return ODBC_SUCCESS;
 }
 
-PUBLIC int decide_info_value_length (SQLUSMALLINT info_type, int buffer_length, int info_value_length)
+PUBLIC int
+decide_info_value_length (SQLUSMALLINT info_type, int buffer_length, int info_value_length)
 {
   switch (info_type)
     {
       /* info_type that returns a string */
-      case SQL_ACCESSIBLE_PROCEDURES:
-      case SQL_ACCESSIBLE_TABLES:
-      case SQL_CATALOG_NAME:
-      case SQL_CATALOG_NAME_SEPARATOR:
-      case SQL_CATALOG_TERM:
-      case SQL_COLLATION_SEQ:
-      case SQL_COLUMN_ALIAS:
-      case SQL_DATA_SOURCE_NAME:
-      case SQL_DATA_SOURCE_READ_ONLY:
-      case SQL_DATABASE_NAME:
-      case SQL_DBMS_NAME:
-      case SQL_DBMS_VER:
-      case SQL_DESCRIBE_PARAMETER:
-      case SQL_DRIVER_NAME:
-      case SQL_DRIVER_ODBC_VER:
-      case SQL_DRIVER_VER:
-      case SQL_EXPRESSIONS_IN_ORDERBY:
-      case SQL_IDENTIFIER_QUOTE_CHAR:
-      case SQL_INTEGRITY:
-      case SQL_KEYWORDS:
-      case SQL_LIKE_ESCAPE_CLAUSE:
-      case SQL_MAX_ROW_SIZE_INCLUDES_LONG:
-      case SQL_MULT_RESULT_SETS:
-      case SQL_MULTIPLE_ACTIVE_TXN:
-      case SQL_NEED_LONG_DATA_LEN:
-      case SQL_ORDER_BY_COLUMNS_IN_SELECT:
-      case SQL_PROCEDURE_TERM:
-      case SQL_PROCEDURES:
-      case SQL_ROW_UPDATES:
-      case SQL_SCHEMA_TERM:
-      case SQL_SEARCH_PATTERN_ESCAPE:
-      case SQL_SERVER_NAME:
-      case SQL_SPECIAL_CHARACTERS:
-      case SQL_TABLE_TERM:
-      case SQL_USER_NAME:
-      case SQL_XOPEN_CLI_YEAR:
-        if (info_value_length > buffer_length - sizeof (SQLWCHAR))
-          {
-            info_value_length = buffer_length - sizeof (SQLWCHAR);
-          }
+    case SQL_ACCESSIBLE_PROCEDURES:
+    case SQL_ACCESSIBLE_TABLES:
+    case SQL_CATALOG_NAME:
+    case SQL_CATALOG_NAME_SEPARATOR:
+    case SQL_CATALOG_TERM:
+    case SQL_COLLATION_SEQ:
+    case SQL_COLUMN_ALIAS:
+    case SQL_DATA_SOURCE_NAME:
+    case SQL_DATA_SOURCE_READ_ONLY:
+    case SQL_DATABASE_NAME:
+    case SQL_DBMS_NAME:
+    case SQL_DBMS_VER:
+    case SQL_DESCRIBE_PARAMETER:
+    case SQL_DRIVER_NAME:
+    case SQL_DRIVER_ODBC_VER:
+    case SQL_DRIVER_VER:
+    case SQL_EXPRESSIONS_IN_ORDERBY:
+    case SQL_IDENTIFIER_QUOTE_CHAR:
+    case SQL_INTEGRITY:
+    case SQL_KEYWORDS:
+    case SQL_LIKE_ESCAPE_CLAUSE:
+    case SQL_MAX_ROW_SIZE_INCLUDES_LONG:
+    case SQL_MULT_RESULT_SETS:
+    case SQL_MULTIPLE_ACTIVE_TXN:
+    case SQL_NEED_LONG_DATA_LEN:
+    case SQL_ORDER_BY_COLUMNS_IN_SELECT:
+    case SQL_PROCEDURE_TERM:
+    case SQL_PROCEDURES:
+    case SQL_ROW_UPDATES:
+    case SQL_SCHEMA_TERM:
+    case SQL_SEARCH_PATTERN_ESCAPE:
+    case SQL_SERVER_NAME:
+    case SQL_SPECIAL_CHARACTERS:
+    case SQL_TABLE_TERM:
+    case SQL_USER_NAME:
+    case SQL_XOPEN_CLI_YEAR:
+      if (info_value_length > buffer_length - sizeof (SQLWCHAR))
+	{
+	  info_value_length = buffer_length - sizeof (SQLWCHAR);
+	}
 
-        break;
+      break;
 
-      default:
-        break;
+    default:
+      break;
     }
 
   return info_value_length;
@@ -1670,22 +1648,22 @@ remove_owner_name (char *tablename)
 }
 
 PUBLIC int
-connected_db_ver(const char *version_string)
+connected_db_ver (const char *version_string)
 {
   char *p;
   int vers = -1;
 
-  if (version_string == NULL || strlen(version_string) == 0)
+  if (version_string == NULL || strlen (version_string) == 0)
     {
       return SQL_ERROR;
     }
 
-  vers = atoi(version_string) * 100;
+  vers = atoi (version_string) * 100;
 
-  p = strchr(version_string, '.');
+  p = strchr (version_string, '.');
   if (p)
     {
-      vers += atoi(p + 1);
+      vers += atoi (p + 1);
     }
 
   return vers;

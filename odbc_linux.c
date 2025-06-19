@@ -16,30 +16,28 @@
  *
  */
 
-#include	<stdio.h>
-#include	<fcntl.h>
-#include	<stdlib.h>
-#include	<iconv.h>
-#include	<locale.h>
-#include	<wchar.h>
-#include	<errno.h>
-#include	<stdarg.h>
-#include	<string.h>
-#include	"odbc_portable.h"
-#include	"odbcinst.h"
-#include	"odbc_resource.h"
-#include	"odbc_connection.h"
-#include	"odbc_util.h"
+#include  <stdio.h>
+#include  <fcntl.h>
+#include  <stdlib.h>
+#include  <iconv.h>
+#include  <locale.h>
+#include  <wchar.h>
+#include  <errno.h>
+#include  <stdarg.h>
+#include  <string.h>
+#include  "odbc_portable.h"
+#include  "odbcinst.h"
+#include  "odbc_resource.h"
+#include  "odbc_connection.h"
+#include  "odbc_util.h"
 
 static int get_section_from_file (const char *ini, const char *section, char *value_p, int size);
 
-PUBLIC INT_PTR CALLBACK
-ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam,
-		                  LPARAM lParam);
+PUBLIC INT_PTR CALLBACK ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam);
 
-#define LINE_SIZE	512
-#define TBUF_SIZE	8192
-#define PROF_BUF_SIZE	4096
+#define LINE_SIZE 512
+#define TBUF_SIZE 8192
+#define PROF_BUF_SIZE 4096
 
 /*
  * ODBC Driver function not supported
@@ -49,12 +47,11 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLDataSources (SQLHENV EnvironmentHandle,
-                  SQLUSMALLINT Direction,
-                  SQLCHAR * ServerName,
-                  SQLSMALLINT BufferLength1,
-                  SQLSMALLINT * NameLength1Ptr,
-                  SQLCHAR * Description,
-                  SQLSMALLINT BufferLength2, SQLSMALLINT * NameLength2Ptr)
+		SQLUSMALLINT Direction,
+		SQLCHAR * ServerName,
+		SQLSMALLINT BufferLength1,
+		SQLSMALLINT * NameLength1Ptr,
+		SQLCHAR * Description, SQLSMALLINT BufferLength2, SQLSMALLINT * NameLength2Ptr)
 {
   OutputDebugString ("SQLDataSources called\n");
   return SQL_SUCCESS;
@@ -81,18 +78,14 @@ SQLSetConfigMode (UWORD mode)
 }
 
 int INSTAPI
-SQLGetPrivateProfileString (
-	LPCSTR lpszSection,
-	LPCSTR lpszEntry,
-	LPCSTR lpszDefault,
-	LPSTR lpszRetBuffer,
-	int cbRetBuffer,
-	LPCSTR lpszFilename)
+SQLGetPrivateProfileString (LPCSTR lpszSection,
+			    LPCSTR lpszEntry,
+			    LPCSTR lpszDefault, LPSTR lpszRetBuffer, int cbRetBuffer, LPCSTR lpszFilename)
 {
   int rc = SQL_ERROR;
-  char	inifile[_MAX_PATH];
-  char	filename[_MAX_PATH];
-  char	element_list[PROF_BUF_SIZE];
+  char inifile[_MAX_PATH];
+  char filename[_MAX_PATH];
+  char element_list[PROF_BUF_SIZE];
   char *envp, *p;
 
   OutputDebugString ("SQLGetPrivateProfileString called");
@@ -105,7 +98,7 @@ SQLGetPrivateProfileString (
   else
     {
       tolower_str (filename, lpszFilename);
-      snprintf (inifile, _MAX_PATH, "%s/.%s", getenv("HOME"), filename);
+      snprintf (inifile, _MAX_PATH, "%s/.%s", getenv ("HOME"), filename);
     }
 
   memset (element_list, 0, PROF_BUF_SIZE);
@@ -114,12 +107,12 @@ SQLGetPrivateProfileString (
       return -1;
     }
 
-   if ((p = element_value_by_key (element_list, lpszEntry)) == NULL)
-     {
-           return rc;
-     }
+  if ((p = element_value_by_key (element_list, lpszEntry)) == NULL)
+    {
+      return rc;
+    }
 
-  strcpy (lpszRetBuffer,  p); 
+  strcpy (lpszRetBuffer, p);
 
   return rc;
 }
@@ -127,10 +120,8 @@ SQLGetPrivateProfileString (
 /*
  * Version Introduced: ODBC 1.0 Standards Compliance: Deprecated
  */
-SQLRETURN SQL_API SQLSetConnectOption (
-	SQLHDBC ConnectionHandle,
-        SQLUSMALLINT Option,
-	SQLULEN Value)
+SQLRETURN SQL_API
+SQLSetConnectOption (SQLHDBC ConnectionHandle, SQLUSMALLINT Option, SQLULEN Value)
 {
   return SQL_ERROR;
 }
@@ -148,23 +139,23 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 INT_PTR
-DialogBoxParam(HINSTANCE hInst, LPCSTR tmpNaae, HWND hWndP, INT_PTR CALLBACK lpDialogFunc, LPARAM dwInit)
+DialogBoxParam (HINSTANCE hInst, LPCSTR tmpNaae, HWND hWndP, INT_PTR CALLBACK lpDialogFunc, LPARAM dwInit)
 {
   return NULL;
 }
 
 
 WCHAR *
-SysAllocStringLen (const WCHAR *strIn, UINT ui)
+SysAllocStringLen (const WCHAR * strIn, UINT ui)
 {
   WCHAR *p;
 
-  p = calloc (1, ui * sizeof(WCHAR));
+  p = calloc (1, ui * sizeof (WCHAR));
   return p;
 }
 
-void 
-SysFreeString(WCHAR *bstr)
+void
+SysFreeString (WCHAR * bstr)
 {
   if (bstr)
     {
@@ -298,22 +289,22 @@ itoa (int value, char *string, int radix)
       i = v % radix;
       v = v / radix;
       if (i < 10)
-        {
-          *tp++ = i + '0';
-        }
+	{
+	  *tp++ = i + '0';
+	}
       else
-        {
-          *tp++ = i + 'a' - 10;
-        }
+	{
+	  *tp++ = i + 'a' - 10;
+	}
     }
 
- if (string == NULL)
+  if (string == NULL)
     {
       string = (char *) malloc ((tp - tmp) + sign + 1);
       if (string == NULL)
-        {
-          return string;
-        }
+	{
+	  return string;
+	}
     }
   sp = string;
 
@@ -331,8 +322,8 @@ itoa (int value, char *string, int radix)
 
 
 int
-MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int cbMultiByte, 
-		wchar_t *lpWideCharStr, int cchWideChar)
+MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int cbMultiByte,
+		     wchar_t * lpWideCharStr, int cchWideChar)
 {
   char *default_unicode_charset = "UTF-16LE";
   char *charset = "UTF-8";
@@ -341,8 +332,8 @@ MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int cbMu
   size_t iconv_in_len = cbMultiByte;
   size_t iconv_out_len = cchWideChar * sizeof (wchar_t);
   size_t iconv_out_org = iconv_out_len;
-  wchar_t _buf [TBUF_SIZE];
-  char outbuf [TBUF_SIZE], *op = outbuf;
+  wchar_t _buf[TBUF_SIZE];
+  char outbuf[TBUF_SIZE], *op = outbuf;
   iconv_t cd;
   int ret, required;
 
@@ -351,21 +342,21 @@ MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int cbMu
     {
       iconv_out_len = TBUF_SIZE;
       iconv_out_org = TBUF_SIZE;
-      iconv_out = &_buf [0];
+      iconv_out = &_buf[0];
     }
 
   switch (codepage)
     {
     case CP_EUC_KR:
-	charset = "EUCKR";
-	break;
+      charset = "EUCKR";
+      break;
     case CP_UTF8:
     case CP_ACP:
-	charset = "UTF-8";
-	break;
+      charset = "UTF-8";
+      break;
     default:
-	charset = "UTF-8";
-	break;
+      charset = "UTF-8";
+      break;
     }
 
   if ((cd = iconv_open (default_unicode_charset, charset)) < 0)
@@ -392,14 +383,11 @@ MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int cbMu
 }
 
 
-int WideCharToMultiByte (int wincode,
-				 int dw, 
-				 wchar_t *str, 
-				 int size, 
-				 char *out_buffer, 
-				 int cbMultiByte, 
-				 char *lpdefaultchar, 
-				 char *lpusedfdefaultchar)
+int
+WideCharToMultiByte (int wincode,
+		     int dw,
+		     wchar_t * str,
+		     int size, char *out_buffer, int cbMultiByte, char *lpdefaultchar, char *lpusedfdefaultchar)
 {
   char *charset;
   char *default_unicode_charset = "UTF-16";	// UCS2, UCS2-LE
@@ -407,12 +395,12 @@ int WideCharToMultiByte (int wincode,
   char *iconv_out = out_buffer;
   unsigned char *iconv_in = (unsigned char *) str;
 
-  size_t iconv_in_len = (size_t)  size;
+  size_t iconv_in_len = (size_t) size;
   size_t iconv_out_len = (size_t) cbMultiByte;
   size_t iconv_out_org = (size_t) cbMultiByte;
   int ret, required;
-  char _buf [TBUF_SIZE];
-  char inbuf [TBUF_SIZE], *ip = inbuf;
+  char _buf[TBUF_SIZE];
+  char inbuf[TBUF_SIZE], *ip = inbuf;
 
   memset (inbuf, 0, TBUF_SIZE);
 
@@ -432,7 +420,7 @@ int WideCharToMultiByte (int wincode,
 
   if (size < 0)
     {
-      size = TBUF_SIZE / sizeof(wchar_t);
+      size = TBUF_SIZE / sizeof (wchar_t);
     }
 
   switch (wincode)

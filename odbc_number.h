@@ -32,11 +32,11 @@ typedef enum
 typedef struct
 {
   sign n_sign;
-  int n_len;			/* The number of digits before the decimal point. */
-  int n_scale;			/* The number of digits after the decimal point. */
-  int n_refs;			/* The number of pointers to this number. */
-  char n_value[1];		/* The storage. Not zero char terminated. It is 
-				   allocated with all other fields.  */
+  int n_len;      /* The number of digits before the decimal point. */
+  int n_scale;      /* The number of digits after the decimal point. */
+  int n_refs;     /* The number of pointers to this number. */
+  char n_value[1];    /* The storage. Not zero char terminated. It is 
+           allocated with all other fields.  */
 } bc_struct;
 
 typedef bc_struct *bc_num;
@@ -50,4 +50,4 @@ int bc_sub (bc_num n1, bc_num n2, bc_num * result, int scale_min);
 int bc_multiply (bc_num n1, bc_num n2, bc_num * prod, int scale);
 int bc_divide (bc_num n1, bc_num n2, bc_num * quot, int scale);
 int bc_divmod (bc_num num1, bc_num num2, bc_num * quot, bc_num * rem,
-	       int scale);
+         int scale);

@@ -28,44 +28,44 @@
 *
 */
 
-#ifndef	__ODBC_CONN_HEADER	/* to avoid multiple inclusion */
-#define	__ODBC_CONN_HEADER
+#ifndef __ODBC_CONN_HEADER  /* to avoid multiple inclusion */
+#define __ODBC_CONN_HEADER
 
-#include		"odbc_portable.h"
-#include		"odbc_diag_record.h"
-#include		"odbc_env.h"
-#include		"odbc_statement.h"
+#include    "odbc_portable.h"
+#include    "odbc_diag_record.h"
+#include    "odbc_env.h"
+#include    "odbc_statement.h"
 
-#define			KEYWORD_DSN		"DSN"
-#define			KEYWORD_FILEDSN		"FILEDSN"
-#define			KEYWORD_DBNAME		"DB_NAME"
-#define			KEYWORD_USER		"UID"
-#define			KEYWORD_PASSWORD	"PWD"
-#define			KEYWORD_SERVER		"SERVER"
-#define			KEYWORD_PORT		"PORT"
-#define			KEYWORD_FETCH_SIZE	"FETCH_SIZE"
-#define			KEYWORD_DESCRIPTION	"DESCRIPTION"
-#define			KEYWORD_SAVEFILE	"SAVEFILE"
-#define			KEYWORD_DRIVER		"DRIVER"
-#define			KEYWORD_CHARSET		"CHARSET"
-#define			KEYWORD_AUTOCOMMIT	"AUTOCOMMIT"
-#define			KEYWORD_OMIT_SCHEMA	"OMIT_SCHEMA"
+#define     KEYWORD_DSN   "DSN"
+#define     KEYWORD_FILEDSN   "FILEDSN"
+#define     KEYWORD_DBNAME    "DB_NAME"
+#define     KEYWORD_USER    "UID"
+#define     KEYWORD_PASSWORD  "PWD"
+#define     KEYWORD_SERVER    "SERVER"
+#define     KEYWORD_PORT    "PORT"
+#define     KEYWORD_FETCH_SIZE  "FETCH_SIZE"
+#define     KEYWORD_DESCRIPTION "DESCRIPTION"
+#define     KEYWORD_SAVEFILE  "SAVEFILE"
+#define     KEYWORD_DRIVER    "DRIVER"
+#define     KEYWORD_CHARSET   "CHARSET"
+#define     KEYWORD_AUTOCOMMIT  "AUTOCOMMIT"
+#define     KEYWORD_OMIT_SCHEMA "OMIT_SCHEMA"
 
-#define			KEYWORD_ALTHOSTS	"ALTHOSTS"
-#define			KEYWORD_RCTIME		"RCTIME"
-#define			KEYWORD_LOADBALANCE	"LOADBALANCE"
-#define			KEYWORD_QUERYTIMEOUT	"QUERYTIMEOUT"
-#define			KEYWORD_QUERY_TIMEOUT	"QUERY_TIMEOUT"
-#define			KEYWORD_LOGINTIMEOUT	"LOGINTIMEOUT"
-#define			KEYWORD_LOGIN_TIMEOUT	"LOGIN_TIMEOUT"
-#define			KEYWORD_DISCONNECT_ON_QUERY_TIMEOUT	"DISCONNECT_ON_QUERY_TIMEOUT"
-#define			KEYWORD_DISCONNECTONQUERYTIMEOUT	"DISCONNECTONQUERYTIMEOUT"
-#define			KEYWORD_LOGFILE		"LOGFILE"
-#define			KEYWORD_LOGBASEDIR	"LOGBASEDIR"
-#define			KEYWORD_LOGSLOWQUERIES	"LOGSLOWQUERIES"
-#define			KEYWORD_SLOWQUERYTHRESHOLDMILLIS	"SLOWQUERYTHRESHOLDMILLIS"
-#define			KEYWORD_LOGTRACEAPI	"LOGTRACEAPI"
-#define			KEYWORD_LOGTRACENETWORK	"LOGTRACENETWORK"
+#define     KEYWORD_ALTHOSTS  "ALTHOSTS"
+#define     KEYWORD_RCTIME    "RCTIME"
+#define     KEYWORD_LOADBALANCE "LOADBALANCE"
+#define     KEYWORD_QUERYTIMEOUT  "QUERYTIMEOUT"
+#define     KEYWORD_QUERY_TIMEOUT "QUERY_TIMEOUT"
+#define     KEYWORD_LOGINTIMEOUT  "LOGINTIMEOUT"
+#define     KEYWORD_LOGIN_TIMEOUT "LOGIN_TIMEOUT"
+#define     KEYWORD_DISCONNECT_ON_QUERY_TIMEOUT "DISCONNECT_ON_QUERY_TIMEOUT"
+#define     KEYWORD_DISCONNECTONQUERYTIMEOUT  "DISCONNECTONQUERYTIMEOUT"
+#define     KEYWORD_LOGFILE   "LOGFILE"
+#define     KEYWORD_LOGBASEDIR  "LOGBASEDIR"
+#define     KEYWORD_LOGSLOWQUERIES  "LOGSLOWQUERIES"
+#define     KEYWORD_SLOWQUERYTHRESHOLDMILLIS  "SLOWQUERYTHRESHOLDMILLIS"
+#define     KEYWORD_LOGTRACEAPI "LOGTRACEAPI"
+#define     KEYWORD_LOGTRACENETWORK "LOGTRACENETWORK"
 
 
 typedef struct stCUBRIDDSNItem
@@ -112,97 +112,97 @@ typedef struct st_odbc_connection
   //void                                  *statements;
   //void                                  *descriptors;
   struct st_odbc_statement *statements;
-  struct st_odbc_desc *descriptors;	/* external descriptor */
+  struct st_odbc_desc *descriptors; /* external descriptor */
 
-  char *data_source;		/* data source name */
-  unsigned char *server;	/* odbc server address */
-  long port;			/* odbc server port number */
-  char *db_name;		/* CUBRID db name */
-  char *user;			/* CUBRID db user */
-  char *password;		/* CUBRID db password */
-  int fetch_size;		/* fetch size */
+  char *data_source;    /* data source name */
+  unsigned char *server;  /* odbc server address */
+  long port;      /* odbc server port number */
+  char *db_name;    /* CUBRID db name */
+  char *user;     /* CUBRID db user */
+  char *password;   /* CUBRID db password */
+  int fetch_size;   /* fetch size */
   struct st_odbc_connection_attr attr_connect;
   char *charset;
   char db_ver[16];
 
-  unsigned long old_txn_isolation;	/* for read-only mode */
+  unsigned long old_txn_isolation;  /* for read-only mode */
 
   // Maximum length of the string data type from UniCAS
   long max_string_length;
 
   /* ODBC connection attributes */
 
-  unsigned long attr_access_mode;	/* CORE */
-  unsigned long attr_autocommit;	/* LEVEL 1 */
+  unsigned long attr_access_mode; /* CORE */
+  unsigned long attr_autocommit;  /* LEVEL 1 */
   //unsigned long         attr_connection_dead;   /* LEVEL 1 */
-  //      attr_connection_dead´Â connhd·Î ºÎÅÍ ¾Ë¾Æ ³¾ ¼ö ÀÖ´Ù.
+  //      attr_connection_deadëŠ” connhdë¡œ ë¶€í„° ì•Œì•„ ë‚¼ ìˆ˜ ìžˆë‹¤.
   // if connhd > 0, alive.
 
-  void *attr_quiet_mode;	/* CORE */
-  unsigned long attr_metadata_id;	/* CORE */
-  unsigned long attr_odbc_cursors;	/* CORE, DM */
-  unsigned long attr_trace;	/* CORE, DM */
-  char *attr_tracefile;		/* CORE, DM */
-  unsigned long attr_txn_isolation;	/* LEVEL 1 */
-  unsigned long attr_async_enable;	/* LEVEL 1 */
+  void *attr_quiet_mode;  /* CORE */
+  unsigned long attr_metadata_id; /* CORE */
+  unsigned long attr_odbc_cursors;  /* CORE, DM */
+  unsigned long attr_trace; /* CORE, DM */
+  char *attr_tracefile;   /* CORE, DM */
+  unsigned long attr_txn_isolation; /* LEVEL 1 */
+  unsigned long attr_async_enable;  /* LEVEL 1 */
 
   /* Not supported */
-  unsigned long attr_auto_ipd;	/* LEVEL2, RDONLY */
-  unsigned long attr_connection_timeout;	/* LEVEL 2 */
-  char *attr_current_catalog;	/* LEVEL 2 */
-  unsigned long attr_login_timeout;	/* LEVEL 2 */
-  unsigned long attr_packet_size;	/* LEVEL 2 */
-  char *attr_translate_lib;	/* CORE */
-  unsigned long attr_translate_option;	/* CORE */
+  unsigned long attr_auto_ipd;  /* LEVEL2, RDONLY */
+  unsigned long attr_connection_timeout;  /* LEVEL 2 */
+  char *attr_current_catalog; /* LEVEL 2 */
+  unsigned long attr_login_timeout; /* LEVEL 2 */
+  unsigned long attr_packet_size; /* LEVEL 2 */
+  char *attr_translate_lib; /* CORE */
+  unsigned long attr_translate_option;  /* CORE */
 
   /* stmt attributes */
-  unsigned long attr_max_rows;	// 1
-  unsigned long attr_query_timeout;	// 2
+  unsigned long attr_max_rows;  // 1
+  unsigned long attr_query_timeout; // 2
   int omit_schema;
 } ODBC_CONNECTION;
 
 PUBLIC RETCODE odbc_alloc_connection (ODBC_ENV *env,
-				      ODBC_CONNECTION **connptr);
+              ODBC_CONNECTION **connptr);
 PUBLIC RETCODE odbc_free_connection (ODBC_CONNECTION *conn);
 PUBLIC RETCODE odbc_connect_new (ODBC_CONNECTION *conn,
-				 const char *data_source,
-				 const char *db_name,
-				 const char *user,
-				 const char *password,
-				 const char *server,
-				 int port, int fetch_size,
-				 const char *charset,
-				 const char *autocommit,
-				 const char *omit_schema,
-				 const char *conn_str_in);
+         const char *data_source,
+         const char *db_name,
+         const char *user,
+         const char *password,
+         const char *server,
+         int port, int fetch_size,
+         const char *charset,
+         const char *autocommit,
+         const char *omit_schema,
+         const char *conn_str_in);
 PUBLIC RETCODE odbc_disconnect (ODBC_CONNECTION *conn);
 PUBLIC RETCODE odbc_set_connect_attr (ODBC_CONNECTION *conn,
-				      long attribute,
-				      void *valueptr, long stringlength);
+              long attribute,
+              void *valueptr, long stringlength);
 PUBLIC RETCODE odbc_get_connect_attr (ODBC_CONNECTION *conn,
-				      SQLINTEGER attribute,
-				      SQLPOINTER value_ptr,
-				      SQLINTEGER buffer_length,
-				      SQLINTEGER *string_length_ptr);
+              SQLINTEGER attribute,
+              SQLPOINTER value_ptr,
+              SQLINTEGER buffer_length,
+              SQLINTEGER *string_length_ptr);
 PUBLIC RETCODE odbc_auto_commit (ODBC_CONNECTION *conn);
 PUBLIC RETCODE odbc_native_sql (ODBC_CONNECTION *conn,
-				SQLCHAR *in_stmt_text,
-				SQLCHAR *out_stmt_text,
-				SQLINTEGER buffer_length,
-				SQLINTEGER *out_stmt_length);
+        SQLCHAR *in_stmt_text,
+        SQLCHAR *out_stmt_text,
+        SQLINTEGER buffer_length,
+        SQLINTEGER *out_stmt_length);
 PUBLIC RETCODE odbc_get_functions (ODBC_CONNECTION *conn,
-				   unsigned short function_id,
-				   unsigned short *supported_ptr);
+           unsigned short function_id,
+           unsigned short *supported_ptr);
 PUBLIC RETCODE odbc_get_info (ODBC_CONNECTION *conn, SQLUSMALLINT info_type,
-			      SQLPOINTER info_value_ptr,
-			      SQLSMALLINT buffer_length,
-			      SQLLEN *string_length_ptr);
+            SQLPOINTER info_value_ptr,
+            SQLSMALLINT buffer_length,
+            SQLLEN *string_length_ptr);
 PUBLIC int get_dsn_info (const char *dsn, char *db_name, int db_name_len,
-			 char *user, int user_len, char *pwd, int pwd_len,
-			 char *server, int server_len, int *port,
-			 int *fetch_size,
-			 char *charset, int charset_len,
-			 char *autocommit, int autocommit_len,
-			 char *omit_schema, int omit_schema_len);
+       char *user, int user_len, char *pwd, int pwd_len,
+       char *server, int server_len, int *port,
+       int *fetch_size,
+       char *charset, int charset_len,
+       char *autocommit, int autocommit_len,
+       char *omit_schema, int omit_schema_len);
 
 #endif /* ! __ODBC_CONN_HEADER */

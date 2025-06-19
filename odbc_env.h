@@ -28,11 +28,11 @@
  *
  */
 
-#ifndef	__ODBC_ENV_HEADER	/* to avoid multiple inclusion */
-#define	__ODBC_ENV_HEADER
+#ifndef __ODBC_ENV_HEADER /* to avoid multiple inclusion */
+#define __ODBC_ENV_HEADER
 
-#include		"odbc_portable.h"
-#include		"odbc_diag_record.h"
+#include    "odbc_portable.h"
+#include    "odbc_diag_record.h"
 
 typedef struct st_odbc_env
 {
@@ -55,23 +55,23 @@ typedef struct st_odbc_env
   unsigned long attr_cp_match;
 } ODBC_ENV;
 
-#define ODBC_RETURN(rc, handle)					\
-  do {								\
-    if ( handle != NULL && ((ODBC_ENV*)handle)->diag != NULL)					\
-	((ODBC_ENV*)handle)->diag->retcode = rc;		\
-    return rc;							\
+#define ODBC_RETURN(rc, handle)         \
+  do {                \
+    if ( handle != NULL && ((ODBC_ENV*)handle)->diag != NULL)         \
+  ((ODBC_ENV*)handle)->diag->retcode = rc;    \
+    return rc;              \
   } while (0 )
   
 PUBLIC RETCODE odbc_alloc_env (ODBC_ENV ** envptr);
 PUBLIC RETCODE odbc_free_env (ODBC_ENV * env);
 PUBLIC RETCODE odbc_set_env_attr (ODBC_ENV * env,
-				  long attribute,
-				  void *valueptr, long stringlength);
+          long attribute,
+          void *valueptr, long stringlength);
 PUBLIC odbc_get_env_attr (ODBC_ENV * env,
-			  long attribute,
-			  void *value_ptr,
-			  long buffer_length, long *string_length_ptr);
+        long attribute,
+        void *value_ptr,
+        long buffer_length, long *string_length_ptr);
 PUBLIC RETCODE odbc_end_tran (short handle_type,
-			      void *handle, short completion_type);
+            void *handle, short completion_type);
 
 #endif /* ! __ODBC_ENV_HEADER */
