@@ -178,10 +178,10 @@ odbc_alloc_connection (ODBC_ENV * env, ODBC_CONNECTION ** connptr)
   conn->attr_autocommit = SQL_AUTOCOMMIT_ON;
   conn->attr_connection_timeout = 0;
   conn->attr_current_catalog = NULL;
-  conn->attr_login_timeout = SQL_LOGIN_TIMEOUT_DEFAULT; /* but... driver-specific */
+  conn->attr_login_timeout = SQL_LOGIN_TIMEOUT_DEFAULT;	/* but... driver-specific */
   conn->attr_odbc_cursors = SQL_CUR_DEFAULT;
-  conn->attr_packet_size = 1024;  /* ??? */
-  conn->attr_quiet_mode = NULL; /* NOT implemented */
+  conn->attr_packet_size = 1024;	/* ??? */
+  conn->attr_quiet_mode = NULL;	/* NOT implemented */
   conn->attr_trace = SQL_OPT_TRACE_DEFAULT;
   conn->attr_tracefile = UT_MAKE_STRING (SQL_OPT_TRACE_FILE_DEFAULT, -1);
   conn->attr_translate_lib = NULL;
@@ -233,16 +233,15 @@ odbc_free_connection (ODBC_CONNECTION * conn)
 
   if (conn->env != NULL)
     {
-      for (c = conn->env->conn, prev = NULL;
-     c != NULL && c != conn; c = c->next)
-  prev = c;
+      for (c = conn->env->conn, prev = NULL; c != NULL && c != conn; c = c->next)
+	prev = c;
       if (c == conn)
-  {
-    if (prev != NULL)
-      prev->next = conn->next;
-    else
-      conn->env->conn = conn->next;
-  }
+	{
+	  if (prev != NULL)
+	    prev->next = conn->next;
+	  else
+	    conn->env->conn = conn->next;
+	}
     }
 
   odbc_free_diag (conn->diag, FREE_ALL);
@@ -277,54 +276,53 @@ odbc_free_connection (ODBC_CONNECTION * conn)
 *   (ODBC_CONNECTION).old_txn_isolation이 사용된다.
 ************************************************************************/
 PUBLIC RETCODE
-odbc_set_connect_attr (ODBC_CONNECTION * conn,
-           long attribute, void *valueptr, long stringlength)
+odbc_set_connect_attr (ODBC_CONNECTION * conn, long attribute, void *valueptr, long stringlength)
 {
 
   switch (attribute)
     {
     case SQL_ATTR_ACCESS_MODE:
       switch ((unsigned long) valueptr)
-  {
-  case SQL_MODE_READ_WRITE:
-    conn->attr_access_mode = (unsigned long) valueptr;
-    conn->attr_txn_isolation = conn->old_txn_isolation;
-    if (set_isolation_level (conn) < 0)
-      {
-        goto error;
-      }
-    break;
-  case SQL_MODE_READ_ONLY:
-    conn->attr_access_mode = (unsigned long) valueptr;
-    conn->old_txn_isolation = conn->attr_txn_isolation;
-    conn->attr_txn_isolation = SQL_TXN_READ_COMMITTED;
-    if (set_isolation_level (conn) < 0)
-      {
-        goto error;
-      }
-    break;
-  default:
-    /* HY024 - invalid value */
-    odbc_set_diag (conn->diag, "HY024", 0, NULL);
-    goto error;
-    break;
-  }
+	{
+	case SQL_MODE_READ_WRITE:
+	  conn->attr_access_mode = (unsigned long) valueptr;
+	  conn->attr_txn_isolation = conn->old_txn_isolation;
+	  if (set_isolation_level (conn) < 0)
+	    {
+	      goto error;
+	    }
+	  break;
+	case SQL_MODE_READ_ONLY:
+	  conn->attr_access_mode = (unsigned long) valueptr;
+	  conn->old_txn_isolation = conn->attr_txn_isolation;
+	  conn->attr_txn_isolation = SQL_TXN_READ_COMMITTED;
+	  if (set_isolation_level (conn) < 0)
+	    {
+	      goto error;
+	    }
+	  break;
+	default:
+	  /* HY024 - invalid value */
+	  odbc_set_diag (conn->diag, "HY024", 0, NULL);
+	  goto error;
+	  break;
+	}
       break;
 
     case SQL_ATTR_ASYNC_ENABLE:
       switch ((unsigned long) valueptr)
-  {
-  case SQL_ASYNC_ENABLE_OFF:
-  case SQL_ASYNC_ENABLE_ON:
-    conn->attr_async_enable = (unsigned long) valueptr;
-    break;
+	{
+	case SQL_ASYNC_ENABLE_OFF:
+	case SQL_ASYNC_ENABLE_ON:
+	  conn->attr_async_enable = (unsigned long) valueptr;
+	  break;
 
-  default:
-    /* HY024 - invalid value */
-    odbc_set_diag (conn->diag, "HY024", 0, NULL);
-    goto error;
-    break;
-  }
+	default:
+	  /* HY024 - invalid value */
+	  odbc_set_diag (conn->diag, "HY024", 0, NULL);
+	  goto error;
+	  break;
+	}
       break;
 
     case SQL_ATTR_AUTO_IPD:
@@ -335,17 +333,17 @@ odbc_set_connect_attr (ODBC_CONNECTION * conn,
 
     case SQL_ATTR_AUTOCOMMIT:
       switch ((unsigned long) valueptr)
-  {
-  case SQL_AUTOCOMMIT_OFF:
-  case SQL_AUTOCOMMIT_ON:
-    conn->attr_autocommit = (unsigned long) valueptr;
-    break;
-  default:
-    /* HY024 - invalid value */
-    odbc_set_diag (conn->diag, "HY024", 0, NULL);
-    goto error;
-    break;
-  }
+	{
+	case SQL_AUTOCOMMIT_OFF:
+	case SQL_AUTOCOMMIT_ON:
+	  conn->attr_autocommit = (unsigned long) valueptr;
+	  break;
+	default:
+	  /* HY024 - invalid value */
+	  odbc_set_diag (conn->diag, "HY024", 0, NULL);
+	  goto error;
+	  break;
+	}
 
       break;
 
@@ -356,10 +354,10 @@ odbc_set_connect_attr (ODBC_CONNECTION * conn,
 
     case SQL_ATTR_CONNECTION_TIMEOUT:
       if ((unsigned long) valueptr < 0)
-  {
-    odbc_set_diag (conn->diag, "HY024", 0, NULL);
-    goto error;
-  }
+	{
+	  odbc_set_diag (conn->diag, "HY024", 0, NULL);
+	  goto error;
+	}
       conn->attr_connection_timeout = (unsigned long) valueptr;
       break;
 
@@ -370,51 +368,51 @@ odbc_set_connect_attr (ODBC_CONNECTION * conn,
 
     case SQL_ATTR_LOGIN_TIMEOUT:
       if ((unsigned long) valueptr < 0)
-  {
-    /* HY024 - invalid value */
-    odbc_set_diag (conn->diag, "HY024", 0, NULL);
-    goto error;
-  }
+	{
+	  /* HY024 - invalid value */
+	  odbc_set_diag (conn->diag, "HY024", 0, NULL);
+	  goto error;
+	}
 
       conn->attr_login_timeout = (unsigned long) valueptr;
       break;
 
     case SQL_ATTR_METADATA_ID:
       switch ((unsigned long) valueptr)
-  {
-  case SQL_TRUE:
-  case SQL_FALSE:
-    conn->attr_metadata_id = (unsigned long) valueptr;
-    break;
-  default:
-    /* HY024 - invalid value */
-    odbc_set_diag (conn->diag, "HY024", 0, NULL);
-    goto error;
-    break;
-  }
+	{
+	case SQL_TRUE:
+	case SQL_FALSE:
+	  conn->attr_metadata_id = (unsigned long) valueptr;
+	  break;
+	default:
+	  /* HY024 - invalid value */
+	  odbc_set_diag (conn->diag, "HY024", 0, NULL);
+	  goto error;
+	  break;
+	}
       break;
 
     case SQL_ATTR_ODBC_CURSORS:
       switch ((unsigned long) valueptr)
-  {
-  case SQL_CUR_USE_IF_NEEDED:
-  case SQL_CUR_USE_ODBC:
-  case SQL_CUR_USE_DRIVER:
-    conn->attr_odbc_cursors = (unsigned long) valueptr;
-    break;
-  default:
-    odbc_set_diag (conn->diag, "HY024", 0, NULL);
-    goto error;
-    break;
-  }
+	{
+	case SQL_CUR_USE_IF_NEEDED:
+	case SQL_CUR_USE_ODBC:
+	case SQL_CUR_USE_DRIVER:
+	  conn->attr_odbc_cursors = (unsigned long) valueptr;
+	  break;
+	default:
+	  odbc_set_diag (conn->diag, "HY024", 0, NULL);
+	  goto error;
+	  break;
+	}
       break;
 
     case SQL_ATTR_PACKET_SIZE:
       if ((unsigned long) valueptr < 0)
-  {
-    odbc_set_diag (conn->diag, "HY024", 0, NULL);
-    goto error;
-  }
+	{
+	  odbc_set_diag (conn->diag, "HY024", 0, NULL);
+	  goto error;
+	}
       conn->attr_packet_size = (unsigned long) valueptr;
       break;
 
@@ -424,17 +422,17 @@ odbc_set_connect_attr (ODBC_CONNECTION * conn,
 
     case SQL_ATTR_TRACE:
       switch ((unsigned long) valueptr)
-  {
-  case SQL_OPT_TRACE_OFF:
-  case SQL_OPT_TRACE_ON:
-    conn->attr_trace = (unsigned long) valueptr;
-    break;
-  default:
-    /* HY024 - invalid value */
-    odbc_set_diag (conn->diag, "HY024", 0, NULL);
-    goto error;
-    break;
-  }
+	{
+	case SQL_OPT_TRACE_OFF:
+	case SQL_OPT_TRACE_ON:
+	  conn->attr_trace = (unsigned long) valueptr;
+	  break;
+	default:
+	  /* HY024 - invalid value */
+	  odbc_set_diag (conn->diag, "HY024", 0, NULL);
+	  goto error;
+	  break;
+	}
 
       break;
 
@@ -449,10 +447,10 @@ odbc_set_connect_attr (ODBC_CONNECTION * conn,
       odbc_set_diag (conn->diag, "HYC00", 0, NULL);
       goto error;
       /*
-      NC_FREE (conn->attr_translate_lib);
-      conn->attr_translate_lib = UT_MAKE_STRING (valueptr, stringlength);
-      break;
-      */
+         NC_FREE (conn->attr_translate_lib);
+         conn->attr_translate_lib = UT_MAKE_STRING (valueptr, stringlength);
+         break;
+       */
     case SQL_ATTR_TRANSLATE_OPTION:
       /* HYC00 */
       /*Yet not implemented */
@@ -463,9 +461,9 @@ odbc_set_connect_attr (ODBC_CONNECTION * conn,
     case SQL_ATTR_TXN_ISOLATION:
       conn->attr_txn_isolation = (unsigned long) valueptr;
       if (set_isolation_level (conn) < 0)
-  {
-    goto error;
-  }
+	{
+	  goto error;
+	}
       break;
 
       // stmt attributes
@@ -499,10 +497,8 @@ error:
 ************************************************************************/
 PUBLIC RETCODE
 odbc_get_connect_attr (ODBC_CONNECTION * conn,
-           SQLINTEGER attribute, 
-           SQLPOINTER value_ptr,
-           SQLINTEGER buffer_length,
-           SQLINTEGER * string_length_ptr)
+		       SQLINTEGER attribute,
+		       SQLPOINTER value_ptr, SQLINTEGER buffer_length, SQLINTEGER * string_length_ptr)
 {
   RETCODE rc = ODBC_SUCCESS;
   SQLLEN tmp_length;
@@ -511,18 +507,18 @@ odbc_get_connect_attr (ODBC_CONNECTION * conn,
     {
     case SQL_ATTR_ACCESS_MODE:
       if (value_ptr != NULL)
-  *((unsigned long *) value_ptr) = conn->attr_access_mode;
+	*((unsigned long *) value_ptr) = conn->attr_access_mode;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_ATTR_ASYNC_ENABLE:
       if (value_ptr != NULL)
-  *((unsigned long *) value_ptr) = conn->attr_async_enable;
+	*((unsigned long *) value_ptr) = conn->attr_async_enable;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_ATTR_AUTO_IPD:
@@ -533,36 +529,36 @@ odbc_get_connect_attr (ODBC_CONNECTION * conn,
 
 #if 0
       if (value_ptr != NULL)
-  *((unsigned long *) value_ptr) = conn->attr_auto_ipd;
+	*((unsigned long *) value_ptr) = conn->attr_auto_ipd;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 #endif
 
     case SQL_ATTR_AUTOCOMMIT:
       if (value_ptr != NULL)
-  *((unsigned long *) value_ptr) = conn->attr_autocommit;
+	*((unsigned long *) value_ptr) = conn->attr_autocommit;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_ATTR_CONNECTION_DEAD:
       if (value_ptr != NULL)
-  {
-    if (conn->connhd > 0)
-      {
-        *((unsigned long *) value_ptr) = SQL_CD_FALSE;
-      }
-    else
-      {
-        *((unsigned long *) value_ptr) = SQL_CD_TRUE;
-      }
-  }
+	{
+	  if (conn->connhd > 0)
+	    {
+	      *((unsigned long *) value_ptr) = SQL_CD_FALSE;
+	    }
+	  else
+	    {
+	      *((unsigned long *) value_ptr) = SQL_CD_TRUE;
+	    }
+	}
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_ATTR_CONNECTION_TIMEOUT:
@@ -573,28 +569,26 @@ odbc_get_connect_attr (ODBC_CONNECTION * conn,
 
 #if 0
       if (value_ptr != NULL)
-  *((unsigned long *) value_ptr) = conn->attr_connection_timeout;
+	*((unsigned long *) value_ptr) = conn->attr_connection_timeout;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 #endif
 
     case SQL_ATTR_CURRENT_CATALOG:
 
       /* CHECK : test */
-      rc =
-          str_value_assign (conn->db_name, value_ptr, buffer_length,
-        &tmp_length);
-    if(string_length_ptr != NULL)
-     {
-         *string_length_ptr = (SQLINTEGER) tmp_length;
-     }
+      rc = str_value_assign (conn->db_name, value_ptr, buffer_length, &tmp_length);
+      if (string_length_ptr != NULL)
+	{
+	  *string_length_ptr = (SQLINTEGER) tmp_length;
+	}
 
       if (rc == ODBC_SUCCESS_WITH_INFO)
-     {
-         odbc_set_diag (conn->diag, "01004", 0, NULL);
-     }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
       /* HYC00 */
@@ -603,15 +597,13 @@ odbc_get_connect_attr (ODBC_CONNECTION * conn,
       goto error;
 
 #if 0
-      rc =
-  str_value_assign (conn->attr_current_catalog, value_ptr,
-        buffer_length, &tmp_length);
+      rc = str_value_assign (conn->attr_current_catalog, value_ptr, buffer_length, &tmp_length);
       *string_length_ptr = (SQLINTEGER) tmp_length;
 
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
 
       break;
 #endif
@@ -632,10 +624,10 @@ odbc_get_connect_attr (ODBC_CONNECTION * conn,
 
     case SQL_ATTR_METADATA_ID:
       if (value_ptr != NULL)
-  *((unsigned long *) value_ptr) = conn->attr_metadata_id;
+	*((unsigned long *) value_ptr) = conn->attr_metadata_id;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
 
       break;
 
@@ -647,10 +639,10 @@ odbc_get_connect_attr (ODBC_CONNECTION * conn,
 
 #if 0
       if (value_ptr != NULL)
-  *((unsigned long *) value_ptr) = conn->attr_odbc_cursors;
+	*((unsigned long *) value_ptr) = conn->attr_odbc_cursors;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
 
       break;
 #endif
@@ -663,42 +655,40 @@ odbc_get_connect_attr (ODBC_CONNECTION * conn,
 
 #if 0
       if (value_ptr != NULL)
-  *((unsigned long *) value_ptr) = conn->attr_packet_size;
+	*((unsigned long *) value_ptr) = conn->attr_packet_size;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
 
       break;
 #endif
 
     case SQL_ATTR_QUIET_MODE:
       if (value_ptr != NULL)
-  *((void **) value_ptr) = conn->attr_quiet_mode;
+	*((void **) value_ptr) = conn->attr_quiet_mode;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (void *);
+	*string_length_ptr = sizeof (void *);
       break;
 
     case SQL_ATTR_TRACE:
       if (value_ptr != NULL)
-  *((unsigned long *) value_ptr) = conn->attr_trace;
+	*((unsigned long *) value_ptr) = conn->attr_trace;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
 
       break;
 
     case SQL_ATTR_TRACEFILE:
-      rc =
-  str_value_assign (conn->attr_tracefile, value_ptr, buffer_length,
-        &tmp_length);
-    if (string_length_ptr != NULL)
-        *string_length_ptr = (SQLINTEGER) tmp_length;
+      rc = str_value_assign (conn->attr_tracefile, value_ptr, buffer_length, &tmp_length);
+      if (string_length_ptr != NULL)
+	*string_length_ptr = (SQLINTEGER) tmp_length;
 
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_ATTR_TRANSLATE_LIB:
@@ -708,15 +698,13 @@ odbc_get_connect_attr (ODBC_CONNECTION * conn,
       goto error;
 
 #if 0
-      rc =
-  str_value_assign (conn->attr_translate_lib, value_ptr, buffer_length,
-        &tmp_length);
+      rc = str_value_assign (conn->attr_translate_lib, value_ptr, buffer_length, &tmp_length);
       *string_length_ptr = (SQLINTEGER) tmp_length;
 
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 #endif
 
@@ -728,28 +716,28 @@ odbc_get_connect_attr (ODBC_CONNECTION * conn,
 
     case SQL_ATTR_TXN_ISOLATION:
       if (value_ptr != NULL)
-  *(unsigned long *) value_ptr = conn->attr_txn_isolation;
+	*(unsigned long *) value_ptr = conn->attr_txn_isolation;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
 
       break;
 
       // stmt attributes
     case SQL_ATTR_MAX_ROWS:
       if (value_ptr != NULL)
-  *(unsigned long *) value_ptr = conn->attr_max_rows;
+	*(unsigned long *) value_ptr = conn->attr_max_rows;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_ATTR_QUERY_TIMEOUT:
       if (value_ptr != NULL)
-  *(unsigned long *) value_ptr = conn->attr_query_timeout;
+	*(unsigned long *) value_ptr = conn->attr_query_timeout;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     default:
@@ -774,25 +762,22 @@ error:
 ************************************************************************/
 PUBLIC RETCODE
 odbc_connect_new (ODBC_CONNECTION * conn,
-      const char *data_source,
-      const char *db_name,
-      const char *user,
-      const char *password,
-      const char *server, 
-      int port, 
-      int fetch_size,
-      const char *charset,
-                  const char *autocommit,
-      const char *omit_schema,
-      const char* conn_str)
+		  const char *data_source,
+		  const char *db_name,
+		  const char *user,
+		  const char *password,
+		  const char *server,
+		  int port,
+		  int fetch_size,
+		  const char *charset, const char *autocommit, const char *omit_schema, const char *conn_str)
 {
   int connhd;
   RETCODE rc;
   int cci_rc;
   T_CCI_ERROR cci_err_buf;
   char *pt;
-  char connect_url[BUF_SIZE*4] = {0};
-  char connect_url_attr[BUF_SIZE*4] = {0};
+  char connect_url[BUF_SIZE * 4] = { 0 };
+  char connect_url_attr[BUF_SIZE * 4] = { 0 };
 
   NA_FREE (conn->data_source);
   NA_FREE (conn->db_name);
@@ -802,18 +787,18 @@ odbc_connect_new (ODBC_CONNECTION * conn,
   NA_FREE (conn->charset);
 
 
-  strncpy (connect_url, "cci:CUBRID:", sizeof(connect_url));
+  strncpy (connect_url, "cci:CUBRID:", sizeof (connect_url));
   pt = data_source == NULL ? "" : data_source;
   conn->data_source = UT_MAKE_STRING (pt, -1);
-  
+
   pt = server == NULL ? "" : server;
   conn->server = UT_MAKE_STRING (pt, -1);
   strcat (connect_url, conn->server);
   strcat (connect_url, ":");
-  
+
   itoa (port, connect_url + strlen (connect_url), 10);
-  strcat (connect_url,":");
-  
+  strcat (connect_url, ":");
+
   pt = db_name == NULL ? "" : db_name;
   conn->db_name = UT_MAKE_STRING (pt, -1);
   strcat (connect_url, conn->db_name);
@@ -848,26 +833,25 @@ odbc_connect_new (ODBC_CONNECTION * conn,
       strcat (connect_url, "?");
       strcat (connect_url, connect_url_attr);
     }
-  connhd = cci_connect_with_url_ex (
-              connect_url, conn->user, conn->password, &cci_err_buf);
+  connhd = cci_connect_with_url_ex (connect_url, conn->user, conn->password, &cci_err_buf);
 
   if (connhd < 0)
-  {
-    odbc_set_diag_by_cci (conn->diag, connhd, &cci_err_buf);
-    goto error;
-  }
+    {
+      odbc_set_diag_by_cci (conn->diag, connhd, &cci_err_buf);
+      goto error;
+    }
   // CCI auto-commit mode has little problem in async mode, 
   // ODBC has own auto-commit mechanism, we should turn off CCI auto-commit mode
-  rc = cci_set_autocommit(connhd, CCI_AUTOCOMMIT_FALSE);
+  rc = cci_set_autocommit (connhd, CCI_AUTOCOMMIT_FALSE);
   ERROR_GOTO (rc, error);
 
   conn->connhd = connhd;
-   
+
 #ifndef CUBRID_ODBC_UNICODE
   if (conn->charset[0] != '\0')
     {
-      rc = cci_set_charset(connhd, conn->charset);
-    ERROR_GOTO (rc, error);
+      rc = cci_set_charset (connhd, conn->charset);
+      ERROR_GOTO (rc, error);
     }
 #endif
   rc = get_db_version (conn);
@@ -880,13 +864,13 @@ odbc_connect_new (ODBC_CONNECTION * conn,
 
       p = strchr (conn->db_ver, '.');
       if (p)
-        {
-          version += atoi (p+1);
-        }
+	{
+	  version += atoi (p + 1);
+	}
       if (version >= 1102 && stricmp (omit_schema, "yes") == 0)
-        {
-          conn->omit_schema = 1;
-        }
+	{
+	  conn->omit_schema = 1;
+	}
     }
 
   // disconnect with cas
@@ -894,10 +878,10 @@ odbc_connect_new (ODBC_CONNECTION * conn,
     {
       cci_rc = cci_end_tran (conn->connhd, CCI_TRAN_ROLLBACK, &cci_err_buf);
       if (cci_rc < 0)
-  {
-    odbc_set_diag_by_cci (conn->diag, cci_rc, &cci_err_buf);
-    return ODBC_ERROR;
-  }
+	{
+	  odbc_set_diag_by_cci (conn->diag, cci_rc, &cci_err_buf);
+	  return ODBC_ERROR;
+	}
     }
 
   /*
@@ -985,14 +969,14 @@ odbc_auto_commit (ODBC_CONNECTION * conn)
   if (conn->attr_autocommit == SQL_AUTOCOMMIT_ON)
     {
       if (conn->connhd > 0)
-  {
-    cci_rc = cci_end_tran (conn->connhd, CCI_TRAN_COMMIT, &cci_err_buf);
-    if (cci_rc < 0)
-      {
-        odbc_set_diag_by_cci (conn->diag, cci_rc, &cci_err_buf);
-        return ODBC_ERROR;
-      }
-  }
+	{
+	  cci_rc = cci_end_tran (conn->connhd, CCI_TRAN_COMMIT, &cci_err_buf);
+	  if (cci_rc < 0)
+	    {
+	      odbc_set_diag_by_cci (conn->diag, cci_rc, &cci_err_buf);
+	      return ODBC_ERROR;
+	    }
+	}
     }
   return ODBC_SUCCESS;
 }
@@ -1008,15 +992,13 @@ odbc_auto_commit (ODBC_CONNECTION * conn)
  ************************************************************************/
 PUBLIC RETCODE
 odbc_native_sql (ODBC_CONNECTION * conn,
-     SQLCHAR * in_stmt_text,
-     SQLCHAR * out_stmt_text,
-     SQLINTEGER buffer_length, SQLINTEGER * out_stmt_length)
+		 SQLCHAR * in_stmt_text,
+		 SQLCHAR * out_stmt_text, SQLINTEGER buffer_length, SQLINTEGER * out_stmt_length)
 {
   RETCODE rc = ODBC_SUCCESS;
   SQLLEN tmp_length;
 
-  rc = str_value_assign (in_stmt_text, out_stmt_text,
-       buffer_length, &tmp_length);
+  rc = str_value_assign (in_stmt_text, out_stmt_text, buffer_length, &tmp_length);
   *out_stmt_length = (SQLINTEGER) tmp_length;
 
   if (rc == ODBC_SUCCESS_WITH_INFO)
@@ -1028,8 +1010,7 @@ odbc_native_sql (ODBC_CONNECTION * conn,
 }
 
 PUBLIC RETCODE
-odbc_get_functions (ODBC_CONNECTION * conn,
-        unsigned short function_id, unsigned short *supported_ptr)
+odbc_get_functions (ODBC_CONNECTION * conn, unsigned short function_id, unsigned short *supported_ptr)
 {
   int i;
   int set_size = GET_SET_SIZE (functions_support_info_set);
@@ -1043,23 +1024,22 @@ odbc_get_functions (ODBC_CONNECTION * conn,
     {
       memset (supported_ptr, 0, SQL_API_ODBC3_ALL_FUNCTIONS_SIZE);
       for (i = 0; i < set_size; i++)
-  {
-    if (functions_support_info_set[i].supported == SQL_TRUE)
-      {
-        SQL_FUNC_SET (supported_ptr,
-          functions_support_info_set[i].func_id);
-      }
-  }
+	{
+	  if (functions_support_info_set[i].supported == SQL_TRUE)
+	    {
+	      SQL_FUNC_SET (supported_ptr, functions_support_info_set[i].func_id);
+	    }
+	}
     }
   else
     {
       for (i = 0; i < set_size; i++)
-  {
-    if (functions_support_info_set[i].func_id == function_id)
-      {
-        *supported_ptr = functions_support_info_set[i].supported;
-      }
-  }
+	{
+	  if (functions_support_info_set[i].func_id == function_id)
+	    {
+	      *supported_ptr = functions_support_info_set[i].supported;
+	    }
+	}
     }
 
   return ODBC_SUCCESS;
@@ -1075,9 +1055,7 @@ odbc_get_functions (ODBC_CONNECTION * conn,
 ************************************************************************/
 PUBLIC RETCODE
 odbc_get_info (ODBC_CONNECTION * conn,
-         SQLUSMALLINT info_type,
-         SQLPOINTER info_value_ptr,
-         SQLSMALLINT buffer_length, SQLLEN * string_length_ptr)
+	       SQLUSMALLINT info_type, SQLPOINTER info_value_ptr, SQLSMALLINT buffer_length, SQLLEN * string_length_ptr)
 {
   RETCODE rc = ODBC_SUCCESS;
   char buf[1024];
@@ -1088,445 +1066,417 @@ odbc_get_info (ODBC_CONNECTION * conn,
 
       /* Character String - "Y" or "N" */
     case SQL_ACCESSIBLE_PROCEDURES:
-      rc =
-  str_value_assign ("N", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("N", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_ACCESSIBLE_TABLES:
-      rc =
-  str_value_assign ("Y", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("Y", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_ACTIVE_ENVIRONMENTS:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
 
       break;
 
     case SQL_AGGREGATE_FUNCTIONS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr =
-    SQL_AF_ALL | SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_DISTINCT |
-    SQL_AF_MAX | SQL_AF_MIN | SQL_AF_SUM;
+	*(unsigned long *) info_value_ptr =
+	  SQL_AF_ALL | SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_DISTINCT | SQL_AF_MAX | SQL_AF_MIN | SQL_AF_SUM;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
 
       break;
 
     case SQL_ALTER_DOMAIN:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_AD_ADD_DOMAIN_CONSTRAINT |
-    SQL_AD_ADD_DOMAIN_DEFAULT | SQL_AD_DROP_DOMAIN_CONSTRAINT;
+	*(unsigned long *) info_value_ptr = SQL_AD_ADD_DOMAIN_CONSTRAINT |
+	  SQL_AD_ADD_DOMAIN_DEFAULT | SQL_AD_DROP_DOMAIN_CONSTRAINT;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
-    case SQL_ALTER_TABLE: /* SQL_AT_DROP_COLUMN  - ODBC 2.0 */
+    case SQL_ALTER_TABLE:	/* SQL_AT_DROP_COLUMN  - ODBC 2.0 */
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr =
-    SQL_AT_ADD_COLUMN | SQL_AT_ADD_COLUMN_DEFAULT |
-    SQL_AT_ADD_COLUMN_SINGLE | SQL_AT_ADD_CONSTRAINT |
-    SQL_AT_ADD_TABLE_CONSTRAINT | SQL_AT_DROP_COLUMN;
+	*(unsigned long *) info_value_ptr =
+	  SQL_AT_ADD_COLUMN | SQL_AT_ADD_COLUMN_DEFAULT |
+	  SQL_AT_ADD_COLUMN_SINGLE | SQL_AT_ADD_CONSTRAINT | SQL_AT_ADD_TABLE_CONSTRAINT | SQL_AT_DROP_COLUMN;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_ASYNC_MODE:
       if (info_value_ptr != NULL)
-  /* FIXME :  SQL_AM_STATEMENT , SQL_AM_CONNECTION 둘 중에 하나로
-   * fix해야 한다. */
-  *(unsigned long *) info_value_ptr = SQL_AM_STATEMENT;
+	/* FIXME :  SQL_AM_STATEMENT , SQL_AM_CONNECTION 둘 중에 하나로
+	 * fix해야 한다. */
+	*(unsigned long *) info_value_ptr = SQL_AM_STATEMENT;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_BATCH_ROW_COUNT:
       /* CHECK : YET Not supported */
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_BATCH_SUPPORT:
       /* CHECK : YET Not supported */
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_BOOKMARK_PERSISTENCE:
       /* CHECK : Never supported */
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_CATALOG_LOCATION:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_CATALOG_NAME:
-      rc =
-  str_value_assign ("N", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("N", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_CATALOG_NAME_SEPARATOR:
-      rc =
-  str_value_assign ("", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_CATALOG_TERM:
-      rc =
-  str_value_assign ("", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_CATALOG_USAGE:
       /* CHECK : Never supported */
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_COLLATION_SEQ:
-      rc =
-  str_value_assign ("", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_COLUMN_ALIAS:
-      rc =
-  str_value_assign ("N", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("N", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_CONCAT_NULL_BEHAVIOR:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = SQL_CB_NULL;
+	*(unsigned short *) info_value_ptr = SQL_CB_NULL;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_CONVERT_BIGINT:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
-    SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
-    SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR |
-    SQL_CVT_VARCHAR | SQL_CONVERT_BIGINT;
+	*(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
+	  SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
+	  SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR | SQL_CONVERT_BIGINT;
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_BINARY:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr =
-    SQL_CVT_BINARY | SQL_CVT_LONGVARBINARY | SQL_CVT_VARBINARY |
-    SQL_CVT_CHAR | SQL_CVT_VARCHAR | SQL_CVT_LONGVARCHAR;
+	*(unsigned long *) info_value_ptr =
+	  SQL_CVT_BINARY | SQL_CVT_LONGVARBINARY | SQL_CVT_VARBINARY |
+	  SQL_CVT_CHAR | SQL_CVT_VARCHAR | SQL_CVT_LONGVARCHAR;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_BIT:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_CHAR:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CVT_BINARY | SQL_CVT_CHAR |
-    SQL_CVT_DATE | SQL_CVT_DECIMAL | SQL_CVT_DOUBLE | SQL_CVT_FLOAT |
-    SQL_CVT_INTEGER | SQL_CVT_LONGVARBINARY | SQL_CVT_LONGVARCHAR |
-    SQL_CVT_NUMERIC | SQL_CVT_REAL | SQL_CVT_SMALLINT | SQL_CVT_TIME |
-    SQL_CVT_TIMESTAMP | SQL_CVT_VARBINARY | SQL_CVT_VARCHAR;
+	*(unsigned long *) info_value_ptr = SQL_CVT_BINARY | SQL_CVT_CHAR |
+	  SQL_CVT_DATE | SQL_CVT_DECIMAL | SQL_CVT_DOUBLE | SQL_CVT_FLOAT |
+	  SQL_CVT_INTEGER | SQL_CVT_LONGVARBINARY | SQL_CVT_LONGVARCHAR |
+	  SQL_CVT_NUMERIC | SQL_CVT_REAL | SQL_CVT_SMALLINT | SQL_CVT_TIME |
+	  SQL_CVT_TIMESTAMP | SQL_CVT_VARBINARY | SQL_CVT_VARCHAR;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_DATE:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr =
-    SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR | SQL_CVT_DATE
-    | SQL_CVT_TIMESTAMP;
+	*(unsigned long *) info_value_ptr =
+	  SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR | SQL_CVT_DATE | SQL_CVT_TIMESTAMP;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_DECIMAL:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
-    SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
-    SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR |
-    SQL_CVT_VARCHAR;
+	*(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
+	  SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
+	  SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_DOUBLE:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
-    SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
-    SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR |
-    SQL_CVT_VARCHAR;
+	*(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
+	  SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
+	  SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_FLOAT:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
-    SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
-    SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR |
-    SQL_CVT_VARCHAR;
+	*(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
+	  SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
+	  SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_INTEGER:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
-    SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
-    SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR |
-    SQL_CVT_VARCHAR;
+	*(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
+	  SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
+	  SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_INTERVAL_YEAR_MONTH:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_INTERVAL_DAY_TIME:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_LONGVARBINARY:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr =
-    SQL_CVT_BINARY | SQL_CVT_LONGVARBINARY | SQL_CVT_VARBINARY |
-    SQL_CVT_CHAR | SQL_CVT_VARCHAR | SQL_CVT_LONGVARCHAR;
+	*(unsigned long *) info_value_ptr =
+	  SQL_CVT_BINARY | SQL_CVT_LONGVARBINARY | SQL_CVT_VARBINARY |
+	  SQL_CVT_CHAR | SQL_CVT_VARCHAR | SQL_CVT_LONGVARCHAR;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_LONGVARCHAR:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CVT_BINARY | SQL_CVT_CHAR |
-    SQL_CVT_DATE | SQL_CVT_DECIMAL | SQL_CVT_DOUBLE | SQL_CVT_FLOAT |
-    SQL_CVT_INTEGER | SQL_CVT_LONGVARBINARY | SQL_CVT_LONGVARCHAR |
-    SQL_CVT_NUMERIC | SQL_CVT_REAL | SQL_CVT_SMALLINT | SQL_CVT_TIME |
-    SQL_CVT_TIMESTAMP | SQL_CVT_VARBINARY | SQL_CVT_VARCHAR;
+	*(unsigned long *) info_value_ptr = SQL_CVT_BINARY | SQL_CVT_CHAR |
+	  SQL_CVT_DATE | SQL_CVT_DECIMAL | SQL_CVT_DOUBLE | SQL_CVT_FLOAT |
+	  SQL_CVT_INTEGER | SQL_CVT_LONGVARBINARY | SQL_CVT_LONGVARCHAR |
+	  SQL_CVT_NUMERIC | SQL_CVT_REAL | SQL_CVT_SMALLINT | SQL_CVT_TIME |
+	  SQL_CVT_TIMESTAMP | SQL_CVT_VARBINARY | SQL_CVT_VARCHAR;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_NUMERIC:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
-    SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
-    SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR |
-    SQL_CVT_VARCHAR;
+	*(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
+	  SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
+	  SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_REAL:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
-    SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
-    SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR |
-    SQL_CVT_VARCHAR;
+	*(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
+	  SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
+	  SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_SMALLINT:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
-    SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
-    SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR |
-    SQL_CVT_VARCHAR;
+	*(unsigned long *) info_value_ptr = SQL_CVT_DECIMAL | SQL_CVT_DOUBLE |
+	  SQL_CVT_FLOAT | SQL_CVT_INTEGER | SQL_CVT_NUMERIC | SQL_CVT_REAL |
+	  SQL_CVT_SMALLINT | SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_TIME:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr =
-    SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR | SQL_CVT_TIME;
+	*(unsigned long *) info_value_ptr = SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR | SQL_CVT_TIME;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_TIMESTAMP:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr =
-    SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR | SQL_CVT_TIME
-    | SQL_CVT_DATE | SQL_CVT_TIMESTAMP;
+	*(unsigned long *) info_value_ptr =
+	  SQL_CVT_CHAR | SQL_CVT_LONGVARCHAR | SQL_CVT_VARCHAR | SQL_CVT_TIME | SQL_CVT_DATE | SQL_CVT_TIMESTAMP;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_TINYINT:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_VARBINARY:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr =
-    SQL_CVT_BINARY | SQL_CVT_LONGVARBINARY | SQL_CVT_VARBINARY |
-    SQL_CVT_CHAR | SQL_CVT_VARCHAR | SQL_CVT_LONGVARCHAR;
+	*(unsigned long *) info_value_ptr =
+	  SQL_CVT_BINARY | SQL_CVT_LONGVARBINARY | SQL_CVT_VARBINARY |
+	  SQL_CVT_CHAR | SQL_CVT_VARCHAR | SQL_CVT_LONGVARCHAR;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CONVERT_VARCHAR:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CVT_BINARY | SQL_CVT_CHAR |
-    SQL_CVT_DATE | SQL_CVT_DECIMAL | SQL_CVT_DOUBLE | SQL_CVT_FLOAT |
-    SQL_CVT_INTEGER | SQL_CVT_LONGVARBINARY | SQL_CVT_LONGVARCHAR |
-    SQL_CVT_NUMERIC | SQL_CVT_REAL | SQL_CVT_SMALLINT | SQL_CVT_TIME |
-    SQL_CVT_TIMESTAMP | SQL_CVT_VARBINARY | SQL_CVT_VARCHAR;
+	*(unsigned long *) info_value_ptr = SQL_CVT_BINARY | SQL_CVT_CHAR |
+	  SQL_CVT_DATE | SQL_CVT_DECIMAL | SQL_CVT_DOUBLE | SQL_CVT_FLOAT |
+	  SQL_CVT_INTEGER | SQL_CVT_LONGVARBINARY | SQL_CVT_LONGVARCHAR |
+	  SQL_CVT_NUMERIC | SQL_CVT_REAL | SQL_CVT_SMALLINT | SQL_CVT_TIME |
+	  SQL_CVT_TIMESTAMP | SQL_CVT_VARBINARY | SQL_CVT_VARCHAR;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_CONVERT_FUNCTIONS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_FN_CVT_CAST;
+	*(unsigned long *) info_value_ptr = SQL_FN_CVT_CAST;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_CORRELATION_NAME:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = SQL_CN_ANY;
+	*(unsigned short *) info_value_ptr = SQL_CN_ANY;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_CREATE_ASSERTION:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_CREATE_CHARACTER_SET:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_CREATE_COLLATION:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CREATE_DOMAIN:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CREATE_SCHEMA:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CREATE_TABLE:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CT_CREATE_TABLE;
+	*(unsigned long *) info_value_ptr = SQL_CT_CREATE_TABLE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CREATE_TRANSLATION:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_CREATE_VIEW:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CV_CREATE_VIEW |
-    SQL_CV_CHECK_OPTION;
+	*(unsigned long *) info_value_ptr = SQL_CV_CREATE_VIEW | SQL_CV_CHECK_OPTION;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_CURSOR_COMMIT_BEHAVIOR:
@@ -1535,10 +1485,10 @@ odbc_get_info (ODBC_CONNECTION * conn,
       // SQL_CB_CLOSE에 맞게 동작하기 위해서 emulation 시켰다.
       // 참고, SQL_CB_CLOSE는 CUBRID에서 지원하지 않는다.
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = SQL_CB_CLOSE;
+	*(unsigned short *) info_value_ptr = SQL_CB_CLOSE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_CURSOR_ROLLBACK_BEHAVIOR:
@@ -1547,695 +1497,649 @@ odbc_get_info (ODBC_CONNECTION * conn,
       // SQL_CB_CLOSE에 맞게 동작하기 위해서 emulation 시켰다.
       // 참고, SQL_CB_CLOSE는 CUBRID에서 지원하지 않는다.
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = SQL_CB_CLOSE;
+	*(unsigned short *) info_value_ptr = SQL_CB_CLOSE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_CURSOR_SENSITIVITY:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_UNSPECIFIED;
+	*(unsigned long *) info_value_ptr = SQL_UNSPECIFIED;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_DATA_SOURCE_NAME:
       if (conn->data_source == NULL)
-  {
-    buf[0] = '\0';
-  }
+	{
+	  buf[0] = '\0';
+	}
       else
-  {
-    strcpy (buf, conn->data_source);
-  }
+	{
+	  strcpy (buf, conn->data_source);
+	}
 
-      rc =
-  str_value_assign (buf, info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign (buf, info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_DATA_SOURCE_READ_ONLY:
       if (conn->attr_access_mode == SQL_MODE_READ_ONLY)
-  {
-    strcpy (buf, "Y");
-  }
+	{
+	  strcpy (buf, "Y");
+	}
       else
-  {
-    strcpy (buf, "N");
-  }
-      rc =
-  str_value_assign (buf, info_value_ptr, buffer_length,
-        string_length_ptr);
+	{
+	  strcpy (buf, "N");
+	}
+      rc = str_value_assign (buf, info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_DATABASE_NAME:
       if (conn->db_name == NULL)
-  {
-    buf[0] = '\0';
-  }
+	{
+	  buf[0] = '\0';
+	}
       else
-  {
-    strcpy (buf, conn->db_name);
-  }
+	{
+	  strcpy (buf, conn->db_name);
+	}
 
-      rc =
-  str_value_assign (buf, info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign (buf, info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_DATETIME_LITERALS:
-      *(unsigned long *) info_value_ptr =
-  SQL_DL_SQL92_DATE | SQL_DL_SQL92_TIME | SQL_DL_SQL92_TIMESTAMP;
+      *(unsigned long *) info_value_ptr = SQL_DL_SQL92_DATE | SQL_DL_SQL92_TIME | SQL_DL_SQL92_TIMESTAMP;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_DBMS_NAME:
-      rc =
-  str_value_assign (CUBRID_DBMS_NAME, info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign (CUBRID_DBMS_NAME, info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_DBMS_VER:
-      rc =
-  str_value_assign (conn->db_ver, info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign (conn->db_ver, info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_DDL_INDEX:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_DI_CREATE_INDEX |
-    SQL_DI_DROP_INDEX;
+	*(unsigned long *) info_value_ptr = SQL_DI_CREATE_INDEX | SQL_DI_DROP_INDEX;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_DEFAULT_TXN_ISOLATION:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_TXN_READ_COMMITTED;
+	*(unsigned long *) info_value_ptr = SQL_TXN_READ_COMMITTED;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_DESCRIBE_PARAMETER:
-      rc =
-  str_value_assign ("N", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("N", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_DRIVER_NAME:
-      rc =
-  str_value_assign (CUBRID_DRIVER_NAME, info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign (CUBRID_DRIVER_NAME, info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_DRIVER_ODBC_VER:
-      rc =
-  str_value_assign (CUBRID_DRIVER_ODBC_VER, info_value_ptr,
-        buffer_length, string_length_ptr);
+      rc = str_value_assign (CUBRID_DRIVER_ODBC_VER, info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_DRIVER_VER:
-      rc =
-  str_value_assign (CUBRID_DRIVER_VER, info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign (CUBRID_DRIVER_VER, info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_DROP_ASSERTION:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_DROP_CHARACTER_SET:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_DROP_COLLATION:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_DROP_DOMAIN:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_DROP_SCHEMA:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_DROP_TABLE:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_DT_DROP_TABLE;
+	*(unsigned long *) info_value_ptr = SQL_DT_DROP_TABLE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_DROP_TRANSLATION:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_DROP_VIEW:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_DV_DROP_VIEW;
+	*(unsigned long *) info_value_ptr = SQL_DV_DROP_VIEW;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_DYNAMIC_CURSOR_ATTRIBUTES1:
       /* CHECK : YET not supported */
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CA1_NEXT;
+	*(unsigned long *) info_value_ptr = SQL_CA1_NEXT;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_DYNAMIC_CURSOR_ATTRIBUTES2:
       /* CHECK : YET not supported */
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CA2_READ_ONLY_CONCURRENCY;
+	*(unsigned long *) info_value_ptr = SQL_CA2_READ_ONLY_CONCURRENCY;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_EXPRESSIONS_IN_ORDERBY:
-      rc =
-  str_value_assign ("Y", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("Y", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_FILE_USAGE:
       if (info_value_ptr != NULL)
-  if (info_value_ptr != NULL)
-    *(unsigned short *) info_value_ptr = SQL_FILE_NOT_SUPPORTED;
+	if (info_value_ptr != NULL)
+	  *(unsigned short *) info_value_ptr = SQL_FILE_NOT_SUPPORTED;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES1:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CA1_NEXT;
+	*(unsigned long *) info_value_ptr = SQL_CA1_NEXT;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES2:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CA2_READ_ONLY_CONCURRENCY |
-    SQL_CA2_LOCK_CONCURRENCY | SQL_CA2_CRC_EXACT |
-    SQL_CA2_SIMULATE_NON_UNIQUE;
+	*(unsigned long *) info_value_ptr = SQL_CA2_READ_ONLY_CONCURRENCY |
+	  SQL_CA2_LOCK_CONCURRENCY | SQL_CA2_CRC_EXACT | SQL_CA2_SIMULATE_NON_UNIQUE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_GETDATA_EXTENSIONS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_GD_ANY_COLUMN |
-    SQL_GD_ANY_ORDER | SQL_GD_BOUND;
+	*(unsigned long *) info_value_ptr = SQL_GD_ANY_COLUMN | SQL_GD_ANY_ORDER | SQL_GD_BOUND;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_GROUP_BY:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = SQL_GB_GROUP_BY_CONTAINS_SELECT;
+	*(unsigned short *) info_value_ptr = SQL_GB_GROUP_BY_CONTAINS_SELECT;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_IDENTIFIER_CASE:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = SQL_IC_MIXED;
+	*(unsigned short *) info_value_ptr = SQL_IC_MIXED;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_IDENTIFIER_QUOTE_CHAR:
       /* YET not exactly implemented */
-      rc =
-  str_value_assign ("\"", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("\"", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_INDEX_KEYWORDS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_IK_ALL;
+	*(unsigned long *) info_value_ptr = SQL_IK_ALL;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_INFO_SCHEMA_VIEWS:
       /* CHECK : YET not exactly implemented */
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_INSERT_STATEMENT:
       /* CHECK : YET not exactly implemented */
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_INTEGRITY:
-      rc =
-  str_value_assign ("N", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("N", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_KEYSET_CURSOR_ATTRIBUTES1:
       /* CHECK : YET not exactly implemented */
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
     case SQL_KEYSET_CURSOR_ATTRIBUTES2:
       /* CHECK : YET not exactly implemented */
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_KEYWORDS:
-      rc =
-  str_value_assign (CUBRID_KEYWORDS, info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign (CUBRID_KEYWORDS, info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_LIKE_ESCAPE_CLAUSE:
-      rc =
-  str_value_assign ("Y", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("Y", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_MAX_ASYNC_CONCURRENT_STATEMENTS:
       /* CHECK : Unknown */
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_MAX_BINARY_LITERAL_LEN:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = MAX_CUBRID_CHAR_LEN / 8;
+	*(unsigned long *) info_value_ptr = MAX_CUBRID_CHAR_LEN / 8;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_MAX_CATALOG_NAME_LEN:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_CHAR_LITERAL_LEN:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = MAX_CUBRID_CHAR_LEN;
+	*(unsigned long *) info_value_ptr = MAX_CUBRID_CHAR_LEN;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_MAX_COLUMN_NAME_LEN:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 255;
+	*(unsigned short *) info_value_ptr = 255;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_COLUMNS_IN_GROUP_BY:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_COLUMNS_IN_INDEX:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_COLUMNS_IN_ORDER_BY:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_COLUMNS_IN_SELECT:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_COLUMNS_IN_TABLE:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_CONCURRENT_ACTIVITIES:
       /* CHECK : Unknown */
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_CURSOR_NAME_LEN:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_DRIVER_CONNECTIONS:
       /* CHECK : Unknown */
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_IDENTIFIER_LEN:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 255;
+	*(unsigned short *) info_value_ptr = 255;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_INDEX_SIZE:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_MAX_PROCEDURE_NAME_LEN:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_ROW_SIZE:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_MAX_ROW_SIZE_INCLUDES_LONG:
-      rc =
-  str_value_assign ("N", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("N", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_MAX_SCHEMA_NAME_LEN:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_STATEMENT_LEN:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_MAX_TABLE_NAME_LEN:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = db_ver < 1102 ? MAX_TABLE_NAMME_LEN : MAX_TABLE_NAMME_LEN_1102;
+	*(unsigned short *) info_value_ptr = db_ver < 1102 ? MAX_TABLE_NAMME_LEN : MAX_TABLE_NAMME_LEN_1102;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_TABLES_IN_SELECT:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MAX_USER_NAME_LEN:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = 0;
+	*(unsigned short *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_MULT_RESULT_SETS:
       /* CHECK : array bind parameter와 batch execution, SQLMoreResults       */
       /* 등이 지원되어야 한다.                                                                                        */
-      rc =
-  str_value_assign ("Y", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("Y", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_MULTIPLE_ACTIVE_TXN:
-      rc =
-  str_value_assign ("Y", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("Y", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_NEED_LONG_DATA_LEN:
-      rc =
-  str_value_assign ("N", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("N", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_NON_NULLABLE_COLUMNS:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = SQL_NNC_NON_NULL;
+	*(unsigned short *) info_value_ptr = SQL_NNC_NON_NULL;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_NULL_COLLATION:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = SQL_NC_LOW;
+	*(unsigned short *) info_value_ptr = SQL_NC_LOW;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_NUMERIC_FUNCTIONS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_ODBC_INTERFACE_CONFORMANCE:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_OIC_CORE;
+	*(unsigned long *) info_value_ptr = SQL_OIC_CORE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_OJ_CAPABILITIES:
     case SQL_OUTER_JOINS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_ORDER_BY_COLUMNS_IN_SELECT:
-      rc =
-  str_value_assign ("Y", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("Y", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_PARAM_ARRAY_ROW_COUNTS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_PARC_NO_BATCH;
+	*(unsigned long *) info_value_ptr = SQL_PARC_NO_BATCH;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_PARAM_ARRAY_SELECTS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_PAS_NO_SELECT;
+	*(unsigned long *) info_value_ptr = SQL_PAS_NO_SELECT;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_PROCEDURE_TERM:
       /* CUBRID does not support procedure */
-      rc =
-  str_value_assign ("", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_PROCEDURES:
       /* CUBRID does not support procedure */
-      rc =
-  str_value_assign ("N", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("N", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_QUOTED_IDENTIFIER_CASE:
@@ -2243,349 +2147,319 @@ odbc_get_info (ODBC_CONNECTION * conn,
       *(unsigned short *) info_value_ptr = SQL_IC_MIXED;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_ROW_UPDATES:
-      rc =
-  str_value_assign ("N", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("N", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_SCHEMA_TERM:
       /* CUBRID does not support schema */
-      rc =
-  str_value_assign ("", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_SCHEMA_USAGE:
       /* CUBRID does not support schema */
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SCROLL_OPTIONS:
       //*(unsigned long*)info_value_ptr = SQL_SO_FORWARD_ONLY | SQL_SO_STATIC;
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr =
-    SQL_SO_FORWARD_ONLY | SQL_SO_KEYSET_DRIVEN | SQL_SO_DYNAMIC |
-    SQL_SO_STATIC;
+	*(unsigned long *) info_value_ptr = SQL_SO_FORWARD_ONLY | SQL_SO_KEYSET_DRIVEN | SQL_SO_DYNAMIC | SQL_SO_STATIC;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SEARCH_PATTERN_ESCAPE:
-      rc =
-  str_value_assign ("\\", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("\\", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_SERVER_NAME:
       if (conn->server == NULL)
-  {
-    buf[0] = '\0';
-  }
+	{
+	  buf[0] = '\0';
+	}
       else
-  {
-    strcpy (buf, "CUBRID");
-  }
-      rc =
-  str_value_assign (buf, info_value_ptr, buffer_length,
-        string_length_ptr);
+	{
+	  strcpy (buf, "CUBRID");
+	}
+      rc = str_value_assign (buf, info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_SPECIAL_CHARACTERS:
-      rc =
-  str_value_assign (CUBRID_SPECIAL_CHARACTERS, info_value_ptr,
-        buffer_length, string_length_ptr);
+      rc = str_value_assign (CUBRID_SPECIAL_CHARACTERS, info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_SQL_CONFORMANCE:
       // 정확한 정보는 아니고, SQL_SC_SQL92_ENTRY가 가장 작은 spec이다.
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_SC_SQL92_ENTRY;
+	*(unsigned long *) info_value_ptr = SQL_SC_SQL92_ENTRY;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SQL92_DATETIME_FUNCTIONS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_SDF_CURRENT_DATE |
-    SQL_SDF_CURRENT_TIME | SQL_SDF_CURRENT_TIMESTAMP;
+	*(unsigned long *) info_value_ptr = SQL_SDF_CURRENT_DATE | SQL_SDF_CURRENT_TIME | SQL_SDF_CURRENT_TIMESTAMP;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SQL92_FOREIGN_KEY_DELETE_RULE:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SQL92_FOREIGN_KEY_UPDATE_RULE:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SQL92_GRANT:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_SG_DELETE_TABLE |
-    SQL_SG_INSERT_COLUMN | SQL_SG_INSERT_TABLE |
-    SQL_SG_SELECT_TABLE | SQL_SG_UPDATE_COLUMN |
-    SQL_SG_UPDATE_TABLE | SQL_SG_WITH_GRANT_OPTION;
+	*(unsigned long *) info_value_ptr = SQL_SG_DELETE_TABLE |
+	  SQL_SG_INSERT_COLUMN | SQL_SG_INSERT_TABLE |
+	  SQL_SG_SELECT_TABLE | SQL_SG_UPDATE_COLUMN | SQL_SG_UPDATE_TABLE | SQL_SG_WITH_GRANT_OPTION;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SQL92_NUMERIC_VALUE_FUNCTIONS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_SNVF_BIT_LENGTH |
-    SQL_SNVF_CHAR_LENGTH | SQL_SNVF_OCTET_LENGTH | SQL_SNVF_POSITION;
+	*(unsigned long *) info_value_ptr = SQL_SNVF_BIT_LENGTH |
+	  SQL_SNVF_CHAR_LENGTH | SQL_SNVF_OCTET_LENGTH | SQL_SNVF_POSITION;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SQL92_PREDICATES:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_SP_BETWEEN |
-    SQL_SP_COMPARISON | SQL_SP_EXISTS | SQL_SP_IN |
-    SQL_SP_ISNOTNULL | SQL_SP_ISNULL | SQL_SP_LIKE |
-    SQL_SP_QUANTIFIED_COMPARISON | SQL_SP_UNIQUE;
+	*(unsigned long *) info_value_ptr = SQL_SP_BETWEEN |
+	  SQL_SP_COMPARISON | SQL_SP_EXISTS | SQL_SP_IN |
+	  SQL_SP_ISNOTNULL | SQL_SP_ISNULL | SQL_SP_LIKE | SQL_SP_QUANTIFIED_COMPARISON | SQL_SP_UNIQUE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SQL92_RELATIONAL_JOIN_OPERATORS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_SRJO_CORRESPONDING_CLAUSE |
-    SQL_SRJO_CROSS_JOIN | SQL_SRJO_EXCEPT_JOIN |
-    SQL_SRJO_INTERSECT_JOIN | SQL_SRJO_NATURAL_JOIN |
-    SQL_SRJO_UNION_JOIN;
+	*(unsigned long *) info_value_ptr = SQL_SRJO_CORRESPONDING_CLAUSE |
+	  SQL_SRJO_CROSS_JOIN | SQL_SRJO_EXCEPT_JOIN |
+	  SQL_SRJO_INTERSECT_JOIN | SQL_SRJO_NATURAL_JOIN | SQL_SRJO_UNION_JOIN;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SQL92_REVOKE:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_SR_DELETE_TABLE |
-    SQL_SR_GRANT_OPTION_FOR | SQL_SR_INSERT_COLUMN |
-    SQL_SR_INSERT_TABLE | SQL_SR_SELECT_TABLE |
-    SQL_SR_UPDATE_COLUMN | SQL_SR_UPDATE_TABLE;
+	*(unsigned long *) info_value_ptr = SQL_SR_DELETE_TABLE |
+	  SQL_SR_GRANT_OPTION_FOR | SQL_SR_INSERT_COLUMN |
+	  SQL_SR_INSERT_TABLE | SQL_SR_SELECT_TABLE | SQL_SR_UPDATE_COLUMN | SQL_SR_UPDATE_TABLE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SQL92_ROW_VALUE_CONSTRUCTOR:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_SRVC_VALUE_EXPRESSION |
-    SQL_SRVC_NULL | SQL_SRVC_ROW_SUBQUERY;
+	*(unsigned long *) info_value_ptr = SQL_SRVC_VALUE_EXPRESSION | SQL_SRVC_NULL | SQL_SRVC_ROW_SUBQUERY;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SQL92_STRING_FUNCTIONS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_SSF_CONVERT |
-    SQL_SSF_LOWER | SQL_SSF_UPPER | SQL_SSF_SUBSTRING |
-    SQL_SSF_TRANSLATE | SQL_SSF_TRIM_BOTH | SQL_SSF_TRIM_LEADING |
-    SQL_SSF_TRIM_TRAILING;
+	*(unsigned long *) info_value_ptr = SQL_SSF_CONVERT |
+	  SQL_SSF_LOWER | SQL_SSF_UPPER | SQL_SSF_SUBSTRING |
+	  SQL_SSF_TRANSLATE | SQL_SSF_TRIM_BOTH | SQL_SSF_TRIM_LEADING | SQL_SSF_TRIM_TRAILING;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SQL92_VALUE_EXPRESSIONS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_SVE_CASE |
-    SQL_SVE_CAST | SQL_SVE_COALESCE | SQL_SVE_NULLIF;
+	*(unsigned long *) info_value_ptr = SQL_SVE_CASE | SQL_SVE_CAST | SQL_SVE_COALESCE | SQL_SVE_NULLIF;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_STANDARD_CLI_CONFORMANCE:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_SCC_ISO92_CLI;
+	*(unsigned long *) info_value_ptr = SQL_SCC_ISO92_CLI;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_STATIC_CURSOR_ATTRIBUTES1:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CA1_NEXT | SQL_CA1_ABSOLUTE |
-    SQL_CA1_RELATIVE;
+	*(unsigned long *) info_value_ptr = SQL_CA1_NEXT | SQL_CA1_ABSOLUTE | SQL_CA1_RELATIVE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_STATIC_CURSOR_ATTRIBUTES2:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_CA2_READ_ONLY_CONCURRENCY |
-    SQL_CA2_LOCK_CONCURRENCY | SQL_CA2_CRC_EXACT |
-    SQL_CA2_SIMULATE_NON_UNIQUE;
+	*(unsigned long *) info_value_ptr = SQL_CA2_READ_ONLY_CONCURRENCY |
+	  SQL_CA2_LOCK_CONCURRENCY | SQL_CA2_CRC_EXACT | SQL_CA2_SIMULATE_NON_UNIQUE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_STRING_FUNCTIONS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_FN_STR_BIT_LENGTH |
-    SQL_FN_STR_CHAR | SQL_FN_STR_CHAR_LENGTH |
-    SQL_FN_STR_LCASE | SQL_FN_STR_LTRIM |
-    SQL_FN_STR_OCTET_LENGTH | SQL_FN_STR_POSITION |
-    SQL_FN_STR_REPLACE | SQL_FN_STR_RTRIM |
-    SQL_FN_STR_SUBSTRING | SQL_FN_STR_UCASE;
+	*(unsigned long *) info_value_ptr = SQL_FN_STR_BIT_LENGTH |
+	  SQL_FN_STR_CHAR | SQL_FN_STR_CHAR_LENGTH |
+	  SQL_FN_STR_LCASE | SQL_FN_STR_LTRIM |
+	  SQL_FN_STR_OCTET_LENGTH | SQL_FN_STR_POSITION |
+	  SQL_FN_STR_REPLACE | SQL_FN_STR_RTRIM | SQL_FN_STR_SUBSTRING | SQL_FN_STR_UCASE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SUBQUERIES:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_SQ_CORRELATED_SUBQUERIES |
-    SQL_SQ_COMPARISON | SQL_SQ_EXISTS | SQL_SQ_IN | SQL_SQ_QUANTIFIED;
+	*(unsigned long *) info_value_ptr = SQL_SQ_CORRELATED_SUBQUERIES |
+	  SQL_SQ_COMPARISON | SQL_SQ_EXISTS | SQL_SQ_IN | SQL_SQ_QUANTIFIED;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_SYSTEM_FUNCTIONS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_TABLE_TERM:
-      rc =
-  str_value_assign (CUBRID_TABLE_TERM, info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign (CUBRID_TABLE_TERM, info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_TIMEDATE_ADD_INTERVALS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_TIMEDATE_DIFF_INTERVALS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = 0;
+	*(unsigned long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_TIMEDATE_FUNCTIONS:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_FN_TD_CURRENT_DATE |
-    SQL_FN_TD_CURRENT_TIME | SQL_FN_TD_CURRENT_TIMESTAMP;
+	*(unsigned long *) info_value_ptr = SQL_FN_TD_CURRENT_DATE |
+	  SQL_FN_TD_CURRENT_TIME | SQL_FN_TD_CURRENT_TIMESTAMP;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_TXN_CAPABLE:
       if (info_value_ptr != NULL)
-  *(unsigned short *) info_value_ptr = SQL_TC_ALL;
+	*(unsigned short *) info_value_ptr = SQL_TC_ALL;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned short);
+	*string_length_ptr = sizeof (unsigned short);
       break;
 
     case SQL_TXN_ISOLATION_OPTION:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_TXN_READ_UNCOMMITTED |
-    SQL_TXN_READ_COMMITTED | SQL_TXN_REPEATABLE_READ |
-    SQL_TXN_SERIALIZABLE;
+	*(unsigned long *) info_value_ptr = SQL_TXN_READ_UNCOMMITTED |
+	  SQL_TXN_READ_COMMITTED | SQL_TXN_REPEATABLE_READ | SQL_TXN_SERIALIZABLE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_UNION:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_U_UNION;
+	*(unsigned long *) info_value_ptr = SQL_U_UNION;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_USER_NAME:
       if (conn->user == NULL)
-  {
-    buf[0] = '\0';
-  }
+	{
+	  buf[0] = '\0';
+	}
       else
-  {
-    strcpy (buf, conn->user);
-  }
-      rc =
-  str_value_assign (buf, info_value_ptr, buffer_length,
-        string_length_ptr);
+	{
+	  strcpy (buf, conn->user);
+	}
+      rc = str_value_assign (buf, info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
     case SQL_XOPEN_CLI_YEAR:
       /* CHECK : YET not exactly implemented */
-      rc =
-  str_value_assign ("", info_value_ptr, buffer_length,
-        string_length_ptr);
+      rc = str_value_assign ("", info_value_ptr, buffer_length, string_length_ptr);
       if (rc == ODBC_SUCCESS_WITH_INFO)
-  {
-    odbc_set_diag (conn->diag, "01004", 0, NULL);
-  }
+	{
+	  odbc_set_diag (conn->diag, "01004", 0, NULL);
+	}
       break;
 
 
@@ -2597,65 +2471,65 @@ odbc_get_info (ODBC_CONNECTION * conn,
    *------------------------------------------------------------*/
     case SQL_FETCH_DIRECTION:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_FD_FETCH_NEXT;
+	*(unsigned long *) info_value_ptr = SQL_FD_FETCH_NEXT;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_LOCK_TYPES:
       if (info_value_ptr != NULL)
-  *(unsigned long *) info_value_ptr = SQL_LCK_NO_CHANGE;
+	*(unsigned long *) info_value_ptr = SQL_LCK_NO_CHANGE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (unsigned long);
+	*string_length_ptr = sizeof (unsigned long);
       break;
 
     case SQL_ODBC_API_CONFORMANCE:
       if (info_value_ptr != NULL)
-  *(short *) info_value_ptr = SQL_OAC_NONE;
+	*(short *) info_value_ptr = SQL_OAC_NONE;
 #if 1
       /* MS ACCESS에서 데이타베이스 연결시 SQL_OAC_NONE일 경우 연결실패 */
       if (info_value_ptr != NULL)
-  *(short *) info_value_ptr = SQL_OAC_LEVEL1;
+	*(short *) info_value_ptr = SQL_OAC_LEVEL1;
 #endif
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (short);
+	*string_length_ptr = sizeof (short);
       break;
     case SQL_ODBC_SQL_CONFORMANCE:
       if (info_value_ptr != NULL)
-  *(short *) info_value_ptr = SQL_OSC_CORE;
+	*(short *) info_value_ptr = SQL_OSC_CORE;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (short);
+	*string_length_ptr = sizeof (short);
       break;
     case SQL_POS_OPERATIONS:
       if (info_value_ptr != NULL)
-  *(long *) info_value_ptr = 0;
+	*(long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (long);
+	*string_length_ptr = sizeof (long);
       break;
     case SQL_POSITIONED_STATEMENTS:
       if (info_value_ptr != NULL)
-  *(long *) info_value_ptr = 0;
+	*(long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (long);
+	*string_length_ptr = sizeof (long);
       break;
     case SQL_SCROLL_CONCURRENCY:
       if (info_value_ptr != NULL)
-  *(long *) info_value_ptr = SQL_SCCO_READ_ONLY;
+	*(long *) info_value_ptr = SQL_SCCO_READ_ONLY;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (long);
+	*string_length_ptr = sizeof (long);
       break;
     case SQL_STATIC_SENSITIVITY:
       if (info_value_ptr != NULL)
-  *(long *) info_value_ptr = 0;
+	*(long *) info_value_ptr = 0;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (long);
+	*string_length_ptr = sizeof (long);
       break;
 
 
@@ -2680,17 +2554,15 @@ odbc_get_info (ODBC_CONNECTION * conn,
 ************************************************************************/
 PUBLIC int
 get_dsn_info (const char *dsn,
-        char *db_name, int db_name_len,
-        char *user, int user_len,
-        char *pwd, int pwd_len,
-        char *server, int server_len, int *port, int *fetch_size,
-        char *charset, int charset_len,
-              char *autocommit, int autocommit_len,
-        char *omit_schema, int omit_schema_len)
-
+	      char *db_name, int db_name_len,
+	      char *user, int user_len,
+	      char *pwd, int pwd_len,
+	      char *server, int server_len, int *port, int *fetch_size,
+	      char *charset, int charset_len,
+	      char *autocommit, int autocommit_len, char *omit_schema, int omit_schema_len)
 {
   char buf[1024];
-  int rcn;      // return char number
+  int rcn;			// return char number
 
   if (dsn == NULL)
     {
@@ -2702,104 +2574,86 @@ get_dsn_info (const char *dsn,
   // Get DB name entry
   if (db_name != NULL)
     {
-      rcn =
-  SQLGetPrivateProfileString (dsn, KEYWORD_DBNAME, "", buf,
-            sizeof (buf), "ODBC.INI");
+      rcn = SQLGetPrivateProfileString (dsn, KEYWORD_DBNAME, "", buf, sizeof (buf), "ODBC.INI");
       if (rcn == 0)
-  buf[0] = '\0';
+	buf[0] = '\0';
       str_value_assign (buf, db_name, db_name_len, NULL);
     }
 
   // Get user entry
   if (user != NULL)
     {
-      rcn =
-  SQLGetPrivateProfileString (dsn, KEYWORD_USER, "", buf, sizeof (buf),
-            "ODBC.INI");
+      rcn = SQLGetPrivateProfileString (dsn, KEYWORD_USER, "", buf, sizeof (buf), "ODBC.INI");
       if (rcn == 0)
-  buf[0] = '\0';
+	buf[0] = '\0';
       str_value_assign (buf, user, user_len, NULL);
     }
 
   // Get password entry
   if (pwd != NULL)
     {
-      rcn =
-  SQLGetPrivateProfileString (dsn, KEYWORD_PASSWORD, "", buf,
-            sizeof (buf), "ODBC.INI");
+      rcn = SQLGetPrivateProfileString (dsn, KEYWORD_PASSWORD, "", buf, sizeof (buf), "ODBC.INI");
       if (rcn == 0)
-  buf[0] = '\0';
+	buf[0] = '\0';
       str_value_assign (buf, pwd, pwd_len, NULL);
     }
 
   // Get server entry
   if (server != NULL)
     {
-      rcn =
-  SQLGetPrivateProfileString (dsn, KEYWORD_SERVER, "", buf,
-            sizeof (buf), "ODBC.INI");
+      rcn = SQLGetPrivateProfileString (dsn, KEYWORD_SERVER, "", buf, sizeof (buf), "ODBC.INI");
       if (rcn == 0)
-  buf[0] = '\0';
+	buf[0] = '\0';
       str_value_assign (buf, server, server_len, NULL);
     }
 
   // Get port entry
   if (port != NULL)
     {
-      rcn =
-  SQLGetPrivateProfileString (dsn, KEYWORD_PORT, "", buf, sizeof (buf),
-            "ODBC.INI");
+      rcn = SQLGetPrivateProfileString (dsn, KEYWORD_PORT, "", buf, sizeof (buf), "ODBC.INI");
       if (rcn == 0)
-  *port = 0;
+	*port = 0;
       else
-  *port = atoi (buf);
+	*port = atoi (buf);
     }
 
   // Get fetch size entry
   if (fetch_size != NULL)
     {
-      rcn =
-  SQLGetPrivateProfileString (dsn, KEYWORD_FETCH_SIZE, "", buf,
-            sizeof (buf), "ODBC.INI");
+      rcn = SQLGetPrivateProfileString (dsn, KEYWORD_FETCH_SIZE, "", buf, sizeof (buf), "ODBC.INI");
       if (rcn == 0)
-  *fetch_size = 0;
+	*fetch_size = 0;
       else
-  *fetch_size = atoi (buf);
+	*fetch_size = atoi (buf);
     }
 
   if (charset != NULL)
     {
-      rcn =
-  SQLGetPrivateProfileString (dsn, KEYWORD_CHARSET, "", buf,
-            sizeof (buf), "ODBC.INI");
+      rcn = SQLGetPrivateProfileString (dsn, KEYWORD_CHARSET, "", buf, sizeof (buf), "ODBC.INI");
       if (rcn == 0)
-  buf[0] = '\0';
+	buf[0] = '\0';
       else
-        str_value_assign (buf, charset, server_len, NULL);
+	str_value_assign (buf, charset, server_len, NULL);
     }
 
   // Get autocommit entry
   if (autocommit != NULL)
     {
-      rcn =
-  SQLGetPrivateProfileString (dsn, KEYWORD_AUTOCOMMIT, "", buf, sizeof (buf),
-    "ODBC.INI");
+      rcn = SQLGetPrivateProfileString (dsn, KEYWORD_AUTOCOMMIT, "", buf, sizeof (buf), "ODBC.INI");
       if (rcn == 0)
-  buf[0] = '\0';
+	buf[0] = '\0';
       else
-  str_value_assign (buf, autocommit, autocommit_len, NULL);
+	str_value_assign (buf, autocommit, autocommit_len, NULL);
     }
 
   if (omit_schema != NULL)
-  {
-    rcn =
-      SQLGetPrivateProfileString(dsn, KEYWORD_OMIT_SCHEMA, "", buf, sizeof(buf),
-        "ODBC.INI");
-    if (rcn == 0)
-      buf[0] = '\0';
-    else
-      str_value_assign(buf, omit_schema, omit_schema_len, NULL);
-  }
+    {
+      rcn = SQLGetPrivateProfileString (dsn, KEYWORD_OMIT_SCHEMA, "", buf, sizeof (buf), "ODBC.INI");
+      if (rcn == 0)
+	buf[0] = '\0';
+      else
+	str_value_assign (buf, omit_schema, omit_schema_len, NULL);
+    }
 
   return 0;
 }
@@ -2819,7 +2673,7 @@ PRIVATE int
 get_server_setting (ODBC_CONNECTION * conn)
 {
   char buf[256];
-  int rcn;      // return char number
+  int rcn;			// return char number
 
   if (conn->data_source == NULL)
     {
@@ -2829,45 +2683,35 @@ get_server_setting (ODBC_CONNECTION * conn)
   SQLSetConfigMode (ODBC_BOTH_DSN);
 
   // Get server entry
-  rcn =
-    SQLGetPrivateProfileString ("CUBRID", KEYWORD_SERVER, "", buf,
-        sizeof (buf), "ODBC.INI");
+  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_SERVER, "", buf, sizeof (buf), "ODBC.INI");
   if (rcn == 0)
     buf[0] = '\0';
   conn->server = UT_MAKE_STRING (buf, -1);
 
   // Get port entry
-  rcn =
-    SQLGetPrivateProfileString ("CUBRID", KEYWORD_PORT, "", buf, sizeof (buf),
-        "ODBC.INI");
+  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_PORT, "", buf, sizeof (buf), "ODBC.INI");
   if (rcn == 0)
     buf[0] = '\0';
   conn->port = atoi (buf);
 
   // Get DB name entry
-  rcn =
-    SQLGetPrivateProfileString ("CUBRID", KEYWORD_DBNAME, "", buf,
-        sizeof (buf), "ODBC.INI");
+  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_DBNAME, "", buf, sizeof (buf), "ODBC.INI");
   if (rcn == 0)
     buf[0] = '\0';
   conn->db_name = UT_MAKE_STRING (buf, -1);
 
   // Get fetch size entry
-  rcn =
-    SQLGetPrivateProfileString ("CUBRID", KEYWORD_FETCH_SIZE, "", buf,
-        sizeof (buf), "ODBC.INI");
+  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_FETCH_SIZE, "", buf, sizeof (buf), "ODBC.INI");
   if (rcn == 0)
     buf[0] = '\0';
   conn->fetch_size = atoi (buf);
 
 
   // Get fetch charset
-  rcn =
-    SQLGetPrivateProfileString ("CUBRID", KEYWORD_CHARSET, "", buf,
-        sizeof (buf), "ODBC.INI");
+  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_CHARSET, "", buf, sizeof (buf), "ODBC.INI");
   if (rcn == 0)
     buf[0] = '\0';
-  conn->charset = (char*)atoi (buf);
+  conn->charset = (char *) atoi (buf);
 
   return 0;
 }
@@ -2902,13 +2746,12 @@ set_isolation_level (ODBC_CONNECTION * conn)
     case SQL_TXN_READ_UNCOMMITTED:
       odbc_set_diag_by_cci (conn->diag, CCI_ER_NOT_IMPLEMENTED, NULL);
       return ODBC_ERROR;
-    default:      // serializable
+    default:			// serializable
       isolation_level = TRAN_REP_CLASS_REP_INSTANCE;
       break;
     }
 
-  cci_rc = cci_set_db_parameter (conn->connhd, CCI_PARAM_ISOLATION_LEVEL,
-         &isolation_level, &cci_err_buf);
+  cci_rc = cci_set_db_parameter (conn->connhd, CCI_PARAM_ISOLATION_LEVEL, &isolation_level, &cci_err_buf);
   if (cci_rc < 0)
     {
       odbc_set_diag_by_cci (conn->diag, cci_rc, &cci_err_buf);
@@ -2932,8 +2775,7 @@ get_db_version (ODBC_CONNECTION * conn)
   int cci_rc;
   T_CCI_ERROR error;
 
-  cci_rc =
-    cci_get_db_version (conn->connhd, conn->db_ver, sizeof (conn->db_ver));
+  cci_rc = cci_get_db_version (conn->connhd, conn->db_ver, sizeof (conn->db_ver));
 
   if (cci_rc < 0)
     {
@@ -2941,15 +2783,13 @@ get_db_version (ODBC_CONNECTION * conn)
       return ODBC_ERROR;
     }
 
-  cci_rc = cci_get_db_parameter (conn->connhd,
-         CCI_PARAM_MAX_STRING_LENGTH,
-         &(conn->max_string_length), &error);
+  cci_rc = cci_get_db_parameter (conn->connhd, CCI_PARAM_MAX_STRING_LENGTH, &(conn->max_string_length), &error);
 
   if (cci_rc < 0)
     {
       //odbc_set_diag_by_cci (conn->diag, cci_rc, &error);
       //return ODBC_ERROR;
-    conn->max_string_length=1073741823;
+      conn->max_string_length = 1073741823;
     }
 
   return ODBC_SUCCESS;

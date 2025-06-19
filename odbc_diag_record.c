@@ -306,7 +306,7 @@ odbc_move_diag (ODBC_DIAG * target_diag, ODBC_DIAG * src_diag)
   else
     {
       while (tmp->next != NULL)
-  tmp = tmp->next;
+	tmp = tmp->next;
     }
 
   tmp->next = target_diag->record;
@@ -322,8 +322,7 @@ odbc_move_diag (ODBC_DIAG * target_diag, ODBC_DIAG * src_diag)
 
 /* recored added to head */
 PUBLIC void
-odbc_set_diag (ODBC_DIAG * diag, char *sql_state, int native_code,
-         char *message)
+odbc_set_diag (ODBC_DIAG * diag, char *sql_state, int native_code, char *message)
 {
   ODBC_DIAG_RECORD *record = NULL;
   int i;
@@ -341,24 +340,28 @@ odbc_set_diag (ODBC_DIAG * diag, char *sql_state, int native_code,
   record->sql_state = UT_MAKE_STRING (sql_state, -1);
   record->native_code = native_code;
 
-  if (message) {
-    record->message = UT_MAKE_STRING (message, -1);
-  } else {
-    for (i = 0; ; i++) {
-      if (strcmp(odbc_3_0_error_map[i].status, sql_state) == 0 ||
-        odbc_3_0_error_map[i].status == NULL) {
-          break;
-      }
+  if (message)
+    {
+      record->message = UT_MAKE_STRING (message, -1);
     }
-    record->message = UT_MAKE_STRING (odbc_3_0_error_map[i].msg, -1);
-  }
+  else
+    {
+      for (i = 0;; i++)
+	{
+	  if (strcmp (odbc_3_0_error_map[i].status, sql_state) == 0 || odbc_3_0_error_map[i].status == NULL)
+	    {
+	      break;
+	    }
+	}
+      record->message = UT_MAKE_STRING (odbc_3_0_error_map[i].msg, -1);
+    }
 
   record->next = diag->record;
   diag->record = record;
 }
 
 PUBLIC void
-odbc_set_diag_by_cci (ODBC_DIAG * diag, int cci_retval, T_CCI_ERROR *error)
+odbc_set_diag_by_cci (ODBC_DIAG * diag, int cci_retval, T_CCI_ERROR * error)
 {
   ODBC_DIAG_RECORD *record = NULL;
   char err_msg[1024] = { 0 };
@@ -375,22 +378,29 @@ odbc_set_diag_by_cci (ODBC_DIAG * diag, int cci_retval, T_CCI_ERROR *error)
   record->number = diag->rec_number;
   record->sql_state = UT_MAKE_STRING ("HY000", -1);
 
-  if (cci_retval == CCI_ER_DBMS) {
-    if (error) {
-      record->native_code = error->err_code;
-      record->message = UT_MAKE_STRING(error->err_msg, -1);
-    } else {
-      record->native_code = CCI_ER_DBMS;
-      record->message = UT_MAKE_STRING("Unknown DBMS error", -1);
+  if (cci_retval == CCI_ER_DBMS)
+    {
+      if (error)
+	{
+	  record->native_code = error->err_code;
+	  record->message = UT_MAKE_STRING (error->err_msg, -1);
+	}
+      else
+	{
+	  record->native_code = CCI_ER_DBMS;
+	  record->message = UT_MAKE_STRING ("Unknown DBMS error", -1);
+	}
     }
-  } else {
-    if (cci_get_err_msg(cci_retval, err_msg, sizeof(err_msg)) < 0) {
-      strncpy(err_msg, "Unknown error", sizeof(err_msg));
-    }
+  else
+    {
+      if (cci_get_err_msg (cci_retval, err_msg, sizeof (err_msg)) < 0)
+	{
+	  strncpy (err_msg, "Unknown error", sizeof (err_msg));
+	}
 
-    record->native_code = cci_retval;
-    record->message = UT_MAKE_STRING(err_msg, -1);
-  }
+      record->native_code = cci_retval;
+      record->message = UT_MAKE_STRING (err_msg, -1);
+    }
 
   record->next = diag->record;
   diag->record = record;
@@ -408,17 +418,16 @@ odbc_set_diag_by_cci (ODBC_DIAG * diag, int cci_retval, T_CCI_ERROR *error)
 ************************************************************************/
 PUBLIC RETCODE
 odbc_get_diag_field (SQLSMALLINT handle_type,
-         SQLHANDLE handle,
-         SQLSMALLINT rec_number,
-         SQLSMALLINT diag_identifier,
-         SQLPOINTER diag_info_ptr,
-         SQLSMALLINT buffer_length, SQLLEN *string_length_ptr)
+		     SQLHANDLE handle,
+		     SQLSMALLINT rec_number,
+		     SQLSMALLINT diag_identifier,
+		     SQLPOINTER diag_info_ptr, SQLSMALLINT buffer_length, SQLLEN * string_length_ptr)
 {
-  ODBC_ENV *env=NULL;
-  ODBC_DIAG_RECORD *record=NULL;
+  ODBC_ENV *env = NULL;
+  ODBC_DIAG_RECORD *record = NULL;
 
-  RETCODE status = ODBC_SUCCESS, rc=-1;
-  char *pt=NULL;
+  RETCODE status = ODBC_SUCCESS, rc = -1;
+  char *pt = NULL;
   char empty_str[1] = "";
 
   env = (ODBC_ENV *) handle;
@@ -426,8 +435,7 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
   if ((diag_identifier == SQL_DIAG_CURSOR_ROW_COUNT ||
        diag_identifier == SQL_DIAG_DYNAMIC_FUNCTION ||
        diag_identifier == SQL_DIAG_DYNAMIC_FUNCTION_CODE ||
-       diag_identifier == SQL_DIAG_ROW_COUNT) &&
-      handle_type != SQL_HANDLE_STMT)
+       diag_identifier == SQL_DIAG_ROW_COUNT) && handle_type != SQL_HANDLE_STMT)
     {
       return ODBC_ERROR;
     }
@@ -435,227 +443,216 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
   if (is_header_field (diag_identifier) == _TRUE_)
     {
       switch (diag_identifier)
-  {
-    /*
-  case SQL_DIAG_CURSOR_ROW_COUNT:
-  case SQL_DIAG_ROW_COUNT:
-    if (diag_info_ptr != NULL)
-      *(long *) diag_info_ptr =
-        ((ODBC_STATEMENT *) handle)->current_tpl_pos;
+	{
+	  /*
+	     case SQL_DIAG_CURSOR_ROW_COUNT:
+	     case SQL_DIAG_ROW_COUNT:
+	     if (diag_info_ptr != NULL)
+	     *(long *) diag_info_ptr =
+	     ((ODBC_STATEMENT *) handle)->current_tpl_pos;
 
-    if (string_length_ptr != NULL)
-      {
-        *string_length_ptr = sizeof (long);
-      }
-    break;
-    */
-  case SQL_DIAG_NUMBER:
-    if (diag_info_ptr != NULL)
-      *(long *) diag_info_ptr = env->diag->rec_number;
+	     if (string_length_ptr != NULL)
+	     {
+	     *string_length_ptr = sizeof (long);
+	     }
+	     break;
+	   */
+	case SQL_DIAG_NUMBER:
+	  if (diag_info_ptr != NULL)
+	    *(long *) diag_info_ptr = env->diag->rec_number;
 
-    if (string_length_ptr != NULL)
-      {
-        *string_length_ptr = sizeof (long);
-      }
-    break;
+	  if (string_length_ptr != NULL)
+	    {
+	      *string_length_ptr = sizeof (long);
+	    }
+	  break;
 
-  case SQL_DIAG_RETURNCODE:
-    if (diag_info_ptr != NULL)
-      *(short *) diag_info_ptr = env->diag->retcode;
+	case SQL_DIAG_RETURNCODE:
+	  if (diag_info_ptr != NULL)
+	    *(short *) diag_info_ptr = env->diag->retcode;
 
-    if (string_length_ptr != NULL)
-      {
-        *string_length_ptr = sizeof (short);
-      }
-    break;
-  default:
-    return ODBC_ERROR;
-  }
+	  if (string_length_ptr != NULL)
+	    {
+	      *string_length_ptr = sizeof (short);
+	    }
+	  break;
+	default:
+	  return ODBC_ERROR;
+	}
     }
   else
     {
       /* record field */
       if (rec_number <= 0 || rec_number > env->diag->rec_number)
-  {
-    return ODBC_NO_DATA;
-  }
+	{
+	  return ODBC_NO_DATA;
+	}
       record = find_diag_record (env->diag, rec_number);
       if (record == NULL)
-  {
-    return ODBC_NO_DATA;
-  }
+	{
+	  return ODBC_NO_DATA;
+	}
 
       switch (diag_identifier)
-  {
-  case SQL_DIAG_CLASS_ORIGIN:
-    pt = get_diag_class_origin (record->sql_state);
-    rc =
-      str_value_assign (pt, diag_info_ptr, buffer_length,
-            string_length_ptr);
-    if (rc == ODBC_SUCCESS_WITH_INFO)
-      {
-        status = rc;
-      }
-    break;
+	{
+	case SQL_DIAG_CLASS_ORIGIN:
+	  pt = get_diag_class_origin (record->sql_state);
+	  rc = str_value_assign (pt, diag_info_ptr, buffer_length, string_length_ptr);
+	  if (rc == ODBC_SUCCESS_WITH_INFO)
+	    {
+	      status = rc;
+	    }
+	  break;
 
-  case SQL_DIAG_COLUMN_NUMBER:  /* yet not implemeted */
-    if (diag_info_ptr != NULL)
-      *(long *) diag_info_ptr = SQL_COLUMN_NUMBER_UNKNOWN;
+	case SQL_DIAG_COLUMN_NUMBER:	/* yet not implemeted */
+	  if (diag_info_ptr != NULL)
+	    *(long *) diag_info_ptr = SQL_COLUMN_NUMBER_UNKNOWN;
 
-    if (string_length_ptr != NULL)
-      {
-        *string_length_ptr = sizeof (long);
-      }
-    break;
+	  if (string_length_ptr != NULL)
+	    {
+	      *string_length_ptr = sizeof (long);
+	    }
+	  break;
 
-  case SQL_DIAG_CONNECTION_NAME:  /* yet not implemeted */
-      if (diag_info_ptr && buffer_length > 0)
-        {
-          int connhd = -1;
-          int cci_ret = 0;
-          T_CCI_ERROR cci_err_buf;
-    
-          if (handle_type == SQL_HANDLE_DBC)
-            {
-              connhd = ((ODBC_CONNECTION *) handle)->connhd;
-            }
-          else if (handle_type == SQL_HANDLE_STMT)
-            {
-              connhd = ((ODBC_STATEMENT *) handle)->conn->connhd;
-            }
+	case SQL_DIAG_CONNECTION_NAME:	/* yet not implemeted */
+	  if (diag_info_ptr && buffer_length > 0)
+	    {
+	      int connhd = -1;
+	      int cci_ret = 0;
+	      T_CCI_ERROR cci_err_buf;
 
-          if (connhd >= 0)
-            {
-              cci_ret = cci_get_cas_info(connhd, (char *)diag_info_ptr, 32, &cci_err_buf);
-            }
-          if (connhd < 0 || cci_ret < 0)
-            {
-              *((char *) diag_info_ptr) = '\0';
-              *string_length_ptr=0;
-            }
-      else
-            {
-        *string_length_ptr = strlen((char *)diag_info_ptr);
-            }
-            return ODBC_SUCCESS;
-          }
-        else
-          {
-             return SQL_SUCCESS_WITH_INFO;
-          }
+	      if (handle_type == SQL_HANDLE_DBC)
+		{
+		  connhd = ((ODBC_CONNECTION *) handle)->connhd;
+		}
+	      else if (handle_type == SQL_HANDLE_STMT)
+		{
+		  connhd = ((ODBC_STATEMENT *) handle)->conn->connhd;
+		}
 
-  case SQL_DIAG_MESSAGE_TEXT:
-    {
-      char *mesg = NULL;
-      char diag_prefix[256] = { 0 };
+	      if (connhd >= 0)
+		{
+		  cci_ret = cci_get_cas_info (connhd, (char *) diag_info_ptr, 32, &cci_err_buf);
+		}
+	      if (connhd < 0 || cci_ret < 0)
+		{
+		  *((char *) diag_info_ptr) = '\0';
+		  *string_length_ptr = 0;
+		}
+	      else
+		{
+		  *string_length_ptr = strlen ((char *) diag_info_ptr);
+		}
+	      return ODBC_SUCCESS;
+	    }
+	  else
+	    {
+	      return SQL_SUCCESS_WITH_INFO;
+	    }
 
-      pt = (char *) get_diag_message (record);
-      if (pt == NULL)
-        pt = empty_str;
+	case SQL_DIAG_MESSAGE_TEXT:
+	  {
+	    char *mesg = NULL;
+	    char diag_prefix[256] = { 0 };
 
-      _snprintf (diag_prefix, sizeof(diag_prefix), "%s[%d]", 
-        DIAG_PREFIX, record->native_code);
-      mesg = UT_MAKE_STRING (diag_prefix, -1);
-      mesg = UT_APPEND_STRING (mesg, pt, -1);
+	    pt = (char *) get_diag_message (record);
+	    if (pt == NULL)
+	      pt = empty_str;
 
-      rc =
-        str_value_assign (mesg, diag_info_ptr, buffer_length,
-        string_length_ptr);
-      if (rc == ODBC_SUCCESS_WITH_INFO)
-        {
-    status = rc;
-        }
+	    _snprintf (diag_prefix, sizeof (diag_prefix), "%s[%d]", DIAG_PREFIX, record->native_code);
+	    mesg = UT_MAKE_STRING (diag_prefix, -1);
+	    mesg = UT_APPEND_STRING (mesg, pt, -1);
 
-      NC_FREE (mesg);
-    }
-    break;
+	    rc = str_value_assign (mesg, diag_info_ptr, buffer_length, string_length_ptr);
+	    if (rc == ODBC_SUCCESS_WITH_INFO)
+	      {
+		status = rc;
+	      }
 
-  case SQL_DIAG_NATIVE:
-    if (diag_info_ptr != NULL)
-      *(long *) diag_info_ptr = record->native_code;
+	    NC_FREE (mesg);
+	  }
+	  break;
 
-    if (string_length_ptr != NULL)
-      {
-        *string_length_ptr = sizeof (long);
-      }
-    break;
+	case SQL_DIAG_NATIVE:
+	  if (diag_info_ptr != NULL)
+	    *(long *) diag_info_ptr = record->native_code;
+
+	  if (string_length_ptr != NULL)
+	    {
+	      *string_length_ptr = sizeof (long);
+	    }
+	  break;
 
 
-  case SQL_DIAG_ROW_NUMBER: /* yet not implemeted */
-    if (diag_info_ptr != NULL)
-      *(long *) diag_info_ptr = SQL_ROW_NUMBER_UNKNOWN;
+	case SQL_DIAG_ROW_NUMBER:	/* yet not implemeted */
+	  if (diag_info_ptr != NULL)
+	    *(long *) diag_info_ptr = SQL_ROW_NUMBER_UNKNOWN;
 
-    if (string_length_ptr != NULL)
-      {
-        *string_length_ptr = sizeof (long);
-      }
-    break;
+	  if (string_length_ptr != NULL)
+	    {
+	      *string_length_ptr = sizeof (long);
+	    }
+	  break;
 
-  case SQL_DIAG_SERVER_NAME:
-    if (handle_type == SQL_HANDLE_ENV)
-      {
-        pt = empty_str;
-      }
-    else
-      {
-        if (handle_type == SQL_HANDLE_DBC)
-    {
-      pt = ((ODBC_CONNECTION *) handle)->data_source;
-    }
-        else if (handle_type == SQL_HANDLE_STMT)
-    {
-      pt = ((ODBC_STATEMENT *) handle)->conn->data_source;
-    }
-        else if (handle_type == SQL_HANDLE_DESC)
-    {
-      pt = ((ODBC_DESC *) handle)->conn->data_source;
-    }
-        rc =
-    str_value_assign (pt, diag_info_ptr, buffer_length,
-          string_length_ptr);
-        if (rc == ODBC_SUCCESS_WITH_INFO)
-    {
-      status = rc;
-    }
-      }
-    break;
+	case SQL_DIAG_SERVER_NAME:
+	  if (handle_type == SQL_HANDLE_ENV)
+	    {
+	      pt = empty_str;
+	    }
+	  else
+	    {
+	      if (handle_type == SQL_HANDLE_DBC)
+		{
+		  pt = ((ODBC_CONNECTION *) handle)->data_source;
+		}
+	      else if (handle_type == SQL_HANDLE_STMT)
+		{
+		  pt = ((ODBC_STATEMENT *) handle)->conn->data_source;
+		}
+	      else if (handle_type == SQL_HANDLE_DESC)
+		{
+		  pt = ((ODBC_DESC *) handle)->conn->data_source;
+		}
+	      rc = str_value_assign (pt, diag_info_ptr, buffer_length, string_length_ptr);
+	      if (rc == ODBC_SUCCESS_WITH_INFO)
+		{
+		  status = rc;
+		}
+	    }
+	  break;
 
-  case SQL_DIAG_SQLSTATE:
-    if (record->sql_state != NULL)
-      {
-        pt = record->sql_state;
-      }
-    else
-      {
-        pt = empty_str;
-      }
-    rc =
-      str_value_assign (pt, diag_info_ptr, buffer_length,
-            string_length_ptr);
-    if (rc == ODBC_SUCCESS_WITH_INFO)
-      {
-        status = rc;
-      }
-    break;
+	case SQL_DIAG_SQLSTATE:
+	  if (record->sql_state != NULL)
+	    {
+	      pt = record->sql_state;
+	    }
+	  else
+	    {
+	      pt = empty_str;
+	    }
+	  rc = str_value_assign (pt, diag_info_ptr, buffer_length, string_length_ptr);
+	  if (rc == ODBC_SUCCESS_WITH_INFO)
+	    {
+	      status = rc;
+	    }
+	  break;
 
-  case SQL_DIAG_SUBCLASS_ORIGIN:
-    pt = get_diag_subclass_origin (record->sql_state);
-    if (pt == NULL)
-      {
-        pt = empty_str;
-      }
-    rc =
-      str_value_assign (pt, diag_info_ptr, buffer_length,
-            string_length_ptr);
-    if (rc == ODBC_SUCCESS_WITH_INFO)
-      {
-        status = rc;
-      }
-    break;
+	case SQL_DIAG_SUBCLASS_ORIGIN:
+	  pt = get_diag_subclass_origin (record->sql_state);
+	  if (pt == NULL)
+	    {
+	      pt = empty_str;
+	    }
+	  rc = str_value_assign (pt, diag_info_ptr, buffer_length, string_length_ptr);
+	  if (rc == ODBC_SUCCESS_WITH_INFO)
+	    {
+	      status = rc;
+	    }
+	  break;
 
-  default:
-    return ODBC_ERROR;
-  }
+	default:
+	  return ODBC_ERROR;
+	}
 
     }
 
@@ -672,12 +669,11 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
 ************************************************************************/
 PUBLIC RETCODE
 odbc_get_diag_rec (SQLSMALLINT handle_type,
-       SQLHANDLE *handle,
-       SQLSMALLINT rec_number,
-       SQLCHAR *sqlstate,
-       SQLINTEGER *native_error_ptr,
-       SQLCHAR *message_text,
-       SQLSMALLINT buffer_length, SQLLEN *text_length_ptr)
+		   SQLHANDLE * handle,
+		   SQLSMALLINT rec_number,
+		   SQLCHAR * sqlstate,
+		   SQLINTEGER * native_error_ptr,
+		   SQLCHAR * message_text, SQLSMALLINT buffer_length, SQLLEN * text_length_ptr)
 {
   RETCODE status = ODBC_SUCCESS, rc;
   ODBC_DIAG_RECORD *record;
@@ -713,8 +709,7 @@ odbc_get_diag_rec (SQLSMALLINT handle_type,
   if (pt == NULL)
     pt = empty_str;
 
-  _snprintf (diag_prefix, sizeof(diag_prefix), "%s[%d]", 
-    DIAG_PREFIX, record->native_code);
+  _snprintf (diag_prefix, sizeof (diag_prefix), "%s[%d]", DIAG_PREFIX, record->native_code);
   mesg = UT_MAKE_STRING (diag_prefix, -1);
   mesg = UT_APPEND_STRING (mesg, pt, -1);
 
@@ -788,8 +783,7 @@ get_diag_subclass_origin (char *sql_state)
       strcmp (sql_state, "IM006") == 0 ||
       strcmp (sql_state, "IM007") == 0 ||
       strcmp (sql_state, "IM008") == 0 ||
-      strcmp (sql_state, "IM010") == 0 ||
-      strcmp (sql_state, "IM011") == 0 || strcmp (sql_state, "IM012") == 0)
+      strcmp (sql_state, "IM010") == 0 || strcmp (sql_state, "IM011") == 0 || strcmp (sql_state, "IM012") == 0)
     {
       return ODBC_CLASS_ORIGIN;
     }

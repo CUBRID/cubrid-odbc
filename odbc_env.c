@@ -36,8 +36,7 @@
 #include    "odbc_util.h"
 #include    "cas_cci.h"
 
-PRIVATE RETCODE connection_end_tran (ODBC_CONNECTION * conn,
-             short completion_type);
+PRIVATE RETCODE connection_end_tran (ODBC_CONNECTION * conn, short completion_type);
 
 /* odbc_environments :
  *    global enviroment handle list head
@@ -120,13 +119,13 @@ odbc_free_env (ODBC_ENV * env)
   if (e == env)
     {
       if (prev != NULL)
-  {
-    prev->next = env->next;
-  }
+	{
+	  prev->next = env->next;
+	}
       else
-  {
-    odbc_environments = env->next;
-  }
+	{
+	  odbc_environments = env->next;
+	}
     }
 
   odbc_free_diag (env->diag, FREE_ALL);
@@ -154,8 +153,7 @@ odbc_free_env (ODBC_ENV * env)
 *   한다.
 ************************************************************************/
 PUBLIC RETCODE
-odbc_set_env_attr (ODBC_ENV * env,
-       long attribute, void *valueptr, long stringlength)
+odbc_set_env_attr (ODBC_ENV * env, long attribute, void *valueptr, long stringlength)
 {
 
   if (valueptr == NULL)
@@ -182,36 +180,36 @@ odbc_set_env_attr (ODBC_ENV * env,
 
     case SQL_ATTR_ODBC_VERSION:
       switch ((long) valueptr)
-  {
-  case SQL_OV_ODBC3:
-  case SQL_OV_ODBC2:
-    env->attr_odbc_version = (long) valueptr;
-    break;
-  default:
-    odbc_set_diag (env->diag, "HY024", 0, NULL);
-    return ODBC_ERROR;
-    break;
-  }
+	{
+	case SQL_OV_ODBC3:
+	case SQL_OV_ODBC2:
+	  env->attr_odbc_version = (long) valueptr;
+	  break;
+	default:
+	  odbc_set_diag (env->diag, "HY024", 0, NULL);
+	  return ODBC_ERROR;
+	  break;
+	}
 
       break;
 
     case SQL_ATTR_OUTPUT_NTS:
       switch ((long) valueptr)
-  {
-  case SQL_TRUE:
-    env->attr_output_nts = (unsigned long) valueptr;
-    break;
+	{
+	case SQL_TRUE:
+	  env->attr_output_nts = (unsigned long) valueptr;
+	  break;
 
-  case SQL_FALSE:
-    odbc_set_diag (env->diag, "HYC00", 0, NULL);
-    return ODBC_ERROR;
-    break;
+	case SQL_FALSE:
+	  odbc_set_diag (env->diag, "HYC00", 0, NULL);
+	  return ODBC_ERROR;
+	  break;
 
-  default:
-    odbc_set_diag (env->diag, "HY024", 0, NULL);
-    return ODBC_ERROR;
-    break;
-  }
+	default:
+	  odbc_set_diag (env->diag, "HY024", 0, NULL);
+	  return ODBC_ERROR;
+	  break;
+	}
       break;
 
     default:
@@ -233,27 +231,24 @@ odbc_set_env_attr (ODBC_ENV * env,
 * NOTE:
 ************************************************************************/
 PUBLIC
-odbc_get_env_attr (ODBC_ENV * env,
-       long attribute,
-       void *value_ptr,
-       long buffer_length, long *string_length_ptr)
+odbc_get_env_attr (ODBC_ENV * env, long attribute, void *value_ptr, long buffer_length, long *string_length_ptr)
 {
   switch (attribute)
     {
     case SQL_ATTR_ODBC_VERSION:
       if (value_ptr != NULL)
-  *((unsigned long *) value_ptr) = env->attr_odbc_version;
+	*((unsigned long *) value_ptr) = env->attr_odbc_version;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (long);
+	*string_length_ptr = sizeof (long);
       break;
 
     case SQL_ATTR_OUTPUT_NTS:
       if (value_ptr != NULL)
-  *((unsigned long *) value_ptr) = env->attr_output_nts;
+	*((unsigned long *) value_ptr) = env->attr_output_nts;
 
       if (string_length_ptr != NULL)
-  *string_length_ptr = sizeof (long);
+	*string_length_ptr = sizeof (long);
       break;
 
     default:
@@ -281,32 +276,29 @@ odbc_end_tran (short handle_type, void *handle, short completion_type)
   if ((handle_type != SQL_HANDLE_ENV && handle_type != SQL_HANDLE_DBC) ||
       (handle_type == SQL_HANDLE_ENV
        && ((ODBC_ENV *) handle)->handle_type != SQL_HANDLE_ENV)
-      || (handle_type == SQL_HANDLE_DBC
-    && ((ODBC_CONNECTION *) handle)->handle_type != SQL_HANDLE_DBC))
+      || (handle_type == SQL_HANDLE_DBC && ((ODBC_CONNECTION *) handle)->handle_type != SQL_HANDLE_DBC))
     {
       return ODBC_INVALID_HANDLE;
     }
 
   if (handle_type == SQL_HANDLE_ENV)
     {
-      for (conn = ((ODBC_ENV *) handle)->conn; conn;
-     conn = ((ODBC_CONNECTION *) conn)->next)
-  {
-    rc =
-      connection_end_tran ((ODBC_CONNECTION *) conn, completion_type);
-    if (rc < 0)
-      {
-        return ODBC_ERROR;
-      }
-  }
+      for (conn = ((ODBC_ENV *) handle)->conn; conn; conn = ((ODBC_CONNECTION *) conn)->next)
+	{
+	  rc = connection_end_tran ((ODBC_CONNECTION *) conn, completion_type);
+	  if (rc < 0)
+	    {
+	      return ODBC_ERROR;
+	    }
+	}
     }
   else
     {
       rc = connection_end_tran ((ODBC_CONNECTION *) handle, completion_type);
       if (rc < 0)
-  {
-    return ODBC_ERROR;
-  }
+	{
+	  return ODBC_ERROR;
+	}
     }
 
   return ODBC_SUCCESS;
@@ -340,10 +332,10 @@ connection_end_tran (ODBC_CONNECTION * conn, short completion_type)
     {
       cci_rc = cci_end_tran (conn->connhd, type, &cci_err_buf);
       if (cci_rc < 0)
-  {
-    odbc_set_diag_by_cci (conn->diag, cci_rc, &cci_err_buf);
-    return ODBC_ERROR;
-  }
+	{
+	  odbc_set_diag_by_cci (conn->diag, cci_rc, &cci_err_buf);
+	  return ODBC_ERROR;
+	}
     }
 
   // delete all open cursor

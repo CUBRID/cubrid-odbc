@@ -47,9 +47,7 @@
 #include    "odbc_resource.h"
 //#include              "setup.h"
 
-PUBLIC INT_PTR CALLBACK
-ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam,
-      LPARAM lParam);
+PUBLIC INT_PTR CALLBACK ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam);
 
 typedef struct __st_DriverConnectInfo
 {
@@ -60,8 +58,7 @@ typedef struct __st_DriverConnectInfo
   char pwd[ITEMBUFLEN];
 } DriverConnectInfo;
 
-PRIVATE INT_PTR CALLBACK
-ConnectDlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+PRIVATE INT_PTR CALLBACK ConnectDlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 PUBLIC HINSTANCE hInstance;
 
@@ -76,8 +73,7 @@ DllMain (HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
       cci_init ();
       DisableThreadLibraryCalls (hModule);
       GetModuleHandleEx (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN,
-       (LPCTSTR)SQLDriverConnect,
-       &hMd);
+			 (LPCTSTR) SQLDriverConnect, &hMd);
     }
 
   // hInstance is declared at resource_proc.c
@@ -100,8 +96,7 @@ const char *cci_client_name = "ODBC";
 ************************************************************************/
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLAllocHandle (SQLSMALLINT HandleType,
-    SQLHANDLE InputHandle, SQLHANDLE *OutputHandle)
+SQLAllocHandle (SQLSMALLINT HandleType, SQLHANDLE InputHandle, SQLHANDLE * OutputHandle)
 {
   RETCODE rc = SQL_SUCCESS;
 #ifdef _DEBUG
@@ -131,19 +126,13 @@ SQLAllocHandle (SQLSMALLINT HandleType,
       rc = odbc_alloc_env ((ODBC_ENV **) OutputHandle);
       break;
     case SQL_HANDLE_DBC:
-      rc =
-        odbc_alloc_connection ((ODBC_ENV *) InputHandle,
-             (ODBC_CONNECTION **) OutputHandle);
+      rc = odbc_alloc_connection ((ODBC_ENV *) InputHandle, (ODBC_CONNECTION **) OutputHandle);
       break;
     case SQL_HANDLE_STMT:
-      rc =
-        odbc_alloc_statement ((ODBC_CONNECTION *) InputHandle,
-            (ODBC_STATEMENT **) OutputHandle);
+      rc = odbc_alloc_statement ((ODBC_CONNECTION *) InputHandle, (ODBC_STATEMENT **) OutputHandle);
       break;
     case SQL_HANDLE_DESC:
-      rc =
-        odbc_alloc_desc ((ODBC_CONNECTION *) InputHandle,
-             (ODBC_DESC **) OutputHandle);
+      rc = odbc_alloc_desc ((ODBC_CONNECTION *) InputHandle, (ODBC_DESC **) OutputHandle);
       break;
     }
 
@@ -164,10 +153,8 @@ SQLAllocHandle (SQLSMALLINT HandleType,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLBindCol (SQLHSTMT StatementHandle,
-      SQLUSMALLINT ColumnNumber,
-      SQLSMALLINT TargetType,
-      SQLPOINTER TargetValue,
-      SQLLEN BufferLength, SQLLEN *StrLen_or_Ind)
+	    SQLUSMALLINT ColumnNumber,
+	    SQLSMALLINT TargetType, SQLPOINTER TargetValue, SQLLEN BufferLength, SQLLEN * StrLen_or_Ind)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -181,8 +168,7 @@ SQLBindCol (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  rc = odbc_bind_col (stmt_handle, ColumnNumber, TargetType,
-          TargetValue, BufferLength, StrLen_or_Ind);
+  rc = odbc_bind_col (stmt_handle, ColumnNumber, TargetType, TargetValue, BufferLength, StrLen_or_Ind);
 
   DEBUG_TIMESTAMP (END_SQLAllocHandle);
 
@@ -192,14 +178,13 @@ SQLBindCol (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLBindParameter (SQLHSTMT StatementHandle,
-      SQLUSMALLINT ParameterNumber,
-      SQLSMALLINT InputOutputType,
-      SQLSMALLINT ValueType,
-      SQLSMALLINT ParameterType,
-      SQLULEN ColumnSize,
-      SQLSMALLINT DecimalDigits,
-      SQLPOINTER ParameterValuePtr,
-      SQLLEN BufferLength, SQLLEN *StrLen_or_IndPtr)
+		  SQLUSMALLINT ParameterNumber,
+		  SQLSMALLINT InputOutputType,
+		  SQLSMALLINT ValueType,
+		  SQLSMALLINT ParameterType,
+		  SQLULEN ColumnSize,
+		  SQLSMALLINT DecimalDigits,
+		  SQLPOINTER ParameterValuePtr, SQLLEN BufferLength, SQLLEN * StrLen_or_IndPtr)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -213,24 +198,23 @@ SQLBindParameter (SQLHSTMT StatementHandle,
   if (StrLen_or_IndPtr && ValueType == SQL_WCHAR)
     {
       if (is_odd_number (*StrLen_or_IndPtr))
-  {
-    odbc_set_diag (stmt_handle->diag, "HY090", 0, NULL);
-    ODBC_RETURN (ODBC_ERROR, StatementHandle);
-  }
+	{
+	  odbc_set_diag (stmt_handle->diag, "HY090", 0, NULL);
+	  ODBC_RETURN (ODBC_ERROR, StatementHandle);
+	}
       else
-  {
-    *StrLen_or_IndPtr = *StrLen_or_IndPtr / sizeof (wchar_t);
-  }
+	{
+	  *StrLen_or_IndPtr = *StrLen_or_IndPtr / sizeof (wchar_t);
+	}
 
     }
 
   odbc_free_diag (stmt_handle->diag, RESET);
 
   rc = odbc_bind_parameter (stmt_handle, ParameterNumber,
-          InputOutputType, ValueType,
-          ParameterType, ColumnSize,
-          DecimalDigits, ParameterValuePtr,
-          BufferLength, StrLen_or_IndPtr);
+			    InputOutputType, ValueType,
+			    ParameterType, ColumnSize,
+			    DecimalDigits, ParameterValuePtr, BufferLength, StrLen_or_IndPtr);
 
   DEBUG_TIMESTAMP (END_SQLBindParameter);
 
@@ -286,14 +270,13 @@ SQLCloseCursor (SQLHSTMT StatementHandle)
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLColAttribute (SQLHSTMT StatementHandle,
-     SQLUSMALLINT ColumnNumber,
-     SQLUSMALLINT FieldIdentifier,
-     SQLPOINTER CharacterAttribute,
-     SQLSMALLINT BufferLength, SQLSMALLINT *StringLength,
+		 SQLUSMALLINT ColumnNumber,
+		 SQLUSMALLINT FieldIdentifier,
+		 SQLPOINTER CharacterAttribute, SQLSMALLINT BufferLength, SQLSMALLINT * StringLength,
 #if defined (_WIN64) || defined (__linux__)
-     SQLLEN *NumericAttribute)
+		 SQLLEN * NumericAttribute)
 #else
-     SQLPOINTER NumericAttribute)
+		 SQLPOINTER NumericAttribute)
 #endif
 {
   RETCODE rc = SQL_SUCCESS;
@@ -313,8 +296,7 @@ SQLColAttribute (SQLHSTMT StatementHandle,
   odbc_free_diag (stmt_handle->diag, RESET);
 
   rc = odbc_col_attribute (stmt_handle, ColumnNumber,
-         FieldIdentifier, CharacterAttribute, BufferLength,
-         StringLength, NumericAttribute);
+			   FieldIdentifier, CharacterAttribute, BufferLength, StringLength, NumericAttribute);
 
   DEBUG_TIMESTAMP (END_SQLColAttribute);
 
@@ -325,13 +307,11 @@ SQLColAttribute (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLColumns (SQLHSTMT StatementHandle,
-      SQLCHAR *CatalogName,
-      SQLSMALLINT NameLength1,
-      SQLCHAR *SchemaName,
-      SQLSMALLINT NameLength2,
-      SQLCHAR *TableName,
-      SQLSMALLINT NameLength3,
-      SQLCHAR *ColumnName, SQLSMALLINT NameLength4)
+	    SQLCHAR * CatalogName,
+	    SQLSMALLINT NameLength1,
+	    SQLCHAR * SchemaName,
+	    SQLSMALLINT NameLength2,
+	    SQLCHAR * TableName, SQLSMALLINT NameLength3, SQLCHAR * ColumnName, SQLSMALLINT NameLength4)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -353,9 +333,7 @@ SQLColumns (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  rc =
-    odbc_columns (stmt_handle, stCatalogName, stSchemaName, stTableName,
-      stColumnName);
+  rc = odbc_columns (stmt_handle, stCatalogName, stSchemaName, stTableName, stColumnName);
 
   NA_FREE (stCatalogName);
   NA_FREE (stSchemaName);
@@ -370,11 +348,9 @@ SQLColumns (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLConnect (SQLHDBC ConnectionHandle,
-      SQLCHAR *DataSource,
-      SQLSMALLINT NameLength1,
-      SQLCHAR *UserName,
-      SQLSMALLINT NameLength2,
-      SQLCHAR *Authentication, SQLSMALLINT NameLength3)
+	    SQLCHAR * DataSource,
+	    SQLSMALLINT NameLength1,
+	    SQLCHAR * UserName, SQLSMALLINT NameLength2, SQLCHAR * Authentication, SQLSMALLINT NameLength3)
 {
   RETCODE rc = SQL_SUCCESS;
   SQLCHAR *stDataSource = NULL;
@@ -399,12 +375,12 @@ SQLConnect (SQLHDBC ConnectionHandle,
   odbc_free_diag (((ODBC_CONNECTION *) ConnectionHandle)->diag, RESET);
 
   get_dsn_info (stDataSource, stDBName, sizeof (stDBName), NULL, 0, NULL, 0,
-    stServerName, sizeof (stServerName), &Port, &FetchSize,
-    stCharSet, sizeof (stCharSet), stAutocommit, sizeof (stAutocommit),
-    stOmitSchema, sizeof (stOmitSchema));
+		stServerName, sizeof (stServerName), &Port, &FetchSize,
+		stCharSet, sizeof (stCharSet), stAutocommit, sizeof (stAutocommit),
+		stOmitSchema, sizeof (stOmitSchema));
   rc = odbc_connect_new ((ODBC_CONNECTION *) ConnectionHandle, stDataSource,
-       stDBName, stUserName, stAuthentication, stServerName,
-       Port, FetchSize, stCharSet, stAutocommit, stOmitSchema, NULL);
+			 stDBName, stUserName, stAuthentication, stServerName,
+			 Port, FetchSize, stCharSet, stAutocommit, stOmitSchema, NULL);
   NA_FREE (stDataSource);
   NA_FREE (stUserName);
   NA_FREE (stAuthentication);
@@ -425,9 +401,7 @@ SQLCopyDesc (SQLHDESC SourceDescHandle, SQLHDESC TargetDescHandle)
 
   odbc_free_diag (((ODBC_DESC *) TargetDescHandle)->diag, RESET);
 
-  rc =
-    odbc_copy_desc ((ODBC_DESC *) SourceDescHandle,
-        (ODBC_DESC *) TargetDescHandle);
+  rc = odbc_copy_desc ((ODBC_DESC *) SourceDescHandle, (ODBC_DESC *) TargetDescHandle);
 
   DEBUG_TIMESTAMP (END_SQLCopyDesc);
 
@@ -440,13 +414,11 @@ SQLCopyDesc (SQLHDESC SourceDescHandle, SQLHDESC TargetDescHandle)
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLDescribeCol (SQLHSTMT StatementHandle,
-    SQLUSMALLINT ColumnNumber,
-    SQLCHAR *ColumnName,
-    SQLSMALLINT BufferLength,
-    SQLSMALLINT *NameLength,
-    SQLSMALLINT *DataType,
-    SQLULEN *ColumnSize,
-    SQLSMALLINT *DecimalDigits, SQLSMALLINT *Nullable)
+		SQLUSMALLINT ColumnNumber,
+		SQLCHAR * ColumnName,
+		SQLSMALLINT BufferLength,
+		SQLSMALLINT * NameLength,
+		SQLSMALLINT * DataType, SQLULEN * ColumnSize, SQLSMALLINT * DecimalDigits, SQLSMALLINT * Nullable)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -459,8 +431,7 @@ SQLDescribeCol (SQLHSTMT StatementHandle,
   odbc_free_diag (stmt_handle->diag, RESET);
 
   rc = odbc_describe_col (stmt_handle, ColumnNumber,
-        ColumnName, BufferLength, NameLength, DataType,
-        ColumnSize, DecimalDigits, Nullable);
+			  ColumnName, BufferLength, NameLength, DataType, ColumnSize, DecimalDigits, Nullable);
 
   DEBUG_TIMESTAMP (END_SQLDescribeCol);
 
@@ -493,12 +464,10 @@ SQLDisconnect (SQLHDBC ConnectionHandle)
  */
 ODBC_INTERFACE RETCODE SQL_API
 SQLDriverConnect (HDBC hdbc,
-      HWND hWnd,
-      UCHAR *szConnStrIn,
-      SWORD cbConnStrIn,
-      UCHAR *szConnStrOut,
-      SWORD cbConnStrOut,
-      SQLSMALLINT *pcbConnStrOut, UWORD uwMode)
+		  HWND hWnd,
+		  UCHAR * szConnStrIn,
+		  SWORD cbConnStrIn,
+		  UCHAR * szConnStrOut, SWORD cbConnStrOut, SQLSMALLINT * pcbConnStrOut, UWORD uwMode)
 {
   RETCODE rc = ODBC_SUCCESS;
 
@@ -525,7 +494,7 @@ SQLDriverConnect (HDBC hdbc,
   const char *ptOmitSchema;
 
   // Deprecated : char            szDriver[ITEMBUFLEN];
-  char ConnStrIn[BUF_SIZE*4];
+  char ConnStrIn[BUF_SIZE * 4];
   char buf[4096];
   char buf2[4096];
   char user[4096] = "";
@@ -548,14 +517,14 @@ SQLDriverConnect (HDBC hdbc,
     }
 
   strncpy (ConnStrIn, szConnStrIn, cbConnStrIn);
-  ConnStrIn[cbConnStrIn] = '\0';  // for end of list, if cbConnStrIn isn't end
+  ConnStrIn[cbConnStrIn] = '\0';	// for end of list, if cbConnStrIn isn't end
   // with ';'
   for (pt = ConnStrIn; *pt != '\0'; ++pt)
     {
-      if (*pt == ';')   // connection string delimiter
-  {
-    *pt = '\0';
-  }
+      if (*pt == ';')		// connection string delimiter
+	{
+	  *pt = '\0';
+	}
     }
   ptDriver = element_value_by_key (ConnStrIn, KEYWORD_DRIVER);
   /*
@@ -582,172 +551,169 @@ SQLDriverConnect (HDBC hdbc,
 
       // extracting user & pwd by dialog box
       if (ptUser == NULL || ptUser[0] == '\0' || ptPWD == NULL)
-  {
-    if (ptDSN != NULL)
-      {
-        get_dsn_info (ptDSN, NULL, 0, user, sizeof (user),
-          pwd, sizeof (pwd), NULL, 0, NULL, NULL, NULL, 0, NULL, 0, NULL, 0);
-      }
-    if (ptUser == NULL || ptUser[0] == '\0')
-      {
-        sprintf (dci.user, "%s", user);
-        sprintf (dci.pwd, "%s", pwd);
-      }
-    else
-      {
-        sprintf (dci.user, "%s", ptUser);
-        sprintf (dci.pwd, "");
-      }
+	{
+	  if (ptDSN != NULL)
+	    {
+	      get_dsn_info (ptDSN, NULL, 0, user, sizeof (user),
+			    pwd, sizeof (pwd), NULL, 0, NULL, NULL, NULL, 0, NULL, 0, NULL, 0);
+	    }
+	  if (ptUser == NULL || ptUser[0] == '\0')
+	    {
+	      sprintf (dci.user, "%s", user);
+	      sprintf (dci.pwd, "%s", pwd);
+	    }
+	  else
+	    {
+	      sprintf (dci.user, "%s", ptUser);
+	      sprintf (dci.pwd, "");
+	    }
 
 #if defined (_WINDOWS)
-    if (strcmp (dci.user, "") == 0)
-      {
-        DialogBoxParam (hInstance, (LPCTSTR) IDD_DRIVERCONNECT, hWnd,
-            ConnectDlgProc, (LPARAM) & dci);
-      }
+	  if (strcmp (dci.user, "") == 0)
+	    {
+	      DialogBoxParam (hInstance, (LPCTSTR) IDD_DRIVERCONNECT, hWnd, ConnectDlgProc, (LPARAM) & dci);
+	    }
 #endif
-    ptUser = dci.user;
-    ptPWD = dci.pwd;
-  }
+	  ptUser = dci.user;
+	  ptPWD = dci.pwd;
+	}
 
       if (ptDSN == NULL)
-  {
-    ptFileDSN = element_value_by_key (ConnStrIn, KEYWORD_FILEDSN);
-    ptDBName = element_value_by_key (ConnStrIn, KEYWORD_DBNAME);
-    ptServer = element_value_by_key (ConnStrIn, KEYWORD_SERVER);
-    ptPort = element_value_by_key (ConnStrIn, KEYWORD_PORT);
-    ptFetchSize = element_value_by_key (ConnStrIn, KEYWORD_FETCH_SIZE);
-    ptCharSet = element_value_by_key (ConnStrIn, KEYWORD_CHARSET);
-    ptAutoCommit = element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT);
-    ptOmitSchema = element_value_by_key (ConnStrIn, KEYWORD_OMIT_SCHEMA);
+	{
+	  ptFileDSN = element_value_by_key (ConnStrIn, KEYWORD_FILEDSN);
+	  ptDBName = element_value_by_key (ConnStrIn, KEYWORD_DBNAME);
+	  ptServer = element_value_by_key (ConnStrIn, KEYWORD_SERVER);
+	  ptPort = element_value_by_key (ConnStrIn, KEYWORD_PORT);
+	  ptFetchSize = element_value_by_key (ConnStrIn, KEYWORD_FETCH_SIZE);
+	  ptCharSet = element_value_by_key (ConnStrIn, KEYWORD_CHARSET);
+	  ptAutoCommit = element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT);
+	  ptOmitSchema = element_value_by_key (ConnStrIn, KEYWORD_OMIT_SCHEMA);
 
-    port = ptPort ? atoi (ptPort) : 0;
-    fetch_size = ptFetchSize ? atoi (ptFetchSize) : 0;
-    rc = odbc_connect_new (hdbc, ptFileDSN, ptDBName, ptUser,
-         ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, ptOmitSchema, ConnStrIn);
-  }
+	  port = ptPort ? atoi (ptPort) : 0;
+	  fetch_size = ptFetchSize ? atoi (ptFetchSize) : 0;
+	  rc = odbc_connect_new (hdbc, ptFileDSN, ptDBName, ptUser,
+				 ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, ptOmitSchema, ConnStrIn);
+	}
       else
-  {
-    // with DSN
-    ptDBName = element_value_by_key (ConnStrIn, KEYWORD_DBNAME);
-    ptServer = element_value_by_key (ConnStrIn, KEYWORD_SERVER);
-    ptPort = element_value_by_key (ConnStrIn, KEYWORD_PORT);
-    ptFetchSize = element_value_by_key (ConnStrIn, KEYWORD_FETCH_SIZE);
-    ptCharSet = element_value_by_key (ConnStrIn, KEYWORD_CHARSET);
-    ptAutoCommit = element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT);
-    ptOmitSchema = element_value_by_key (ConnStrIn, KEYWORD_OMIT_SCHEMA);
+	{
+	  // with DSN
+	  ptDBName = element_value_by_key (ConnStrIn, KEYWORD_DBNAME);
+	  ptServer = element_value_by_key (ConnStrIn, KEYWORD_SERVER);
+	  ptPort = element_value_by_key (ConnStrIn, KEYWORD_PORT);
+	  ptFetchSize = element_value_by_key (ConnStrIn, KEYWORD_FETCH_SIZE);
+	  ptCharSet = element_value_by_key (ConnStrIn, KEYWORD_CHARSET);
+	  ptAutoCommit = element_value_by_key (ConnStrIn, KEYWORD_AUTOCOMMIT);
+	  ptOmitSchema = element_value_by_key (ConnStrIn, KEYWORD_OMIT_SCHEMA);
 
-    get_dsn_info (ptDSN, db_name, sizeof (db_name), NULL, 0,
-      NULL, 0, server, sizeof (server), &port, &fetch_size,
-      charset, sizeof (charset), autocommit, sizeof (autocommit),
-      omit_schema, sizeof (omit_schema));
-    // cbConnStrIn이 DSN의 정보보다 우선하다.
-    if (ptDBName == NULL)
-      {
-        ptDBName = db_name;
-      }
-    if (ptServer == NULL)
-      {
-        ptServer = server;
-      }
-    if (ptPort != NULL)
-      {
-        port = atoi (ptPort);
-      }
-    if (ptFetchSize != NULL)
-      {
-        fetch_size = atoi (ptFetchSize);
-      }
-    if (ptCharSet == NULL)
-      {
-        ptCharSet = charset;
-      }
-    if (ptAutoCommit == NULL)
-      {
-        ptAutoCommit = autocommit;
-      }
-    if (ptOmitSchema == NULL)
-      {
-        ptOmitSchema = omit_schema;
-      }
+	  get_dsn_info (ptDSN, db_name, sizeof (db_name), NULL, 0,
+			NULL, 0, server, sizeof (server), &port, &fetch_size,
+			charset, sizeof (charset), autocommit, sizeof (autocommit), omit_schema, sizeof (omit_schema));
+	  // cbConnStrIn이 DSN의 정보보다 우선하다.
+	  if (ptDBName == NULL)
+	    {
+	      ptDBName = db_name;
+	    }
+	  if (ptServer == NULL)
+	    {
+	      ptServer = server;
+	    }
+	  if (ptPort != NULL)
+	    {
+	      port = atoi (ptPort);
+	    }
+	  if (ptFetchSize != NULL)
+	    {
+	      fetch_size = atoi (ptFetchSize);
+	    }
+	  if (ptCharSet == NULL)
+	    {
+	      ptCharSet = charset;
+	    }
+	  if (ptAutoCommit == NULL)
+	    {
+	      ptAutoCommit = autocommit;
+	    }
+	  if (ptOmitSchema == NULL)
+	    {
+	      ptOmitSchema = omit_schema;
+	    }
 
-    rc = odbc_connect_new (hdbc, ptDSN, ptDBName, ptUser,
-         ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, ptOmitSchema, ConnStrIn);
-  }
+	  rc = odbc_connect_new (hdbc, ptDSN, ptDBName, ptUser,
+				 ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, ptOmitSchema, ConnStrIn);
+	}
 
       // Building ConnStrOut
 
       if (ptDSN != NULL)
-  {
-    sprintf (buf, "%s=%s;", KEYWORD_DSN, ptDSN);
-  }
+	{
+	  sprintf (buf, "%s=%s;", KEYWORD_DSN, ptDSN);
+	}
       if (ptDriver != NULL)
-  {
-    sprintf (buf, "%s=%s;", KEYWORD_DRIVER, ptDriver);
-  }
+	{
+	  sprintf (buf, "%s=%s;", KEYWORD_DRIVER, ptDriver);
+	}
       else
-  {
-    buf2[0] = '\0';
-  }
+	{
+	  buf2[0] = '\0';
+	}
 
       if (ptDBName != NULL)
-  {
-    sprintf (buf2, "%s=%s;", KEYWORD_DBNAME, ptDBName);
-    strcat (buf, buf2);
-  }
+	{
+	  sprintf (buf2, "%s=%s;", KEYWORD_DBNAME, ptDBName);
+	  strcat (buf, buf2);
+	}
       if (ptUser != NULL)
-  {
-    sprintf (buf2, "%s=%s;", KEYWORD_USER, ptUser);
-    strcat (buf, buf2);
-  }
+	{
+	  sprintf (buf2, "%s=%s;", KEYWORD_USER, ptUser);
+	  strcat (buf, buf2);
+	}
       if (ptPWD != NULL)
-  {
-    sprintf (buf2, "%s=%s;", KEYWORD_PASSWORD, ptPWD);
-    strcat (buf, buf2);
-  }
+	{
+	  sprintf (buf2, "%s=%s;", KEYWORD_PASSWORD, ptPWD);
+	  strcat (buf, buf2);
+	}
       if (ptServer != NULL)
-  {
-    sprintf (buf2, "%s=%s;", KEYWORD_SERVER, ptServer);
-    strcat (buf, buf2);
-  }
+	{
+	  sprintf (buf2, "%s=%s;", KEYWORD_SERVER, ptServer);
+	  strcat (buf, buf2);
+	}
       if (port > 0)
-  {
-    sprintf (buf2, "%s=%d;", KEYWORD_PORT, port);
-    strcat (buf, buf2);
-  }
+	{
+	  sprintf (buf2, "%s=%d;", KEYWORD_PORT, port);
+	  strcat (buf, buf2);
+	}
       if (fetch_size > 0)
-  {
-    sprintf (buf2, "%s=%d;", KEYWORD_FETCH_SIZE, fetch_size);
-    strcat (buf, buf2);
-  }
+	{
+	  sprintf (buf2, "%s=%d;", KEYWORD_FETCH_SIZE, fetch_size);
+	  strcat (buf, buf2);
+	}
       if (ptCharSet != NULL)
-  {
-    sprintf (buf2, "%s=%s;", KEYWORD_CHARSET, ptCharSet);
-    strcat (buf, buf2);
-  }
+	{
+	  sprintf (buf2, "%s=%s;", KEYWORD_CHARSET, ptCharSet);
+	  strcat (buf, buf2);
+	}
       if (ptAutoCommit != NULL)
-  {
-    sprintf (buf2, "%s=%s;", KEYWORD_AUTOCOMMIT, ptAutoCommit);
-    strcat (buf, buf2);
-  }
+	{
+	  sprintf (buf2, "%s=%s;", KEYWORD_AUTOCOMMIT, ptAutoCommit);
+	  strcat (buf, buf2);
+	}
 
       if (ptOmitSchema != NULL)
-  {
-    sprintf (buf2, "%s=%s;", KEYWORD_OMIT_SCHEMA, ptOmitSchema);
-    strcat (buf, buf2);
-  }
+	{
+	  sprintf (buf2, "%s=%s;", KEYWORD_OMIT_SCHEMA, ptOmitSchema);
+	  strcat (buf, buf2);
+	}
 
       if ((szConnStrOut) && cbConnStrOut > 0)
-  {
-    strncpy (szConnStrOut, buf,
-       MIN (strlen (buf), (unsigned) cbConnStrOut));
-    szConnStrOut[MIN (strlen (buf), (unsigned) cbConnStrOut)] = '\0';
-  }
+	{
+	  strncpy (szConnStrOut, buf, MIN (strlen (buf), (unsigned) cbConnStrOut));
+	  szConnStrOut[MIN (strlen (buf), (unsigned) cbConnStrOut)] = '\0';
+	}
 
       if (pcbConnStrOut)
-  {
-    *pcbConnStrOut = MIN (strlen (buf), (unsigned) cbConnStrOut);
-  }
+	{
+	  *pcbConnStrOut = MIN (strlen (buf), (unsigned) cbConnStrOut);
+	}
     }
   else
     {
@@ -769,84 +735,81 @@ SQLDriverConnect (HDBC hdbc,
 
       strcpy (dsn_item.save_file, ptSaveFile);
       if (ptDriver != NULL)
-  {
-    strcpy (dsn_item.driver, ptDriver);
-  }
+	{
+	  strcpy (dsn_item.driver, ptDriver);
+	}
       if (ptDBName != NULL)
-  {
-    strcpy (dsn_item.db_name, ptDBName);
-  }
+	{
+	  strcpy (dsn_item.db_name, ptDBName);
+	}
       if (ptUser != NULL)
-  {
-    strcpy (dsn_item.user, ptUser);
-  }
+	{
+	  strcpy (dsn_item.user, ptUser);
+	}
       if (ptPWD != NULL)
-  {
-    strcpy (dsn_item.password, ptPWD);
-  }
+	{
+	  strcpy (dsn_item.password, ptPWD);
+	}
       if (ptServer != NULL)
-  {
-    strcpy (dsn_item.server, ptServer);
-  }
+	{
+	  strcpy (dsn_item.server, ptServer);
+	}
       if (ptPort != NULL)
-  {
-    strcpy (dsn_item.port, ptPort);
-  }
+	{
+	  strcpy (dsn_item.port, ptPort);
+	}
       if (ptFetchSize != NULL)
-  {
-    strcpy (dsn_item.fetch_size, ptFetchSize);
-  }
+	{
+	  strcpy (dsn_item.fetch_size, ptFetchSize);
+	}
       if (ptDescription != NULL)
-  {
-    strcpy (dsn_item.description, ptDescription);
-  }
+	{
+	  strcpy (dsn_item.description, ptDescription);
+	}
       if (ptCharSet != NULL)
-  {
-    strcpy (dsn_item.charset, ptCharSet);
-  }
+	{
+	  strcpy (dsn_item.charset, ptCharSet);
+	}
       if (ptAutoCommit != NULL)
-  {
-    strcpy (dsn_item.autocommit, ptAutoCommit);
-  }
+	{
+	  strcpy (dsn_item.autocommit, ptAutoCommit);
+	}
       if (ptOmitSchema != NULL)
-  {
-    strcpy (dsn_item.omit_schema, ptOmitSchema);
-  }
+	{
+	  strcpy (dsn_item.omit_schema, ptOmitSchema);
+	}
 
 #if defined (_WINDOWS)
-      dlgrc = DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hWnd,
-            ConfigDSNDlgProc, (LPARAM) & dsn_item);
+      dlgrc = DialogBoxParam (hInstance, (LPCTSTR) IDD_CONFIGDSN, hWnd, ConfigDSNDlgProc, (LPARAM) & dsn_item);
       if (dlgrc == IDCANCEL)
-  {
-    return SQL_NO_DATA;
-  }
+	{
+	  return SQL_NO_DATA;
+	}
 #endif
 
       sprintf (buf, "%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s;%s=%s",
-         KEYWORD_DRIVER, ptDriver,
-         KEYWORD_SAVEFILE, ptSaveFile,
-         KEYWORD_DESCRIPTION, dsn_item.description,
-         KEYWORD_DBNAME, dsn_item.db_name,
-         KEYWORD_PASSWORD, dsn_item.password,
-         KEYWORD_USER, dsn_item.user,
-         KEYWORD_SERVER, dsn_item.server,
-         KEYWORD_PORT, dsn_item.port,
-         KEYWORD_FETCH_SIZE, dsn_item.fetch_size,
-         KEYWORD_CHARSET, dsn_item.charset,
-         KEYWORD_AUTOCOMMIT, dsn_item.autocommit,
-         KEYWORD_OMIT_SCHEMA, dsn_item.omit_schema);
+	       KEYWORD_DRIVER, ptDriver,
+	       KEYWORD_SAVEFILE, ptSaveFile,
+	       KEYWORD_DESCRIPTION, dsn_item.description,
+	       KEYWORD_DBNAME, dsn_item.db_name,
+	       KEYWORD_PASSWORD, dsn_item.password,
+	       KEYWORD_USER, dsn_item.user,
+	       KEYWORD_SERVER, dsn_item.server,
+	       KEYWORD_PORT, dsn_item.port,
+	       KEYWORD_FETCH_SIZE, dsn_item.fetch_size,
+	       KEYWORD_CHARSET, dsn_item.charset,
+	       KEYWORD_AUTOCOMMIT, dsn_item.autocommit, KEYWORD_OMIT_SCHEMA, dsn_item.omit_schema);
 
       if ((szConnStrOut) && cbConnStrOut > 0)
-  {
-    strncpy (szConnStrOut, buf,
-       MIN (strlen (buf), (unsigned) cbConnStrOut));
-    szConnStrOut[MIN (strlen (buf), (unsigned) cbConnStrOut)] = '\0';
-  }
+	{
+	  strncpy (szConnStrOut, buf, MIN (strlen (buf), (unsigned) cbConnStrOut));
+	  szConnStrOut[MIN (strlen (buf), (unsigned) cbConnStrOut)] = '\0';
+	}
 
       if (pcbConnStrOut)
-  {
-    *pcbConnStrOut = MIN (strlen (buf), (unsigned) cbConnStrOut);
-  }
+	{
+	  *pcbConnStrOut = MIN (strlen (buf), (unsigned) cbConnStrOut);
+	}
 
       // CHECK : return value
     }
@@ -858,8 +821,7 @@ SQLDriverConnect (HDBC hdbc,
 
 #if (ODBCVER >= 0x0300)
 ODBC_INTERFACE RETCODE SQL_API
-SQLEndTran (SQLSMALLINT HandleType,
-      SQLHANDLE Handle, SQLSMALLINT CompletionType)
+SQLEndTran (SQLSMALLINT HandleType, SQLHANDLE Handle, SQLSMALLINT CompletionType)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -880,8 +842,7 @@ SQLEndTran (SQLSMALLINT HandleType,
 
 // 오직 SQLExecDirect만 prepare된 상태를 풀 수 있다.
 ODBC_INTERFACE RETCODE SQL_API
-SQLExecDirect (SQLHSTMT StatementHandle,
-         SQLCHAR *StatementText, SQLINTEGER TextLength)
+SQLExecDirect (SQLHSTMT StatementHandle, SQLCHAR * StatementText, SQLINTEGER TextLength)
 {
   RETCODE rc = SQL_SUCCESS;
   SQLCHAR *stStatementText = NULL;
@@ -979,7 +940,7 @@ SQLFetch (SQLHSTMT StatementHandle)
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  rc = odbc_fetch (stmt_handle, SQL_FETCH_NEXT, 1, 0, 0); // fetch_offset is ignored
+  rc = odbc_fetch (stmt_handle, SQL_FETCH_NEXT, 1, 0, 0);	// fetch_offset is ignored
 
   DEBUG_TIMESTAMP (END_SQLFetch);
 
@@ -989,8 +950,7 @@ SQLFetch (SQLHSTMT StatementHandle)
 
 #if (ODBCVER >= 0x0300)
 ODBC_INTERFACE RETCODE SQL_API
-SQLFetchScroll (SQLHSTMT StatementHandle,
-    SQLSMALLINT FetchOrientation, SQLLEN FetchOffset)
+SQLFetchScroll (SQLHSTMT StatementHandle, SQLSMALLINT FetchOrientation, SQLLEN FetchOffset)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -1026,9 +986,8 @@ SQLFetchScroll (SQLHSTMT StatementHandle,
 // for 2.x backward compatibility
 ODBC_INTERFACE RETCODE SQL_API
 SQLExtendedFetch (SQLHSTMT StatementHandle,
-      SQLUSMALLINT FetchOrientation,
-      SQLLEN FetchOffset,
-      SQLULEN *RowCountPtr, SQLUSMALLINT *RowStatusArray)
+		  SQLUSMALLINT FetchOrientation,
+		  SQLLEN FetchOffset, SQLULEN * RowCountPtr, SQLUSMALLINT * RowStatusArray)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -1038,10 +997,8 @@ SQLExtendedFetch (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  odbc_set_stmt_attr (stmt_handle, SQL_ATTR_ROWS_FETCHED_PTR,
-          (void *) RowCountPtr, 0, 1);
-  odbc_set_stmt_attr (stmt_handle, SQL_ATTR_ROW_STATUS_PTR,
-          (void *) RowStatusArray, 0, 1);
+  odbc_set_stmt_attr (stmt_handle, SQL_ATTR_ROWS_FETCHED_PTR, (void *) RowCountPtr, 0, 1);
+  odbc_set_stmt_attr (stmt_handle, SQL_ATTR_ROW_STATUS_PTR, (void *) RowStatusArray, 0, 1);
 
   rc = odbc_fetch (stmt_handle, FetchOrientation, FetchOffset, 0, 0);
 
@@ -1104,9 +1061,7 @@ SQLFreeStmt (SQLHSTMT StatementHandle, SQLUSMALLINT Option)
 #if (ODBCVER >= 0x0300)
 ODBC_INTERFACE RETCODE SQL_API
 SQLGetConnectAttr (SQLHDBC ConnectionHandle,
-       SQLINTEGER Attribute,
-       SQLPOINTER Value,
-       SQLINTEGER BufferLength, SQLINTEGER *StringLength)
+		   SQLINTEGER Attribute, SQLPOINTER Value, SQLINTEGER BufferLength, SQLINTEGER * StringLength)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -1116,8 +1071,7 @@ SQLGetConnectAttr (SQLHDBC ConnectionHandle,
 
   odbc_free_diag (((ODBC_CONNECTION *) ConnectionHandle)->diag, RESET);
 
-  rc = odbc_get_connect_attr ((ODBC_CONNECTION *) ConnectionHandle,
-            Attribute, Value, BufferLength, StringLength);
+  rc = odbc_get_connect_attr ((ODBC_CONNECTION *) ConnectionHandle, Attribute, Value, BufferLength, StringLength);
 
   DEBUG_TIMESTAMP (END_SQLGetConnectAttr);
 
@@ -1127,9 +1081,7 @@ SQLGetConnectAttr (SQLHDBC ConnectionHandle,
 
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLGetCursorName (SQLHSTMT StatementHandle,
-      SQLCHAR *CursorName,
-      SQLSMALLINT BufferLength, SQLSMALLINT *NameLength)
+SQLGetCursorName (SQLHSTMT StatementHandle, SQLCHAR * CursorName, SQLSMALLINT BufferLength, SQLSMALLINT * NameLength)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -1140,9 +1092,7 @@ SQLGetCursorName (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  rc =
-    odbc_get_cursor_name (stmt_handle, CursorName, BufferLength,
-        &tmp_NameLength);
+  rc = odbc_get_cursor_name (stmt_handle, CursorName, BufferLength, &tmp_NameLength);
 
   if (NameLength != NULL)
     {
@@ -1155,10 +1105,8 @@ SQLGetCursorName (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLGetData (SQLHSTMT StatementHandle,
-      SQLUSMALLINT ColumnNumber,
-      SQLSMALLINT TargetType,
-      SQLPOINTER TargetValue,
-      SQLLEN BufferLength, SQLLEN *StrLen_or_Ind)
+	    SQLUSMALLINT ColumnNumber,
+	    SQLSMALLINT TargetType, SQLPOINTER TargetValue, SQLLEN BufferLength, SQLLEN * StrLen_or_Ind)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -1175,8 +1123,7 @@ SQLGetData (SQLHSTMT StatementHandle,
       ODBC_RETURN (rc, StatementHandle);
     }
 
-  rc = odbc_get_data (stmt_handle, ColumnNumber,
-          TargetType, TargetValue, BufferLength, StrLen_or_Ind);
+  rc = odbc_get_data (stmt_handle, ColumnNumber, TargetType, TargetValue, BufferLength, StrLen_or_Ind);
 
   DEBUG_TIMESTAMP (END_SQLGetData);
 
@@ -1188,10 +1135,8 @@ SQLGetData (SQLHSTMT StatementHandle,
 #if (ODBCVER >= 0x0300)
 ODBC_INTERFACE RETCODE SQL_API
 SQLGetDescField (SQLHDESC DescriptorHandle,
-     SQLSMALLINT RecNumber,
-     SQLSMALLINT FieldIdentifier,
-     SQLPOINTER Value,
-     SQLINTEGER BufferLength, SQLINTEGER *StringLength)
+		 SQLSMALLINT RecNumber,
+		 SQLSMALLINT FieldIdentifier, SQLPOINTER Value, SQLINTEGER BufferLength, SQLINTEGER * StringLength)
 {
   RETCODE rc = SQL_SUCCESS;
   SQLLEN tmp_StringLength;
@@ -1203,8 +1148,7 @@ SQLGetDescField (SQLHDESC DescriptorHandle,
   odbc_free_diag (((ODBC_DESC *) DescriptorHandle)->diag, RESET);
 
   rc = odbc_get_desc_field ((ODBC_DESC *) DescriptorHandle, RecNumber,
-          FieldIdentifier, Value,
-          BufferLength, &tmp_StringLength);
+			    FieldIdentifier, Value, BufferLength, &tmp_StringLength);
   if (StringLength != NULL)
     {
       *StringLength = (SQLINTEGER) tmp_StringLength;
@@ -1217,15 +1161,13 @@ SQLGetDescField (SQLHDESC DescriptorHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLGetDescRec (SQLHDESC DescriptorHandle,
-         SQLSMALLINT RecNumber,
-         SQLCHAR *Name,
-         SQLSMALLINT BufferLength,
-         SQLSMALLINT *StringLength,
-         SQLSMALLINT *Type,
-         SQLSMALLINT *SubType,
-         SQLLEN *Length,
-         SQLSMALLINT *Precision,
-         SQLSMALLINT *Scale, SQLSMALLINT *Nullable)
+	       SQLSMALLINT RecNumber,
+	       SQLCHAR * Name,
+	       SQLSMALLINT BufferLength,
+	       SQLSMALLINT * StringLength,
+	       SQLSMALLINT * Type,
+	       SQLSMALLINT * SubType,
+	       SQLLEN * Length, SQLSMALLINT * Precision, SQLSMALLINT * Scale, SQLSMALLINT * Nullable)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -1236,8 +1178,7 @@ SQLGetDescRec (SQLHDESC DescriptorHandle,
   odbc_free_diag (((ODBC_DESC *) DescriptorHandle)->diag, RESET);
 
   rc = odbc_get_desc_rec ((ODBC_DESC *) DescriptorHandle, RecNumber,
-        Name, BufferLength, StringLength,
-        Type, SubType, Length, Precision, Scale, Nullable);
+			  Name, BufferLength, StringLength, Type, SubType, Length, Precision, Scale, Nullable);
 
   DEBUG_TIMESTAMP (END_SQLGetDescRec);
 
@@ -1247,21 +1188,18 @@ SQLGetDescRec (SQLHDESC DescriptorHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLGetDiagField (SQLSMALLINT HandleType,
-     SQLHANDLE Handle,
-     SQLSMALLINT RecNumber,
-     SQLSMALLINT DiagIdentifier,
-     SQLPOINTER DiagInfo,
-     SQLSMALLINT BufferLength, SQLSMALLINT *StringLength)
+		 SQLHANDLE Handle,
+		 SQLSMALLINT RecNumber,
+		 SQLSMALLINT DiagIdentifier, SQLPOINTER DiagInfo, SQLSMALLINT BufferLength, SQLSMALLINT * StringLength)
 {
   RETCODE rc = SQL_SUCCESS;
-  SQLLEN tmp_StringLength;  // for type compatibility between short*, int*
+  SQLLEN tmp_StringLength;	// for type compatibility between short*, int*
 
   OutputDebugString ("SQLGetDiagField called\n");
 
   DEBUG_TIMESTAMP (START_SQLGetDiagField);
 
-  rc = odbc_get_diag_field (HandleType, Handle, RecNumber, DiagIdentifier,
-          DiagInfo, BufferLength, &tmp_StringLength);
+  rc = odbc_get_diag_field (HandleType, Handle, RecNumber, DiagIdentifier, DiagInfo, BufferLength, &tmp_StringLength);
   if (StringLength != NULL)
     {
       *StringLength = (short) tmp_StringLength;
@@ -1275,41 +1213,38 @@ SQLGetDiagField (SQLSMALLINT HandleType,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLGetDiagRec (SQLSMALLINT HandleType,
-         SQLHANDLE Handle,
-         SQLSMALLINT RecNumber,
-         SQLCHAR *Sqlstate,
-         SQLINTEGER *NativeError,
-         SQLCHAR *MessageText,
-         SQLSMALLINT BufferLength, SQLSMALLINT *TextLength)
+	       SQLHANDLE Handle,
+	       SQLSMALLINT RecNumber,
+	       SQLCHAR * Sqlstate,
+	       SQLINTEGER * NativeError, SQLCHAR * MessageText, SQLSMALLINT BufferLength, SQLSMALLINT * TextLength)
 {
   RETCODE rc = SQL_SUCCESS;
-  SQLLEN tmp_StringLength=0;
-  ODBC_ENV *env=NULL;
+  SQLLEN tmp_StringLength = 0;
+  ODBC_ENV *env = NULL;
 
   OutputDebugString ("SQLGetDiagRec called\n");
 
   DEBUG_TIMESTAMP (START_SQLGetDiagRec);
 
   rc = odbc_get_diag_rec (HandleType, Handle, RecNumber, Sqlstate,
-        NativeError, MessageText, BufferLength,
-        &tmp_StringLength);
+			  NativeError, MessageText, BufferLength, &tmp_StringLength);
   if (rc != ODBC_SUCCESS)
     {
       if (SQL_SUCCESS_WITH_INFO == rc)
-  {
-    *TextLength = (short) tmp_StringLength;
-  }
+	{
+	  *TextLength = (short) tmp_StringLength;
+	}
       if (rc == SQL_NO_DATA)
-  {
-    env = (ODBC_ENV *)Handle;
-    odbc_free_diag (env->diag,INIT);
-  }
+	{
+	  env = (ODBC_ENV *) Handle;
+	  odbc_free_diag (env->diag, INIT);
+	}
       return rc;
     }
 
   if (TextLength != NULL)
     {
-      *TextLength = (SQLSMALLINT) ((short) tmp_StringLength>BufferLength?BufferLength:tmp_StringLength);
+      *TextLength = (SQLSMALLINT) ((short) tmp_StringLength > BufferLength ? BufferLength : tmp_StringLength);
     }
 
   DEBUG_TIMESTAMP (END_SQLGetDiagRec);
@@ -1320,9 +1255,7 @@ SQLGetDiagRec (SQLSMALLINT HandleType,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLGetEnvAttr (SQLHENV EnvironmentHandle,
-         SQLINTEGER Attribute,
-         SQLPOINTER Value,
-         SQLINTEGER BufferLength, SQLINTEGER *StringLength)
+	       SQLINTEGER Attribute, SQLPOINTER Value, SQLINTEGER BufferLength, SQLINTEGER * StringLength)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_ENV *env;
@@ -1353,8 +1286,7 @@ SQLGetEnvAttr (SQLHENV EnvironmentHandle,
 
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLGetFunctions (SQLHDBC ConnectionHandle,
-     SQLUSMALLINT FunctionId, SQLUSMALLINT *Supported)
+SQLGetFunctions (SQLHDBC ConnectionHandle, SQLUSMALLINT FunctionId, SQLUSMALLINT * Supported)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -1373,9 +1305,7 @@ SQLGetFunctions (SQLHDBC ConnectionHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLGetInfo (SQLHDBC ConnectionHandle,
-      SQLUSMALLINT InfoType,
-      SQLPOINTER InfoValue,
-      SQLSMALLINT BufferLength, SQLSMALLINT *StringLength)
+	    SQLUSMALLINT InfoType, SQLPOINTER InfoValue, SQLSMALLINT BufferLength, SQLSMALLINT * StringLength)
 {
   RETCODE rc = SQL_SUCCESS;
   SQLLEN tmp_StringLength;
@@ -1386,9 +1316,7 @@ SQLGetInfo (SQLHDBC ConnectionHandle,
 
   odbc_free_diag (((ODBC_CONNECTION *) ConnectionHandle)->diag, RESET);
 
-  rc =
-    odbc_get_info ((ODBC_CONNECTION *) ConnectionHandle, InfoType, InfoValue,
-       BufferLength, &tmp_StringLength);
+  rc = odbc_get_info ((ODBC_CONNECTION *) ConnectionHandle, InfoType, InfoValue, BufferLength, &tmp_StringLength);
   if (StringLength != NULL)
     {
       *StringLength = (short) tmp_StringLength;
@@ -1402,9 +1330,7 @@ SQLGetInfo (SQLHDBC ConnectionHandle,
 #if (ODBCVER >= 0x0300)
 ODBC_INTERFACE RETCODE SQL_API
 SQLGetStmtAttr (SQLHSTMT StatementHandle,
-    SQLINTEGER Attribute,
-    SQLPOINTER Value,
-    SQLINTEGER BufferLength, SQLINTEGER *StringLength)
+		SQLINTEGER Attribute, SQLPOINTER Value, SQLINTEGER BufferLength, SQLINTEGER * StringLength)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -1416,8 +1342,7 @@ SQLGetStmtAttr (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  rc = odbc_get_stmt_attr (stmt_handle, Attribute, Value,
-         BufferLength, StringLength);
+  rc = odbc_get_stmt_attr (stmt_handle, Attribute, Value, BufferLength, StringLength);
 
   DEBUG_TIMESTAMP (END_SQLGetStmtAttr);
 
@@ -1448,10 +1373,8 @@ SQLGetTypeInfo (SQLHSTMT StatementHandle, SQLSMALLINT DataType)
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLNativeSql (SQLHDBC ConnectionHandle,
-        SQLCHAR *InStatementText,
-        SQLINTEGER TextLength1,
-        SQLCHAR *OutStatementText,
-        SQLINTEGER BufferLength, SQLINTEGER *TextLength2Ptr)
+	      SQLCHAR * InStatementText,
+	      SQLINTEGER TextLength1, SQLCHAR * OutStatementText, SQLINTEGER BufferLength, SQLINTEGER * TextLength2Ptr)
 {
   RETCODE rc = SQL_SUCCESS;
   SQLCHAR *stInStatementText = NULL;
@@ -1473,7 +1396,7 @@ SQLNativeSql (SQLHDBC ConnectionHandle,
 
   rc =
     odbc_native_sql ((ODBC_CONNECTION *) ConnectionHandle, stInStatementText,
-         OutStatementText, BufferLength, TextLength2Ptr);
+		     OutStatementText, BufferLength, TextLength2Ptr);
 
   DEBUG_TIMESTAMP (END_SQLNativeSql);
 
@@ -1484,7 +1407,7 @@ SQLNativeSql (SQLHDBC ConnectionHandle,
 
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLNumParams (SQLHSTMT StatementHandle, SQLSMALLINT *ParameterCountPtr)
+SQLNumParams (SQLHSTMT StatementHandle, SQLSMALLINT * ParameterCountPtr)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -1506,7 +1429,7 @@ SQLNumParams (SQLHSTMT StatementHandle, SQLSMALLINT *ParameterCountPtr)
 
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLNumResultCols (SQLHSTMT StatementHandle, SQLSMALLINT *ColumnCount)
+SQLNumResultCols (SQLHSTMT StatementHandle, SQLSMALLINT * ColumnCount)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -1527,7 +1450,7 @@ SQLNumResultCols (SQLHSTMT StatementHandle, SQLSMALLINT *ColumnCount)
 
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLParamData (SQLHSTMT StatementHandle, SQLPOINTER *Value)
+SQLParamData (SQLHSTMT StatementHandle, SQLPOINTER * Value)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -1548,8 +1471,7 @@ SQLParamData (SQLHSTMT StatementHandle, SQLPOINTER *Value)
 
 // 오직 SQLPrepare만 prepared된 상태로 만들수 있다.
 ODBC_INTERFACE RETCODE SQL_API
-SQLPrepare (SQLHSTMT StatementHandle,
-      SQLCHAR *StatementText, SQLINTEGER TextLength)
+SQLPrepare (SQLHSTMT StatementHandle, SQLCHAR * StatementText, SQLINTEGER TextLength)
 {
   RETCODE rc = SQL_SUCCESS;
   SQLCHAR *stStatementText = NULL;
@@ -1610,7 +1532,7 @@ SQLPutData (SQLHSTMT StatementHandle, SQLPOINTER Data, SQLLEN StrLen_or_Ind)
 
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLRowCount (SQLHSTMT StatementHandle, SQLLEN *RowCount)
+SQLRowCount (SQLHSTMT StatementHandle, SQLLEN * RowCount)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -1631,9 +1553,7 @@ SQLRowCount (SQLHSTMT StatementHandle, SQLLEN *RowCount)
 
 #if (ODBCVER >= 0x0300)
 ODBC_INTERFACE RETCODE SQL_API
-SQLSetConnectAttr (SQLHDBC ConnectionHandle,
-       SQLINTEGER Attribute,
-       SQLPOINTER Value, SQLINTEGER StringLength)
+SQLSetConnectAttr (SQLHDBC ConnectionHandle, SQLINTEGER Attribute, SQLPOINTER Value, SQLINTEGER StringLength)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -1643,8 +1563,7 @@ SQLSetConnectAttr (SQLHDBC ConnectionHandle,
 
   odbc_free_diag (((ODBC_CONNECTION *) ConnectionHandle)->diag, RESET);
 
-  rc = odbc_set_connect_attr ((ODBC_CONNECTION *) ConnectionHandle, Attribute,
-            Value, StringLength);
+  rc = odbc_set_connect_attr ((ODBC_CONNECTION *) ConnectionHandle, Attribute, Value, StringLength);
 
   DEBUG_TIMESTAMP (END_SQLSetConnectAttr);
 
@@ -1655,8 +1574,7 @@ SQLSetConnectAttr (SQLHDBC ConnectionHandle,
 
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLSetCursorName (SQLHSTMT StatementHandle,
-      SQLCHAR *CursorName, SQLSMALLINT NameLength)
+SQLSetCursorName (SQLHSTMT StatementHandle, SQLCHAR * CursorName, SQLSMALLINT NameLength)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -1678,9 +1596,7 @@ SQLSetCursorName (SQLHSTMT StatementHandle,
 #if (ODBCVER >= 0x0300)
 ODBC_INTERFACE RETCODE SQL_API
 SQLSetDescField (SQLHDESC DescriptorHandle,
-     SQLSMALLINT RecNumber,
-     SQLSMALLINT FieldIdentifier,
-     SQLPOINTER Value, SQLINTEGER BufferLength)
+		 SQLSMALLINT RecNumber, SQLSMALLINT FieldIdentifier, SQLPOINTER Value, SQLINTEGER BufferLength)
 {
   RETCODE rc = SQL_SUCCESS;
   SQLSMALLINT is_driver;
@@ -1692,8 +1608,7 @@ SQLSetDescField (SQLHDESC DescriptorHandle,
   odbc_free_diag (((ODBC_DESC *) DescriptorHandle)->diag, RESET);
 
   if (odbc_is_ird ((ODBC_DESC *) DescriptorHandle) &&
-      (FieldIdentifier == SQL_DESC_ARRAY_STATUS_PTR &&
-       FieldIdentifier == SQL_DESC_ROWS_PROCESSED_PTR))
+      (FieldIdentifier == SQL_DESC_ARRAY_STATUS_PTR && FieldIdentifier == SQL_DESC_ROWS_PROCESSED_PTR))
     {
       is_driver = 1;
     }
@@ -1702,8 +1617,7 @@ SQLSetDescField (SQLHDESC DescriptorHandle,
       is_driver = 0;
     }
 
-  rc = odbc_set_desc_field ((ODBC_DESC *) DescriptorHandle, RecNumber,
-          FieldIdentifier, Value, BufferLength, is_driver);
+  rc = odbc_set_desc_field ((ODBC_DESC *) DescriptorHandle, RecNumber, FieldIdentifier, Value, BufferLength, is_driver);
 
   DEBUG_TIMESTAMP (END_SQLSetDescField);
 
@@ -1713,13 +1627,11 @@ SQLSetDescField (SQLHDESC DescriptorHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLSetDescRec (SQLHDESC DescriptorHandle,
-         SQLSMALLINT RecNumber,
-         SQLSMALLINT Type,
-         SQLSMALLINT SubType,
-         SQLLEN Length,
-         SQLSMALLINT Precision,
-         SQLSMALLINT Scale,
-         SQLPOINTER Data, SQLLEN *StringLength, SQLLEN *Indicator)
+	       SQLSMALLINT RecNumber,
+	       SQLSMALLINT Type,
+	       SQLSMALLINT SubType,
+	       SQLLEN Length,
+	       SQLSMALLINT Precision, SQLSMALLINT Scale, SQLPOINTER Data, SQLLEN * StringLength, SQLLEN * Indicator)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -1730,8 +1642,7 @@ SQLSetDescRec (SQLHDESC DescriptorHandle,
   odbc_free_diag (((ODBC_DESC *) DescriptorHandle)->diag, RESET);
 
   rc = odbc_set_desc_rec ((ODBC_DESC *) DescriptorHandle, RecNumber, Type,
-        SubType, Length, Precision,
-        Scale, Data, StringLength, Indicator);
+			  SubType, Length, Precision, Scale, Data, StringLength, Indicator);
 
   DEBUG_TIMESTAMP (END_SQLSetDescRec);
 
@@ -1739,9 +1650,7 @@ SQLSetDescRec (SQLHDESC DescriptorHandle,
 }
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLSetEnvAttr (SQLHENV EnvironmentHandle,
-         SQLINTEGER Attribute,
-         SQLPOINTER Value, SQLINTEGER StringLength)
+SQLSetEnvAttr (SQLHENV EnvironmentHandle, SQLINTEGER Attribute, SQLPOINTER Value, SQLINTEGER StringLength)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_ENV *env;
@@ -1774,9 +1683,7 @@ SQLSetEnvAttr (SQLHENV EnvironmentHandle,
 
 #if (ODBCVER >= 0x0300)
 ODBC_INTERFACE RETCODE SQL_API
-SQLSetStmtAttr (SQLHSTMT StatementHandle,
-    SQLINTEGER Attribute,
-    SQLPOINTER Value, SQLINTEGER StringLength)
+SQLSetStmtAttr (SQLHSTMT StatementHandle, SQLINTEGER Attribute, SQLPOINTER Value, SQLINTEGER StringLength)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -1799,14 +1706,12 @@ SQLSetStmtAttr (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLSpecialColumns (SQLHSTMT StatementHandle,
-       SQLUSMALLINT IdentifierType,
-       SQLCHAR *CatalogName,
-       SQLSMALLINT NameLength1,
-       SQLCHAR *SchemaName,
-       SQLSMALLINT NameLength2,
-       SQLCHAR *TableName,
-       SQLSMALLINT NameLength3,
-       SQLUSMALLINT Scope, SQLUSMALLINT Nullable)
+		   SQLUSMALLINT IdentifierType,
+		   SQLCHAR * CatalogName,
+		   SQLSMALLINT NameLength1,
+		   SQLCHAR * SchemaName,
+		   SQLSMALLINT NameLength2,
+		   SQLCHAR * TableName, SQLSMALLINT NameLength3, SQLUSMALLINT Scope, SQLUSMALLINT Nullable)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -1826,9 +1731,7 @@ SQLSpecialColumns (SQLHSTMT StatementHandle,
   stSchemaName = UT_MAKE_STRING (SchemaName, NameLength2);
   stTableName = UT_MAKE_STRING (TableName, NameLength3);
 
-  rc = odbc_special_columns (stmt_handle, IdentifierType,
-           stCatalogName, stSchemaName, stTableName, Scope,
-           Nullable);
+  rc = odbc_special_columns (stmt_handle, IdentifierType, stCatalogName, stSchemaName, stTableName, Scope, Nullable);
 
   NA_FREE (stCatalogName);
   NA_FREE (stSchemaName);
@@ -1842,13 +1745,11 @@ SQLSpecialColumns (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLStatistics (SQLHSTMT StatementHandle,
-         SQLCHAR *CatalogName,
-         SQLSMALLINT NameLength1,
-         SQLCHAR *SchemaName,
-         SQLSMALLINT NameLength2,
-         SQLCHAR *TableName,
-         SQLSMALLINT NameLength3,
-         SQLUSMALLINT Unique, SQLUSMALLINT Reserved)
+	       SQLCHAR * CatalogName,
+	       SQLSMALLINT NameLength1,
+	       SQLCHAR * SchemaName,
+	       SQLSMALLINT NameLength2,
+	       SQLCHAR * TableName, SQLSMALLINT NameLength3, SQLUSMALLINT Unique, SQLUSMALLINT Reserved)
 {
   RETCODE rc = SQL_SUCCESS;
   SQLCHAR *stCatalogName = NULL;
@@ -1867,8 +1768,7 @@ SQLStatistics (SQLHSTMT StatementHandle,
   stSchemaName = UT_MAKE_STRING (SchemaName, NameLength2);
   stTableName = UT_MAKE_STRING (TableName, NameLength3);
 
-  rc = odbc_statistics (stmt_handle, stCatalogName,
-      stSchemaName, stTableName, Unique, Reserved);
+  rc = odbc_statistics (stmt_handle, stCatalogName, stSchemaName, stTableName, Unique, Reserved);
 
   NA_FREE (stCatalogName);
   NA_FREE (stSchemaName);
@@ -1881,11 +1781,9 @@ SQLStatistics (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLTablePrivileges (SQLHSTMT StatementHandle,
-        SQLCHAR *CatalogName,
-        SQLSMALLINT NameLength1,
-        SQLCHAR *SchemaName,
-        SQLSMALLINT NameLength2,
-        SQLCHAR *TableName, SQLSMALLINT NameLength3)
+		    SQLCHAR * CatalogName,
+		    SQLSMALLINT NameLength1,
+		    SQLCHAR * SchemaName, SQLSMALLINT NameLength2, SQLCHAR * TableName, SQLSMALLINT NameLength3)
 {
   RETCODE odbc_retval = SQL_SUCCESS;
 
@@ -1905,9 +1803,7 @@ SQLTablePrivileges (SQLHSTMT StatementHandle,
   stSchemaName = UT_MAKE_STRING (SchemaName, NameLength2);
   stTableName = UT_MAKE_STRING (TableName, NameLength3);
 
-  odbc_retval =
-    odbc_table_privileges (stmt_handle, stCatalogName, stSchemaName,
-         stTableName);
+  odbc_retval = odbc_table_privileges (stmt_handle, stCatalogName, stSchemaName, stTableName);
 
   NA_FREE (stCatalogName);
   NA_FREE (stSchemaName);
@@ -1920,13 +1816,11 @@ SQLTablePrivileges (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLTables (SQLHSTMT StatementHandle,
-     SQLCHAR *CatalogName,
-     SQLSMALLINT NameLength1,
-     SQLCHAR *SchemaName,
-     SQLSMALLINT NameLength2,
-     SQLCHAR *TableName,
-     SQLSMALLINT NameLength3,
-     SQLCHAR *TableType, SQLSMALLINT NameLength4)
+	   SQLCHAR * CatalogName,
+	   SQLSMALLINT NameLength1,
+	   SQLCHAR * SchemaName,
+	   SQLSMALLINT NameLength2,
+	   SQLCHAR * TableName, SQLSMALLINT NameLength3, SQLCHAR * TableType, SQLSMALLINT NameLength4)
 {
   RETCODE rc = SQL_SUCCESS;
   SQLCHAR *stCatalogName = NULL;
@@ -1947,8 +1841,7 @@ SQLTables (SQLHSTMT StatementHandle,
   stTableName = UT_MAKE_STRING (TableName, NameLength3);
   stTableType = UT_MAKE_STRING (TableType, NameLength4);
 
-  rc = odbc_tables (stmt_handle, stCatalogName,
-        stSchemaName, stTableName, stTableType);
+  rc = odbc_tables (stmt_handle, stCatalogName, stSchemaName, stTableName, stTableType);
 
   NA_FREE (stCatalogName);
   NA_FREE (stSchemaName);
@@ -2009,9 +1902,7 @@ SQLBulkOperations (SQLHSTMT StatementHandle, SQLSMALLINT Operation)
 }
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLSetPos (SQLHSTMT StatementHandle,
-     SQLSETPOSIROW RowNumber,
-     SQLUSMALLINT Operation, SQLUSMALLINT LockType)
+SQLSetPos (SQLHSTMT StatementHandle, SQLSETPOSIROW RowNumber, SQLUSMALLINT Operation, SQLUSMALLINT LockType)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -2033,10 +1924,9 @@ SQLSetPos (SQLHSTMT StatementHandle,
 #if 0
 ODBC_INTERFACE RETCODE SQL_API
 SQLBrowseConnect (SQLHDBC ConnectionHandle,
-      SQLCHAR *InConnectionString,
-      SQLSMALLINT StringLength1,
-      SQLCHAR *OutConnectionString,
-      SQLSMALLINT BufferLength, SQLSMALLINT *StringLength2Ptr)
+		  SQLCHAR * InConnectionString,
+		  SQLSMALLINT StringLength1,
+		  SQLCHAR * OutConnectionString, SQLSMALLINT BufferLength, SQLSMALLINT * StringLength2Ptr)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -2059,13 +1949,11 @@ SQLBrowseConnect (SQLHDBC ConnectionHandle,
 #if 1
 ODBC_INTERFACE RETCODE SQL_API
 SQLColumnPrivileges (SQLHSTMT StatementHandle,
-         SQLCHAR *CatalogName,
-         SQLSMALLINT NameLength1,
-         SQLCHAR *SchemaName,
-         SQLSMALLINT NameLength2,
-         SQLCHAR *TableName,
-         SQLSMALLINT NameLength3,
-         SQLCHAR *ColumnName, SQLSMALLINT NameLength4)
+		     SQLCHAR * CatalogName,
+		     SQLSMALLINT NameLength1,
+		     SQLCHAR * SchemaName,
+		     SQLSMALLINT NameLength2,
+		     SQLCHAR * TableName, SQLSMALLINT NameLength3, SQLCHAR * ColumnName, SQLSMALLINT NameLength4)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -2079,15 +1967,13 @@ SQLColumnPrivileges (SQLHSTMT StatementHandle,
 }
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLDescribeParam (SQLHSTMT StatementHandle,
-      SQLUSMALLINT ParameterNumber,
-      SQLSMALLINT *DataTypePtr,
+SQLDescribeParam (SQLHSTMT StatementHandle, SQLUSMALLINT ParameterNumber, SQLSMALLINT * DataTypePtr,
 #if defined(_WINDOWS)
-      SQLUINTEGER *ParameterSizePtr,
+		  SQLUINTEGER * ParameterSizePtr,
 #else
-      SQLULEN *ParameterSizePtr,
+		  SQLULEN * ParameterSizePtr,
 #endif
-      SQLSMALLINT *DecimalDigitsPtr, SQLSMALLINT *NullablePtr)
+		  SQLSMALLINT * DecimalDigitsPtr, SQLSMALLINT * NullablePtr)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -2099,15 +1985,15 @@ SQLDescribeParam (SQLHSTMT StatementHandle,
 
   if (DataTypePtr)
     {
-      *DataTypePtr= SQL_VARCHAR;
+      *DataTypePtr = SQL_VARCHAR;
     }
   if (ParameterSizePtr)
     {
-      *ParameterSizePtr= 255;
+      *ParameterSizePtr = 255;
     }
   if (NullablePtr)
     {
-      *NullablePtr= SQL_NULLABLE_UNKNOWN;
+      *NullablePtr = SQL_NULLABLE_UNKNOWN;
     }
 
   return (rc);
@@ -2117,9 +2003,8 @@ SQLDescribeParam (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLPrimaryKeys (SQLHSTMT StatementHandle,
-    SQLCHAR *CatalogName, SQLSMALLINT NameLength1,
-    SQLCHAR *SchemaName, SQLSMALLINT NameLength2,
-    SQLCHAR *TableName, SQLSMALLINT NameLength3)
+		SQLCHAR * CatalogName, SQLSMALLINT NameLength1,
+		SQLCHAR * SchemaName, SQLSMALLINT NameLength2, SQLCHAR * TableName, SQLSMALLINT NameLength3)
 {
   RETCODE odbc_retval = SQL_SUCCESS;
 
@@ -2139,8 +2024,7 @@ SQLPrimaryKeys (SQLHSTMT StatementHandle,
   stSchemaName = UT_MAKE_STRING (SchemaName, NameLength2);
   stTableName = UT_MAKE_STRING (TableName, NameLength3);
 
-  odbc_retval =
-    odbc_primary_keys (stmt_handle, stCatalogName, stSchemaName, stTableName);
+  odbc_retval = odbc_primary_keys (stmt_handle, stCatalogName, stSchemaName, stTableName);
 
   NA_FREE (stCatalogName);
   NA_FREE (stSchemaName);
@@ -2159,12 +2043,11 @@ SQLPrimaryKeys (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLForeignKeys (SQLHSTMT StatementHandle,
-    SQLCHAR *PKCatalogName, SQLSMALLINT NameLength1,
-    SQLCHAR *PKSchemaName, SQLSMALLINT NameLength2,
-    SQLCHAR *PKTableName, SQLSMALLINT NameLength3,
-    SQLCHAR *FKCatalogName, SQLSMALLINT NameLength4,
-    SQLCHAR *FKSchemaName, SQLSMALLINT NameLength5,
-    SQLCHAR *FKTableName, SQLSMALLINT NameLength6)
+		SQLCHAR * PKCatalogName, SQLSMALLINT NameLength1,
+		SQLCHAR * PKSchemaName, SQLSMALLINT NameLength2,
+		SQLCHAR * PKTableName, SQLSMALLINT NameLength3,
+		SQLCHAR * FKCatalogName, SQLSMALLINT NameLength4,
+		SQLCHAR * FKSchemaName, SQLSMALLINT NameLength5, SQLCHAR * FKTableName, SQLSMALLINT NameLength6)
 {
   RETCODE odbc_retval = SQL_SUCCESS;
 
@@ -2200,10 +2083,9 @@ SQLForeignKeys (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLProcedureColumns (SQLHSTMT StatementHandle,
-         SQLCHAR *CatalogName, SQLSMALLINT NameLength1,
-         SQLCHAR *SchemaName, SQLSMALLINT NameLength2,
-         SQLCHAR *ProcName, SQLSMALLINT NameLength3,
-         SQLCHAR *ColumnName, SQLSMALLINT NameLength4)
+		     SQLCHAR * CatalogName, SQLSMALLINT NameLength1,
+		     SQLCHAR * SchemaName, SQLSMALLINT NameLength2,
+		     SQLCHAR * ProcName, SQLSMALLINT NameLength3, SQLCHAR * ColumnName, SQLSMALLINT NameLength4)
 {
   RETCODE odbc_retval = SQL_SUCCESS;
 
@@ -2225,9 +2107,7 @@ SQLProcedureColumns (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  odbc_retval =
-    odbc_procedure_columns (stmt_handle, stCatalogName, stSchemaName,
-          stProcName, stColumnName);
+  odbc_retval = odbc_procedure_columns (stmt_handle, stCatalogName, stSchemaName, stProcName, stColumnName);
 
   NA_FREE (stCatalogName);
   NA_FREE (stSchemaName);
@@ -2241,11 +2121,9 @@ SQLProcedureColumns (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLProcedures (SQLHSTMT StatementHandle,
-         SQLCHAR *CatalogName,
-         SQLSMALLINT NameLength1,
-         SQLCHAR *SchemaName,
-         SQLSMALLINT NameLength2,
-         SQLCHAR *ProcName, SQLSMALLINT NameLength3)
+	       SQLCHAR * CatalogName,
+	       SQLSMALLINT NameLength1,
+	       SQLCHAR * SchemaName, SQLSMALLINT NameLength2, SQLCHAR * ProcName, SQLSMALLINT NameLength3)
 {
   RETCODE odbc_retval = SQL_SUCCESS;
 
@@ -2265,8 +2143,7 @@ SQLProcedures (SQLHSTMT StatementHandle,
   stSchemaName = UT_MAKE_STRING (SchemaName, NameLength2);
   stProcName = UT_MAKE_STRING (ProcName, NameLength3);
 
-  odbc_retval =
-    odbc_procedures (stmt_handle, stCatalogName, stSchemaName, stProcName);
+  odbc_retval = odbc_procedures (stmt_handle, stCatalogName, stSchemaName, stProcName);
 
   NA_FREE (stCatalogName);
   NA_FREE (stSchemaName);
@@ -2280,9 +2157,9 @@ SQLProcedures (SQLHSTMT StatementHandle,
 ODBC_INTERFACE RETCODE SQL_API
 SQLParamOptions (SQLHSTMT StatementHandle,
 #if defined(_WINDOWS)
-     SQLUINTEGER crow, SQLUINTEGER *pirow)
+		 SQLUINTEGER crow, SQLUINTEGER * pirow)
 #else
-     SQLULEN crow, SQLULEN *pirow)
+		 SQLULEN crow, SQLULEN * pirow)
 #endif
 {
   RETCODE rc = SQL_SUCCESS;
@@ -2293,19 +2170,18 @@ SQLParamOptions (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  rc= SQLSetStmtAttr (stmt_handle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER)crow, 0);
+  rc = SQLSetStmtAttr (stmt_handle, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) crow, 0);
   if (!SQL_SUCCEEDED (rc))
     {
       return rc;
     }
 
-  rc= SQLSetStmtAttr (stmt_handle, SQL_ATTR_PARAMS_PROCESSED_PTR, pirow, 0);
+  rc = SQLSetStmtAttr (stmt_handle, SQL_ATTR_PARAMS_PROCESSED_PTR, pirow, 0);
   return rc;
 }
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLTransact (SQLHENV EnvironmentHandle,
-       SQLHDBC ConnectionHandle, SQLUSMALLINT CompletionType)
+SQLTransact (SQLHENV EnvironmentHandle, SQLHDBC ConnectionHandle, SQLUSMALLINT CompletionType)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -2336,12 +2212,11 @@ SQLTransact (SQLHENV EnvironmentHandle,
 #if 0
 ODBC_INTERFACE RETCODE SQL_API
 SQLDrivers (SQLHENV EnvironmentHandle,
-      SQLUSMALLINT Direction,
-      SQLCHAR *DriverDescription,
-      SQLSMALLINT BufferLength1,
-      SQLSMALLINT *DescriptionLengthPtr,
-      SQLCHAR *DriverAttributes,
-      SQLSMALLINT BufferLength2, SQLSMALLINT *AttributesLengthPtr)
+	    SQLUSMALLINT Direction,
+	    SQLCHAR * DriverDescription,
+	    SQLSMALLINT BufferLength1,
+	    SQLSMALLINT * DescriptionLengthPtr,
+	    SQLCHAR * DriverAttributes, SQLSMALLINT BufferLength2, SQLSMALLINT * AttributesLengthPtr)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -2352,12 +2227,11 @@ SQLDrivers (SQLHENV EnvironmentHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLDataSources (SQLHENV EnvironmentHandle,
-    SQLUSMALLINT Direction,
-    SQLCHAR *ServerName,
-    SQLSMALLINT BufferLength1,
-    SQLSMALLINT *NameLength1Ptr,
-    SQLCHAR *Description,
-    SQLSMALLINT BufferLength2, SQLSMALLINT *NameLength2Ptr)
+		SQLUSMALLINT Direction,
+		SQLCHAR * ServerName,
+		SQLSMALLINT BufferLength1,
+		SQLSMALLINT * NameLength1Ptr,
+		SQLCHAR * Description, SQLSMALLINT BufferLength2, SQLSMALLINT * NameLength2Ptr)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -2376,7 +2250,7 @@ SQLDataSources (SQLHENV EnvironmentHandle,
 
 #if 0
 ODBC_INTERFACE RETCODE SQL_API
-SQLAllocConnect (SQLHENV EnvironmentHandle, SQLHDBC *ConnectionHandle)
+SQLAllocConnect (SQLHENV EnvironmentHandle, SQLHDBC * ConnectionHandle)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -2388,7 +2262,7 @@ SQLAllocConnect (SQLHENV EnvironmentHandle, SQLHDBC *ConnectionHandle)
 }
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLAllocEnv (SQLHENV *EnvironmentHandle)
+SQLAllocEnv (SQLHENV * EnvironmentHandle)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -2398,7 +2272,7 @@ SQLAllocEnv (SQLHENV *EnvironmentHandle)
 }
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLAllocStmt (SQLHDBC ConnectionHandle, SQLHSTMT *StatementHandle)
+SQLAllocStmt (SQLHDBC ConnectionHandle, SQLHSTMT * StatementHandle)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -2412,12 +2286,11 @@ SQLAllocStmt (SQLHDBC ConnectionHandle, SQLHSTMT *StatementHandle)
 #if (ODBCVER >= 0x0300)
 ODBC_INTERFACE RETCODE SQL_API
 SQLBindParam (SQLHSTMT StatementHandle,
-        SQLUSMALLINT ParameterNumber,
-        SQLSMALLINT ValueType,
-        SQLSMALLINT ParameterType,
-        SQLUINTEGER LengthPrecision,
-        SQLSMALLINT ParameterScale,
-        SQLPOINTER ParameterValue, SQLINTEGER *StrLen_or_Ind)
+	      SQLUSMALLINT ParameterNumber,
+	      SQLSMALLINT ValueType,
+	      SQLSMALLINT ParameterType,
+	      SQLUINTEGER LengthPrecision,
+	      SQLSMALLINT ParameterScale, SQLPOINTER ParameterValue, SQLINTEGER * StrLen_or_Ind)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -2433,11 +2306,9 @@ SQLBindParam (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLColAttributes (SQLHSTMT StatementHandle,
-      SQLUSMALLINT icol,
-      SQLUSMALLINT fDescType,
-      SQLPOINTER rgbDesc,
-      SQLSMALLINT cbDescMax,
-      SQLSMALLINT *pcbDesc, SQLINTEGER *pfDesc)
+		  SQLUSMALLINT icol,
+		  SQLUSMALLINT fDescType,
+		  SQLPOINTER rgbDesc, SQLSMALLINT cbDescMax, SQLSMALLINT * pcbDesc, SQLINTEGER * pfDesc)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -2459,20 +2330,17 @@ SQLColAttributes (SQLHSTMT StatementHandle,
       fDescType = SQL_DESC_NULLABLE;
       break;
     }
-  rc = odbc_col_attribute (StatementHandle, icol, fDescType,
-         rgbDesc, cbDescMax, pcbDesc, pfDesc);
+  rc = odbc_col_attribute (StatementHandle, icol, fDescType, rgbDesc, cbDescMax, pcbDesc, pfDesc);
 
   ODBC_RETURN (rc, StatementHandle);
 }
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLError (SQLHENV EnvironmentHandle,
-    SQLHDBC ConnectionHandle,
-    SQLHSTMT StatementHandle,
-    SQLCHAR *Sqlstate,
-    SQLINTEGER *NativeError,
-    SQLCHAR *MessageText,
-    SQLSMALLINT BufferLength, SQLSMALLINT *TextLength)
+	  SQLHDBC ConnectionHandle,
+	  SQLHSTMT StatementHandle,
+	  SQLCHAR * Sqlstate,
+	  SQLINTEGER * NativeError, SQLCHAR * MessageText, SQLSMALLINT BufferLength, SQLSMALLINT * TextLength)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -2481,25 +2349,23 @@ SQLError (SQLHENV EnvironmentHandle,
   if (EnvironmentHandle != NULL)
     {
       SQLGetDiagRec (SQL_HANDLE_ENV, EnvironmentHandle, 1, Sqlstate,
-         NativeError, MessageText, BufferLength, TextLength);
+		     NativeError, MessageText, BufferLength, TextLength);
       if (*NativeError != 0)
-  {
-    return rc;
-  }
+	{
+	  return rc;
+	}
     }
   if (ConnectionHandle != NULL)
     {
-      SQLGetDiagRec (SQL_HANDLE_DBC, ConnectionHandle, 1, Sqlstate,
-         NativeError, MessageText, BufferLength, TextLength);
+      SQLGetDiagRec (SQL_HANDLE_DBC, ConnectionHandle, 1, Sqlstate, NativeError, MessageText, BufferLength, TextLength);
       if (*NativeError != 0)
-  {
-    return rc;
-  }
+	{
+	  return rc;
+	}
     }
   if (StatementHandle != NULL)
     {
-      SQLGetDiagRec (SQL_HANDLE_STMT, StatementHandle, 1, Sqlstate,
-         NativeError, MessageText, BufferLength, TextLength);
+      SQLGetDiagRec (SQL_HANDLE_STMT, StatementHandle, 1, Sqlstate, NativeError, MessageText, BufferLength, TextLength);
     }
   return (rc);
 }
@@ -2527,8 +2393,7 @@ SQLFreeEnv (SQLHENV EnvironmentHandle)
 
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLGetConnectOption (SQLHDBC ConnectionHandle,
-         SQLUSMALLINT Option, SQLPOINTER Value)
+SQLGetConnectOption (SQLHDBC ConnectionHandle, SQLUSMALLINT Option, SQLPOINTER Value)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -2540,8 +2405,7 @@ SQLGetConnectOption (SQLHDBC ConnectionHandle,
 }
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLGetStmtOption (SQLHSTMT StatementHandle,
-      SQLUSMALLINT Option, SQLPOINTER Value)
+SQLGetStmtOption (SQLHSTMT StatementHandle, SQLUSMALLINT Option, SQLPOINTER Value)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -2555,8 +2419,7 @@ SQLGetStmtOption (SQLHSTMT StatementHandle,
 }
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLSetConnectOption (SQLHDBC ConnectionHandle,
-         SQLUSMALLINT Option, SQLUINTEGER Value)
+SQLSetConnectOption (SQLHDBC ConnectionHandle, SQLUSMALLINT Option, SQLUINTEGER Value)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -2568,8 +2431,7 @@ SQLSetConnectOption (SQLHDBC ConnectionHandle,
 }
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLSetStmtOption (SQLHSTMT StatementHandle,
-      SQLUSMALLINT Option, SQLUINTEGER Value)
+SQLSetStmtOption (SQLHSTMT StatementHandle, SQLUSMALLINT Option, SQLUINTEGER Value)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -2583,8 +2445,7 @@ SQLSetStmtOption (SQLHSTMT StatementHandle,
 }
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLParamOptions (SQLHSTMT StatementHandle,
-     SQLUINTEGER crow, SQLUINTEGER *pirow)
+SQLParamOptions (SQLHSTMT StatementHandle, SQLUINTEGER crow, SQLUINTEGER * pirow)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -2598,8 +2459,7 @@ SQLParamOptions (SQLHSTMT StatementHandle,
 }
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLTransact (SQLHENV EnvironmentHandle,
-       SQLHDBC ConnectionHandle, SQLUSMALLINT CompletionType)
+SQLTransact (SQLHENV EnvironmentHandle, SQLHDBC ConnectionHandle, SQLUSMALLINT CompletionType)
 {
   RETCODE rc = SQL_SUCCESS;
 
@@ -2626,12 +2486,11 @@ SQLTransact (SQLHENV EnvironmentHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLSetParam (SQLHSTMT StatementHandle,
-       SQLUSMALLINT ParameterNumber,
-       SQLSMALLINT ValueType,
-       SQLSMALLINT ParameterType,
-       SQLUINTEGER LengthPrecision,
-       SQLSMALLINT ParameterScale,
-       SQLPOINTER ParameterValue, SQLINTEGER *StrLen_or_Ind)
+	     SQLUSMALLINT ParameterNumber,
+	     SQLSMALLINT ValueType,
+	     SQLSMALLINT ParameterType,
+	     SQLUINTEGER LengthPrecision,
+	     SQLSMALLINT ParameterScale, SQLPOINTER ParameterValue, SQLINTEGER * StrLen_or_Ind)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -2646,8 +2505,7 @@ SQLSetParam (SQLHSTMT StatementHandle,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLSetScrollOptions (SQLHSTMT StatementHandle,
-         SQLUSMALLINT fConcurrency,
-         SQLINTEGER crowKeyset, SQLUSMALLINT crowRowset)
+		     SQLUSMALLINT fConcurrency, SQLINTEGER crowKeyset, SQLUSMALLINT crowRowset)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
@@ -2679,7 +2537,7 @@ ConnectDlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
   switch (message)
     {
-      HCURSOR hOldCursor; // Default Cursor Shape
+      HCURSOR hOldCursor;	// Default Cursor Shape
 
     case WM_INITDIALOG:
       // display list of available data sources
@@ -2700,31 +2558,31 @@ ConnectDlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND:
 
       switch (LOWORD (wParam))
-  {
-  case IDOK:    // make a connection using the supplied values
+	{
+	case IDOK:		// make a connection using the supplied values
 
-    hOldCursor = SetCursor (LoadCursor ((HINSTANCE) NULL, IDC_WAIT));
+	  hOldCursor = SetCursor (LoadCursor ((HINSTANCE) NULL, IDC_WAIT));
 
-    GetDlgItemText (hWnd, IDC_DCI_PTR, ptr, sizeof (ptr) - 1);
-    sscanf (ptr, "%p", &dci);
+	  GetDlgItemText (hWnd, IDC_DCI_PTR, ptr, sizeof (ptr) - 1);
+	  sscanf (ptr, "%p", &dci);
 
-    GetDlgItemText (hWnd, IDTEXT_USERNAME, dci->user, ITEMBUFLEN - 1);
-    GetDlgItemText (hWnd, IDTEXT_PASSWORD, dci->pwd, ITEMBUFLEN - 1);
+	  GetDlgItemText (hWnd, IDTEXT_USERNAME, dci->user, ITEMBUFLEN - 1);
+	  GetDlgItemText (hWnd, IDTEXT_PASSWORD, dci->pwd, ITEMBUFLEN - 1);
 
-    EndDialog (hWnd, FALSE);
+	  EndDialog (hWnd, FALSE);
 
-    SetCursor (hOldCursor);
-    break;
+	  SetCursor (hOldCursor);
+	  break;
 
-  case IDCANCEL:
+	case IDCANCEL:
 
-    EndDialog (hWnd, FALSE);
-    break;
+	  EndDialog (hWnd, FALSE);
+	  break;
 
-  default:
-    return (FALSE);
-    break;
-  }
+	default:
+	  return (FALSE);
+	  break;
+	}
       break;
 
     default:
