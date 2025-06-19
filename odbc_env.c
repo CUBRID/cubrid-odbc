@@ -149,9 +149,9 @@ odbc_free_env (ODBC_ENV * env)
 * description:
 *		
 * NOTE:
-*		diagnostic¿¡ ´ëÇØ¼­ ¾ÆÁ÷ structure°¡ ¼³Á¤ÀÌ µÇÁö ¾Ê¾Æ¼­ SQLSTATE¸¦ 
-*		¼³Á¤ÇÏÁö ¸øÇÑ´Ù.  structure¿¡ ¹İ¿µÇÑ ÈÄ °¢ state °ªÀ» ¼³Á¤ÇÏµµ·Ï 
-*		ÇÑ´Ù.
+*		diagnosticì— ëŒ€í•´ì„œ ì•„ì§ structureê°€ ì„¤ì •ì´ ë˜ì§€ ì•Šì•„ì„œ SQLSTATEë¥¼ 
+*		ì„¤ì •í•˜ì§€ ëª»í•œë‹¤.  structureì— ë°˜ì˜í•œ í›„ ê° state ê°’ì„ ì„¤ì •í•˜ë„ë¡ 
+*		í•œë‹¤.
 ************************************************************************/
 PUBLIC RETCODE
 odbc_set_env_attr (ODBC_ENV * env,

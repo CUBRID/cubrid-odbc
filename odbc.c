@@ -54,11 +54,11 @@ PRIVATE VOID SQL_API TestConnection (HWND hwndParent, CUBRIDDSNItem *ptDSNItem);
  * arguments:
  * returns/side-effects:
  * description:
- *		SQLConfigDriver¿¡ ´ëÇÑ driver-specific routineÀÌ´Ù.
- *		ÇöÀç ODBC Driver 3.51 for CUBRID¿¡¼­ ³»ºÎÀûÀ¸·Î
- *		¼öÇàÇÏ´Â routineÀº Á¸ÀçÇÏÁö ¾Ê´Â´Ù.
+ *		SQLConfigDriverì— ëŒ€í•œ driver-specific routineì´ë‹¤.
+ *		í˜„ì¬ ODBC Driver 3.51 for CUBRIDì—ì„œ ë‚´ë¶€ì ìœ¼ë¡œ
+ *		ìˆ˜í–‰í•˜ëŠ” routineì€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ”ë‹¤.
  * NOTE:
- *		INTERFACE´Â ODBCINST.h¿¡ Á¤ÀÇµÇ¾î ÀÖ´Ù.
+ *		INTERFACEëŠ” ODBCINST.hì— ì •ì˜ë˜ì–´ ìˆë‹¤.
  ************************************************************************/
 ODBC_INTERFACE INSTAPI
 ConfigDriver (HWND hwndParent,
@@ -134,7 +134,7 @@ void Odbc_strncpy (char *dst,const char *src,int size)
  * returns/side-effects:
  * description:
  * NOTE:
- *		INTERFACE´Â ODBCINST.h¿¡ Á¤ÀÇµÇ¾î ÀÖ´Ù.
+ *		INTERFACEëŠ” ODBCINST.hì— ì •ì˜ë˜ì–´ ìˆë‹¤.
  ************************************************************************/
 ODBC_INTERFACE INSTAPI
 ConfigDSN (HWND hwndParent,
@@ -281,7 +281,7 @@ ConfigDSN (HWND hwndParent,
  * arguments:
  * returns/side-effects:
  * description:
- *  SQLDriverConnect½Ã »ç¿ëµÇ´Â dialog box¸¦ ¶ç¿î´Ù.
+ *  SQLDriverConnectì‹œ ì‚¬ìš©ë˜ëŠ” dialog boxë¥¼ ë„ìš´ë‹¤.
  * NOTE:
  ************************************************************************/
 PUBLIC INT_PTR CALLBACK
@@ -384,8 +384,8 @@ ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
 
 /*
  * AddDSNProc
- *		- FILEDSNÀº SQLDriverConnectÀÇ out connection string
- *		¿¡ ÀÇÇØ¼­ »ı¼º, ¼öÁ¤µÈ´Ù.  ±× ¿ÜÀÇ Ãß°ú°úÁ¤Àº ÇÊ¿ä¾ø´Ù.
+ *		- FILEDSNì€ SQLDriverConnectì˜ out connection string
+ *		ì— ì˜í•´ì„œ ìƒì„±, ìˆ˜ì •ëœë‹¤.  ê·¸ ì™¸ì˜ ì¶”ê³¼ê³¼ì •ì€ í•„ìš”ì—†ë‹¤.
  */
 PRIVATE BOOL FAR PASCAL
 AddDSNProc (HWND hwndParent, char *oldDSN)

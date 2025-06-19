@@ -135,7 +135,7 @@ typedef struct st_odbc_connection
   unsigned long attr_access_mode;	/* CORE */
   unsigned long attr_autocommit;	/* LEVEL 1 */
   //unsigned long         attr_connection_dead;   /* LEVEL 1 */
-  //      attr_connection_dead´Â connhd·Î ºÎÅÍ ¾Ë¾Æ ³¾ ¼ö ÀÖ´Ù.
+  //      attr_connection_deadëŠ” connhdë¡œ ë¶€í„° ì•Œì•„ ë‚¼ ìˆ˜ ìžˆë‹¤.
   // if connhd > 0, alive.
 
   void *attr_quiet_mode;	/* CORE */

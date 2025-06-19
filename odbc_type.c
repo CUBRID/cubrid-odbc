@@ -1017,7 +1017,7 @@ odbc_type_to_cci_u_type (short sql_type)
  * returns/side-effects:
  * description:
  * NOTE:
- *		³»ºÎÀûÀ¸·Î memory allocationÀÌ ÀÏ¾î³ª¹Ç·Î, ¿ÜºÎ¿¡¼­ freeÇØÁà¾ß ÇÑ´Ù.
+ *		ë‚´ë¶€ì ìœ¼ë¡œ memory allocationì´ ì¼ì–´ë‚˜ë¯€ë¡œ, ì™¸ë¶€ì—ì„œ freeí•´ì¤˜ì•¼ í•œë‹¤.
  *
  *			SQL_C_TYPE	|		T_CCI_A_TYPE
  *		----------------------------------------------
@@ -1213,8 +1213,8 @@ odbc_value_to_cci (void *c_value, short c_type, long c_length,
  * returns/side-effects:
  * description:
  * NOTE:
- *		odbc_value_to_cci¿Í ´Ş¸® argument¿¡ °ªÀ» ÇÒ´çÇØÁØ´Ù.
- *		Binary¿Í StringÀÇ °æ¿ì¸¸ memory allocÀÌ ÀÏ¾î³­´Ù.
+ *		odbc_value_to_cciì™€ ë‹¬ë¦¬ argumentì— ê°’ì„ í• ë‹¹í•´ì¤€ë‹¤.
+ *		Binaryì™€ Stringì˜ ê²½ìš°ë§Œ memory allocì´ ì¼ì–´ë‚œë‹¤.
  *
  *			SQL_C_TYPE	|		T_CCI_A_TYPE
  *		----------------------------------------------
@@ -1410,7 +1410,7 @@ odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
 	    ((char *) value)[0] = '-';
 	  }
 
-	/* NUMERICÀº CCI_A_TYPE_STR·Î conversionÇÑ´Ù. */
+	/* NUMERICì€ CCI_A_TYPE_STRë¡œ conversioní•œë‹¤. */
 	*((char **) sql_value_root + index) = value;
 
 	free_num (&num1);
@@ -1432,9 +1432,9 @@ odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
  *		cci_value length
  * description:
  * NOTE:
- *		SQL_C_TYPE°ú T_CCI_A_TYPE°úÀÇ °ü°è´Â odbc_value_to_cci()¸¦ ÂüÁ¶ÇÑ´Ù.
- *		value truncation¿¡ ´ëÇØ¼­ °í·ÁµÇÁö ¾Ê¾Ò´Ù.
- *		string type°ú binary typeÀº ½ÇÁ¦·Î ¹ß»ıÇÏÁö ¾Ê´Â´Ù.
+ *		SQL_C_TYPEê³¼ T_CCI_A_TYPEê³¼ì˜ ê´€ê³„ëŠ” odbc_value_to_cci()ë¥¼ ì°¸ì¡°í•œë‹¤.
+ *		value truncationì— ëŒ€í•´ì„œ ê³ ë ¤ë˜ì§€ ì•Šì•˜ë‹¤.
+ *		string typeê³¼ binary typeì€ ì‹¤ì œë¡œ ë°œìƒí•˜ì§€ ì•ŠëŠ”ë‹¤.
  ************************************************************************/
 PUBLIC SQLLEN
 cci_value_to_odbc (void *c_value, short concise_type,

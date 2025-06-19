@@ -43,11 +43,11 @@
 #include		"cas_cci.h"
 
 /*----------------------------------------------------------------------
-	STMT_NEED_DATA - SQL stmt¿¡ parameter°¡ ÀÖÀ¸¸ç, bindingµÈ paramÀÌ
-		SQL_DATA_AT_EXEC°¡ ¼³Á¤µÈ °æ¿ì·Î stmt°¡ SQLPutData¸¦
-		ÇÊ¿ä·Î ÇÏ´Â °æ¿ì
-	STMT_NEED_NO_MORE_DATA - bindingµÈ paramÀÌ ¾ø°Å³ª SQL_DATA_AT_EXEC
-	°¡ ¾Æ´Ñ °æ¿ìÀÌ°Å³ª SQLPutData·Î data¸¦ ¸ğµÎ º¸³½ °æ¿ì
+	STMT_NEED_DATA - SQL stmtì— parameterê°€ ìˆìœ¼ë©°, bindingëœ paramì´
+		SQL_DATA_AT_EXECê°€ ì„¤ì •ëœ ê²½ìš°ë¡œ stmtê°€ SQLPutDataë¥¼
+		í•„ìš”ë¡œ í•˜ëŠ” ê²½ìš°
+	STMT_NEED_NO_MORE_DATA - bindingëœ paramì´ ì—†ê±°ë‚˜ SQL_DATA_AT_EXEC
+	ê°€ ì•„ë‹Œ ê²½ìš°ì´ê±°ë‚˜ SQLPutDataë¡œ dataë¥¼ ëª¨ë‘ ë³´ë‚¸ ê²½ìš°
  *-----------------------------------------------------------------------*/
 #define		STMT_NEED_DATA				(-1)
 #define		STMT_NEED_NO_MORE_DATA		(-100)
@@ -190,7 +190,7 @@ odbc_alloc_statement (ODBC_CONNECTION * conn, ODBC_STATEMENT ** stmt_ptr)
   s->i_ipd->stmt = s;
   s->i_ird->stmt = s;
 
-  // SQL_ATTR_ASYNC_ENABLEÀÇ °æ¿ì connectionÀ¸·ÎºÎÅÍ »ó¼Ó¹Ş´Â´Ù.
+  // SQL_ATTR_ASYNC_ENABLEì˜ ê²½ìš° connectionìœ¼ë¡œë¶€í„° ìƒì†ë°›ëŠ”ë‹¤.
   s->attr_async_enable = conn->attr_async_enable;
   s->attr_cursor_scrollable = SQL_NONSCROLLABLE;
   //s->attr_cursor_type = SQL_CURSOR_DYNAMIC;
@@ -232,7 +232,7 @@ error:
 * returns/side-effects:
 * description:
 * NOTE:
-*	SQLFreeStmt¿Í matchµÈ´Ù.
+*	SQLFreeStmtì™€ matchëœë‹¤.
 ************************************************************************/
 PUBLIC RETCODE
 odbc_reset_statement (ODBC_STATEMENT * stmt, unsigned short option)
@@ -331,11 +331,11 @@ odbc_free_statement (ODBC_STATEMENT * stmt)
 /************************************************************************
 * name: odbc_set_stmt_attr
 * arguments:
-*	is_driver - SQLSetStmtAttr¿¡ ÀÇÇÑ ftn callÀÎÁö ÆÇ´Ü.
+*	is_driver - SQLSetStmtAttrì— ì˜í•œ ftn callì¸ì§€ íŒë‹¨.
 *	0 - SQLSetStmtAttr, 1 - driver
 * returns/side-effects:
 * description:
-*	is_clientÀÇ °ª¿¡ µû¶ó read-only ATTR¿¡ ´ëÇØ ´Ù¸¥ ÀÛ¾÷
+*	is_clientì˜ ê°’ì— ë”°ë¼ read-only ATTRì— ëŒ€í•´ ë‹¤ë¥¸ ì‘ì—…
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
@@ -604,7 +604,7 @@ odbc_set_stmt_attr (ODBC_STATEMENT * stmt,
 
 
       // Not supported attribute
-      // ¾î¶°ÇÑ ÀÛ¾÷µµ ÇÏÁö ¾Ê´Â´Ù.
+      // ì–´ë– í•œ ì‘ì—…ë„ í•˜ì§€ ì•ŠëŠ”ë‹¤.
     case SQL_ATTR_CONCURRENCY:
     case SQL_ATTR_ENABLE_AUTO_IPD:
     case SQL_ATTR_KEYSET_SIZE:
@@ -1005,7 +1005,7 @@ odbc_get_cursor_name (ODBC_STATEMENT * stmt,
 * returns/side-effects:
 * description:
 * NOTE:
-*	column_size¿¡ ´ëÇØ¼­ °í·ÁÇÏÁö ¾Ê°í ÀÖÀ½.
+*	column_sizeì— ëŒ€í•´ì„œ ê³ ë ¤í•˜ì§€ ì•Šê³  ìˆìŒ.
 ************************************************************************/
 PUBLIC RETCODE
 odbc_bind_parameter (ODBC_STATEMENT * stmt,
@@ -1067,7 +1067,7 @@ odbc_bind_parameter (ODBC_STATEMENT * stmt,
       ERROR_GOTO (rc, error1);
     }
 
-  /* char data typeÀÇ °æ¿ì´Â buffer_length¸¦ octet_length·Î »ç¿ëÇÑ´Ù. */
+  /* char data typeì˜ ê²½ìš°ëŠ” buffer_lengthë¥¼ octet_lengthë¡œ ì‚¬ìš©í•œë‹¤. */
   if (strlen_ind_ptr)
     {
        actual_size = *strlen_ind_ptr > buffer_length ? buffer_length : *strlen_ind_ptr;
@@ -1191,10 +1191,10 @@ error2:
 * returns/side-effects:
 * description:
 * NOTE:
-*		odbc_num_result_cols´Â ird°¡ sql stmt¿¡ ¸Â°Ô »ı¼ºµÇ±â ¶§¹®¿¡
-*		irdÀÇ record°³¼ö°¡ num of result colsÀÌÁö¸¸,
-*		odbc_num_params¿¡¼­´Â ipd°¡ ÀÚµ¿ÀûÀ¸·Î »ı¼ºµÇÁö ¾Ê±â ¶§¹®¿¡,
-*		stmt->param_numberÀÇ member¿¡ À¯ÁöÇÏ°í ÀÖ´Ù.
+*		odbc_num_result_colsëŠ” irdê°€ sql stmtì— ë§ê²Œ ìƒì„±ë˜ê¸° ë•Œë¬¸ì—
+*		irdì˜ recordê°œìˆ˜ê°€ num of result colsì´ì§€ë§Œ,
+*		odbc_num_paramsì—ì„œëŠ” ipdê°€ ìë™ì ìœ¼ë¡œ ìƒì„±ë˜ì§€ ì•Šê¸° ë•Œë¬¸ì—,
+*		stmt->param_numberì˜ memberì— ìœ ì§€í•˜ê³  ìˆë‹¤.
 ************************************************************************/
 PUBLIC RETCODE
 odbc_num_params (ODBC_STATEMENT * stmt, short *parameter_count)
@@ -1214,11 +1214,11 @@ odbc_num_params (ODBC_STATEMENT * stmt, short *parameter_count)
 * returns/side-effects:
 * description:
 * NOTE:
-*	- statement_text°¡ nullÀÌ¸é DM error°¡ ³­´Ù.
-*	- IRD settingÀÌ ÀÏ¾î³­´Ù.
-*	- Method¿¡ ÀÇÇÑ result set¿¡ ´ëÇØ¼­
+*	- statement_textê°€ nullì´ë©´ DM errorê°€ ë‚œë‹¤.
+*	- IRD settingì´ ì¼ì–´ë‚œë‹¤.
+*	- Methodì— ì˜í•œ result setì— ëŒ€í•´ì„œ
 *		col type - SQL_VARCHAR
-*		col precision - MAX_PRECISIONÀ» Àû¿ëÇÏ¿´´Ù.
+*		col precision - MAX_PRECISIONì„ ì ìš©í•˜ì˜€ë‹¤.
 ************************************************************************/
 PUBLIC RETCODE
 odbc_prepare (ODBC_STATEMENT * stmt, char *statement_text)
@@ -1304,9 +1304,9 @@ error:
 * returns/side-effects:
 * description:
 * NOTE:
-*   1) ÇöÀç array parameter bind & executionÀ» Áö¿øÇÏ°í ÀÖÁö ¾Ê´Ù.
-*	2) error°¡ ¹ß»ıÇÑ °æ¿ì, SQL_ERROR³ª SQL_SUCCESS_WITH_INFO¸¦ returnÇÑ´Ù.
-*	ÀÌ ¶§´Â autocommit modeÀÏÁö¶óµµ autocommitÀº ÀÏ¾î³ªÁö ¾Ê´Â´Ù.(rollbackµµ ¾ø´Ù.)
+*   1) í˜„ì¬ array parameter bind & executionì„ ì§€ì›í•˜ê³  ìˆì§€ ì•Šë‹¤.
+*	2) errorê°€ ë°œìƒí•œ ê²½ìš°, SQL_ERRORë‚˜ SQL_SUCCESS_WITH_INFOë¥¼ returní•œë‹¤.
+*	ì´ ë•ŒëŠ” autocommit modeì¼ì§€ë¼ë„ autocommitì€ ì¼ì–´ë‚˜ì§€ ì•ŠëŠ”ë‹¤.(rollbackë„ ì—†ë‹¤.)
 ************************************************************************/
 PUBLIC RETCODE
 odbc_execute (ODBC_STATEMENT * stmt)
@@ -1358,8 +1358,8 @@ odbc_execute (ODBC_STATEMENT * stmt)
 
   if (stmt->apd->array_size == 1)
     {
-      /* cursor°¡ sensitiveÇÒ °æ¿ì SQL_ATTR_ROW_ARRAY_SIZE¿Í fetch_size¸¦ ÀÏÄ¡½ÃÅ²´Ù.
-       * connection handle(or DSN)ÀÇ fetch_size´Â ÀÇ¹Ì¸¦ »ó½ÇÇÑ´Ù. */
+      /* cursorê°€ sensitiveí•  ê²½ìš° SQL_ATTR_ROW_ARRAY_SIZEì™€ fetch_sizeë¥¼ ì¼ì¹˜ì‹œí‚¨ë‹¤.
+       * connection handle(or DSN)ì˜ fetch_sizeëŠ” ì˜ë¯¸ë¥¼ ìƒì‹¤í•œë‹¤. */
       if (stmt->attr_cursor_sensitivity == SQL_SENSITIVE)
 	{
 	  cci_fetch_size (stmt->stmthd, stmt->ard->array_size);
@@ -1406,10 +1406,10 @@ odbc_execute (ODBC_STATEMENT * stmt)
 	  else
 	    {
 				/*--
-				 * cci_bind_param()À» »ç¿ëÇÒ ¶§ SQLBindParam()¿¡ ÀÇÇÑ value pointer
-				 * ¸¦ ¹Ù·Î »ç¿ëÇÒ ¼ö ¾ø´Ù. ¿Ö³Ä¸é SQLBindParam()¿¡ ÀÇÇÑ value pointer
-				 * ¿Í cci_bind_param()¿¡¼­ »ç¿ëÇÏ´Â value pointer»çÀÌ¿¡´Â type conversion
-				 * µîÀÌ ¹ß»ıÇÏ±â ¶§¹®ÀÌ´Ù.
+				 * cci_bind_param()ì„ ì‚¬ìš©í•  ë•Œ SQLBindParam()ì— ì˜í•œ value pointer
+				 * ë¥¼ ë°”ë¡œ ì‚¬ìš©í•  ìˆ˜ ì—†ë‹¤. ì™œëƒë©´ SQLBindParam()ì— ì˜í•œ value pointer
+				 * ì™€ cci_bind_param()ì—ì„œ ì‚¬ìš©í•˜ëŠ” value pointerì‚¬ì´ì—ëŠ” type conversion
+				 * ë“±ì´ ë°œìƒí•˜ê¸° ë•Œë¬¸ì´ë‹¤.
 				 *--*/
 	      cci_value = odbc_value_to_cci (value_ptr, desc_info.type,
 					     desc_info.length,
@@ -1708,7 +1708,7 @@ odbc_param_data (ODBC_STATEMENT * stmt, void **valueptr_ptr)
       goto error;
     }
 
-  // odbc_executeÀÇ putting param data °úÁ¤°ú °°´Ù.
+  // odbc_executeì˜ putting param data ê³¼ì •ê³¼ ê°™ë‹¤.
   if (stmt->param_data.index != 0)
     {
       i = stmt->param_data.index;
@@ -1736,10 +1736,10 @@ odbc_param_data (ODBC_STATEMENT * stmt, void **valueptr_ptr)
 	}
 
 		/*--
-		 * cci_bind_param()À» »ç¿ëÇÒ ¶§ SQLBindParam()¿¡ ÀÇÇÑ value pointer
-		 * ¸¦ ¹Ù·Î »ç¿ëÇÒ ¼ö ¾ø´Ù. ¿Ö³Ä¸é SQLBindParam()¿¡ ÀÇÇÑ value pointer
-		 * ¿Í cci_bind_param()¿¡¼­ »ç¿ëÇÏ´Â value pointer»çÀÌ¿¡´Â type conversion
-		 * µîÀÌ ¹ß»ıÇÏ±â ¶§¹®ÀÌ´Ù.
+		 * cci_bind_param()ì„ ì‚¬ìš©í•  ë•Œ SQLBindParam()ì— ì˜í•œ value pointer
+		 * ë¥¼ ë°”ë¡œ ì‚¬ìš©í•  ìˆ˜ ì—†ë‹¤. ì™œëƒë©´ SQLBindParam()ì— ì˜í•œ value pointer
+		 * ì™€ cci_bind_param()ì—ì„œ ì‚¬ìš©í•˜ëŠ” value pointerì‚¬ì´ì—ëŠ” type conversion
+		 * ë“±ì´ ë°œìƒí•˜ê¸° ë•Œë¬¸ì´ë‹¤.
 		 *--*/
       RevisedParamPos =
 	revised_param_pos (stmt->revised_sql.org_param_pos, i);
@@ -1771,20 +1771,20 @@ odbc_param_data (ODBC_STATEMENT * stmt, void **valueptr_ptr)
 
   if (param >= 0)
     {
-      /* data_at_exec »óÅÂ¿¡ ÀÖ´Â parameter°¡ Á¸Àç */
+      /* data_at_exec ìƒíƒœì— ìˆëŠ” parameterê°€ ì¡´ì¬ */
       stmt->data_at_exec_state = param;
       stmt->param_data.index = param;
 
-      // spec¿¡¼­´Â SQLBindCol¿¡ ÀÇÇÑ data ptrµµ ¾ò¾î¿Ã ¼ö ÀÖ´Ù°í ¾ğ±ŞÇÏ´Âµ¥,
-      // ÀÌÇØÇÏ±â Èûµé´Ù. SQLBindParam¿¡ ´ëÇØ¼­¸¸ ¾ò¾î¿Â´Ù.
+      // specì—ì„œëŠ” SQLBindColì— ì˜í•œ data ptrë„ ì–»ì–´ì˜¬ ìˆ˜ ìˆë‹¤ê³  ì–¸ê¸‰í•˜ëŠ”ë°,
+      // ì´í•´í•˜ê¸° í˜ë“¤ë‹¤. SQLBindParamì— ëŒ€í•´ì„œë§Œ ì–»ì–´ì˜¨ë‹¤.
       odbc_get_desc_field (stmt->apd, param, SQL_DESC_DATA_PTR, valueptr_ptr,
 			   0, NULL);
 
       return ODBC_NEED_DATA;
     }
 
-  // indicator°¡ data_at_execÀÎ ¸ğµç param¿¡ ´ëÇØ¼­ SQLPutData°¡ ³¡³­ »óÅÂ
-  // execute¸¦ ½ÇÇàÇÑ´Ù.
+  // indicatorê°€ data_at_execì¸ ëª¨ë“  paramì— ëŒ€í•´ì„œ SQLPutDataê°€ ëë‚œ ìƒíƒœ
+  // executeë¥¼ ì‹¤í–‰í•œë‹¤.
   stmt->data_at_exec_state = STMT_NEED_NO_MORE_DATA;
 
   flag_cci_exec = get_flag_of_cci_execute (stmt);
@@ -1824,7 +1824,7 @@ error:
 * arguments:
 * returns/side-effects:
 * description:
-*	data_at_exec parameter¸¦ À§ÇØ¼­ stmt->param_data¿¡ data¸¦ ÀûÀçÇÑ´Ù.
+*	data_at_exec parameterë¥¼ ìœ„í•´ì„œ stmt->param_dataì— dataë¥¼ ì ì¬í•œë‹¤.
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
@@ -1887,7 +1887,7 @@ odbc_cancel (ODBC_STATEMENT * stmt)
     }
   else if (stmt->attr_async_enable == SQL_ASYNC_ENABLE_ON)
     {
-      /* CHECK : ÀÌ·Î ÀÎÇØ¼­ ¹ß»ıÇÏ´Â Çö»óÀº? */
+      /* CHECK : ì´ë¡œ ì¸í•´ì„œ ë°œìƒí•˜ëŠ” í˜„ìƒì€? */
       if (stmt->stmthd > 0)
         {
           cci_cancel(stmt->conn->connhd);
@@ -2025,10 +2025,10 @@ odbc_bulk_operations (ODBC_STATEMENT * stmt, short operation)
       break;
 
     case SQL_ADD:
-      /* ÁÖÀÇ1 :selectÀÇ °á°ú°¡ ÇÏ³ªÀÇ table¿¡¼­ ±âÀÎÇÒ ¶§¸¸ À¯È¿ÇÏ´Ù.
-       * ±×·¸Áö ¾ÊÀº °æ¿ì ¿ÀÀÛµ¿
-       * ÁÖÀÇ2 : base_column_nameÀÌ Áö¿øµÇÁö ¾ÊÀ¸¹Ç·Î select attribute
-       * ¿¡ alias°É¸é ¾ÈµÈ´Ù.
+      /* ì£¼ì˜1 :selectì˜ ê²°ê³¼ê°€ í•˜ë‚˜ì˜ tableì—ì„œ ê¸°ì¸í•  ë•Œë§Œ ìœ íš¨í•˜ë‹¤.
+       * ê·¸ë ‡ì§€ ì•Šì€ ê²½ìš° ì˜¤ì‘ë™
+       * ì£¼ì˜2 : base_column_nameì´ ì§€ì›ë˜ì§€ ì•Šìœ¼ë¯€ë¡œ select attribute
+       * ì— aliasê±¸ë©´ ì•ˆëœë‹¤.
        */
       {
 	int addhd = -1;
@@ -2181,8 +2181,8 @@ odbc_bulk_operations (ODBC_STATEMENT * stmt, short operation)
       break;
 
     case SQL_FETCH_BY_BOOKMARK:
-      /* array size¿Í ¹«°üÇÏ°Ô ¼³Á¤µÈ bookmark¿¡ ÀÇÇØ¼­ ÇÑ row¾¿ fetch
-       * ÇØ ¿Í¾ß ÇÔ. */
+      /* array sizeì™€ ë¬´ê´€í•˜ê²Œ ì„¤ì •ëœ bookmarkì— ì˜í•´ì„œ í•œ rowì”© fetch
+       * í•´ ì™€ì•¼ í•¨. */
       odbc_set_stmt_attr (stmt, SQL_ATTR_ROW_ARRAY_SIZE, (void *) 1, 0, 1);
 
       for (i = 1; i <= row_array_size; ++i)
@@ -2191,7 +2191,7 @@ odbc_bulk_operations (ODBC_STATEMENT * stmt, short operation)
 				    (UINT_PTR *) & value_ptr,
 				    (UINT_PTR *) & ind_ptr, NULL);
 	  bookmark = *((long *) value_ptr);
-	  // cursorÀÇ À§Ä¡´Â ±×´ë·Î.
+	  // cursorì˜ ìœ„ì¹˜ëŠ” ê·¸ëŒ€ë¡œ.
 	  rc =
 	    odbc_fetch (stmt, SQL_FETCH_ABSOLUTE, bookmark, (long) i - 1, 1);
 	  if (rc < 0)
@@ -2229,9 +2229,9 @@ odbc_bulk_operations (ODBC_STATEMENT * stmt, short operation)
 * returns/side-effects:
 * description:
 * NOTE:
-*	- refreshÀÏ ¶§´Â operationÀÌ ¹İ¿µÀÌ ¾ÈµÈ´Ù.
-*	- ´©±º°¡ bookmark¸¦ Á¶Á¤ÇÏ¸é ¿ÀÀÛµ¿ÇÑ´Ù.  Àı´ë·Î bookmark¸¦ Á¶ÀıÇØ¼­´Â
-*	¾ÈµÈ´Ù.
+*	- refreshì¼ ë•ŒëŠ” operationì´ ë°˜ì˜ì´ ì•ˆëœë‹¤.
+*	- ëˆ„êµ°ê°€ bookmarkë¥¼ ì¡°ì •í•˜ë©´ ì˜¤ì‘ë™í•œë‹¤.  ì ˆëŒ€ë¡œ bookmarkë¥¼ ì¡°ì ˆí•´ì„œëŠ”
+*	ì•ˆëœë‹¤.
 ************************************************************************/
 PUBLIC RETCODE
 odbc_set_pos (ODBC_STATEMENT * stmt,
@@ -2265,7 +2265,7 @@ odbc_set_pos (ODBC_STATEMENT * stmt,
       break;
 
     case SQL_REFRESH:
-      // cursorÀÇ À§Ä¡´Â ±×´ë·Î.
+      // cursorì˜ ìœ„ì¹˜ëŠ” ê·¸ëŒ€ë¡œ.
       odbc_fetch (stmt, SQL_FETCH_RELATIVE, 0, 0, 1);
       break;
 
@@ -2366,9 +2366,9 @@ odbc_set_pos (ODBC_STATEMENT * stmt,
 * returns/side-effects:
 * description:
 * NOTE:
-*	IRD´Â SQLPrepare ½ÃÁ¡¿¡¼­ ÀÌ·ç¾îÁö¹Ç·Î, ¿©±â¼­ IRD¸¦ deleteÇØ¼­´Â
-*	¾ÈµÈ´Ù.  ¿Ö³Ä¸é SQLExecuteµµ reset_result_setÀ» »ç¿ëÇÏ°í,
-*	SQLCloseCursor½Ã IRD°¡ deleteµÇÁö ¾Ê±â ¶§¹®ÀÌ´Ù.
+*	IRDëŠ” SQLPrepare ì‹œì ì—ì„œ ì´ë£¨ì–´ì§€ë¯€ë¡œ, ì—¬ê¸°ì„œ IRDë¥¼ deleteí•´ì„œëŠ”
+*	ì•ˆëœë‹¤.  ì™œëƒë©´ SQLExecuteë„ reset_result_setì„ ì‚¬ìš©í•˜ê³ ,
+*	SQLCloseCursorì‹œ IRDê°€ deleteë˜ì§€ ì•Šê¸° ë•Œë¬¸ì´ë‹¤.
 ************************************************************************/
 PUBLIC void
 reset_result_set (ODBC_STATEMENT * stmt)
@@ -2473,8 +2473,8 @@ create_ird (ODBC_STATEMENT * stmt, T_CCI_COL_INFO * cci_col_info,
 
 	      cci_u_type = CCI_GET_RESULT_INFO_TYPE (cci_col_info, i);
 
-	      // OBJECT´Â stringÀ¸·Î bindµÇ±â ¶§¹®¿¡ display¸¦ À§ÇØ¼­ precisionÀ»
-	      // 32·Î ¼³Á¤ÇÏ¿´´Ù.
+	      // OBJECTëŠ” stringìœ¼ë¡œ bindë˜ê¸° ë•Œë¬¸ì— displayë¥¼ ìœ„í•´ì„œ precisionì„
+	      // 32ë¡œ ì„¤ì •í•˜ì˜€ë‹¤.
 
 	      if (cci_u_type == CCI_U_TYPE_OBJECT)
 		{
@@ -2547,8 +2547,8 @@ create_ird (ODBC_STATEMENT * stmt, T_CCI_COL_INFO * cci_col_info,
 * returns/side-effects:
 *
 * description:
-*	APD¿¡¼­ param_posÀÌÈÄÀÇ record¿¡ ´ëÇØ¼­ indicator°¡ DATA_AT_EXEC ÀÎ °ÍÀ»
-*	Ã£´Â´Ù.  Ã£À¸¸é record number, else -1
+*	APDì—ì„œ param_posì´í›„ì˜ recordì— ëŒ€í•´ì„œ indicatorê°€ DATA_AT_EXEC ì¸ ê²ƒì„
+*	ì°¾ëŠ”ë‹¤.  ì°¾ìœ¼ë©´ record number, else -1
 * NOTE:
 ************************************************************************/
 PRIVATE short
@@ -2875,7 +2875,7 @@ get_flag_of_cci_execute (ODBC_STATEMENT * stmt)
  * arguments:
  * returns/side-effects:
  * description:
- *		0¹ø ird record´Â BOOKMARK¸¦ À§ÇÑ °ÍÀÌ´Ù.
+ *		0ë²ˆ ird recordëŠ” BOOKMARKë¥¼ ìœ„í•œ ê²ƒì´ë‹¤.
  * NOTE:
  ************************************************************************/
 PRIVATE void
@@ -2915,14 +2915,14 @@ create_bookmark_ird (ODBC_STATEMENT * stmt)
     {
       odbc_set_desc_field (stmt->ird, 0, SQL_DESC_PRECISION, (SQLPOINTER) 0,
 			   0, 1);
-      // precision¿¡ ´ëÇØ¼­ Á¤ÀÇÇÏ°í ÀÖÁö ¾Ê´Ù.
+      // precisionì— ëŒ€í•´ì„œ ì •ì˜í•˜ê³  ìˆì§€ ì•Šë‹¤.
     }
   else if (odbc_is_valid_sql_date_type (type))
     {
       odbc_set_desc_field (stmt->ird, 0, SQL_DESC_PRECISION, (SQLPOINTER) 0,
 			   0, 1);
-      // CUBRIDÀº date type¿¡ ´ëÇØ¼­ precision(for second)Àº 0ÀÌ´Ù.
-      // date type¿¡ ´ëÇÑ length´Â charÇü»öÀÇ display size¿Í °°´Ù.
+      // CUBRIDì€ date typeì— ëŒ€í•´ì„œ precision(for second)ì€ 0ì´ë‹¤.
+      // date typeì— ëŒ€í•œ lengthëŠ” charí˜•ìƒ‰ì˜ display sizeì™€ ê°™ë‹¤.
     }
   else
     {
@@ -2948,7 +2948,7 @@ create_bookmark_ird (ODBC_STATEMENT * stmt)
  * returns/side-effects:
  * description:
  * NOTE:
- *		ÀÌ¹Ì param_array¿¡´Â memory°¡ ÇÒ´çµÈ »óÅÂÀÌ´Ù.
+ *		ì´ë¯¸ param_arrayì—ëŠ” memoryê°€ í• ë‹¹ëœ ìƒíƒœì´ë‹¤.
  ************************************************************************/
 PRIVATE void
 make_param_array (ODBC_STATEMENT * stmt,

@@ -1189,8 +1189,8 @@ odbc_get_type_info (ODBC_STATEMENT * stmt, short data_type)
     }
   else
     {
-      // 2.x type¿¡ ´ëÇØ¼­´Â type_info¸¦ ±¸¼ºÇÏÁö ¾Ê¾Ò´Ù.
-      // ÀÌÀ¯´Â DM¿¡¼­ mappingÀ» ÇØÁÖ±â ¶§¹®ÀÌ´Ù.
+      // 2.x typeì— ëŒ€í•´ì„œëŠ” type_infoë¥¼ êµ¬ì„±í•˜ì§€ ì•Šì•˜ë‹¤.
+      // ì´ìœ ëŠ” DMì—ì„œ mappingì„ í•´ì£¼ê¸° ë•Œë¬¸ì´ë‹¤.
       for (i = 0; type_info[i].type_name != NULL; ++i)
 	{
 	  if (type_info[i].data_type == data_type)

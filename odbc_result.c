@@ -356,17 +356,17 @@ odbc_num_result_cols (ODBC_STATEMENT * stmt, short *column_count)
 /************************************************************************
 * name: odbc_fetch
 * arguments:
-*	bind_offset - SQLBulkOperation with SQL_FETCH_BY_BOOKMARK¸¦
-*	À§ÇØ¼­ °í¾ÈµÈ °ÍÀ¸·Î, ¼³Á¤µÈ °ª¸¸Å­ ard array index¸¦ ÀÌµ¿ÇÑ´Ù.
+*	bind_offset - SQLBulkOperation with SQL_FETCH_BY_BOOKMARKë¥¼
+*	ìœ„í•´ì„œ ê³ ì•ˆëœ ê²ƒìœ¼ë¡œ, ì„¤ì •ëœ ê°’ë§Œí¼ ard array indexë¥¼ ì´ë™í•œë‹¤.
 *	flag_cursor_move - 0 - move, 1 - just value fetch
 * returns/side-effects:
 * description:
 * NOTE:
-*	SQLExtendedFetch´Â SQLFetchScroll µî°ú ´Ù¸¥ error handling ¹æ½ÄÀ»
-*	°®´Â´Ù.  ÀÌ ¶§ ¸ðµç exceptions°¡ °í·ÁµÈ °Ç ¾Æ´Ï°í, SQLSTATE 01S01¸¸
-*	Àû¿ëµÇ¾ú´Ù.  ±×·¯³ª ÀÌ °æ¿ì¿¡µµ fetch½Ã status record ±¸¼º ¹æ½ÄÀÌ
-*	spec°ú ´Ù¸£¹Ç·Î Á¤È®ÇÑ Àû¿ë¹æ½ÄÀÌ¶ó°í ¸»ÇÏ±â Èûµé´Ù.
-*	ÂüÁ¶ : Error handling in SQLFetchScroll
+*	SQLExtendedFetchëŠ” SQLFetchScroll ë“±ê³¼ ë‹¤ë¥¸ error handling ë°©ì‹ì„
+*	ê°–ëŠ”ë‹¤.  ì´ ë•Œ ëª¨ë“  exceptionsê°€ ê³ ë ¤ëœ ê±´ ì•„ë‹ˆê³ , SQLSTATE 01S01ë§Œ
+*	ì ìš©ë˜ì—ˆë‹¤.  ê·¸ëŸ¬ë‚˜ ì´ ê²½ìš°ì—ë„ fetchì‹œ status record êµ¬ì„± ë°©ì‹ì´
+*	specê³¼ ë‹¤ë¥´ë¯€ë¡œ ì •í™•í•œ ì ìš©ë°©ì‹ì´ë¼ê³  ë§í•˜ê¸° íž˜ë“¤ë‹¤.
+*	ì°¸ì¡° : Error handling in SQLFetchScroll
 ************************************************************************/
 PUBLIC RETCODE
 odbc_fetch (ODBC_STATEMENT * stmt,
@@ -478,7 +478,7 @@ odbc_fetch (ODBC_STATEMENT * stmt,
 	      continue;
 	    }
 	}
-      // catalog result setÀÇ °æ¿ì fetch°úÁ¤ÀÌ ÇÊ¿ä¾ø´Ù.
+      // catalog result setì˜ ê²½ìš° fetchê³¼ì •ì´ í•„ìš”ì—†ë‹¤.
 
       // bind BOOKMARK
       if (stmt->attr_use_bookmark == SQL_UB_VARIABLE)
@@ -519,7 +519,7 @@ odbc_fetch (ODBC_STATEMENT * stmt,
 	}
     }
 
-  // array fetch µ¿¾È cursor movement º¸Á¤
+  // array fetch ë™ì•ˆ cursor movement ë³´ì •
   if (stmt->result_type == QUERY)
     {
       if (flag_cursor_move == 1)
@@ -538,9 +538,9 @@ odbc_fetch (ODBC_STATEMENT * stmt,
 
   return ODBC_SUCCESS;
 
-// CHECK : error, get_date, move_cursor, fetch_tuple¿¡¼­ cci_error°¡
-// ¹ß»ýÇÑ´Ù. SQL_ROW_ERROR º¸´Ù ½É°¢ÇÑ errorÀÇ °æ¿ì ODBC_ERROR¸¦
-// »Ñ·Á¾ß ÇÑ´Ù.
+// CHECK : error, get_date, move_cursor, fetch_tupleì—ì„œ cci_errorê°€
+// ë°œìƒí•œë‹¤. SQL_ROW_ERROR ë³´ë‹¤ ì‹¬ê°í•œ errorì˜ ê²½ìš° ODBC_ERRORë¥¼
+// ë¿Œë ¤ì•¼ í•œë‹¤.
 
 error:
   if (stmt->conn->env->attr_odbc_version == SQL_OV_ODBC2)	// for 2.x backward compatibility
@@ -666,7 +666,7 @@ odbc_get_data (ODBC_STATEMENT * stmt,
             }
           else
             {
-              // object, set typeÀº stringÀ¸·Î match
+              // object, set typeì€ stringìœ¼ë¡œ match
               if (target_type == SQL_C_CHAR ||
                   target_type == SQL_C_UNI_SET || target_type == SQL_C_UNI_OBJECT)
                 {
@@ -814,7 +814,7 @@ odbc_get_data (ODBC_STATEMENT * stmt,
               target_value.type = target_type;
               odbc_value_converter (&target_value, &c_value);
 
-              // catalog result set¿¡´Â object, set typeÀÌ ¾ø´Ù.
+              // catalog result setì—ëŠ” object, set typeì´ ì—†ë‹¤.
               if (target_type == SQL_C_CHAR)
                 {
                   rc =
@@ -1014,7 +1014,7 @@ error:
  *		buffer_length (OUT)
  * returns/side-effects:
  * description:
- *		ard·ÎºÎÅÍ bound_ptr°ú strlen_ind_ptrÀ» ¾ò¾î¿Â´Ù.
+ *		ardë¡œë¶€í„° bound_ptrê³¼ strlen_ind_ptrì„ ì–»ì–´ì˜¨ë‹¤.
  * NOTE:
  ************************************************************************/
 PRIVATE void
@@ -1051,7 +1051,7 @@ get_bind_info (ODBC_STATEMENT * stmt,
   odbc_get_desc_field (stmt->ard, (short) col_index, SQL_DESC_CONCISE_TYPE,
 		       (void *) type, 0, NULL);
 
-  // set°ú object typeÀº stringÀ¸·Î matchµÇ¾î ÀÖ´Ù.
+  // setê³¼ object typeì€ stringìœ¼ë¡œ matchë˜ì–´ ìžˆë‹¤.
   if (*type == SQL_C_CHAR || *type == SQL_C_BINARY
       || *type == SQL_C_UNI_OBJECT || *type == SQL_C_UNI_SET
       || *type == SQL_C_DEFAULT || *type == SQL_C_WCHAR)
@@ -1448,8 +1448,8 @@ error:
 
 
 /*
- * check : TINYINT, BIGINT¿¡ ´ëÇØ¼­ °í·ÁµÇÁö ¾Ê¾Ò´Ù.
- * ÇöÀç bound_ptrÀÇ typeÀº c_value->type°ú °°´Ù.
+ * check : TINYINT, BIGINTì— ëŒ€í•´ì„œ ê³ ë ¤ë˜ì§€ ì•Šì•˜ë‹¤.
+ * í˜„ìž¬ bound_ptrì˜ typeì€ c_value->typeê³¼ ê°™ë‹¤.
  */
 
 PRIVATE RETCODE

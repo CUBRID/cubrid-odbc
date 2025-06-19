@@ -59,7 +59,7 @@ PRIVATE short odbc_type_searchable (short type);
 * returns/side-effects:
 * description:
 * NOTE:
-*    conÀÌ nullÀÌ ¾Æ´Ï¸é con¿¡ ¿¬°áµÈ explicit desc·Î °£ÁÖÇÑ´Ù.
+*    conì´ nullì´ ì•„ë‹ˆë©´ conì— ì—°ê²°ëœ explicit descë¡œ ê°„ì£¼í•œë‹¤.
 ************************************************************************/
 PUBLIC RETCODE
 odbc_alloc_desc (ODBC_CONNECTION * conn, ODBC_DESC ** desc_ptr)
@@ -120,7 +120,7 @@ error:
 * returns/side-effects:
 * description:
 * NOTE:
-*    desc->conÀÌ nullÀÌ ¾Æ´Ï¸é con¿¡ ¿¬°áµÈ explicit desc·Î °£ÁÖÇÑ´Ù.
+*    desc->conì´ nullì´ ì•„ë‹ˆë©´ conì— ì—°ê²°ëœ explicit descë¡œ ê°„ì£¼í•œë‹¤.
 ************************************************************************/
 PUBLIC RETCODE
 odbc_free_desc (ODBC_DESC * desc)
@@ -171,8 +171,8 @@ error:
 * returns/side-effects:
 * description:
 * NOTE:
-*    record handleÀº Á¤ÀÇµµ ¾È µÇ¾úÀ»»Ó¸¸ ¾Æ´Ï¶ó, ¿ÜºÎ¿¡¼­ Á÷Á¢ÀûÀ¸·Î »ç¿ëÇÒ
-*    ÀÏÀÌ ¾øÀ¸¹Ç·Î NULLÀ» Çã¿ëÇÑ´Ù.
+*    record handleì€ ì •ì˜ë„ ì•ˆ ë˜ì—ˆì„ë¿ë§Œ ì•„ë‹ˆë¼, ì™¸ë¶€ì—ì„œ ì§ì ‘ì ìœ¼ë¡œ ì‚¬ìš©í• 
+*    ì¼ì´ ì—†ìœ¼ë¯€ë¡œ NULLì„ í—ˆìš©í•œë‹¤.
 *	- error messaging
 ************************************************************************/
 PUBLIC RETCODE
@@ -731,7 +731,7 @@ odbc_get_desc_field (ODBC_DESC * desc,
 	  break;
 
 	case SQL_DESC_TABLE_NAME:
-	case SQL_DESC_BASE_TABLE_NAME:	/* µû·Î Áö¿øÇÏÁö ¾Ê°í TABLE_NAME°ú °°ÀÌ ¾´´Ù. */
+	case SQL_DESC_BASE_TABLE_NAME:	/* ë”°ë¡œ ì§€ì›í•˜ì§€ ì•Šê³  TABLE_NAMEê³¼ ê°™ì´ ì“´ë‹¤. */
 	  if (record->table_name != NULL)
 	    {
 	      pt = record->table_name;
@@ -923,7 +923,7 @@ odbc_get_desc_rec (ODBC_DESC * desc,
 * description:
 * NOTE:
 *	CHECK : consistency
-*	ÀÏºÎ consistency check°¡ odbc_set_desc_rec¿¡¼­ ÀÌ·ç¾îÁø´Ù. Âü°í..
+*	ì¼ë¶€ consistency checkê°€ odbc_set_desc_recì—ì„œ ì´ë£¨ì–´ì§„ë‹¤. ì°¸ê³ ..
 ************************************************************************/
 PUBLIC RETCODE
 odbc_set_desc_field (ODBC_DESC * desc,
@@ -1040,7 +1040,7 @@ odbc_set_desc_field (ODBC_DESC * desc,
 	case SQL_DESC_SEARCHABLE:
 	  record->searchable = (short) value_ptr;
 	  break;
-	  /* BASE_TABLE_NAME°ú TABLE_NAME°úÀÇ ±¸ºĞÀº ¾ø´Ù. */
+	  /* BASE_TABLE_NAMEê³¼ TABLE_NAMEê³¼ì˜ êµ¬ë¶„ì€ ì—†ë‹¤. */
 	case SQL_DESC_TABLE_NAME:
 	case SQL_DESC_BASE_TABLE_NAME:
 	  NC_FREE (record->table_name);
@@ -1440,14 +1440,14 @@ odbc_set_ird (ODBC_STATEMENT * stmt,
     {
       odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_PRECISION,
 			   (SQLPOINTER) 0, 0, 1);
-      // precision¿¡ ´ëÇØ¼­ Á¤ÀÇÇÏ°í ÀÖÁö ¾Ê´Ù.
+      // precisionì— ëŒ€í•´ì„œ ì •ì˜í•˜ê³  ìˆì§€ ì•Šë‹¤.
     }
   else if (odbc_is_valid_sql_date_type (type))
     {
       odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_PRECISION,
 			   (SQLPOINTER) 0, 0, 1);
-      // CUBRID´Â date type¿¡ ´ëÇØ¼­ precision(for second)Àº 0ÀÌ´Ù.
-      // date type¿¡ ´ëÇÑ length´Â charÇü»öÀÇ display size¿Í °°´Ù.
+      // CUBRIDëŠ” date typeì— ëŒ€í•´ì„œ precision(for second)ì€ 0ì´ë‹¤.
+      // date typeì— ëŒ€í•œ lengthëŠ” charí˜•ìƒ‰ì˜ display sizeì™€ ê°™ë‹¤.
     }
   else
     {
@@ -1516,8 +1516,8 @@ find_record_from_desc (ODBC_DESC * desc, int rec_number)
 * description:
 * NOTE:
 *		SQL_DESC_ROWS_PROCESSED_PTR,
-*		SQL_DESC_ARRAY_STATUS_PTRÀÇ °æ¿ì¿¡´Â »ç¿ëÀÚ¿¡ ÀÇÇØ¼­ ¼³Á¤µÇ¹Ç·Î
-*		deleteÇÏÁö ¸»¾Æ¾ß ÇÑ´Ù.
+*		SQL_DESC_ARRAY_STATUS_PTRì˜ ê²½ìš°ì—ëŠ” ì‚¬ìš©ìì— ì˜í•´ì„œ ì„¤ì •ë˜ë¯€ë¡œ
+*		deleteí•˜ì§€ ë§ì•„ì•¼ í•œë‹¤.
 ************************************************************************/
 PUBLIC void
 reset_descriptor (ODBC_DESC * desc)

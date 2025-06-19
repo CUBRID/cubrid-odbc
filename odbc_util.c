@@ -556,7 +556,7 @@ ListTailAdd (ST_LIST * head, void *key, void *val,
  *  If 'key' or 'value' has its own memory, the memory must be freed	*
  *  in 'nodeDelete' function. But, the node container is freed in	*
  *  this module.							*
- *  dummy headerÆ÷ÇÔÇÏ¿© ¸ğµÎ Áö¿î´Ù.
+ *  dummy headerí¬í•¨í•˜ì—¬ ëª¨ë‘ ì§€ìš´ë‹¤.
  ************************************************************************/
 
 PUBLIC void
@@ -700,7 +700,7 @@ is_korean (unsigned char ch)
  * name: next_element
  * arguments:
  * returns/side-effects:
- *		´õÀÌ»ó value°¡ ¾øÀ» ¶§ NULL return
+ *		ë”ì´ìƒ valueê°€ ì—†ì„ ë•Œ NULL return
  * description:
  * NOTE:
  *	element list structure
@@ -787,7 +787,7 @@ element_value_by_key (const char *element_list, const char *key)
  * returns/side-effects:
  * description:
  * NOTE:
- *	¾ÕµÚÀÇ °ø¹é¹®ÀÚ¸¦ Çã¿ëÇÑ´Ù.
+ *	ì•ë’¤ì˜ ê³µë°±ë¬¸ìë¥¼ í—ˆìš©í•œë‹¤.
  ************************************************************************/
 PUBLIC short
 is_oidstr_array (char **array, int size)
@@ -808,9 +808,9 @@ is_oidstr_array (char **array, int size)
  * arguments:
  * returns/side-effects:
  * description:
- *	stringÀÌ oidÀÎÁö ÆÇº°ÇÑ´Ù. 
+ *	stringì´ oidì¸ì§€ íŒë³„í•œë‹¤. 
  * NOTE:
- *	¾ÕµÚÀÇ °ø¹é¹®ÀÚ¸¦ Çã¿ëÇÑ´Ù.
+ *	ì•ë’¤ì˜ ê³µë°±ë¬¸ìë¥¼ í—ˆìš©í•œë‹¤.
  ************************************************************************/
 PUBLIC short
 is_oidstr (char *str)
@@ -889,10 +889,10 @@ is_oidstr (char *str)
  * name:  replace_oid
  * arguments:
  * returns/side-effects:
- *		±³Ã¼µÈ oid parameter °³¼ö¸¦ returnÇÑ´Ù.
+ *		êµì²´ëœ oid parameter ê°œìˆ˜ë¥¼ returní•œë‹¤.
  * description:
  * NOTE:
- *		parameter number´Â 1À» base·Î ÇÏ°í ÀÖ´Ù°í °¡Á¤Çß´Ù.
+ *		parameter numberëŠ” 1ì„ baseë¡œ í•˜ê³  ìˆë‹¤ê³  ê°€ì •í–ˆë‹¤.
  ************************************************************************/
 PUBLIC int
 replace_oid (char *sql_text, char **org_param_pos_pt,
@@ -985,7 +985,7 @@ replace_oid (char *sql_text, char **org_param_pos_pt,
  * arguments:
  * returns/side-effects:
  * description:
- *	ÀüÈÄÀÇ °ø¹é¹®ÀÚ¸¦ Á¦°ÅÇÑ ÇüÅÂ·Î º¯ÇüÇÑ´Ù. (strÀÇ ³»¿ëÀÌ º¯ÇüµÊ)
+ *	ì „í›„ì˜ ê³µë°±ë¬¸ìë¥¼ ì œê±°í•œ í˜•íƒœë¡œ ë³€í˜•í•œë‹¤. (strì˜ ë‚´ìš©ì´ ë³€í˜•ë¨)
  * NOTE:
  ************************************************************************/
 PUBLIC char *

@@ -222,8 +222,8 @@ odbc_alloc_connection (ODBC_ENV * env, ODBC_CONNECTION ** connptr)
 *		SQLRETCODE
 * description:
 * NOTE:
-*		statement handle°ú explicitly allocated desc handleÀº
-*		SQLDisconnect(odbc_disconnect)½Ã¿¡ freeµÈ´Ù.
+*		statement handleê³¼ explicitly allocated desc handleì€
+*		SQLDisconnect(odbc_disconnect)ì‹œì— freeëœë‹¤.
 ************************************************************************/
 
 PUBLIC RETCODE
@@ -271,10 +271,10 @@ odbc_free_connection (ODBC_CONNECTION * conn)
 * returns/side-effects:
 * description:
 * NOTE:
-*	attribute°¡ SQL_ATTR_ACCESS_MODEÀÏ °æ¿ì,
-*		³»ºÎÀûÀ¸·Î isolation levelÀÌ TRAN_COMMIT_CLASS_COMMIT_INSTANCE·Î
-*		¼³Á¤µÈ´Ù.  ÀÌ ¶§ ±âÁ¸ÀÇ isolation levelÀ» »ç¿ëÇÏ±â À§ÇØ¼­
-*		(ODBC_CONNECTION).old_txn_isolationÀÌ »ç¿ëµÈ´Ù.
+*	attributeê°€ SQL_ATTR_ACCESS_MODEì¼ ê²½ìš°,
+*		ë‚´ë¶€ì ìœ¼ë¡œ isolation levelì´ TRAN_COMMIT_CLASS_COMMIT_INSTANCEë¡œ
+*		ì„¤ì •ëœë‹¤.  ì´ ë•Œ ê¸°ì¡´ì˜ isolation levelì„ ì‚¬ìš©í•˜ê¸° ìœ„í•´ì„œ
+*		(ODBC_CONNECTION).old_txn_isolationì´ ì‚¬ìš©ëœë‹¤.
 ************************************************************************/
 PUBLIC RETCODE
 odbc_set_connect_attr (ODBC_CONNECTION * conn,
@@ -350,8 +350,8 @@ odbc_set_connect_attr (ODBC_CONNECTION * conn,
       break;
 
     case SQL_ATTR_CONNECTION_DEAD:
-      // ¾Æ¹«ÀÏµµ ÀÏ¾î³ªÁö ¾ÊÀ½. connection »óÈ²Àº connection handleÀÇ
-      // connhd·Î ºÎÅÍ ¾Ë¾Æ³¾ ¼ö ÀÖÀ½.
+      // ì•„ë¬´ì¼ë„ ì¼ì–´ë‚˜ì§€ ì•ŠìŒ. connection ìƒí™©ì€ connection handleì˜
+      // connhdë¡œ ë¶€í„° ì•Œì•„ë‚¼ ìˆ˜ ìˆìŒ.
       break;
 
     case SQL_ATTR_CONNECTION_TIMEOUT:
@@ -917,8 +917,8 @@ error:
  * arguments:
  * returns/side-effects:
  * description:
- *		Data source(CUBRIDÀÇ °æ¿ì CAS)¿ÍÀÇ ¿¬°áÀ» ²÷°í, connection handle
- *		¿¡ µş·ÁÀÖ´Â statement handle, descriptor handleÀ» freeÇÑ´Ù.
+ *		Data source(CUBRIDì˜ ê²½ìš° CAS)ì™€ì˜ ì—°ê²°ì„ ëŠê³ , connection handle
+ *		ì— ë”¸ë ¤ìˆëŠ” statement handle, descriptor handleì„ freeí•œë‹¤.
  * NOTE:
  ************************************************************************/
 PUBLIC RETCODE
@@ -973,7 +973,7 @@ error:
  * arguments:
  * returns/side-effects:
  * description:
- * auto commit mode°¡ ONÀÌ¸é end tranÀ» ½ÇÇàÇÑ´Ù.
+ * auto commit modeê°€ ONì´ë©´ end tranì„ ì‹¤í–‰í•œë‹¤.
  * NOTE:
  ************************************************************************/
 PUBLIC RETCODE
@@ -1003,7 +1003,7 @@ odbc_auto_commit (ODBC_CONNECTION * conn)
  * arguments:
  * returns/side-effects:
  * description:
- *	input stmt text¸¦ return ÇØÁØ´Ù. ODBC SQL to CUBRID SQLÀÇ Ã³¸®°úÁ¤ÀÌ ¾ø´Ù.
+ *	input stmt textë¥¼ return í•´ì¤€ë‹¤. ODBC SQL to CUBRID SQLì˜ ì²˜ë¦¬ê³¼ì •ì´ ì—†ë‹¤.
  * NOTE:
  ************************************************************************/
 PUBLIC RETCODE
@@ -1149,8 +1149,8 @@ odbc_get_info (ODBC_CONNECTION * conn,
 
     case SQL_ASYNC_MODE:
       if (info_value_ptr != NULL)
-	/* FIXME :  SQL_AM_STATEMENT , SQL_AM_CONNECTION µÑ Áß¿¡ ÇÏ³ª·Î
-	 * fixÇØ¾ß ÇÑ´Ù. */
+	/* FIXME :  SQL_AM_STATEMENT , SQL_AM_CONNECTION ë‘˜ ì¤‘ì— í•˜ë‚˜ë¡œ
+	 * fixí•´ì•¼ í•œë‹¤. */
 	*(unsigned long *) info_value_ptr = SQL_AM_STATEMENT;
 
       if (string_length_ptr != NULL)
@@ -1530,10 +1530,10 @@ odbc_get_info (ODBC_CONNECTION * conn,
       break;
 
     case SQL_CURSOR_COMMIT_BEHAVIOR:
-      // SQL_CB_DELETE »ç¿ë½Ã ADO¿¡¼­ memory access violationÀÌ ¹ß»ıÇÑ´Ù.
-      // ÀÌ¸¦ ÇÇÇÏ±â À§ÇØ¼­ SQL_CB_CLOSE¸¦ »ç¿ëÇß°í,
-      // SQL_CB_CLOSE¿¡ ¸Â°Ô µ¿ÀÛÇÏ±â À§ÇØ¼­ emulation ½ÃÄ×´Ù.
-      // Âü°í, SQL_CB_CLOSE´Â CUBRID¿¡¼­ Áö¿øÇÏÁö ¾Ê´Â´Ù.
+      // SQL_CB_DELETE ì‚¬ìš©ì‹œ ADOì—ì„œ memory access violationì´ ë°œìƒí•œë‹¤.
+      // ì´ë¥¼ í”¼í•˜ê¸° ìœ„í•´ì„œ SQL_CB_CLOSEë¥¼ ì‚¬ìš©í–ˆê³ ,
+      // SQL_CB_CLOSEì— ë§ê²Œ ë™ì‘í•˜ê¸° ìœ„í•´ì„œ emulation ì‹œì¼°ë‹¤.
+      // ì°¸ê³ , SQL_CB_CLOSEëŠ” CUBRIDì—ì„œ ì§€ì›í•˜ì§€ ì•ŠëŠ”ë‹¤.
       if (info_value_ptr != NULL)
 	*(unsigned short *) info_value_ptr = SQL_CB_CLOSE;
 
@@ -1542,10 +1542,10 @@ odbc_get_info (ODBC_CONNECTION * conn,
       break;
 
     case SQL_CURSOR_ROLLBACK_BEHAVIOR:
-      // SQL_CB_DELETE »ç¿ë½Ã ADO¿¡¼­ memory access violationÀÌ ¹ß»ıÇÑ´Ù.
-      // ÀÌ¸¦ ÇÇÇÏ±â À§ÇØ¼­ SQL_CB_CLOSE¸¦ »ç¿ëÇß°í,
-      // SQL_CB_CLOSE¿¡ ¸Â°Ô µ¿ÀÛÇÏ±â À§ÇØ¼­ emulation ½ÃÄ×´Ù.
-      // Âü°í, SQL_CB_CLOSE´Â CUBRID¿¡¼­ Áö¿øÇÏÁö ¾Ê´Â´Ù.
+      // SQL_CB_DELETE ì‚¬ìš©ì‹œ ADOì—ì„œ memory access violationì´ ë°œìƒí•œë‹¤.
+      // ì´ë¥¼ í”¼í•˜ê¸° ìœ„í•´ì„œ SQL_CB_CLOSEë¥¼ ì‚¬ìš©í–ˆê³ ,
+      // SQL_CB_CLOSEì— ë§ê²Œ ë™ì‘í•˜ê¸° ìœ„í•´ì„œ emulation ì‹œì¼°ë‹¤.
+      // ì°¸ê³ , SQL_CB_CLOSEëŠ” CUBRIDì—ì„œ ì§€ì›í•˜ì§€ ì•ŠëŠ”ë‹¤.
       if (info_value_ptr != NULL)
 	*(unsigned short *) info_value_ptr = SQL_CB_CLOSE;
 
@@ -2118,8 +2118,8 @@ odbc_get_info (ODBC_CONNECTION * conn,
       break;
 
     case SQL_MULT_RESULT_SETS:
-      /* CHECK : array bind parameter¿Í batch execution, SQLMoreResults       */
-      /* µîÀÌ Áö¿øµÇ¾î¾ß ÇÑ´Ù.                                                                                        */
+      /* CHECK : array bind parameterì™€ batch execution, SQLMoreResults       */
+      /* ë“±ì´ ì§€ì›ë˜ì–´ì•¼ í•œë‹¤.                                                                                        */
       rc =
 	str_value_assign ("Y", info_value_ptr, buffer_length,
 			  string_length_ptr);
@@ -2326,7 +2326,7 @@ odbc_get_info (ODBC_CONNECTION * conn,
       break;
 
     case SQL_SQL_CONFORMANCE:
-      // Á¤È®ÇÑ Á¤º¸´Â ¾Æ´Ï°í, SQL_SC_SQL92_ENTRY°¡ °¡Àå ÀÛÀº specÀÌ´Ù.
+      // ì •í™•í•œ ì •ë³´ëŠ” ì•„ë‹ˆê³ , SQL_SC_SQL92_ENTRYê°€ ê°€ì¥ ì‘ì€ specì´ë‹¤.
       if (info_value_ptr != NULL)
 	*(unsigned long *) info_value_ptr = SQL_SC_SQL92_ENTRY;
 
@@ -2615,7 +2615,7 @@ odbc_get_info (ODBC_CONNECTION * conn,
       if (info_value_ptr != NULL)
 	*(short *) info_value_ptr = SQL_OAC_NONE;
 #if 1
-      /* MS ACCESS¿¡¼­ µ¥ÀÌÅ¸º£ÀÌ½º ¿¬°á½Ã SQL_OAC_NONEÀÏ °æ¿ì ¿¬°á½ÇÆĞ */
+      /* MS ACCESSì—ì„œ ë°ì´íƒ€ë² ì´ìŠ¤ ì—°ê²°ì‹œ SQL_OAC_NONEì¼ ê²½ìš° ì—°ê²°ì‹¤íŒ¨ */
       if (info_value_ptr != NULL)
 	*(short *) info_value_ptr = SQL_OAC_LEVEL1;
 #endif
@@ -2674,9 +2674,9 @@ odbc_get_info (ODBC_CONNECTION * conn,
 * returns/side-effects:
 * description:
 * NOTE:
-*	1. SQLSetConfigMode(ODBC_BOTH_DSN)¿¡ ÀÇÇØ¼­ ODBC_USER_DSN¿¡
-*	¸ÕÀú Á¢±ÙÇÏ°Ô µÈ´Ù.
-*	2. char* lengthÀÇ max size´Â 1024bytesÀÌ´Ù.
+*	1. SQLSetConfigMode(ODBC_BOTH_DSN)ì— ì˜í•´ì„œ ODBC_USER_DSNì—
+*	ë¨¼ì € ì ‘ê·¼í•˜ê²Œ ëœë‹¤.
+*	2. char* lengthì˜ max sizeëŠ” 1024bytesì´ë‹¤.
 ************************************************************************/
 PUBLIC int
 get_dsn_info (const char *dsn,
@@ -2809,10 +2809,10 @@ get_dsn_info (const char *dsn,
 * arguments:
 * returns/side-effects:
 * description:
-*		DSN(registry)¿¡¼­ ip address, port num, db nameÀ» ¾ò¾î¿Â´Ù.
+*		DSN(registry)ì—ì„œ ip address, port num, db nameì„ ì–»ì–´ì˜¨ë‹¤.
 * NOTE:
-*		SQLSetConfigMode(ODBC_BOTH_DSN)¿¡ ÀÇÇØ¼­ ODBC_USER_DSN¿¡
-*		¸ÕÀú Á¢±ÙÇÏ°Ô µÈ´Ù.
+*		SQLSetConfigMode(ODBC_BOTH_DSN)ì— ì˜í•´ì„œ ODBC_USER_DSNì—
+*		ë¨¼ì € ì ‘ê·¼í•˜ê²Œ ëœë‹¤.
 ************************************************************************/
 
 PRIVATE int

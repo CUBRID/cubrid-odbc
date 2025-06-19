@@ -80,17 +80,17 @@ typedef struct tagCATALOG_RESULT
 } CATALOG_RESULT;
 
 /* COLUMN_DATA
-*		large data¿¡ ´ëÇØ¼­ ºĞÇÒÇÏ¿© °¡Á®¿Ã ¼ö ÀÖµµ·Ï ÇÏ´Â SQLGetData¸¦
-*		Áö¿øÇÏ±â À§ÇØ¼­ °í¾ÈµÇ¾ú´Ù.
-*		column_no : column_no°¡ °°À¸¸é sequential call·Î ÀÎ½ÄÇÑ´Ù.
-*		current_pt : ³²Àº dataÀÇ start pointer
-*		remain_length :	³²Àº dataÀÇ length, ¹®Á¦´Â remain_length°¡ 0ÀÌ¶ó°í ÇØ¼­
-*			SQL_NO_DATA¸¦ returnÇÒ ¼ö ¾ú´Ù.  empty string¿¡ ´ëÇØ¼­ buffer length°¡ 0ÀÌ¸é
-*			¿¹¿Ü »óÈ²ÀÌ ¹ß»ıÇÑ´Ù.  ÀÌ¸¦ ¸·±â À§ÇØ¼­ µµÀÔÇÑ°Ô fetch_statusÀÌ´Ù.
+*		large dataì— ëŒ€í•´ì„œ ë¶„í• í•˜ì—¬ ê°€ì ¸ì˜¬ ìˆ˜ ìˆë„ë¡ í•˜ëŠ” SQLGetDataë¥¼
+*		ì§€ì›í•˜ê¸° ìœ„í•´ì„œ ê³ ì•ˆë˜ì—ˆë‹¤.
+*		column_no : column_noê°€ ê°™ìœ¼ë©´ sequential callë¡œ ì¸ì‹í•œë‹¤.
+*		current_pt : ë‚¨ì€ dataì˜ start pointer
+*		remain_length :	ë‚¨ì€ dataì˜ length, ë¬¸ì œëŠ” remain_lengthê°€ 0ì´ë¼ê³  í•´ì„œ
+*			SQL_NO_DATAë¥¼ returní•  ìˆ˜ ì—ˆë‹¤.  empty stringì— ëŒ€í•´ì„œ buffer lengthê°€ 0ì´ë©´
+*			ì˜ˆì™¸ ìƒí™©ì´ ë°œìƒí•œë‹¤.  ì´ë¥¼ ë§‰ê¸° ìœ„í•´ì„œ ë„ì…í•œê²Œ fetch_statusì´ë‹¤.
 *		fetch_status :  
-*				ÃÖÃÊÀÇ function call¿¡¼­ SQL_NO_DATA°¡ ¹ß»ıÇÒ ¼ö ¾øÀ¸¸ç, SQL_SUCCESS_WITH_INFO
-*				´ÙÀ½¿¡ SQL_NO_DATA·Î °Ç³Ê ¶Û ¼ö ¾ø´Ù. ÀÌ°ÍÀ» ÀÌ¿ëÇØ¼­ Àú¹ø return status¸¦
-*				ÀúÀåÇØ¼­ buffer length°¡ 0¿¡ ´ëÇØ¼­ SQL_NO_DATA¸¦ returnÇÒ °ÇÁö °áÁ¤ÇÑ´Ù.
+*				ìµœì´ˆì˜ function callì—ì„œ SQL_NO_DATAê°€ ë°œìƒí•  ìˆ˜ ì—†ìœ¼ë©°, SQL_SUCCESS_WITH_INFO
+*				ë‹¤ìŒì— SQL_NO_DATAë¡œ ê±´ë„ˆ ë›¸ ìˆ˜ ì—†ë‹¤. ì´ê²ƒì„ ì´ìš©í•´ì„œ ì €ë²ˆ return statusë¥¼
+*				ì €ì¥í•´ì„œ buffer lengthê°€ 0ì— ëŒ€í•´ì„œ SQL_NO_DATAë¥¼ returní•  ê±´ì§€ ê²°ì •í•œë‹¤.
 *					
 *					->		SQL_SUCCESS_WITH_INFO
 *
@@ -133,23 +133,23 @@ typedef struct st_odbc_statement
   char *sql_text;		/* origianl SQL statement */
   struct tagREVISED_SQL revised_sql;
   char *cursor;			/* cursor name */
-  short data_at_exec_state;	/*      > 0ÀÏ ¶§´Â ÇöÀç º¸³»¾ßÇÒ bind parameter,
-				   STMT_NEED_DATA ¾ÆÁ÷ º¸³»±â Á÷Àü,
-				   STMT_NEED_NO_MORE_DATA º¸³¾ data°¡ ¾ø°Å³ª,
-				   ¸ğµÎ º¸³½ ÀÌÈÄ */
-  unsigned long tpl_number;	/* tpl_number - result setÀÇ tuple °³¼ö, ¶Ç´Â
-				 * update°¡ ¹İ¿µµÈ row ¼ö
+  short data_at_exec_state;	/*      > 0ì¼ ë•ŒëŠ” í˜„ì¬ ë³´ë‚´ì•¼í•  bind parameter,
+				   STMT_NEED_DATA ì•„ì§ ë³´ë‚´ê¸° ì§ì „,
+				   STMT_NEED_NO_MORE_DATA ë³´ë‚¼ dataê°€ ì—†ê±°ë‚˜,
+				   ëª¨ë‘ ë³´ë‚¸ ì´í›„ */
+  unsigned long tpl_number;	/* tpl_number - result setì˜ tuple ê°œìˆ˜, ë˜ëŠ”
+				 * updateê°€ ë°˜ì˜ëœ row ìˆ˜
 				 * row_number - currunt row position */
-  unsigned long current_tpl_pos;	/* result set¿¡¼­ cursorÀÇ À§Ä¡,
-					 * attr_row_number¿Í ÀÇ¹Ì»ó °°´Ù. 
+  unsigned long current_tpl_pos;	/* result setì—ì„œ cursorì˜ ìœ„ì¹˜,
+					 * attr_row_numberì™€ ì˜ë¯¸ìƒ ê°™ë‹¤. 
 					 * 0 Befor start, -1 After end */
 
-  // param number´Â column number¿Í´Â ´Ş¸® ipdÀÇ record°³¼ö°¡ ¾Æ´Ï´Ù.
-  // ¿Ö³Ä¸é ird¿Í ´Ş¸® auto ipd°¡ ¾Æ´Ï±â ¶§¹®ÀÌ´Ù.
+  // param numberëŠ” column numberì™€ëŠ” ë‹¬ë¦¬ ipdì˜ recordê°œìˆ˜ê°€ ì•„ë‹ˆë‹¤.
+  // ì™œëƒë©´ irdì™€ ë‹¬ë¦¬ auto ipdê°€ ì•„ë‹ˆê¸° ë•Œë¬¸ì´ë‹¤.
   unsigned short param_number;
   T_CCI_CUBRID_STMT stmt_type;
   PARAM_DATA param_data;	/* For data at exec */
-  char is_prepared;		// SQLPrepare¿¡ ÀÇÇØ¼­¸¸ prepare»óÅÂ¿¡ ³õÀÎ´Ù.
+  char is_prepared;		// SQLPrepareì— ì˜í•´ì„œë§Œ prepareìƒíƒœì— ë†“ì¸ë‹¤.
   char query_plan;
 
   /* Supported attributes */
@@ -158,9 +158,9 @@ typedef struct st_odbc_statement
   unsigned long attr_cursor_type;	// core, 2
   unsigned long attr_async_enable;	// 1, 2
   unsigned long attr_use_bookmark;	/* 2    
-					 * bookmark°¡ okÀÎ °æ¿ì 
-					 * prepare½Ã 0¹ø record¸¦ Ãß°¡·Î
-					 * »ı¼ºÇÑ´Ù. */
+					 * bookmarkê°€ okì¸ ê²½ìš° 
+					 * prepareì‹œ 0ë²ˆ recordë¥¼ ì¶”ê°€ë¡œ
+					 * ìƒì„±í•œë‹¤. */
 
 
   /* Not supported attributes */

@@ -193,10 +193,10 @@ odbc_alloc_diag (void)
  * name: odbc_free_diag
  * arguments:
  *    option -
- *		INIT - ÃÊ±âÈ­
+ *		INIT - ì´ˆê¸°í™”
  *		RESET - member reset
- *		FREE_MEBER - member¸¸ free
- *		FREE_ALL - member ¹× node free
+ *		FREE_MEBER - memberë§Œ free
+ *		FREE_ALL - member ë° node free
  * returns/side-effects:
  * description:
  * NOTE:
@@ -402,9 +402,9 @@ odbc_set_diag_by_cci (ODBC_DIAG * diag, int cci_retval, T_CCI_ERROR *error)
 * returns/side-effects:
 * description:
 * NOTE:
-*	record fieldÀÇ SQL_DIAG_COLUMN_NUMBER¿Í SQL_DIAG_ROW_NUMBER´Â
-*	°¢ data cell¿¡ ´ëÇÑ fetch½Ã ÀÏ¾î³ª´Â error¿¡ °üÇÑ Á¤º¸ÀÌ´Ù.
-*	ÇöÀç Áö¿øÇÏÁö ¾Ê´Â´Ù.
+*	record fieldì˜ SQL_DIAG_COLUMN_NUMBERì™€ SQL_DIAG_ROW_NUMBERëŠ”
+*	ê° data cellì— ëŒ€í•œ fetchì‹œ ì¼ì–´ë‚˜ëŠ” errorì— ê´€í•œ ì •ë³´ì´ë‹¤.
+*	í˜„ì¬ ì§€ì›í•˜ì§€ ì•ŠëŠ”ë‹¤.
 ************************************************************************/
 PUBLIC RETCODE
 odbc_get_diag_field (SQLSMALLINT handle_type,
