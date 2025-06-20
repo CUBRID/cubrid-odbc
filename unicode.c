@@ -418,9 +418,16 @@ SQLDescribeColW (SQLHSTMT hstmt, SQLUSMALLINT column,
 
   bytes_to_wide_char (name_buffer, name_buffer_len, &name, name_max, &out_length, stmt_handle->conn->charset);
 
-  if (name_len && name != NULL)
+  if (name_len)
     {
-      *name_len = (SQLSMALLINT) (out_length / sizeof (wchar_t));
+      if (name != NULL) 
+        {
+          *name_len = (SQLSMALLINT) (out_length / sizeof (wchar_t));
+        }
+      else 
+        {
+          *name_len = 0;
+        }
     }
 
   UT_FREE (name_buffer);
