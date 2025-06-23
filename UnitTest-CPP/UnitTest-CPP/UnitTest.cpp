@@ -1232,5 +1232,96 @@ namespace UnitTestCPP
 			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
 		}
 
+		TEST_METHOD(APIS_1053_SQLDescribeColW)
+		{
+			SQLHENV		hEnv;
+			SQLHDBC		hDbc;
+			SQLHSTMT	hStmt;
+
+			RETCODE retcode(0);
+
+			retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocHandle(SQL_HANDLE_DBC, hEnv, &hDbc);
+			retcode = SQLConnect(hDbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, L"", SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt);
+
+			retcode = SQLExecDirect(hStmt, L"DROP TABLE IF EXISTS apis1053", SQL_NTS);
+			retcode = SQLExecDirect(hStmt, L"CREATE TABLE apis1053 (id INT, name VARCHAR(255))", SQL_NTS);
+
+			retcode = SQLPrepare(hStmt, (SQLWCHAR*)(wchar_t*)L"INSERT INTO apis1053(id, name) VALUES(?, ?)", SQL_NTS);
+
+			retcode = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_LONG, SQL_INTEGER, 0, 0, 0, 0, NULL);
+			retcode = SQLBindParameter(hStmt, 2, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_WVARCHAR, 255, 0, L"test", 0, NULL);
+
+			retcode = SQLExecute(hStmt);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLTransact(hEnv, hDbc, SQL_COMMIT);
+
+			SQLWCHAR allSQL[] = L"SELECT * FROM apis1053";
+			retcode = SQLExecDirect(hStmt, allSQL, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			SQLSMALLINT numCols;
+			retcode = SQLNumResultCols(hStmt, &numCols);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			Assert::AreEqual((int)numCols, 2);
+
+			SQLWCHAR col_name[256] = {0,};
+			SQLSMALLINT name_len;
+			SQLSMALLINT data_type;
+			SQLULEN col_size;
+			SQLSMALLINT decimal_digits;
+			SQLSMALLINT nullable;
+
+			for (SQLUSMALLINT i = 1; i <= numCols; i++) {
+				retcode = SQLDescribeColW(hStmt, i, col_name, sizeof(col_name) / sizeof(SQLWCHAR), &name_len, &data_type, &col_size, &decimal_digits, &nullable);
+				if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
+					Assert::Fail(L"Error getting column information");
+				}
+				if (i == 1) {
+					Assert::AreEqual(col_name, L"id");
+					Assert::AreEqual((int)name_len, 2);
+					Assert::AreEqual((int)data_type, SQL_INTEGER);
+					Assert::AreEqual((int)col_size, 11);
+					Assert::AreEqual((int)decimal_digits, 0);
+					Assert::AreEqual((int)nullable, SQL_NULLABLE);
+				}
+				else if (i == 2) {
+					Assert::AreEqual(col_name, L"name");
+					Assert::AreEqual((int)name_len, 4);
+					Assert::AreEqual((int)data_type, SQL_VARCHAR);
+					Assert::AreEqual((int)col_size, 255);
+					Assert::AreEqual((int)decimal_digits, 0);
+					Assert::AreEqual((int)nullable, SQL_NULLABLE);
+				}
+			}
+
+			for (SQLUSMALLINT i = 1; i <= numCols; i++) {
+				retcode = SQLDescribeColW(hStmt, i, NULL, sizeof(col_name) / sizeof(SQLWCHAR), &name_len, &data_type, &col_size, &decimal_digits, &nullable);
+				if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) {
+					Assert::Fail(L"Error getting column information");
+				}
+				if (i == 1) {
+					Assert::AreEqual((int)name_len, 0);
+					Assert::AreEqual((int)data_type, SQL_INTEGER);
+					Assert::AreEqual((int)col_size, 11);
+					Assert::AreEqual((int)decimal_digits, 0);
+					Assert::AreEqual((int)nullable, SQL_NULLABLE);
+				}
+				else if (i == 2) {
+					Assert::AreEqual((int)name_len, 0);
+					Assert::AreEqual((int)data_type, SQL_VARCHAR);
+					Assert::AreEqual((int)col_size, 255);
+					Assert::AreEqual((int)decimal_digits, 0);
+					Assert::AreEqual((int)nullable, SQL_NULLABLE);
+				}
+			}
+			SQLFreeStmt(hStmt, SQL_DROP);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+		}
 	};
 }

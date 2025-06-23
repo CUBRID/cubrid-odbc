@@ -1410,7 +1410,7 @@ bytes_to_wide_char (char *str, int size, wchar_t ** buffer, int buffer_length, i
 {
   int nLength;
   int wincode = CP_ACP;
-  wchar_t *temp_buffer = *buffer;
+  wchar_t *temp_buffer = NULL;
   int temp_buffer_length = buffer_length;
 
   if (characterset == NULL || _stricmp (characterset, "utf-8") == 0 || _stricmp (characterset, "utf8") == 0)
@@ -1427,6 +1427,12 @@ bytes_to_wide_char (char *str, int size, wchar_t ** buffer, int buffer_length, i
       return ODBC_SUCCESS;
     }
 
+  if (buffer_length > 0 && *buffer == NULL)
+    {
+      return ODBC_SUCCESS;
+    }
+
+  temp_buffer = *buffer;
   temp_buffer_length = MultiByteToWideChar (wincode, 0, (LPCSTR) str, size, NULL, 0);
   if (buffer_length == 0)	// need to malloc buffer
     {

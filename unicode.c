@@ -420,7 +420,14 @@ SQLDescribeColW (SQLHSTMT hstmt, SQLUSMALLINT column,
 
   if (name_len)
     {
-      *name_len = (SQLSMALLINT) (out_length / sizeof (wchar_t));
+      if (name != NULL)
+	{
+	  *name_len = (SQLSMALLINT) (out_length / sizeof (wchar_t));
+	}
+      else
+	{
+	  *name_len = 0;
+	}
     }
 
   UT_FREE (name_buffer);

@@ -565,8 +565,10 @@ odbc_get_desc_field (ODBC_DESC * desc,
 	      case SQL_CHAR:
 	      case SQL_VARCHAR:
 		*(SQLULEN *) value_ptr = record->length;
+		break;
 	      default:
 		*(unsigned long *) value_ptr = record->length;
+		break;
 	      }
 	  if (string_length_ptr != NULL)
 	    {
