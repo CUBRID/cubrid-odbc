@@ -37,7 +37,7 @@ namespace UnitTestCPP
 			/* Allocate a connection handle */
 			SQLAllocHandle(SQL_HANDLE_DBC, env, &dbc);
 
-			retcode = SQLDriverConnect(dbc, NULL, L"DSN=CUBRID Driver Unicode;DB_NAME=demodb;SERVER=test-db-server;PORT=33000;USER=dba;PWD=;CHARSET=utf-8;AUTOCOMMIT=ON", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+			retcode = SQLDriverConnect(dbc, NULL, L"DRIVER=CUBRID Driver Unicode;DB_NAME=demodb;SERVER=test-db-server;PORT=33000;UID=dba;PWD=;CHARSET=utf-8;AUTOCOMMIT=ON", SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
 
 			if (retcode == SQL_ERROR) {
 				SQLGetDiagField(SQL_HANDLE_DBC, dbc, 0, SQL_DIAG_NUMBER, &diag_rec, 0, &plm_pcbErrorMsg);
@@ -668,7 +668,7 @@ namespace UnitTestCPP
 			SQLHSTMT        hstmt;
 			SQLINTEGER		retcode;
 			SQLWCHAR		*user = L"PUBLIC";
-			int				cbTableNameMax;
+			SQLSMALLINT		cbTableNameMax;
 			int				max_table_name_len(255);
 			int				len;
 			SQLWCHAR		query[512];
@@ -1318,6 +1318,88 @@ namespace UnitTestCPP
 					Assert::AreEqual((int)nullable, SQL_NULLABLE);
 				}
 			}
+			SQLFreeStmt(hStmt, SQL_DROP);
+			retcode = SQLDisconnect(hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+			retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+		}
+
+		TEST_METHOD(APIS_1055_SQLMoreResults_Bind_Issue)
+		{
+			SQLHENV		hEnv;
+			SQLHDBC		hDbc;
+			SQLHSTMT	hStmt;
+
+			RETCODE retcode(0);
+			int insert_count = 5;
+			int inserted_row_count = 0;
+			int selected_row_count = 0;
+
+			retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &hEnv);
+			retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+			retcode = SQLAllocHandle(SQL_HANDLE_DBC, hEnv, &hDbc);
+			retcode = SQLConnect(hDbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, L"", SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt);
+
+			retcode = SQLExecDirect(hStmt, L"DROP TABLE IF EXISTS apis1055", SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			retcode = SQLExecDirect(hStmt, L"CREATE TABLE apis1055 (id INT, name VARCHAR(255))", SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			retcode = SQLPrepare(hStmt, (SQLWCHAR*)(wchar_t*)L"INSERT INTO apis1055(id, name) VALUES(?, ?)", SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			SQLWCHAR name[256];
+			SQLLEN name_size = 0;
+			for (SQLLEN i = 0; i < insert_count; i++) {
+				swprintf(name, sizeof(name) / sizeof(SQLWCHAR), L"test%d", i);
+				name_size = wcslen(name) * sizeof(SQLWCHAR);
+
+				retcode = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_LONG, SQL_INTEGER, 0, 0, &i, 0, NULL);
+				retcode = SQLBindParameter(hStmt, 2, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_WVARCHAR, 255, 0, name, 0, &name_size);
+
+				retcode = SQLExecute(hStmt);
+				Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+				for (;;) 
+				{
+					SQLLEN c;
+					retcode = SQLRowCount(hStmt, &c);
+					Assert::AreNotEqual((int)retcode, SQL_ERROR);
+					inserted_row_count += (int)c;
+					
+					if (SQLMoreResults(hStmt) == SQL_NO_DATA) {
+						break;
+					}
+				}
+			}
+			Assert::AreEqual(inserted_row_count, insert_count);
+			retcode = SQLTransact(hEnv, hDbc, SQL_COMMIT);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			SQLWCHAR allSQL[] = L"SELECT * FROM apis1055";
+			retcode = SQLExecDirect(hStmt, allSQL, SQL_NTS);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+
+			SQLSMALLINT numCols;
+			retcode = SQLNumResultCols(hStmt, &numCols);
+			Assert::AreNotEqual((int)retcode, SQL_ERROR);
+			Assert::AreEqual((int)numCols, 2);
+
+			int out_id = 0;
+			SQLWCHAR int_name[256] = {0,};
+			SQLWCHAR out_name[256] = {0,};
+			
+			while (SQLFetch(hStmt) == SQL_SUCCESS) {
+				SQLGetData(hStmt, 1, SQL_C_LONG, &out_id, 0, NULL);
+				SQLGetData(hStmt, 2, SQL_C_WCHAR, out_name, 255, NULL);
+				Assert::AreEqual((int)out_id, selected_row_count);
+				swprintf(int_name, L"test%d", selected_row_count);
+				Assert::AreEqual(out_name, int_name);
+				selected_row_count++;
+			}
+			Assert::AreEqual(selected_row_count, inserted_row_count);
 			SQLFreeStmt(hStmt, SQL_DROP);
 			retcode = SQLDisconnect(hDbc);
 			retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);

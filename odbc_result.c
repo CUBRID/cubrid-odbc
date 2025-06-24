@@ -1265,11 +1265,6 @@ odbc_more_results (ODBC_STATEMENT * stmt)
   T_CCI_COL_INFO *cci_col_info;
   int column_number;
 
-
-  reset_result_set (stmt);
-  reset_descriptor (stmt->ird);
-  stmt->param_number = 0;
-
   cci_rc = cci_next_result (stmt->stmthd, &cci_err_buf);
   if (cci_rc < 0)
     {
@@ -1286,6 +1281,11 @@ odbc_more_results (ODBC_STATEMENT * stmt)
 	  goto error;
 	}
     }
+
+  reset_result_set (stmt);
+  reset_descriptor (stmt->ird);
+  stmt->param_number = 0;
+
   stmt->tpl_number = cci_rc;
 
   stmt->result_type = QUERY;
