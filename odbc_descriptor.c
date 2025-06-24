@@ -45,10 +45,10 @@
 #define     CUBRID_NUMERIC_SCALE_DEFAULT    0
 
 PRIVATE int is_header_field (short desc_field_id);
-PRIVATE int odbc_consistency_check (ODBC_RECORD * record);
+PRIVATE int odbc_consistency_check (ODBC_RECORD *record);
 PRIVATE short is_read_only_field (short field_id);
-PRIVATE void header_desc_field_copy (ODBC_DESC * source_desc, ODBC_DESC * dest_desc);
-PRIVATE void record_desc_field_copy (ODBC_DESC * source_desc, ODBC_DESC * dest_desc);
+PRIVATE void header_desc_field_copy (ODBC_DESC *source_desc, ODBC_DESC *dest_desc);
+PRIVATE void record_desc_field_copy (ODBC_DESC *source_desc, ODBC_DESC *dest_desc);
 PRIVATE short odbc_type_searchable (short type);
 
 /************************************************************************
@@ -60,14 +60,16 @@ PRIVATE short odbc_type_searchable (short type);
 *    con이 null이 아니면 con에 연결된 explicit desc로 간주한다.
 ************************************************************************/
 PUBLIC RETCODE
-odbc_alloc_desc (ODBC_CONNECTION * conn, ODBC_DESC ** desc_ptr)
+odbc_alloc_desc (ODBC_CONNECTION *conn, ODBC_DESC **desc_ptr)
 {
   ODBC_DESC *desc_node;
 
   if (desc_ptr == NULL)
     {
       if (conn != NULL)
-	odbc_set_diag (conn->diag, "HY090", 0, NULL);
+	{
+	  odbc_set_diag (conn->diag, "HY090", 0, NULL);
+	}
       goto error;
     }
 
@@ -75,7 +77,9 @@ odbc_alloc_desc (ODBC_CONNECTION * conn, ODBC_DESC ** desc_ptr)
   if (desc_node == NULL)
     {
       if (conn != NULL)
-	odbc_set_diag (conn->diag, "HY001", 0, NULL);
+	{
+	  odbc_set_diag (conn->diag, "HY001", 0, NULL);
+	}
       goto error;
     }
 
@@ -121,7 +125,7 @@ error:
 *    desc->con이 null이 아니면 con에 연결된 explicit desc로 간주한다.
 ************************************************************************/
 PUBLIC RETCODE
-odbc_free_desc (ODBC_DESC * desc)
+odbc_free_desc (ODBC_DESC *desc)
 {
   ODBC_DESC *d, *prev;
 
@@ -141,9 +145,13 @@ odbc_free_desc (ODBC_DESC * desc)
       if (d == desc)
 	{
 	  if (prev != NULL)
-	    prev->next = desc->next;
+	    {
+	      prev->next = desc->next;
+	    }
 	  else
-	    desc->conn->descriptors = desc->next;
+	    {
+	      desc->conn->descriptors = desc->next;
+	    }
 	}
     }
 
@@ -173,7 +181,7 @@ error:
 * - error messaging
 ************************************************************************/
 PUBLIC RETCODE
-odbc_alloc_record (ODBC_DESC * desc, ODBC_RECORD ** rec, int rec_number)
+odbc_alloc_record (ODBC_DESC *desc, ODBC_RECORD **rec, int rec_number)
 {
   ODBC_RECORD *rec_node;
 
@@ -264,7 +272,7 @@ error:
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_free_record (ODBC_RECORD * record)
+odbc_free_record (ODBC_RECORD *record)
 {
   ODBC_RECORD *r, *prev;
 
@@ -297,9 +305,13 @@ odbc_free_record (ODBC_RECORD * record)
       if (r == record)
 	{
 	  if (prev != NULL)
-	    prev->next = record->next;
+	    {
+	      prev->next = record->next;
+	    }
 	  else
-	    record->desc->records = record->next;
+	    {
+	      record->desc->records = record->next;
+	    }
 	}
     }
 
@@ -318,7 +330,7 @@ error:
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_free_all_records (ODBC_RECORD * head_record)
+odbc_free_all_records (ODBC_RECORD *head_record)
 {
   ODBC_RECORD *now, *deleted_node;
 
@@ -350,9 +362,9 @@ error:
 * BASE_COLUMN_NAME, NAME, LABEL are same as SQL_DESC_NAME
 ************************************************************************/
 PUBLIC RETCODE
-odbc_get_desc_field (ODBC_DESC * desc,
+odbc_get_desc_field (ODBC_DESC *desc,
 		     SQLSMALLINT rec_number,
-		     SQLSMALLINT field_id, SQLPOINTER value_ptr, SQLLEN buffer_length, SQLLEN * string_length_ptr)
+		     SQLSMALLINT field_id, SQLPOINTER value_ptr, SQLLEN buffer_length, SQLLEN *string_length_ptr)
 {
   RETCODE status = ODBC_SUCCESS, rc;
   ODBC_RECORD *record;
@@ -367,58 +379,86 @@ odbc_get_desc_field (ODBC_DESC * desc,
 	{
 	case SQL_DESC_COUNT:
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = desc->max_count;
+	    {
+	      * (short *) value_ptr = desc->max_count;
+	    }
 
 	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->max_count);
+	    {
+	      *string_length_ptr = sizeof (desc->max_count);
+	    }
 	  break;
 
 	case SQL_DESC_ALLOC_TYPE:
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = desc->alloc_type;
+	    {
+	      * (short *) value_ptr = desc->alloc_type;
+	    }
 
 	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->alloc_type);
+	    {
+	      *string_length_ptr = sizeof (desc->alloc_type);
+	    }
 	  break;
 
 	case SQL_DESC_ARRAY_SIZE:
 	  if (value_ptr != NULL)
-	    *(unsigned long *) value_ptr = desc->array_size;
+	    {
+	      * (unsigned long *) value_ptr = desc->array_size;
+	    }
 
 	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->array_status_ptr);
+	    {
+	      *string_length_ptr = sizeof (desc->array_status_ptr);
+	    }
 	  break;
 
 	case SQL_DESC_ARRAY_STATUS_PTR:
 	  if (value_ptr != NULL)
-	    *(unsigned short **) value_ptr = desc->array_status_ptr;
+	    {
+	      * (unsigned short **) value_ptr = desc->array_status_ptr;
+	    }
 
 	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->array_status_ptr);
+	    {
+	      *string_length_ptr = sizeof (desc->array_status_ptr);
+	    }
 	  break;
 
 	case SQL_DESC_BIND_OFFSET_PTR:
 	  if (value_ptr != NULL)
-	    *(long long **) value_ptr = desc->bind_offset_ptr;
+	    {
+	      * (long long **) value_ptr = desc->bind_offset_ptr;
+	    }
 
 	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->bind_offset_ptr);
+	    {
+	      *string_length_ptr = sizeof (desc->bind_offset_ptr);
+	    }
 	  break;
 
 	case SQL_DESC_BIND_TYPE:
 	  if (value_ptr != NULL)
-	    *(long *) value_ptr = desc->bind_type;
+	    {
+	      * (long *) value_ptr = desc->bind_type;
+	    }
 
 	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->bind_type);
+	    {
+	      *string_length_ptr = sizeof (desc->bind_type);
+	    }
 	  break;
 
 	case SQL_DESC_ROWS_PROCESSED_PTR:
 	  if (value_ptr != NULL)
-	    *(unsigned long long **) value_ptr = desc->rows_processed_ptr;
+	    {
+	      * (unsigned long long **) value_ptr = desc->rows_processed_ptr;
+	    }
 
 	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (desc->rows_processed_ptr);
+	    {
+	      *string_length_ptr = sizeof (desc->rows_processed_ptr);
+	    }
 	  break;
 
 	default:
@@ -469,10 +509,14 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_CASE_SENSITIVE:
 	  if (value_ptr != NULL)
-	    *(long *) value_ptr = record->case_sensitive;
+	    {
+	      * (long *) value_ptr = record->case_sensitive;
+	    }
 
 	  if (string_length_ptr != NULL)
-	    *string_length_ptr = sizeof (record->case_sensitive);
+	    {
+	      *string_length_ptr = sizeof (record->case_sensitive);
+	    }
 	  break;
 
 
@@ -481,15 +525,15 @@ odbc_get_desc_field (ODBC_DESC * desc,
 	    {
 	      if (record->concise_type == SQL_BLOB)
 		{
-		  *(short *) value_ptr = SQL_LONGVARBINARY;
+		  * (short *) value_ptr = SQL_LONGVARBINARY;
 		}
 	      else if (record->concise_type == SQL_CLOB)
 		{
-		  *(short *) value_ptr = SQL_LONGVARCHAR;
+		  * (short *) value_ptr = SQL_LONGVARCHAR;
 		}
 	      else
 		{
-		  *(short *) value_ptr = record->concise_type;
+		  * (short *) value_ptr = record->concise_type;
 		}
 	    }
 	  if (string_length_ptr != NULL)
@@ -500,7 +544,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_DATA_PTR:
 	  if (value_ptr != NULL)
-	    *(void **) value_ptr = record->data_ptr;
+	    {
+	      * (void **) value_ptr = record->data_ptr;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -510,7 +556,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_DATETIME_INTERVAL_CODE:
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->datetime_interval_code;
+	    {
+	      * (short *) value_ptr = record->datetime_interval_code;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -520,7 +568,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_DATETIME_INTERVAL_PRECISION:
 	  if (value_ptr != NULL)
-	    *(long *) value_ptr = record->datetime_interval_precision;
+	    {
+	      * (long *) value_ptr = record->datetime_interval_precision;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -530,7 +580,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_DISPLAY_SIZE:
 	  if (value_ptr != NULL)
-	    *(long *) value_ptr = record->display_size;
+	    {
+	      * (long *) value_ptr = record->display_size;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -540,7 +592,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_FIXED_PREC_SCALE:
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->fixed_prec_scale;
+	    {
+	      * (short *) value_ptr = record->fixed_prec_scale;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -550,7 +604,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_INDICATOR_PTR:
 	  if (value_ptr != NULL)
-	    *(long **) value_ptr = record->indicator_ptr;
+	    {
+	      * (long **) value_ptr = record->indicator_ptr;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -564,10 +620,10 @@ odbc_get_desc_field (ODBC_DESC * desc,
 	      {
 	      case SQL_CHAR:
 	      case SQL_VARCHAR:
-		*(SQLULEN *) value_ptr = record->length;
+		* (SQLULEN *) value_ptr = record->length;
 		break;
 	      default:
-		*(unsigned long *) value_ptr = record->length;
+		* (unsigned long *) value_ptr = record->length;
 		break;
 	      }
 	  if (string_length_ptr != NULL)
@@ -577,7 +633,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 	  break;
 	case SQL_COLUMN_LENGTH:	// for 2.x backward compatibility
 	  if (value_ptr != NULL)
-	    *(unsigned long *) value_ptr = record->length;
+	    {
+	      * (unsigned long *) value_ptr = record->length;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -638,7 +696,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_NULLABLE:
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->nullable;
+	    {
+	      * (short *) value_ptr = record->nullable;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -648,7 +708,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_NUM_PREC_RADIX:
 	  if (value_ptr != NULL)
-	    *(long *) value_ptr = record->num_prec_radix;
+	    {
+	      * (long *) value_ptr = record->num_prec_radix;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -658,7 +720,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_OCTET_LENGTH:
 	  if (value_ptr != NULL)
-	    *(long *) value_ptr = record->octet_length;
+	    {
+	      * (long *) value_ptr = record->octet_length;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -668,7 +732,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_OCTET_LENGTH_PTR:
 	  if (value_ptr != NULL)
-	    *(long **) value_ptr = record->octet_length_ptr;
+	    {
+	      * (long **) value_ptr = record->octet_length_ptr;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -678,7 +744,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_PARAMETER_TYPE:
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->parameter_type;
+	    {
+	      * (short *) value_ptr = record->parameter_type;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -689,7 +757,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 	case SQL_DESC_PRECISION:
 	case SQL_COLUMN_PRECISION:	// for 2.x backward compatibility
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->precision;
+	    {
+	      * (short *) value_ptr = record->precision;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -700,7 +770,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 	case SQL_DESC_SCALE:
 	case SQL_COLUMN_SCALE:	// for 2.x backward compatibility
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->scale;
+	    {
+	      * (short *) value_ptr = record->scale;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -710,7 +782,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_SEARCHABLE:
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->searchable;
+	    {
+	      * (short *) value_ptr = record->searchable;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -739,7 +813,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_TYPE:
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->type;
+	    {
+	      * (short *) value_ptr = record->type;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -766,7 +842,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_UNNAMED:
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->unnamed;
+	    {
+	      * (short *) value_ptr = record->unnamed;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -776,7 +854,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 
 	case SQL_DESC_UNSIGNED:
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = record->unsigned_type;
+	    {
+	      * (short *) value_ptr = record->unsigned_type;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -787,7 +867,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 	case SQL_DESC_AUTO_UNIQUE_VALUE:
 	  // there is no auto unique attribute in CUBRID
 	  if (value_ptr != NULL)
-	    *(long *) value_ptr = SQL_FALSE;
+	    {
+	      * (long *) value_ptr = SQL_FALSE;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -808,7 +890,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 	case SQL_DESC_ROWVER:
 	  // there is no rowver attribute in CUBRID
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = SQL_FALSE;
+	    {
+	      * (short *) value_ptr = SQL_FALSE;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -820,7 +904,9 @@ odbc_get_desc_field (ODBC_DESC * desc,
 	case SQL_DESC_UPDATABLE:
 	  // always READWRITE_UNKNOWN
 	  if (value_ptr != NULL)
-	    *(short *) value_ptr = SQL_ATTR_READWRITE_UNKNOWN;
+	    {
+	      * (short *) value_ptr = SQL_ATTR_READWRITE_UNKNOWN;
+	    }
 
 
 	  if (string_length_ptr != NULL)
@@ -849,15 +935,15 @@ error:
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_get_desc_rec (ODBC_DESC * desc,
+odbc_get_desc_rec (ODBC_DESC *desc,
 		   SQLSMALLINT rec_number,
-		   SQLCHAR * name,
+		   SQLCHAR *name,
 		   SQLSMALLINT buffer_length,
-		   SQLSMALLINT * string_length_ptr,
-		   SQLSMALLINT * type_ptr,
-		   SQLSMALLINT * subtype_ptr,
-		   SQLLEN * length_ptr,
-		   SQLSMALLINT * precision_ptr, SQLSMALLINT * scale_ptr, SQLSMALLINT * nullable_ptr)
+		   SQLSMALLINT *string_length_ptr,
+		   SQLSMALLINT *type_ptr,
+		   SQLSMALLINT *subtype_ptr,
+		   SQLLEN *length_ptr,
+		   SQLSMALLINT *precision_ptr, SQLSMALLINT *scale_ptr, SQLSMALLINT *nullable_ptr)
 {
   ODBC_RECORD *record = NULL;
   SQLLEN tmp_length;
@@ -900,7 +986,7 @@ odbc_get_desc_rec (ODBC_DESC * desc,
 * 일부 consistency check가 odbc_set_desc_rec에서 이루어진다. 참고..
 ************************************************************************/
 PUBLIC RETCODE
-odbc_set_desc_field (ODBC_DESC * desc,
+odbc_set_desc_field (ODBC_DESC *desc,
 		     short rec_number, short field_id, void *value_ptr, long buffer_length, short is_driver)
 {
   ODBC_RECORD *record;
@@ -1012,7 +1098,7 @@ odbc_set_desc_field (ODBC_DESC * desc,
 	case SQL_DESC_SEARCHABLE:
 	  record->searchable = (short) value_ptr;
 	  break;
-	  /* BASE_TABLE_NAME과 TABLE_NAME과의 구분은 없다. */
+	/* BASE_TABLE_NAME과 TABLE_NAME과의 구분은 없다. */
 	case SQL_DESC_TABLE_NAME:
 	case SQL_DESC_BASE_TABLE_NAME:
 	  NC_FREE (record->table_name);
@@ -1222,13 +1308,13 @@ error:
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_set_desc_rec (ODBC_DESC * desc,
+odbc_set_desc_rec (ODBC_DESC *desc,
 		   SQLSMALLINT rec_number,
 		   SQLSMALLINT type,
 		   SQLSMALLINT subtype,
 		   SQLLEN length,
 		   SQLSMALLINT precision,
-		   SQLSMALLINT scale, SQLPOINTER data_ptr, SQLLEN * string_length_ptr, SQLLEN * indicator_ptr)
+		   SQLSMALLINT scale, SQLPOINTER data_ptr, SQLLEN *string_length_ptr, SQLLEN *indicator_ptr)
 {
   /* ODBC_RECORD *record; */
   short concise_type;
@@ -1278,7 +1364,7 @@ odbc_set_desc_rec (ODBC_DESC * desc,
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_copy_desc (ODBC_DESC * source_desc, ODBC_DESC * dest_desc)
+odbc_copy_desc (ODBC_DESC *source_desc, ODBC_DESC *dest_desc)
 {
 
   if (source_desc == NULL || dest_desc == NULL)
@@ -1305,7 +1391,7 @@ odbc_copy_desc (ODBC_DESC * source_desc, ODBC_DESC * dest_desc)
 * yet not assigned to any statement.
 ************************************************************************/
 PUBLIC int
-odbc_is_ird (ODBC_DESC * desc)
+odbc_is_ird (ODBC_DESC *desc)
 {
   return ((desc->stmt != NULL) && (desc == desc->stmt->ird));
 }
@@ -1318,7 +1404,7 @@ odbc_is_ird (ODBC_DESC * desc)
 * NOTE:
 ************************************************************************/
 PUBLIC void
-odbc_set_ird (ODBC_STATEMENT * stmt,
+odbc_set_ird (ODBC_STATEMENT *stmt,
 	      short column_number,
 	      short type,
 	      char *table_name, char *column_name, long precision, short scale, short nullable, short updatable)
@@ -1406,9 +1492,13 @@ odbc_set_ird (ODBC_STATEMENT * stmt,
     }
 
   if (type == SQL_NUMERIC)
-    odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_LENGTH, (SQLPOINTER) precision, 0, 1);
+    {
+      odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_LENGTH, (SQLPOINTER) precision, 0, 1);
+    }
   else
-    odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_LENGTH, (SQLPOINTER) display_size, 0, 1);
+    {
+      odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_LENGTH, (SQLPOINTER) display_size, 0, 1);
+    }
   //odbc_set_desc_field(stmt->ird, column_number, SQL_DESC_LENGTH, (SQLPOINTER)display_size, 0, 1);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_OCTET_LENGTH, (SQLPOINTER) octet_length, 0, 1);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_SCALE, (SQLPOINTER) scale, 0, 1);
@@ -1427,7 +1517,7 @@ odbc_set_ird (ODBC_STATEMENT * stmt,
 * NOTE:
 ************************************************************************/
 PUBLIC ODBC_RECORD *
-find_record_from_desc (ODBC_DESC * desc, int rec_number)
+find_record_from_desc (ODBC_DESC *desc, int rec_number)
 {
   ODBC_RECORD *rec = NULL;
 
@@ -1463,10 +1553,12 @@ find_record_from_desc (ODBC_DESC * desc, int rec_number)
 *   delete하지 말아야 한다.
 ************************************************************************/
 PUBLIC void
-reset_descriptor (ODBC_DESC * desc)
+reset_descriptor (ODBC_DESC *desc)
 {
   if (desc == NULL)
-    return;
+    {
+      return;
+    }
 
   odbc_set_desc_field (desc, 0, SQL_DESC_ARRAY_SIZE, (void *) 1, 0, 1);
 
@@ -1559,7 +1651,7 @@ is_header_field (short desc_field_id)
 * Refer to SQLSetDescRec .
 ************************************************************************/
 PRIVATE int
-odbc_consistency_check (ODBC_RECORD * record)
+odbc_consistency_check (ODBC_RECORD *record)
 {
   if (!odbc_is_valid_type (record->concise_type) || !odbc_is_valid_type (record->type))
     {
@@ -1635,7 +1727,7 @@ is_read_only_field (short field_id)
 * NOTE:
 ************************************************************************/
 PRIVATE void
-header_desc_field_copy (ODBC_DESC * source_desc, ODBC_DESC * dest_desc)
+header_desc_field_copy (ODBC_DESC *source_desc, ODBC_DESC *dest_desc)
 {
   dest_desc->array_size = source_desc->array_size;
   dest_desc->fetched_size = source_desc->fetched_size;
@@ -1654,7 +1746,7 @@ header_desc_field_copy (ODBC_DESC * source_desc, ODBC_DESC * dest_desc)
 * NOTE:
 ************************************************************************/
 PRIVATE void
-record_desc_field_copy (ODBC_DESC * source_desc, ODBC_DESC * dest_desc)
+record_desc_field_copy (ODBC_DESC *source_desc, ODBC_DESC *dest_desc)
 {
   int i;
   ODBC_RECORD *src_record, *dest_record;
@@ -1666,7 +1758,9 @@ record_desc_field_copy (ODBC_DESC * source_desc, ODBC_DESC * dest_desc)
 
       src_record = find_record_from_desc (source_desc, i);
       if (src_record == NULL)
-	continue;
+	{
+	  continue;
+	}
 
       odbc_alloc_record (dest_desc, &dest_record, i);
 

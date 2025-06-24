@@ -1,30 +1,30 @@
 /*
- * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution. 
+ * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
- * Redistribution and use in source and binary forms, with or without modification, 
- * are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- *   this list of conditions and the following disclaimer. 
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
  *
- * - Redistributions in binary form must reproduce the above copyright notice, 
- *   this list of conditions and the following disclaimer in the documentation 
- *   and/or other materials provided with the distribution. 
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
  *
- * - Neither the name of the <ORGANIZATION> nor the names of its contributors 
- *   may be used to endorse or promote products derived from this software without 
- *   specific prior written permission. 
+ * - Neither the name of the <ORGANIZATION> nor the names of its contributors
+ *   may be used to endorse or promote products derived from this software without
+ *   specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
- * IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
- * OF SUCH DAMAGE. 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+ * OF SUCH DAMAGE.
  *
  */
 
@@ -40,17 +40,18 @@
 #define   ODBC_CLASS_ORIGIN   "ODBC 3.0"
 #define   DIAG_PREFIX       "[CUBRID][ODBC CUBRID Driver]"
 
-PRIVATE const char *get_diag_message (ODBC_DIAG_RECORD * record);
+PRIVATE const char *get_diag_message (ODBC_DIAG_RECORD *record);
 PRIVATE char *get_diag_subclass_origin (char *sql_state);
-PRIVATE void odbc_init_diag (ODBC_DIAG * diag);
-PRIVATE void odbc_clear_diag (ODBC_DIAG * diag);
-PRIVATE void odbc_init_diag_record (ODBC_DIAG_RECORD * node);
-PRIVATE void odbc_clear_diag_record (ODBC_DIAG_RECORD * node);
+PRIVATE void odbc_init_diag (ODBC_DIAG *diag);
+PRIVATE void odbc_clear_diag (ODBC_DIAG *diag);
+PRIVATE void odbc_init_diag_record (ODBC_DIAG_RECORD *node);
+PRIVATE void odbc_clear_diag_record (ODBC_DIAG_RECORD *node);
 PRIVATE short is_header_field (short field_id);
-PRIVATE ODBC_DIAG_RECORD *find_diag_record (ODBC_DIAG * diag, int rec_number);
+PRIVATE ODBC_DIAG_RECORD *find_diag_record (ODBC_DIAG *diag, int rec_number);
 PRIVATE char *get_diag_class_origin (char *sql_state);
 
-PRIVATE ODBC_ERROR_MAP odbc_3_0_error_map[] = {
+PRIVATE ODBC_ERROR_MAP odbc_3_0_error_map[] =
+{
   {"01000", "General warning"},
   {"01001", "Cursor operation conflict"},
   {"01002", "Disconnect error"},
@@ -202,10 +203,12 @@ odbc_alloc_diag (void)
  * NOTE:
  ************************************************************************/
 PUBLIC void
-odbc_free_diag (ODBC_DIAG * diag, int option)
+odbc_free_diag (ODBC_DIAG *diag, int option)
 {
   if (diag == NULL)
-    return;
+    {
+      return;
+    }
 
   switch (option)
     {
@@ -252,10 +255,12 @@ odbc_alloc_diag_record (void)
  * NOTE:
  ************************************************************************/
 PUBLIC void
-odbc_free_diag_record (ODBC_DIAG_RECORD * diag_record, int option)
+odbc_free_diag_record (ODBC_DIAG_RECORD *diag_record, int option)
 {
   if (diag_record == NULL)
-    return;
+    {
+      return;
+    }
 
   switch (option)
     {
@@ -277,7 +282,7 @@ odbc_free_diag_record (ODBC_DIAG_RECORD * diag_record, int option)
 }
 
 PUBLIC void
-odbc_free_diag_record_list (ODBC_DIAG_RECORD * diag_record)
+odbc_free_diag_record_list (ODBC_DIAG_RECORD *diag_record)
 {
   ODBC_DIAG_RECORD *current, *del;
 
@@ -292,21 +297,27 @@ odbc_free_diag_record_list (ODBC_DIAG_RECORD * diag_record)
 }
 
 PUBLIC void
-odbc_move_diag (ODBC_DIAG * target_diag, ODBC_DIAG * src_diag)
+odbc_move_diag (ODBC_DIAG *target_diag, ODBC_DIAG *src_diag)
 {
   ODBC_DIAG_RECORD *tmp;
 
   if (src_diag == NULL || target_diag == NULL)
-    return;
+    {
+      return;
+    }
 
   tmp = src_diag->record;
 
   if (tmp == NULL)
-    return;
+    {
+      return;
+    }
   else
     {
       while (tmp->next != NULL)
-	tmp = tmp->next;
+	{
+	  tmp = tmp->next;
+	}
     }
 
   tmp->next = target_diag->record;
@@ -322,19 +333,23 @@ odbc_move_diag (ODBC_DIAG * target_diag, ODBC_DIAG * src_diag)
 
 /* recored added to head */
 PUBLIC void
-odbc_set_diag (ODBC_DIAG * diag, char *sql_state, int native_code, char *message)
+odbc_set_diag (ODBC_DIAG *diag, char *sql_state, int native_code, char *message)
 {
   ODBC_DIAG_RECORD *record = NULL;
   int i;
 
   if (diag == NULL)
-    return;
+    {
+      return;
+    }
 
   record = odbc_alloc_diag_record ();
   if (record == NULL)
-    return;
+    {
+      return;
+    }
 
-  ++(diag->rec_number);
+  ++ (diag->rec_number);
 
   record->number = diag->rec_number;
   record->sql_state = UT_MAKE_STRING (sql_state, -1);
@@ -361,19 +376,23 @@ odbc_set_diag (ODBC_DIAG * diag, char *sql_state, int native_code, char *message
 }
 
 PUBLIC void
-odbc_set_diag_by_cci (ODBC_DIAG * diag, int cci_retval, T_CCI_ERROR * error)
+odbc_set_diag_by_cci (ODBC_DIAG *diag, int cci_retval, T_CCI_ERROR *error)
 {
   ODBC_DIAG_RECORD *record = NULL;
   char err_msg[1024] = { 0 };
 
   if (diag == NULL)
-    return;
+    {
+      return;
+    }
 
   record = odbc_alloc_diag_record ();
   if (record == NULL)
-    return;
+    {
+      return;
+    }
 
-  ++(diag->rec_number);
+  ++ (diag->rec_number);
 
   record->number = diag->rec_number;
   record->sql_state = UT_MAKE_STRING ("HY000", -1);
@@ -421,7 +440,7 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
 		     SQLHANDLE handle,
 		     SQLSMALLINT rec_number,
 		     SQLSMALLINT diag_identifier,
-		     SQLPOINTER diag_info_ptr, SQLSMALLINT buffer_length, SQLLEN * string_length_ptr)
+		     SQLPOINTER diag_info_ptr, SQLSMALLINT buffer_length, SQLLEN *string_length_ptr)
 {
   ODBC_ENV *env = NULL;
   ODBC_DIAG_RECORD *record = NULL;
@@ -444,22 +463,24 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
     {
       switch (diag_identifier)
 	{
-	  /*
-	     case SQL_DIAG_CURSOR_ROW_COUNT:
-	     case SQL_DIAG_ROW_COUNT:
-	     if (diag_info_ptr != NULL)
-	     *(long *) diag_info_ptr =
-	     ((ODBC_STATEMENT *) handle)->current_tpl_pos;
+	/*
+	   case SQL_DIAG_CURSOR_ROW_COUNT:
+	   case SQL_DIAG_ROW_COUNT:
+	   if (diag_info_ptr != NULL)
+	   *(long *) diag_info_ptr =
+	   ((ODBC_STATEMENT *) handle)->current_tpl_pos;
 
-	     if (string_length_ptr != NULL)
-	     {
-	     *string_length_ptr = sizeof (long);
-	     }
-	     break;
-	   */
+	   if (string_length_ptr != NULL)
+	   {
+	   *string_length_ptr = sizeof (long);
+	   }
+	   break;
+	 */
 	case SQL_DIAG_NUMBER:
 	  if (diag_info_ptr != NULL)
-	    *(long *) diag_info_ptr = env->diag->rec_number;
+	    {
+	      * (long *) diag_info_ptr = env->diag->rec_number;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -469,7 +490,9 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
 
 	case SQL_DIAG_RETURNCODE:
 	  if (diag_info_ptr != NULL)
-	    *(short *) diag_info_ptr = env->diag->retcode;
+	    {
+	      * (short *) diag_info_ptr = env->diag->retcode;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -506,7 +529,9 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
 
 	case SQL_DIAG_COLUMN_NUMBER:	/* yet not implemeted */
 	  if (diag_info_ptr != NULL)
-	    *(long *) diag_info_ptr = SQL_COLUMN_NUMBER_UNKNOWN;
+	    {
+	      * (long *) diag_info_ptr = SQL_COLUMN_NUMBER_UNKNOWN;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -536,7 +561,7 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
 		}
 	      if (connhd < 0 || cci_ret < 0)
 		{
-		  *((char *) diag_info_ptr) = '\0';
+		  * ((char *) diag_info_ptr) = '\0';
 		  *string_length_ptr = 0;
 		}
 	      else
@@ -551,31 +576,35 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
 	    }
 
 	case SQL_DIAG_MESSAGE_TEXT:
-	  {
-	    char *mesg = NULL;
-	    char diag_prefix[256] = { 0 };
+	{
+	  char *mesg = NULL;
+	  char diag_prefix[256] = { 0 };
 
-	    pt = (char *) get_diag_message (record);
-	    if (pt == NULL)
+	  pt = (char *) get_diag_message (record);
+	  if (pt == NULL)
+	    {
 	      pt = empty_str;
+	    }
 
-	    _snprintf (diag_prefix, sizeof (diag_prefix), "%s[%d]", DIAG_PREFIX, record->native_code);
-	    mesg = UT_MAKE_STRING (diag_prefix, -1);
-	    mesg = UT_APPEND_STRING (mesg, pt, -1);
+	  _snprintf (diag_prefix, sizeof (diag_prefix), "%s[%d]", DIAG_PREFIX, record->native_code);
+	  mesg = UT_MAKE_STRING (diag_prefix, -1);
+	  mesg = UT_APPEND_STRING (mesg, pt, -1);
 
-	    rc = str_value_assign (mesg, diag_info_ptr, buffer_length, string_length_ptr);
-	    if (rc == ODBC_SUCCESS_WITH_INFO)
-	      {
-		status = rc;
-	      }
+	  rc = str_value_assign (mesg, diag_info_ptr, buffer_length, string_length_ptr);
+	  if (rc == ODBC_SUCCESS_WITH_INFO)
+	    {
+	      status = rc;
+	    }
 
-	    NC_FREE (mesg);
-	  }
-	  break;
+	  NC_FREE (mesg);
+	}
+	break;
 
 	case SQL_DIAG_NATIVE:
 	  if (diag_info_ptr != NULL)
-	    *(long *) diag_info_ptr = record->native_code;
+	    {
+	      * (long *) diag_info_ptr = record->native_code;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -586,7 +615,9 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
 
 	case SQL_DIAG_ROW_NUMBER:	/* yet not implemeted */
 	  if (diag_info_ptr != NULL)
-	    *(long *) diag_info_ptr = SQL_ROW_NUMBER_UNKNOWN;
+	    {
+	      * (long *) diag_info_ptr = SQL_ROW_NUMBER_UNKNOWN;
+	    }
 
 	  if (string_length_ptr != NULL)
 	    {
@@ -669,11 +700,11 @@ odbc_get_diag_field (SQLSMALLINT handle_type,
 ************************************************************************/
 PUBLIC RETCODE
 odbc_get_diag_rec (SQLSMALLINT handle_type,
-		   SQLHANDLE * handle,
+		   SQLHANDLE *handle,
 		   SQLSMALLINT rec_number,
-		   SQLCHAR * sqlstate,
-		   SQLINTEGER * native_error_ptr,
-		   SQLCHAR * message_text, SQLSMALLINT buffer_length, SQLLEN * text_length_ptr)
+		   SQLCHAR *sqlstate,
+		   SQLINTEGER *native_error_ptr,
+		   SQLCHAR *message_text, SQLSMALLINT buffer_length, SQLLEN *text_length_ptr)
 {
   RETCODE status = ODBC_SUCCESS, rc;
   ODBC_DIAG_RECORD *record;
@@ -686,11 +717,15 @@ odbc_get_diag_rec (SQLSMALLINT handle_type,
   env = (ODBC_ENV *) handle;
 
   if (rec_number <= 0)
-    return ODBC_ERROR;
+    {
+      return ODBC_ERROR;
+    }
 
   /* Sequence error record is not implemented */
   if (rec_number > env->diag->rec_number)
-    return ODBC_NO_DATA;
+    {
+      return ODBC_NO_DATA;
+    }
   if ((record = find_diag_record (env->diag, rec_number)) == NULL)
     {
       return ODBC_NO_DATA;
@@ -707,7 +742,9 @@ odbc_get_diag_rec (SQLSMALLINT handle_type,
 
   pt = (char *) get_diag_message (record);
   if (pt == NULL)
-    pt = empty_str;
+    {
+      pt = empty_str;
+    }
 
   _snprintf (diag_prefix, sizeof (diag_prefix), "%s[%d]", DIAG_PREFIX, record->native_code);
   mesg = UT_MAKE_STRING (diag_prefix, -1);
@@ -724,7 +761,7 @@ odbc_get_diag_rec (SQLSMALLINT handle_type,
 }
 
 PRIVATE const char *
-get_diag_message (ODBC_DIAG_RECORD * record)
+get_diag_message (ODBC_DIAG_RECORD *record)
 {
   if (record->message != NULL && record->message[0] != '\0')
     {
@@ -791,7 +828,7 @@ get_diag_subclass_origin (char *sql_state)
 }
 
 PRIVATE ODBC_DIAG_RECORD *
-find_diag_record (ODBC_DIAG * diag, int rec_number)
+find_diag_record (ODBC_DIAG *diag, int rec_number)
 {
   ODBC_DIAG_RECORD *record = NULL;
 
@@ -799,9 +836,13 @@ find_diag_record (ODBC_DIAG * diag, int rec_number)
 
   while (record != NULL)
     if (record->number == rec_number)
-      break;
+      {
+	break;
+      }
     else
-      record = record->next;
+      {
+	record = record->next;
+      }
 
   return record;
 }
@@ -809,25 +850,29 @@ find_diag_record (ODBC_DIAG * diag, int rec_number)
 
 
 PRIVATE void
-odbc_init_diag (ODBC_DIAG * diag)
+odbc_init_diag (ODBC_DIAG *diag)
 {
   if (diag == NULL)
-    return;
+    {
+      return;
+    }
 
   memset (diag, 0, sizeof (ODBC_DIAG));
 }
 
 PRIVATE void
-odbc_clear_diag (ODBC_DIAG * diag)
+odbc_clear_diag (ODBC_DIAG *diag)
 {
   if (diag == NULL)
-    return;
+    {
+      return;
+    }
 
   odbc_free_diag_record_list (diag->record);
 }
 
 PRIVATE void
-odbc_init_diag_record (ODBC_DIAG_RECORD * node)
+odbc_init_diag_record (ODBC_DIAG_RECORD *node)
 {
   if (node != NULL)
     {
@@ -836,10 +881,12 @@ odbc_init_diag_record (ODBC_DIAG_RECORD * node)
 }
 
 PRIVATE void
-odbc_clear_diag_record (ODBC_DIAG_RECORD * node)
+odbc_clear_diag_record (ODBC_DIAG_RECORD *node)
 {
   if (node == NULL)
-    return;
+    {
+      return;
+    }
   NC_FREE (node->message);
   NC_FREE (node->sql_state);
 }
@@ -865,7 +912,11 @@ PRIVATE char *
 get_diag_class_origin (char *sql_state)
 {
   if (strncmp (sql_state, "IM", 2) == 0)
-    return ODBC_CLASS_ORIGIN;
+    {
+      return ODBC_CLASS_ORIGIN;
+    }
   else
-    return ISO_CLASS_ORIGIN;
+    {
+      return ISO_CLASS_ORIGIN;
+    }
 }

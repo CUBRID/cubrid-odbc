@@ -55,8 +55,8 @@
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
 SQLDriverConnectW (SQLHDBC hdbc, SQLHWND hwnd,
-		   SQLWCHAR * in, SQLSMALLINT in_len,
-		   SQLWCHAR * out, SQLSMALLINT out_max, SQLSMALLINT * out_len, SQLUSMALLINT completion)
+		   SQLWCHAR *in, SQLSMALLINT in_len,
+		   SQLWCHAR *out, SQLSMALLINT out_max, SQLSMALLINT *out_len, SQLUSMALLINT completion)
 {
   RETCODE rc = ODBC_SUCCESS;
   SQLCHAR *pt_in, *pt_out;
@@ -100,8 +100,8 @@ SQLDriverConnectW (SQLHDBC hdbc, SQLHWND hwnd,
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
-SQLConnectW (SQLHDBC hdbc, SQLWCHAR * dsn, SQLSMALLINT dsn_len,
-	     SQLWCHAR * user, SQLSMALLINT user_len, SQLWCHAR * auth, SQLSMALLINT auth_len)
+SQLConnectW (SQLHDBC hdbc, SQLWCHAR *dsn, SQLSMALLINT dsn_len,
+	     SQLWCHAR *user, SQLSMALLINT user_len, SQLWCHAR *auth, SQLSMALLINT auth_len)
 {
   SQLCHAR *cb_user, *cb_auth, *cb_dsn;
   int cb_user_len, cb_auth_len, cb_dsn_len;
@@ -130,7 +130,7 @@ SQLConnectW (SQLHDBC hdbc, SQLWCHAR * dsn, SQLSMALLINT dsn_len,
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
-SQLExecDirectW (SQLHSTMT StatementHandle, SQLWCHAR * StatementText, SQLINTEGER TextLength)
+SQLExecDirectW (SQLHSTMT StatementHandle, SQLWCHAR *StatementText, SQLINTEGER TextLength)
 {
   SQLCHAR *sql_text;
   RETCODE ret;
@@ -155,7 +155,7 @@ SQLExecDirectW (SQLHSTMT StatementHandle, SQLWCHAR * StatementText, SQLINTEGER T
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
 SQLGetInfoW (SQLHDBC ConnectionHandle,
-	     SQLUSMALLINT InfoType, SQLPOINTER InfoValue, SQLSMALLINT BufferLength, SQLSMALLINT * StringLength)
+	     SQLUSMALLINT InfoType, SQLPOINTER InfoValue, SQLSMALLINT BufferLength, SQLSMALLINT *StringLength)
 {
   RETCODE rc = SQL_SUCCESS;
   SQLLEN tmp_StringLength;
@@ -246,8 +246,8 @@ ODBC_INTERFACE RETCODE SQL_API
 SQLGetDiagRecW (SQLSMALLINT HandleType,
 		SQLHANDLE Handle,
 		SQLSMALLINT RecNumber,
-		SQLWCHAR * Sqlstate,
-		SQLINTEGER * NativeError, SQLWCHAR * MessageText, SQLSMALLINT BufferLength, SQLSMALLINT * TextLength)
+		SQLWCHAR *Sqlstate,
+		SQLINTEGER *NativeError, SQLWCHAR *MessageText, SQLSMALLINT BufferLength, SQLSMALLINT *TextLength)
 {
   SQLCHAR *sql_state, *message_text_buffer = NULL;
   int sql_state_len = 0;
@@ -310,7 +310,7 @@ SQLGetDiagRecW (SQLSMALLINT HandleType,
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
-SQLNativeSqlW (SQLHDBC hdbc, SQLWCHAR * in, SQLINTEGER in_len, SQLWCHAR * out, SQLINTEGER out_max, SQLINTEGER * out_len)
+SQLNativeSqlW (SQLHDBC hdbc, SQLWCHAR *in, SQLINTEGER in_len, SQLWCHAR *out, SQLINTEGER out_max, SQLINTEGER *out_len)
 {
   RETCODE ret = ODBC_ERROR;
   SQLCHAR *sql_state, *sql_text_buffer = NULL;
@@ -350,9 +350,9 @@ SQLNativeSqlW (SQLHDBC hdbc, SQLWCHAR * in, SQLINTEGER in_len, SQLWCHAR * out, S
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
 SQLColumnsW (SQLHSTMT hstmt,
-	     SQLWCHAR * catalog, SQLSMALLINT catalog_len,
-	     SQLWCHAR * schema, SQLSMALLINT schema_len,
-	     SQLWCHAR * table, SQLSMALLINT table_len, SQLWCHAR * column, SQLSMALLINT column_len)
+	     SQLWCHAR *catalog, SQLSMALLINT catalog_len,
+	     SQLWCHAR *schema, SQLSMALLINT schema_len,
+	     SQLWCHAR *table, SQLSMALLINT table_len, SQLWCHAR *column, SQLSMALLINT column_len)
 {
   RETCODE ret = ODBC_ERROR;
   char *cb_catalog = NULL, *cb_schema = NULL, *cb_table = NULL, *cb_column = NULL;
@@ -390,8 +390,8 @@ SQLColumnsW (SQLHSTMT hstmt,
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
 SQLDescribeColW (SQLHSTMT hstmt, SQLUSMALLINT column,
-		 SQLWCHAR * name, SQLSMALLINT name_max, SQLSMALLINT * name_len,
-		 SQLSMALLINT * type, SQLULEN * size, SQLSMALLINT * scale, SQLSMALLINT * nullable)
+		 SQLWCHAR *name, SQLSMALLINT name_max, SQLSMALLINT *name_len,
+		 SQLSMALLINT *type, SQLULEN *size, SQLSMALLINT *scale, SQLSMALLINT *nullable)
 {
   RETCODE ret = ODBC_ERROR;
   SQLCHAR *name_buffer = NULL;
@@ -443,17 +443,17 @@ SQLDescribeColW (SQLHSTMT hstmt, SQLUSMALLINT column,
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
 SQLForeignKeysW (SQLHSTMT hstmt,
-		 SQLWCHAR * pk_catalog, SQLSMALLINT pk_catalog_len,
-		 SQLWCHAR * pk_schema, SQLSMALLINT pk_schema_len,
-		 SQLWCHAR * pk_table, SQLSMALLINT pk_table_len,
-		 SQLWCHAR * fk_catalog, SQLSMALLINT fk_catalog_len,
-		 SQLWCHAR * fk_schema, SQLSMALLINT fk_schema_len, SQLWCHAR * fk_table, SQLSMALLINT fk_table_len)
+		 SQLWCHAR *pk_catalog, SQLSMALLINT pk_catalog_len,
+		 SQLWCHAR *pk_schema, SQLSMALLINT pk_schema_len,
+		 SQLWCHAR *pk_table, SQLSMALLINT pk_table_len,
+		 SQLWCHAR *fk_catalog, SQLSMALLINT fk_catalog_len,
+		 SQLWCHAR *fk_schema, SQLSMALLINT fk_schema_len, SQLWCHAR *fk_table, SQLSMALLINT fk_table_len)
 {
   RETCODE ret = ODBC_ERROR;
   char *cb_pk_catalog = NULL, *cb_pk_schema = NULL, *cb_pk_table = NULL,
-    *cb_fk_catalog = NULL, *cb_fk_schema = NULL, *cb_fk_table = NULL;
+	*cb_fk_catalog = NULL, *cb_fk_schema = NULL, *cb_fk_table = NULL;
   int cb_pk_catalog_len = 0, cb_pk_schema_len = 0, cb_pk_table_len = 0,
-    cb_fk_catalog_len = 0, cb_fk_schema_len = 0, cb_fk_table_len = 0;
+      cb_fk_catalog_len = 0, cb_fk_schema_len = 0, cb_fk_table_len = 0;
 
   ODBC_STATEMENT *stmt = (ODBC_STATEMENT *) hstmt;
 
@@ -512,7 +512,7 @@ SQLGetConnectOptionW (SQLHDBC hdbc, SQLUSMALLINT option, SQLPOINTER param)
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
-SQLGetCursorNameW (SQLHSTMT hstmt, SQLWCHAR * cursor, SQLSMALLINT cursor_max, SQLSMALLINT * cursor_len)
+SQLGetCursorNameW (SQLHSTMT hstmt, SQLWCHAR *cursor, SQLSMALLINT cursor_max, SQLSMALLINT *cursor_len)
 {
   RETCODE ret = ODBC_ERROR;
   char *cursor_name = NULL;
@@ -554,7 +554,7 @@ SQLGetCursorNameW (SQLHSTMT hstmt, SQLWCHAR * cursor, SQLSMALLINT cursor_max, SQ
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
-SQLPrepareW (SQLHSTMT hstmt, SQLWCHAR * str, SQLINTEGER str_len)
+SQLPrepareW (SQLHSTMT hstmt, SQLWCHAR *str, SQLINTEGER str_len)
 {
   RETCODE ret = ODBC_ERROR;
   char *sql_state = NULL;
@@ -581,8 +581,8 @@ SQLPrepareW (SQLHSTMT hstmt, SQLWCHAR * str, SQLINTEGER str_len)
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
 SQLPrimaryKeysW (SQLHSTMT hstmt,
-		 SQLWCHAR * catalog, SQLSMALLINT catalog_len,
-		 SQLWCHAR * schema, SQLSMALLINT schema_len, SQLWCHAR * table, SQLSMALLINT table_len)
+		 SQLWCHAR *catalog, SQLSMALLINT catalog_len,
+		 SQLWCHAR *schema, SQLSMALLINT schema_len, SQLWCHAR *table, SQLSMALLINT table_len)
 {
   RETCODE ret = ODBC_ERROR;
   SQLCHAR *cb_catalog = NULL, *cb_schema = NULL, *cb_table = NULL;
@@ -611,7 +611,7 @@ SQLPrimaryKeysW (SQLHSTMT hstmt,
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
-SQLSetCursorNameW (SQLHSTMT hstmt, SQLWCHAR * name, SQLSMALLINT name_len)
+SQLSetCursorNameW (SQLHSTMT hstmt, SQLWCHAR *name, SQLSMALLINT name_len)
 {
   RETCODE ret = ODBC_ERROR;
   SQLCHAR *cb_name = NULL;
@@ -634,9 +634,9 @@ SQLSetCursorNameW (SQLHSTMT hstmt, SQLWCHAR * name, SQLSMALLINT name_len)
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
 SQLSpecialColumnsW (SQLHSTMT hstmt, SQLUSMALLINT type,
-		    SQLWCHAR * catalog, SQLSMALLINT catalog_len,
-		    SQLWCHAR * schema, SQLSMALLINT schema_len,
-		    SQLWCHAR * table, SQLSMALLINT table_len, SQLUSMALLINT scope, SQLUSMALLINT nullable)
+		    SQLWCHAR *catalog, SQLSMALLINT catalog_len,
+		    SQLWCHAR *schema, SQLSMALLINT schema_len,
+		    SQLWCHAR *table, SQLSMALLINT table_len, SQLUSMALLINT scope, SQLUSMALLINT nullable)
 {
   RETCODE ret = ODBC_ERROR;
   SQLCHAR *cb_catalog = NULL, *cb_schema = NULL, *cb_table = NULL;
@@ -668,9 +668,9 @@ SQLSpecialColumnsW (SQLHSTMT hstmt, SQLUSMALLINT type,
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
 SQLStatisticsW (SQLHSTMT hstmt,
-		SQLWCHAR * catalog, SQLSMALLINT catalog_len,
-		SQLWCHAR * schema, SQLSMALLINT schema_len,
-		SQLWCHAR * table, SQLSMALLINT table_len, SQLUSMALLINT unique, SQLUSMALLINT accuracy)
+		SQLWCHAR *catalog, SQLSMALLINT catalog_len,
+		SQLWCHAR *schema, SQLSMALLINT schema_len,
+		SQLWCHAR *table, SQLSMALLINT table_len, SQLUSMALLINT unique, SQLUSMALLINT accuracy)
 {
   RETCODE ret = ODBC_ERROR;
   SQLCHAR *cb_catalog = NULL, *cb_schema = NULL, *cb_table = NULL;
@@ -701,8 +701,8 @@ SQLStatisticsW (SQLHSTMT hstmt,
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
 SQLTablePrivilegesW (SQLHSTMT hstmt,
-		     SQLWCHAR * catalog, SQLSMALLINT catalog_len,
-		     SQLWCHAR * schema, SQLSMALLINT schema_len, SQLWCHAR * table, SQLSMALLINT table_len)
+		     SQLWCHAR *catalog, SQLSMALLINT catalog_len,
+		     SQLWCHAR *schema, SQLSMALLINT schema_len, SQLWCHAR *table, SQLSMALLINT table_len)
 {
   RETCODE ret = ODBC_ERROR;
   SQLCHAR *cb_catalog = NULL, *cb_schema = NULL, *cb_table = NULL;
@@ -732,9 +732,9 @@ SQLTablePrivilegesW (SQLHSTMT hstmt,
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
 SQLTablesW (SQLHSTMT hstmt,
-	    SQLWCHAR * catalog, SQLSMALLINT catalog_len,
-	    SQLWCHAR * schema, SQLSMALLINT schema_len,
-	    SQLWCHAR * table, SQLSMALLINT table_len, SQLWCHAR * type, SQLSMALLINT type_len)
+	    SQLWCHAR *catalog, SQLSMALLINT catalog_len,
+	    SQLWCHAR *schema, SQLSMALLINT schema_len,
+	    SQLWCHAR *table, SQLSMALLINT table_len, SQLWCHAR *type, SQLSMALLINT type_len)
 {
   RETCODE ret = ODBC_ERROR;
   SQLCHAR *cb_catalog = NULL, *cb_schema = NULL, *cb_table = NULL, *cb_type = NULL;
@@ -767,7 +767,7 @@ SQLTablesW (SQLHSTMT hstmt,
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
 SQLGetDescFieldW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT field,
-		  SQLPOINTER value, SQLINTEGER value_max, SQLINTEGER * value_len)
+		  SQLPOINTER value, SQLINTEGER value_max, SQLINTEGER *value_len)
 {
   RETCODE ret = ODBC_ERROR;
   char *cb_value = NULL;
@@ -804,10 +804,10 @@ SQLGetDescFieldW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT field,
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
-SQLGetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLWCHAR * name,
-		SQLSMALLINT name_max, SQLSMALLINT * name_len, SQLSMALLINT * type,
-		SQLSMALLINT * subtype, SQLLEN * length, SQLSMALLINT * precision,
-		SQLSMALLINT * scale, SQLSMALLINT * nullable)
+SQLGetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLWCHAR *name,
+		SQLSMALLINT name_max, SQLSMALLINT *name_len, SQLSMALLINT *type,
+		SQLSMALLINT *subtype, SQLLEN *length, SQLSMALLINT *precision,
+		SQLSMALLINT *scale, SQLSMALLINT *nullable)
 {
   RETCODE ret = ODBC_ERROR;
   SQLCHAR *name_buffer = NULL;
@@ -870,7 +870,7 @@ SQLSetDescFieldW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT field, SQLPOIN
 ODBC_INTERFACE RETCODE SQL_API
 SQLSetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT type,
 		SQLSMALLINT subtype, SQLLEN length, SQLSMALLINT precision,
-		SQLSMALLINT scale, SQLPOINTER data_ptr, SQLLEN * octet_length_ptr, SQLLEN * indicator_ptr)
+		SQLSMALLINT scale, SQLPOINTER data_ptr, SQLLEN *octet_length_ptr, SQLLEN *indicator_ptr)
 {
   RETCODE ret = ODBC_ERROR;
   OutputDebugString ("SQLSetDescRecW called\n");
@@ -886,8 +886,8 @@ SQLSetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT type,
 * NOTE: ODBC 2.0 API, not need to implement
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
-SQLBrowseConnectW (SQLHDBC hdbc, SQLWCHAR * in, SQLSMALLINT in_len,
-		   SQLWCHAR * out, SQLSMALLINT out_max, SQLSMALLINT * out_len)
+SQLBrowseConnectW (SQLHDBC hdbc, SQLWCHAR *in, SQLSMALLINT in_len,
+		   SQLWCHAR *out, SQLSMALLINT out_max, SQLSMALLINT *out_len)
 {
   OutputDebugString ("SQLBrowseConnectW called\n");
   return ODBC_ERROR;
@@ -903,7 +903,7 @@ SQLBrowseConnectW (SQLHDBC hdbc, SQLWCHAR * in, SQLSMALLINT in_len,
 #if (ODBCVER >= 0x0300)
 ODBC_INTERFACE RETCODE SQL_API
 SQLGetStmtAttrW (SQLHSTMT StatementHandle,
-		 SQLINTEGER Attribute, SQLPOINTER Value, SQLINTEGER BufferLength, SQLINTEGER * StringLength)
+		 SQLINTEGER Attribute, SQLPOINTER Value, SQLINTEGER BufferLength, SQLINTEGER *StringLength)
 {
   OutputDebugString ("SQLGetStmtAttrW called\n");
   return SQLGetStmtAttr (StatementHandle, Attribute, Value, BufferLength, StringLength);
@@ -959,7 +959,7 @@ SQLSetConnectOptionW (SQLHDBC hdbc, SQLUSMALLINT option, SQLULEN param)
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
-SQLGetConnectAttrW (SQLHDBC hdbc, SQLINTEGER attribute, SQLPOINTER value, SQLINTEGER value_max, SQLINTEGER * value_len)
+SQLGetConnectAttrW (SQLHDBC hdbc, SQLINTEGER attribute, SQLPOINTER value, SQLINTEGER value_max, SQLINTEGER *value_len)
 {
   RETCODE ret = ODBC_ERROR;
   OutputDebugString ("SQLGetConnectAttrW called.\n");
@@ -977,7 +977,7 @@ SQLGetConnectAttrW (SQLHDBC hdbc, SQLINTEGER attribute, SQLPOINTER value, SQLINT
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
 SQLGetDiagFieldW (SQLSMALLINT handle_type, SQLHANDLE handle,
-		  SQLSMALLINT record, SQLSMALLINT field, SQLPOINTER info, SQLSMALLINT info_max, SQLSMALLINT * info_len)
+		  SQLSMALLINT record, SQLSMALLINT field, SQLPOINTER info, SQLSMALLINT info_max, SQLSMALLINT *info_len)
 {
   RETCODE ret = ODBC_ERROR;
   OutputDebugString ("SQLGetDiagFieldW called.\n");
@@ -997,9 +997,9 @@ ODBC_INTERFACE RETCODE SQL_API
 SQLColAttributeW (SQLHSTMT StatementHandle,
 		  SQLUSMALLINT ColumnNumber,
 		  SQLUSMALLINT FieldIdentifier,
-		  SQLPOINTER CharacterAttribute, SQLSMALLINT BufferLength, SQLSMALLINT * StringLength,
+		  SQLPOINTER CharacterAttribute, SQLSMALLINT BufferLength, SQLSMALLINT *StringLength,
 #if defined(_WIN64) || defined(__linux__)
-		  SQLLEN * NumericAttribute)
+		  SQLLEN *NumericAttribute)
 #else
 		  SQLPOINTER NumericAttribute)
 #endif
