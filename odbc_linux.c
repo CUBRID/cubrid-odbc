@@ -1,5 +1,5 @@
 /*
- * 
+ *
  * Copyright 2016 CUBRID Corporation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,10 +48,10 @@ PUBLIC INT_PTR CALLBACK ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM 
 ODBC_INTERFACE RETCODE SQL_API
 SQLDataSources (SQLHENV EnvironmentHandle,
 		SQLUSMALLINT Direction,
-		SQLCHAR * ServerName,
+		SQLCHAR *ServerName,
 		SQLSMALLINT BufferLength1,
-		SQLSMALLINT * NameLength1Ptr,
-		SQLCHAR * Description, SQLSMALLINT BufferLength2, SQLSMALLINT * NameLength2Ptr)
+		SQLSMALLINT *NameLength1Ptr,
+		SQLCHAR *Description, SQLSMALLINT BufferLength2, SQLSMALLINT *NameLength2Ptr)
 {
   OutputDebugString ("SQLDataSources called\n");
   return SQL_SUCCESS;
@@ -146,7 +146,7 @@ DialogBoxParam (HINSTANCE hInst, LPCSTR tmpNaae, HWND hWndP, INT_PTR CALLBACK lp
 
 
 WCHAR *
-SysAllocStringLen (const WCHAR * strIn, UINT ui)
+SysAllocStringLen (const WCHAR *strIn, UINT ui)
 {
   WCHAR *p;
 
@@ -155,7 +155,7 @@ SysAllocStringLen (const WCHAR * strIn, UINT ui)
 }
 
 void
-SysFreeString (WCHAR * bstr)
+SysFreeString (WCHAR *bstr)
 {
   if (bstr)
     {
@@ -248,7 +248,9 @@ get_section_from_file (const char *ini, const char *section, char *value_p, int 
   for (pt = value_p; *pt != '\0'; ++pt)
     {
       if (*pt == ';')		// connection string delimiter
-	*pt = '\0';
+	{
+	  *pt = '\0';
+	}
     }
 
   return rc;
@@ -323,7 +325,7 @@ itoa (int value, char *string, int radix)
 
 int
 MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int cbMultiByte,
-		     wchar_t * lpWideCharStr, int cchWideChar)
+		     wchar_t *lpWideCharStr, int cchWideChar)
 {
   char *default_unicode_charset = "UTF-16LE";
   char *charset = "UTF-8";
@@ -386,7 +388,7 @@ MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int cbMu
 int
 WideCharToMultiByte (int wincode,
 		     int dw,
-		     wchar_t * str,
+		     wchar_t *str,
 		     int size, char *out_buffer, int cbMultiByte, char *lpdefaultchar, char *lpusedfdefaultchar)
 {
   char *charset;

@@ -44,8 +44,8 @@ PUBLIC INT_PTR CALLBACK ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM 
 
 
 PRIVATE BOOL FAR PASCAL AddDSNProc (HWND hwndParent, char *oldDSN);
-PRIVATE VOID FAR PASCAL GetDSNInfo (HWND hwndParent, CUBRIDDSNItem * ptDSNItem);
-PRIVATE VOID SQL_API TestConnection (HWND hwndParent, CUBRIDDSNItem * ptDSNItem);
+PRIVATE VOID FAR PASCAL GetDSNInfo (HWND hwndParent, CUBRIDDSNItem *ptDSNItem);
+PRIVATE VOID SQL_API TestConnection (HWND hwndParent, CUBRIDDSNItem *ptDSNItem);
 
 /************************************************************************
  * name:  ConfigDriver
@@ -60,7 +60,7 @@ PRIVATE VOID SQL_API TestConnection (HWND hwndParent, CUBRIDDSNItem * ptDSNItem)
  ************************************************************************/
 ODBC_INTERFACE INSTAPI
 ConfigDriver (HWND hwndParent,
-	      WORD fRequest, LPCSTR lpszDriver, LPCSTR lpszArgs, LPSTR lpszMsg, WORD cbMsgMax, WORD * pcbMsgOut)
+	      WORD fRequest, LPCSTR lpszDriver, LPCSTR lpszArgs, LPSTR lpszMsg, WORD cbMsgMax, WORD *pcbMsgOut)
 {
   OutputDebugString ("ConfigDriver called\n");
 
@@ -76,7 +76,7 @@ ConfigDriver (HWND hwndParent,
  *    add dsn(app)
  ************************************************************************/
 PRIVATE BOOL FAR PASCAL
-AddDSNProcByParam (CUBRIDDSNItem * pDsn_item)
+AddDSNProcByParam (CUBRIDDSNItem *pDsn_item)
 {
   BOOL rc;
   CUBRIDDSNItem dsn_item = *pDsn_item;
@@ -433,7 +433,7 @@ AddDSNProc (HWND hwndParent, char *oldDSN)
 }
 
 PRIVATE VOID FAR PASCAL
-GetDSNInfo (HWND hwndParent, CUBRIDDSNItem * ptDSNItem)
+GetDSNInfo (HWND hwndParent, CUBRIDDSNItem *ptDSNItem)
 {
   GetDlgItemText (hwndParent, IDC_DSN, ptDSNItem->dsn, ITEMBUFLEN);
   GetDlgItemText (hwndParent, IDC_DBNAME, ptDSNItem->db_name, ITEMBUFLEN);
@@ -449,7 +449,7 @@ GetDSNInfo (HWND hwndParent, CUBRIDDSNItem * ptDSNItem)
 }
 
 PRIVATE VOID SQL_API
-TestConnection (HWND hwndParent, CUBRIDDSNItem * ptDSNItem)
+TestConnection (HWND hwndParent, CUBRIDDSNItem *ptDSNItem)
 {
   SQLHENV hEnv;
   SQLHDBC hDbc;

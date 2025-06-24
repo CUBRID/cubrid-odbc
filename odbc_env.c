@@ -1,30 +1,30 @@
 /*
- * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution. 
+ * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
- * Redistribution and use in source and binary forms, with or without modification, 
- * are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- *   this list of conditions and the following disclaimer. 
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
  *
- * - Redistributions in binary form must reproduce the above copyright notice, 
- *   this list of conditions and the following disclaimer in the documentation 
- *   and/or other materials provided with the distribution. 
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
  *
- * - Neither the name of the <ORGANIZATION> nor the names of its contributors 
- *   may be used to endorse or promote products derived from this software without 
- *   specific prior written permission. 
+ * - Neither the name of the <ORGANIZATION> nor the names of its contributors
+ *   may be used to endorse or promote products derived from this software without
+ *   specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
- * IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
- * OF SUCH DAMAGE. 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+ * OF SUCH DAMAGE.
  *
  */
 
@@ -36,7 +36,7 @@
 #include    "odbc_util.h"
 #include    "cas_cci.h"
 
-PRIVATE RETCODE connection_end_tran (ODBC_CONNECTION * conn, short completion_type);
+PRIVATE RETCODE connection_end_tran (ODBC_CONNECTION *conn, short completion_type);
 
 /* odbc_environments :
  *    global enviroment handle list head
@@ -53,7 +53,7 @@ static ODBC_ENV *odbc_environments = NULL;
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_alloc_env (ODBC_ENV ** envptr)
+odbc_alloc_env (ODBC_ENV **envptr)
 {
   ODBC_ENV *env;
 
@@ -91,7 +91,7 @@ odbc_alloc_env (ODBC_ENV ** envptr)
 /************************************************************************
 * name:  odbc_free_env
 * arguments:
-*   ODBC_ENV *env 
+*   ODBC_ENV *env
 * returns/side-effects:
 *   RETCODE - odbc api return code
 * description:
@@ -99,7 +99,7 @@ odbc_alloc_env (ODBC_ENV ** envptr)
 ************************************************************************/
 
 PUBLIC RETCODE
-odbc_free_env (ODBC_ENV * env)
+odbc_free_env (ODBC_ENV *env)
 {
   ODBC_ENV *e, *prev;
 
@@ -146,14 +146,14 @@ odbc_free_env (ODBC_ENV * env)
 * returns/side-effects:
 *   RETCODE
 * description:
-*   
+*
 * NOTE:
-*   diagnostic에 대해서 아직 structure가 설정이 되지 않아서 SQLSTATE를 
-*   설정하지 못한다.  structure에 반영한 후 각 state 값을 설정하도록 
+*   diagnostic에 대해서 아직 structure가 설정이 되지 않아서 SQLSTATE를
+*   설정하지 못한다.  structure에 반영한 후 각 state 값을 설정하도록
 *   한다.
 ************************************************************************/
 PUBLIC RETCODE
-odbc_set_env_attr (ODBC_ENV * env, long attribute, void *valueptr, long stringlength)
+odbc_set_env_attr (ODBC_ENV *env, long attribute, void *valueptr, long stringlength)
 {
 
   if (valueptr == NULL)
@@ -162,8 +162,8 @@ odbc_set_env_attr (ODBC_ENV * env, long attribute, void *valueptr, long stringle
       return ODBC_ERROR;
     }
 
-  /* valueptr will be a 32-bit integer value or 
-   * point to a null-terminated character string 
+  /* valueptr will be a 32-bit integer value or
+   * point to a null-terminated character string
    */
   switch (attribute)
     {
@@ -224,31 +224,39 @@ odbc_set_env_attr (ODBC_ENV * env, long attribute, void *valueptr, long stringle
 /************************************************************************
 * name:  odbc_get_env_attr
 * arguments:
-*   ODBC_ENV *env 
+*   ODBC_ENV *env
 * returns/side-effects:
 *   RETCODE - odbc api return code
 * description:
 * NOTE:
 ************************************************************************/
 PUBLIC
-odbc_get_env_attr (ODBC_ENV * env, long attribute, void *value_ptr, long buffer_length, long *string_length_ptr)
+odbc_get_env_attr (ODBC_ENV *env, long attribute, void *value_ptr, long buffer_length, long *string_length_ptr)
 {
   switch (attribute)
     {
     case SQL_ATTR_ODBC_VERSION:
       if (value_ptr != NULL)
-	*((unsigned long *) value_ptr) = env->attr_odbc_version;
+	{
+	  * ((unsigned long *) value_ptr) = env->attr_odbc_version;
+	}
 
       if (string_length_ptr != NULL)
-	*string_length_ptr = sizeof (long);
+	{
+	  *string_length_ptr = sizeof (long);
+	}
       break;
 
     case SQL_ATTR_OUTPUT_NTS:
       if (value_ptr != NULL)
-	*((unsigned long *) value_ptr) = env->attr_output_nts;
+	{
+	  * ((unsigned long *) value_ptr) = env->attr_output_nts;
+	}
 
       if (string_length_ptr != NULL)
-	*string_length_ptr = sizeof (long);
+	{
+	  *string_length_ptr = sizeof (long);
+	}
       break;
 
     default:
@@ -262,10 +270,10 @@ odbc_get_env_attr (ODBC_ENV * env, long attribute, void *value_ptr, long buffer_
 
 /************************************************************************
 * name: odbc_end_tran
-* arguments: 
-* returns/side-effects: 
-* description: 
-* NOTE: 
+* arguments:
+* returns/side-effects:
+* description:
+* NOTE:
 ************************************************************************/
 PUBLIC RETCODE
 odbc_end_tran (short handle_type, void *handle, short completion_type)
@@ -306,13 +314,13 @@ odbc_end_tran (short handle_type, void *handle, short completion_type)
 
 /************************************************************************
 * name: connection_end_tran
-* arguments: 
-* returns/side-effects: 
-* description: 
-* NOTE: 
+* arguments:
+* returns/side-effects:
+* description:
+* NOTE:
 ************************************************************************/
 PRIVATE RETCODE
-connection_end_tran (ODBC_CONNECTION * conn, short completion_type)
+connection_end_tran (ODBC_CONNECTION *conn, short completion_type)
 {
   ODBC_STATEMENT *stmt;
   int cci_rc;

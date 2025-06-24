@@ -41,13 +41,6 @@ jobs:
           
           # install astyle
           sudo apt-get -yq install astyle
-          
-          # indent 2.2.11, the lastest version (2.2.12) make a different result
-          wget https://github.com/CUBRID/3rdparty/raw/develop/indent/indent-2.2.11.tar.gz
-          tar xf indent-2.2.11.tar.gz
-          cd indent-2.2.11
-          ./configure
-          sudo make -j install
         working-directory: ${{ env.working-directory }}
       - id: files
         uses: jitterbit/get-changed-files@v1

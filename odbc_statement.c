@@ -83,29 +83,29 @@ typedef struct __st_DescInfo
   long *octet_len_ptr;
 } DescInfo;
 
-PRIVATE SQLSMALLINT next_param_data_at_exec (ODBC_STATEMENT * stmt, SQLSMALLINT param_pos);
-PRIVATE void get_appl_desc_info (ODBC_DESC * desc, short col_index, DescInfo * desc_info_ptr);
-PRIVATE void recalculate_bind_pointer (DescInfo * desc_info_ptr,
+PRIVATE SQLSMALLINT next_param_data_at_exec (ODBC_STATEMENT *stmt, SQLSMALLINT param_pos);
+PRIVATE void get_appl_desc_info (ODBC_DESC *desc, short col_index, DescInfo *desc_info_ptr);
+PRIVATE void recalculate_bind_pointer (DescInfo *desc_info_ptr,
 				       SQLSETPOSIROW row_index,
-				       UINT_PTR * value_addr, UINT_PTR * ind_addr, UINT_PTR * octet_len_addr);
-PRIVATE void make_param_array (ODBC_STATEMENT * stmt, short column_index,
-			       DescInfo * desc_info, ParamArray * param_array, int array_size);
+				       UINT_PTR *value_addr, UINT_PTR *ind_addr, UINT_PTR *octet_len_addr);
+PRIVATE void make_param_array (ODBC_STATEMENT *stmt, short column_index,
+			       DescInfo *desc_info, ParamArray *param_array, int array_size);
 
-PRIVATE void reset_revised_sql (ODBC_STATEMENT * stmt);
+PRIVATE void reset_revised_sql (ODBC_STATEMENT *stmt);
 PRIVATE int revised_param_pos (char *param_pos, int i);
-PRIVATE char get_flag_of_cci_execute (ODBC_STATEMENT * stmt);
-PRIVATE char get_flag_of_cci_prepare (ODBC_STATEMENT * stmt);
-PRIVATE void create_bookmark_ird (ODBC_STATEMENT * stmt);
-PRIVATE void memory_alloc_param_array (ParamArray * param_array, int array_size);
-PRIVATE RETCODE delete_row_by_cursor_pos (ODBC_STATEMENT * stmt, unsigned long cursor_pos);
-PRIVATE RETCODE odbc_set_pos_update (ODBC_STATEMENT * stmt,
-				     DescInfo * bookmark_desc_info_ptr,
-				     DescInfo * desc_info_ptr, SQLSETPOSIROW row_pos);
-PRIVATE RETCODE odbc_set_pos_delete (ODBC_STATEMENT * stmt, DescInfo * boomark_desc_info_ptr, SQLSETPOSIROW row_pos);
-PRIVATE void free_param_array (ParamArray * param_ptr, int array_count, int member_count);
+PRIVATE char get_flag_of_cci_execute (ODBC_STATEMENT *stmt);
+PRIVATE char get_flag_of_cci_prepare (ODBC_STATEMENT *stmt);
+PRIVATE void create_bookmark_ird (ODBC_STATEMENT *stmt);
+PRIVATE void memory_alloc_param_array (ParamArray *param_array, int array_size);
+PRIVATE RETCODE delete_row_by_cursor_pos (ODBC_STATEMENT *stmt, unsigned long cursor_pos);
+PRIVATE RETCODE odbc_set_pos_update (ODBC_STATEMENT *stmt,
+				     DescInfo *bookmark_desc_info_ptr,
+				     DescInfo *desc_info_ptr, SQLSETPOSIROW row_pos);
+PRIVATE RETCODE odbc_set_pos_delete (ODBC_STATEMENT *stmt, DescInfo *boomark_desc_info_ptr, SQLSETPOSIROW row_pos);
+PRIVATE void free_param_array (ParamArray *param_ptr, int array_count, int member_count);
 PRIVATE short default_type_to_c_type (short value_type, short parameter_type);
 #ifdef _DEBUG
-PRIVATE void debug_print_appl_desc (DescInfo * desc_info, void *value_ptr, long *ind_ptr);
+PRIVATE void debug_print_appl_desc (DescInfo *desc_info, void *value_ptr, long *ind_ptr);
 #endif
 
 /************************************************************************
@@ -118,7 +118,7 @@ PRIVATE void debug_print_appl_desc (DescInfo * desc_info, void *value_ptr, long 
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_alloc_statement (ODBC_CONNECTION * conn, ODBC_STATEMENT ** stmt_ptr)
+odbc_alloc_statement (ODBC_CONNECTION *conn, ODBC_STATEMENT **stmt_ptr)
 {
   ODBC_STATEMENT *s;
 
@@ -163,10 +163,10 @@ odbc_alloc_statement (ODBC_CONNECTION * conn, ODBC_STATEMENT ** stmt_ptr)
 
   free_column_data (&s->column_data, INIT);
 
-  odbc_alloc_desc (NULL, &(s->i_apd));
-  odbc_alloc_desc (NULL, &(s->i_ard));
-  odbc_alloc_desc (NULL, &(s->i_ipd));
-  odbc_alloc_desc (NULL, &(s->i_ird));
+  odbc_alloc_desc (NULL, & (s->i_apd));
+  odbc_alloc_desc (NULL, & (s->i_ard));
+  odbc_alloc_desc (NULL, & (s->i_ipd));
+  odbc_alloc_desc (NULL, & (s->i_ird));
 
   s->apd = s->i_apd;
   s->ard = s->i_ard;
@@ -223,7 +223,7 @@ error:
 * SQLFreeStmt와 match된다.
 ************************************************************************/
 PUBLIC RETCODE
-odbc_reset_statement (ODBC_STATEMENT * stmt, unsigned short option)
+odbc_reset_statement (ODBC_STATEMENT *stmt, unsigned short option)
 {
   RETCODE rc = ODBC_SUCCESS;
 
@@ -259,12 +259,14 @@ odbc_reset_statement (ODBC_STATEMENT * stmt, unsigned short option)
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_free_statement (ODBC_STATEMENT * stmt)
+odbc_free_statement (ODBC_STATEMENT *stmt)
 {
   ODBC_STATEMENT *s, *prev;
 
   if (stmt == NULL || stmt->handle_type != SQL_HANDLE_STMT)
-    return SQL_INVALID_HANDLE;
+    {
+      return SQL_INVALID_HANDLE;
+    }
 
   if (stmt->conn != NULL)
     {
@@ -276,9 +278,13 @@ odbc_free_statement (ODBC_STATEMENT * stmt)
       if (s == stmt)
 	{
 	  if (prev != NULL)
-	    prev->next = stmt->next;
+	    {
+	      prev->next = stmt->next;
+	    }
 	  else
-	    stmt->conn->statements = stmt->next;
+	    {
+	      stmt->conn->statements = stmt->next;
+	    }
 	}
       odbc_close_cursor (stmt);
     }
@@ -326,7 +332,7 @@ odbc_free_statement (ODBC_STATEMENT * stmt)
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_set_stmt_attr (ODBC_STATEMENT * stmt, long attribute, void *valueptr, long stringlength, short is_driver)
+odbc_set_stmt_attr (ODBC_STATEMENT *stmt, long attribute, void *valueptr, long stringlength, short is_driver)
 {
   RETCODE rc;
 
@@ -576,8 +582,8 @@ odbc_set_stmt_attr (ODBC_STATEMENT * stmt, long attribute, void *valueptr, long 
       break;
 
 
-      // Not supported attribute
-      // 어떠한 작업도 하지 않는다.
+    // Not supported attribute
+    // 어떠한 작업도 하지 않는다.
     case SQL_ATTR_CONCURRENCY:
     case SQL_ATTR_ENABLE_AUTO_IPD:
     case SQL_ATTR_KEYSET_SIZE:
@@ -611,8 +617,8 @@ error:
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_get_stmt_attr (ODBC_STATEMENT * stmt,
-		    long attr, SQLPOINTER value_ptr, SQLINTEGER buffer_length, SQLINTEGER * length_ptr)
+odbc_get_stmt_attr (ODBC_STATEMENT *stmt,
+		    long attr, SQLPOINTER value_ptr, SQLINTEGER buffer_length, SQLINTEGER *length_ptr)
 {
   SQLLEN tmp_length;
 
@@ -626,57 +632,85 @@ odbc_get_stmt_attr (ODBC_STATEMENT * stmt,
     {
     case SQL_ATTR_APP_PARAM_DESC:
       if (value_ptr != NULL)
-	*(ODBC_DESC **) value_ptr = stmt->apd;
+	{
+	  * (ODBC_DESC **) value_ptr = stmt->apd;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (stmt->apd);
+	{
+	  *length_ptr = sizeof (stmt->apd);
+	}
       break;
 
     case SQL_ATTR_APP_ROW_DESC:
       if (value_ptr != NULL)
-	*(ODBC_DESC **) value_ptr = stmt->ard;
+	{
+	  * (ODBC_DESC **) value_ptr = stmt->ard;
+	}
       if (length_ptr != NULL)
-	*length_ptr = sizeof (stmt->ard);
+	{
+	  *length_ptr = sizeof (stmt->ard);
+	}
       break;
 
     case SQL_ATTR_ASYNC_ENABLE:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = stmt->attr_async_enable;
+	{
+	  * (unsigned long *) value_ptr = stmt->attr_async_enable;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (unsigned long);
+	{
+	  *length_ptr = sizeof (unsigned long);
+	}
       break;
 
     case SQL_ATTR_CURSOR_SCROLLABLE:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = stmt->attr_cursor_scrollable;
+	{
+	  * (unsigned long *) value_ptr = stmt->attr_cursor_scrollable;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (stmt->attr_cursor_scrollable);
+	{
+	  *length_ptr = sizeof (stmt->attr_cursor_scrollable);
+	}
       break;
 
     case SQL_ATTR_IMP_PARAM_DESC:
       if (value_ptr != NULL)
-	*(ODBC_DESC **) value_ptr = stmt->ipd;
+	{
+	  * (ODBC_DESC **) value_ptr = stmt->ipd;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (stmt->ipd);
+	{
+	  *length_ptr = sizeof (stmt->ipd);
+	}
       break;
 
     case SQL_ATTR_IMP_ROW_DESC:
       if (value_ptr != NULL)
-	*(ODBC_DESC **) value_ptr = stmt->ird;
+	{
+	  * (ODBC_DESC **) value_ptr = stmt->ird;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (stmt->ird);
+	{
+	  *length_ptr = sizeof (stmt->ird);
+	}
       break;
 
     case SQL_ATTR_METADATA_ID:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = stmt->attr_metadata_id;
+	{
+	  * (unsigned long *) value_ptr = stmt->attr_metadata_id;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (stmt->attr_metadata_id);
+	{
+	  *length_ptr = sizeof (stmt->attr_metadata_id);
+	}
       break;
 
     case SQL_ATTR_PARAM_BIND_OFFSET_PTR:
@@ -729,10 +763,14 @@ odbc_get_stmt_attr (ODBC_STATEMENT * stmt,
 
     case SQL_ATTR_RETRIEVE_DATA:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = SQL_RD_ON;
+	{
+	  * (unsigned long *) value_ptr = SQL_RD_ON;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (unsigned long);
+	{
+	  *length_ptr = sizeof (unsigned long);
+	}
       break;
 
     case SQL_ATTR_ROW_ARRAY_SIZE:
@@ -788,51 +826,75 @@ odbc_get_stmt_attr (ODBC_STATEMENT * stmt,
       if (value_ptr != NULL)
 	{
 	  if (stmt->current_tpl_pos <= 0)
-	    *(unsigned long *) value_ptr = 0;
+	    {
+	      * (unsigned long *) value_ptr = 0;
+	    }
 	  else
-	    *(unsigned long *) value_ptr = stmt->current_tpl_pos;
+	    {
+	      * (unsigned long *) value_ptr = stmt->current_tpl_pos;
+	    }
 	}
       if (length_ptr != NULL)
-	*length_ptr = sizeof (stmt->attr_cursor_scrollable);
+	{
+	  *length_ptr = sizeof (stmt->attr_cursor_scrollable);
+	}
       break;
 
     case SQL_ATTR_CURSOR_TYPE:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = stmt->attr_cursor_type;
+	{
+	  * (unsigned long *) value_ptr = stmt->attr_cursor_type;
+	}
       if (length_ptr != NULL)
-	*length_ptr = sizeof (unsigned long);
+	{
+	  *length_ptr = sizeof (unsigned long);
+	}
       break;
 
-      // SQL_CONCUR_READ_ONLY
+    // SQL_CONCUR_READ_ONLY
     case SQL_ATTR_CONCURRENCY:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = stmt->attr_concurrency;
+	{
+	  * (unsigned long *) value_ptr = stmt->attr_concurrency;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (unsigned long);
+	{
+	  *length_ptr = sizeof (unsigned long);
+	}
       break;
 
-      // Not supported attribute
+    // Not supported attribute
 
     case SQL_ATTR_CURSOR_SENSITIVITY:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = stmt->attr_cursor_sensitivity;
+	{
+	  * (unsigned long *) value_ptr = stmt->attr_cursor_sensitivity;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (unsigned long);
+	{
+	  *length_ptr = sizeof (unsigned long);
+	}
       break;
 
     case SQL_ATTR_ENABLE_AUTO_IPD:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = SQL_FALSE;
+	{
+	  * (unsigned long *) value_ptr = SQL_FALSE;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (unsigned long);
+	{
+	  *length_ptr = sizeof (unsigned long);
+	}
       break;
 
     case SQL_ATTR_FETCH_BOOKMARK_PTR:
       if (value_ptr != NULL)
-	*((void **) value_ptr) = NULL;
+	{
+	  * ((void **) value_ptr) = NULL;
+	}
 
       if (length_ptr != NULL)
 	{
@@ -842,57 +904,85 @@ odbc_get_stmt_attr (ODBC_STATEMENT * stmt,
 
     case SQL_ATTR_KEYSET_SIZE:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = 0;
+	{
+	  * (unsigned long *) value_ptr = 0;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (unsigned long);
+	{
+	  *length_ptr = sizeof (unsigned long);
+	}
       break;
 
     case SQL_ATTR_MAX_LENGTH:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = 0;
+	{
+	  * (unsigned long *) value_ptr = 0;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (unsigned long);
+	{
+	  *length_ptr = sizeof (unsigned long);
+	}
       break;
 
     case SQL_ATTR_MAX_ROWS:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = 0;
+	{
+	  * (unsigned long *) value_ptr = 0;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (unsigned long);
+	{
+	  *length_ptr = sizeof (unsigned long);
+	}
       break;
 
     case SQL_ATTR_NOSCAN:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = SQL_NOSCAN_ON;
+	{
+	  * (unsigned long *) value_ptr = SQL_NOSCAN_ON;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (unsigned long);
+	{
+	  *length_ptr = sizeof (unsigned long);
+	}
       break;
 
     case SQL_ATTR_QUERY_TIMEOUT:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = 0;
+	{
+	  * (unsigned long *) value_ptr = 0;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (unsigned long);
+	{
+	  *length_ptr = sizeof (unsigned long);
+	}
       break;
 
     case SQL_ATTR_SIMULATE_CURSOR:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = SQL_SC_NON_UNIQUE;
+	{
+	  * (unsigned long *) value_ptr = SQL_SC_NON_UNIQUE;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (unsigned long);
+	{
+	  *length_ptr = sizeof (unsigned long);
+	}
       break;
     case SQL_ATTR_USE_BOOKMARKS:
       if (value_ptr != NULL)
-	*(unsigned long *) value_ptr = stmt->attr_use_bookmark;
+	{
+	  * (unsigned long *) value_ptr = stmt->attr_use_bookmark;
+	}
 
       if (length_ptr != NULL)
-	*length_ptr = sizeof (unsigned long);
+	{
+	  *length_ptr = sizeof (unsigned long);
+	}
       break;
 
     default:
@@ -914,7 +1004,7 @@ error:
  * NOTE:
  ************************************************************************/
 PUBLIC RETCODE
-odbc_set_cursor_name (ODBC_STATEMENT * stmt, char *cursor_name, short name_length)
+odbc_set_cursor_name (ODBC_STATEMENT *stmt, char *cursor_name, short name_length)
 {
   if (cursor_name != NULL)
     {
@@ -931,7 +1021,7 @@ odbc_set_cursor_name (ODBC_STATEMENT * stmt, char *cursor_name, short name_lengt
  * NOTE:
  ************************************************************************/
 PUBLIC RETCODE
-odbc_get_cursor_name (ODBC_STATEMENT * stmt, SQLCHAR * cursor_name, SQLSMALLINT buffer_length, SQLLEN * name_length_ptr)
+odbc_get_cursor_name (ODBC_STATEMENT *stmt, SQLCHAR *cursor_name, SQLSMALLINT buffer_length, SQLLEN *name_length_ptr)
 {
   RETCODE rc, status = ODBC_SUCCESS;
   char *pt;
@@ -964,14 +1054,14 @@ odbc_get_cursor_name (ODBC_STATEMENT * stmt, SQLCHAR * cursor_name, SQLSMALLINT 
 * column_size에 대해서 고려하지 않고 있음.
 ************************************************************************/
 PUBLIC RETCODE
-odbc_bind_parameter (ODBC_STATEMENT * stmt,
+odbc_bind_parameter (ODBC_STATEMENT *stmt,
 		     SQLUSMALLINT parameter_num,
 		     SQLSMALLINT input_output_type,
 		     SQLSMALLINT value_type,
 		     SQLSMALLINT parameter_type,
 		     SQLULEN column_size,
 		     SQLSMALLINT decimal_digits,
-		     SQLPOINTER parameter_value_ptr, SQLLEN buffer_length, SQLLEN * strlen_ind_ptr)
+		     SQLPOINTER parameter_value_ptr, SQLLEN buffer_length, SQLLEN *strlen_ind_ptr)
 {
   ODBC_DESC *apd = NULL, *ipd = NULL;
   RETCODE rc;
@@ -1129,7 +1219,7 @@ error2:
 *   stmt->param_number의 member에 유지하고 있다.
 ************************************************************************/
 PUBLIC RETCODE
-odbc_num_params (ODBC_STATEMENT * stmt, short *parameter_count)
+odbc_num_params (ODBC_STATEMENT *stmt, short *parameter_count)
 {
 
   if (parameter_count)
@@ -1153,7 +1243,7 @@ odbc_num_params (ODBC_STATEMENT * stmt, short *parameter_count)
 *   col precision - MAX_PRECISION을 적용하였다.
 ************************************************************************/
 PUBLIC RETCODE
-odbc_prepare (ODBC_STATEMENT * stmt, char *statement_text)
+odbc_prepare (ODBC_STATEMENT *stmt, char *statement_text)
 {
   int cci_rc;
   T_CCI_ERROR cci_err_buf;
@@ -1179,8 +1269,8 @@ odbc_prepare (ODBC_STATEMENT * stmt, char *statement_text)
   stmt->revised_sql.sql_text = UT_MAKE_STRING (statement_text, -1);
   // revise sql text because oid string value
   stmt->revised_sql.oid_param_num = replace_oid (stmt->revised_sql.sql_text,
-						 &stmt->revised_sql.org_param_pos,
-						 &stmt->revised_sql.oid_param_pos, &stmt->revised_sql.oid_param_val);
+				    &stmt->revised_sql.org_param_pos,
+				    &stmt->revised_sql.oid_param_pos, &stmt->revised_sql.oid_param_val);
   if (stmt->revised_sql.oid_param_num < 0)
     {
       odbc_set_diag (stmt->diag, "HY000", 0, "Too many bind Parameters used.");
@@ -1189,7 +1279,9 @@ odbc_prepare (ODBC_STATEMENT * stmt, char *statement_text)
   flag_cci_prepare = get_flag_of_cci_prepare (stmt);
   cci_rc = cci_prepare (stmt->conn->connhd, stmt->revised_sql.sql_text, flag_cci_prepare, &cci_err_buf);
   if (cci_rc < 0)
-    goto error;
+    {
+      goto error;
+    }
 
   stmt->stmthd = cci_rc;
 
@@ -1232,7 +1324,7 @@ error:
 * 이 때는 autocommit mode일지라도 autocommit은 일어나지 않는다.(rollback도 없다.)
 ************************************************************************/
 PUBLIC RETCODE
-odbc_execute (ODBC_STATEMENT * stmt)
+odbc_execute (ODBC_STATEMENT *stmt)
 {
   short count, valid_param_count;
   short sql_type;
@@ -1309,7 +1401,9 @@ odbc_execute (ODBC_STATEMENT * stmt)
 	      desc_info.length = *octet_len_ptr;
 	    }
 	  else
-	    odbc_get_desc_field (stmt->ipd, i, SQL_DESC_LENGTH, &(desc_info.length), 0, NULL);
+	    {
+	      odbc_get_desc_field (stmt->ipd, i, SQL_DESC_LENGTH, & (desc_info.length), 0, NULL);
+	    }
 
 	  if (value_ptr == NULL || ind_ptr != NULL && *ind_ptr == SQL_NULL_DATA)
 	    {
@@ -1322,12 +1416,12 @@ odbc_execute (ODBC_STATEMENT * stmt)
 	    }
 	  else
 	    {
-	/*--
-         * cci_bind_param()을 사용할 때 SQLBindParam()에 의한 value pointer
-         * 를 바로 사용할 수 없다. 왜냐면 SQLBindParam()에 의한 value pointer
-         * 와 cci_bind_param()에서 사용하는 value pointer사이에는 type conversion
-         * 등이 발생하기 때문이다.
-         *--*/
+	      /*--
+	       * cci_bind_param()을 사용할 때 SQLBindParam()에 의한 value pointer
+	       * 를 바로 사용할 수 없다. 왜냐면 SQLBindParam()에 의한 value pointer
+	       * 와 cci_bind_param()에서 사용하는 value pointer사이에는 type conversion
+	       * 등이 발생하기 때문이다.
+	       *--*/
 	      cci_value = odbc_value_to_cci (value_ptr, desc_info.type,
 					     desc_info.length, desc_info.precision, desc_info.scale);
 	      if (cci_value == NULL)
@@ -1385,7 +1479,8 @@ odbc_execute (ODBC_STATEMENT * stmt)
 
     }
   else
-    {				/* ARRAY binding & query for update */
+    {
+      /* ARRAY binding & query for update */
       odbc_get_stmt_attr (stmt, SQL_ATTR_PARAM_STATUS_PTR, &ParamStatusArrayPtr, 0, NULL);
       odbc_get_stmt_attr (stmt, SQL_ATTR_PARAM_OPERATION_PTR, &ParamOperationArrayPtr, 0, NULL);
 
@@ -1401,13 +1496,17 @@ odbc_execute (ODBC_STATEMENT * stmt)
 	  if (ParamOperationArrayPtr != NULL && ParamOperationArrayPtr[h - 1] == SQL_PARAM_IGNORE)
 	    {
 	      if (ParamStatusArrayPtr != NULL)
-		ParamStatusArrayPtr[h - 1] = SQL_PARAM_UNUSED;
+		{
+		  ParamStatusArrayPtr[h - 1] = SQL_PARAM_UNUSED;
+		}
 	      continue;
 	    }
 	  else
 	    {
 	      if (ParamStatusArrayPtr != NULL)
-		ParamStatusArrayPtr[h - 1] = SQL_PARAM_SUCCESS;
+		{
+		  ParamStatusArrayPtr[h - 1] = SQL_PARAM_SUCCESS;
+		}
 	    }
 	  ++ProcessedParamNum;
 	}
@@ -1450,9 +1549,9 @@ odbc_execute (ODBC_STATEMENT * stmt)
 	    }
 
 	  cci_rc =
-	    cci_bind_param_array (stmt->stmthd, RevisedParamPos, a_type,
-				  array_of_param_array[i - 1].value_array,
-				  array_of_param_array[i - 1].ind_array, u_type);
+		  cci_bind_param_array (stmt->stmthd, RevisedParamPos, a_type,
+					array_of_param_array[i - 1].value_array,
+					array_of_param_array[i - 1].ind_array, u_type);
 	  ERROR_GOTO (cci_rc, cci_error);
 	}
 
@@ -1482,10 +1581,10 @@ odbc_execute (ODBC_STATEMENT * stmt)
 		}
 
 	      cci_rc =
-		cci_bind_param_array (stmt->stmthd, RevisedParamPos,
-				      CCI_A_TYPE_STR,
-				      array_of_oid_param_array[i].value_array,
-				      array_of_oid_param_array[i].ind_array, CCI_U_TYPE_OBJECT);
+		      cci_bind_param_array (stmt->stmthd, RevisedParamPos,
+					    CCI_A_TYPE_STR,
+					    array_of_oid_param_array[i].value_array,
+					    array_of_oid_param_array[i].ind_array, CCI_U_TYPE_OBJECT);
 
 	      ERROR_GOTO (cci_rc, cci_error);
 	    }
@@ -1525,7 +1624,9 @@ odbc_execute (ODBC_STATEMENT * stmt)
       // set processed parameters number
       odbc_get_stmt_attr (stmt, SQL_ATTR_PARAMS_PROCESSED_PTR, &ProcessedParamNumPtr, 0, NULL);
       if (ProcessedParamNumPtr != NULL)
-	*ProcessedParamNumPtr = ProcessedParamNum;
+	{
+	  *ProcessedParamNumPtr = ProcessedParamNum;
+	}
 
       if (stmt->tpl_number == 0 && (stmt->stmt_type == CUBRID_STMT_UPDATE || stmt->stmt_type == CUBRID_STMT_DELETE))
 	{
@@ -1543,7 +1644,9 @@ odbc_execute (ODBC_STATEMENT * stmt)
     }
 
   if (flag_stmt_need_data != 0)
-    return ODBC_NEED_DATA;
+    {
+      return ODBC_NEED_DATA;
+    }
 
   if (!RESULTSET_STMT_TYPE (stmt->stmt_type) || stmt->conn->attr_autocommit == SQL_AUTOCOMMIT_ON)
     {
@@ -1554,7 +1657,9 @@ odbc_execute (ODBC_STATEMENT * stmt)
 
 cci_error:
   if (cci_rc < 0)
-    odbc_set_diag_by_cci (stmt->diag, cci_rc, &cci_err_buf);
+    {
+      odbc_set_diag_by_cci (stmt->diag, cci_rc, &cci_err_buf);
+    }
 error:
   NA_FREE (cci_value);
   return ODBC_ERROR;
@@ -1570,7 +1675,7 @@ error:
 ************************************************************************/
 
 PUBLIC RETCODE
-odbc_param_data (ODBC_STATEMENT * stmt, void **valueptr_ptr)
+odbc_param_data (ODBC_STATEMENT *stmt, void **valueptr_ptr)
 {
   short param;
   short sql_type;
@@ -1608,8 +1713,8 @@ odbc_param_data (ODBC_STATEMENT * stmt, void **valueptr_ptr)
 
 
       cci_value =
-	odbc_value_to_cci (stmt->param_data.val.value, desc_info.type,
-			   stmt->param_data.val.usedSize, desc_info.precision, desc_info.scale);
+	      odbc_value_to_cci (stmt->param_data.val.value, desc_info.type,
+				 stmt->param_data.val.usedSize, desc_info.precision, desc_info.scale);
 
       if (cci_value == NULL)
 	{
@@ -1617,12 +1722,12 @@ odbc_param_data (ODBC_STATEMENT * stmt, void **valueptr_ptr)
 	  goto error;
 	}
 
-    /*--
-     * cci_bind_param()을 사용할 때 SQLBindParam()에 의한 value pointer
-     * 를 바로 사용할 수 없다. 왜냐면 SQLBindParam()에 의한 value pointer
-     * 와 cci_bind_param()에서 사용하는 value pointer사이에는 type conversion
-     * 등이 발생하기 때문이다.
-     *--*/
+      /*--
+       * cci_bind_param()을 사용할 때 SQLBindParam()에 의한 value pointer
+       * 를 바로 사용할 수 없다. 왜냐면 SQLBindParam()에 의한 value pointer
+       * 와 cci_bind_param()에서 사용하는 value pointer사이에는 type conversion
+       * 등이 발생하기 때문이다.
+       *--*/
       RevisedParamPos = revised_param_pos (stmt->revised_sql.org_param_pos, i);
       cci_rc = cci_bind_param (stmt->stmthd, RevisedParamPos, a_type, cci_value, u_type, 0);
       ERROR_GOTO (cci_rc, cci_error);
@@ -1687,7 +1792,9 @@ odbc_param_data (ODBC_STATEMENT * stmt, void **valueptr_ptr)
 
 cci_error:
   if (cci_rc < 0)
-    odbc_set_diag_by_cci (stmt->diag, cci_rc, &cci_err_buf);
+    {
+      odbc_set_diag_by_cci (stmt->diag, cci_rc, &cci_err_buf);
+    }
 error:
   FreeStr (&stmt->param_data.val);
   stmt->param_data.index = 0;
@@ -1704,7 +1811,7 @@ error:
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_put_data (ODBC_STATEMENT * stmt, void *data_ptr, SQLLEN strlen_or_ind)
+odbc_put_data (ODBC_STATEMENT *stmt, void *data_ptr, SQLLEN strlen_or_ind)
 {
 
   MemcatImproved (&stmt->param_data.val, data_ptr, (int) strlen_or_ind);
@@ -1721,7 +1828,7 @@ odbc_put_data (ODBC_STATEMENT * stmt, void *data_ptr, SQLLEN strlen_or_ind)
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_close_cursor (ODBC_STATEMENT * stmt)
+odbc_close_cursor (ODBC_STATEMENT *stmt)
 {
   if (stmt->stmthd > 0)
     {
@@ -1751,7 +1858,7 @@ odbc_close_cursor (ODBC_STATEMENT * stmt)
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_cancel (ODBC_STATEMENT * stmt)
+odbc_cancel (ODBC_STATEMENT *stmt)
 {
 
   if (stmt->data_at_exec_state != STMT_NEED_NO_MORE_DATA)
@@ -1782,7 +1889,7 @@ odbc_cancel (ODBC_STATEMENT * stmt)
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
-odbc_bulk_operations (ODBC_STATEMENT * stmt, short operation)
+odbc_bulk_operations (ODBC_STATEMENT *stmt, short operation)
 {
   RETCODE rc;
   unsigned long row_array_size;
@@ -1828,7 +1935,7 @@ odbc_bulk_operations (ODBC_STATEMENT * stmt, short operation)
       for (i = 1; i <= row_array_size; ++i)
 	{
 	  recalculate_bind_pointer (&bookmark_desc_info, i, (UINT_PTR *) & value_ptr, (UINT_PTR *) & ind_ptr, NULL);
-	  bookmark = *((long *) value_ptr);
+	  bookmark = * ((long *) value_ptr);
 
 	  for (j = 1; j <= stmt->ard->max_count; ++j)
 	    {
@@ -1852,9 +1959,9 @@ odbc_bulk_operations (ODBC_STATEMENT * stmt, short operation)
 	      else
 		{
 		  cci_value =
-		    odbc_value_to_cci (value_ptr, desc_info_ptr[j - 1].type,
-				       desc_info_ptr[j - 1].length,
-				       desc_info_ptr[j - 1].precision, desc_info_ptr[j - 1].scale);
+			  odbc_value_to_cci (value_ptr, desc_info_ptr[j - 1].type,
+					     desc_info_ptr[j - 1].length,
+					     desc_info_ptr[j - 1].precision, desc_info_ptr[j - 1].scale);
 		  cci_rc = cci_cursor_update (stmt->stmthd, bookmark, j, a_type, value_ptr, &cci_err_buf);
 		  if (cci_rc < 0)
 		    {
@@ -1874,7 +1981,7 @@ odbc_bulk_operations (ODBC_STATEMENT * stmt, short operation)
       for (i = 1; i <= row_array_size; ++i)
 	{
 	  recalculate_bind_pointer (&bookmark_desc_info, i, (UINT_PTR *) & value_ptr, (UINT_PTR *) & ind_ptr, NULL);
-	  bookmark = *((long *) value_ptr);
+	  bookmark = * ((long *) value_ptr);
 
 	  rc = delete_row_by_cursor_pos (stmt, bookmark);
 	  ERROR_GOTO (rc, delete_error);
@@ -1883,7 +1990,7 @@ odbc_bulk_operations (ODBC_STATEMENT * stmt, short operation)
 	  RowStatusPtr[i - 1] = SQL_ROW_DELETED;
 	  continue;
 
-	delete_error:
+delete_error:
 	  RowStatusPtr[i - 1] = SQL_ROW_ERROR;
 	  err_flag = 1;
 	}
@@ -1895,141 +2002,141 @@ odbc_bulk_operations (ODBC_STATEMENT * stmt, short operation)
        * 주의2 : base_column_name이 지원되지 않으므로 select attribute
        * 에 alias걸면 안된다.
        */
-      {
-	int addhd = -1;
-	int attr_num;
-	int cci_rc;
-	T_CCI_ERROR cci_err_buf;
-	short sql_type;
-	T_CCI_A_TYPE a_type;
-	T_CCI_U_TYPE u_type;
-	void *cci_value = NULL;
-	RETCODE rc;
+    {
+      int addhd = -1;
+      int attr_num;
+      int cci_rc;
+      T_CCI_ERROR cci_err_buf;
+      short sql_type;
+      T_CCI_A_TYPE a_type;
+      T_CCI_U_TYPE u_type;
+      void *cci_value = NULL;
+      RETCODE rc;
 
 
-	for (i = 1; i <= row_array_size; ++i)
-	  {
-	    recalculate_bind_pointer (&bookmark_desc_info, i, (UINT_PTR *) & value_ptr, (UINT_PTR *) & ind_ptr, NULL);
-	    bookmark = *((long *) value_ptr);
+      for (i = 1; i <= row_array_size; ++i)
+	{
+	  recalculate_bind_pointer (&bookmark_desc_info, i, (UINT_PTR *) & value_ptr, (UINT_PTR *) & ind_ptr, NULL);
+	  bookmark = * ((long *) value_ptr);
 
-	    init_flag = 0;
-	    sprintf (query_buf, "insert into %s(", stmt->ird->records->table_name);
-	    sprintf (param_buf, " values(");
+	  init_flag = 0;
+	  sprintf (query_buf, "insert into %s(", stmt->ird->records->table_name);
+	  sprintf (param_buf, " values(");
 
-	    for (j = 1, attr_num = 0; j <= stmt->ard->max_count; ++j)
-	      {
-		recalculate_bind_pointer (&desc_info_ptr[j - 1], i,
-					  (UINT_PTR *) & value_ptr, (UINT_PTR *) & ind_ptr, NULL);
-		if (*ind_ptr == SQL_COLUMN_IGNORE)
-		  {
-		    continue;
-		  }
-		else
-		  {
-		    rc =
-		      odbc_get_desc_field (stmt->ird, j,
-					   SQL_DESC_BASE_COLUMN_NAME, attr_name, sizeof (attr_name), NULL);
-		    if (init_flag == 1)
-		      {
-			sprintf (buf, ", %s", attr_name);
-			strcat (param_buf, ", ?");
+	  for (j = 1, attr_num = 0; j <= stmt->ard->max_count; ++j)
+	    {
+	      recalculate_bind_pointer (&desc_info_ptr[j - 1], i,
+					(UINT_PTR *) & value_ptr, (UINT_PTR *) & ind_ptr, NULL);
+	      if (*ind_ptr == SQL_COLUMN_IGNORE)
+		{
+		  continue;
+		}
+	      else
+		{
+		  rc =
+			  odbc_get_desc_field (stmt->ird, j,
+					       SQL_DESC_BASE_COLUMN_NAME, attr_name, sizeof (attr_name), NULL);
+		  if (init_flag == 1)
+		    {
+		      sprintf (buf, ", %s", attr_name);
+		      strcat (param_buf, ", ?");
 
-		      }
-		    else
-		      {
-			sprintf (buf, "%s", attr_name);
-			strcat (param_buf, "?");
-			init_flag = 1;
-		      }
-		    strcat (query_buf, buf);
-		    ++attr_num;
-		  }
+		    }
+		  else
+		    {
+		      sprintf (buf, "%s", attr_name);
+		      strcat (param_buf, "?");
+		      init_flag = 1;
+		    }
+		  strcat (query_buf, buf);
+		  ++attr_num;
+		}
 
-	      }
-	    strcat (query_buf, ") ");
-	    strcat (param_buf, ");");
-	    strcat (query_buf, param_buf);
-
-
-	    cci_rc = cci_prepare (stmt->conn->connhd, query_buf, 0, &cci_err_buf);
-	    ERROR_GOTO (cci_rc, add_error);
-
-	    addhd = cci_rc;
-
-	    for (j = 1, attr_num = 0; j <= stmt->ard->max_count; ++j)
-	      {
-		recalculate_bind_pointer (&desc_info_ptr[j - 1], i,
-					  (UINT_PTR *) & value_ptr, (UINT_PTR *) & ind_ptr, NULL);
-
-		odbc_get_desc_field (stmt->ird, j, SQL_DESC_CONCISE_TYPE, &sql_type, 0, NULL);
-
-		a_type = odbc_type_to_cci_a_type (desc_info_ptr[j - 1].type);
-		u_type = odbc_type_to_cci_u_type (sql_type);
-
-		if (*ind_ptr == SQL_COLUMN_IGNORE)
-		  {
-		    continue;
-		  }
-		else if (*ind_ptr == SQL_NULL_DATA)
-		  {
-		    cci_rc = cci_bind_param (addhd, j, a_type, NULL, u_type, 0);
-		    ERROR_GOTO (cci_rc, add_error);
-		  }
-		else
-		  {
-		    cci_value =
-		      odbc_value_to_cci (value_ptr, desc_info_ptr[j - 1].type,
-					 desc_info_ptr[j - 1].length,
-					 desc_info_ptr[j - 1].precision, desc_info_ptr[j - 1].scale);
-		    if (cci_value == NULL)
-		      {
-			goto add_error;
-		      }
-		    // oid string checking
-		    if (a_type == CCI_A_TYPE_STR && (u_type == CCI_U_TYPE_CHAR || u_type == CCI_U_TYPE_VARNCHAR))
-		      {
-			if (is_oidstr (cci_value) == _TRUE_)
-			  {
-			    u_type = CCI_U_TYPE_OBJECT;
-			  }
-		      }
-
-		    cci_rc = cci_bind_param (addhd, j, a_type, cci_value, u_type, 0);
-		    ERROR_GOTO (cci_rc, add_error);
-
-		    NA_FREE (cci_value);
-		  }
-
-	      }
-
-	    cci_rc = cci_execute (addhd, 0, 0, &cci_err_buf);
-	    ERROR_GOTO (cci_rc, add_error);
+	    }
+	  strcat (query_buf, ") ");
+	  strcat (param_buf, ");");
+	  strcat (query_buf, param_buf);
 
 
-	    if (addhd > 0)
-	      {
-		cci_close_req_handle (addhd);
-		addhd = -1;
-	      }
+	  cci_rc = cci_prepare (stmt->conn->connhd, query_buf, 0, &cci_err_buf);
+	  ERROR_GOTO (cci_rc, add_error);
 
-	    ++update_count;
-	    RowStatusPtr[i - 1] = SQL_ROW_ADDED;
-	    continue;
+	  addhd = cci_rc;
 
-	  add_error:
-	    NA_FREE (cci_value);
+	  for (j = 1, attr_num = 0; j <= stmt->ard->max_count; ++j)
+	    {
+	      recalculate_bind_pointer (&desc_info_ptr[j - 1], i,
+					(UINT_PTR *) & value_ptr, (UINT_PTR *) & ind_ptr, NULL);
 
-	    if (addhd > 0)
-	      {
-		cci_close_req_handle (addhd);
-		addhd = -1;
-	      }
-	    RowStatusPtr[i - 1] = SQL_ROW_ERROR;
-	    err_flag = 1;
-	  }
+	      odbc_get_desc_field (stmt->ird, j, SQL_DESC_CONCISE_TYPE, &sql_type, 0, NULL);
 
-      }
-      break;
+	      a_type = odbc_type_to_cci_a_type (desc_info_ptr[j - 1].type);
+	      u_type = odbc_type_to_cci_u_type (sql_type);
+
+	      if (*ind_ptr == SQL_COLUMN_IGNORE)
+		{
+		  continue;
+		}
+	      else if (*ind_ptr == SQL_NULL_DATA)
+		{
+		  cci_rc = cci_bind_param (addhd, j, a_type, NULL, u_type, 0);
+		  ERROR_GOTO (cci_rc, add_error);
+		}
+	      else
+		{
+		  cci_value =
+			  odbc_value_to_cci (value_ptr, desc_info_ptr[j - 1].type,
+					     desc_info_ptr[j - 1].length,
+					     desc_info_ptr[j - 1].precision, desc_info_ptr[j - 1].scale);
+		  if (cci_value == NULL)
+		    {
+		      goto add_error;
+		    }
+		  // oid string checking
+		  if (a_type == CCI_A_TYPE_STR && (u_type == CCI_U_TYPE_CHAR || u_type == CCI_U_TYPE_VARNCHAR))
+		    {
+		      if (is_oidstr (cci_value) == _TRUE_)
+			{
+			  u_type = CCI_U_TYPE_OBJECT;
+			}
+		    }
+
+		  cci_rc = cci_bind_param (addhd, j, a_type, cci_value, u_type, 0);
+		  ERROR_GOTO (cci_rc, add_error);
+
+		  NA_FREE (cci_value);
+		}
+
+	    }
+
+	  cci_rc = cci_execute (addhd, 0, 0, &cci_err_buf);
+	  ERROR_GOTO (cci_rc, add_error);
+
+
+	  if (addhd > 0)
+	    {
+	      cci_close_req_handle (addhd);
+	      addhd = -1;
+	    }
+
+	  ++update_count;
+	  RowStatusPtr[i - 1] = SQL_ROW_ADDED;
+	  continue;
+
+add_error:
+	  NA_FREE (cci_value);
+
+	  if (addhd > 0)
+	    {
+	      cci_close_req_handle (addhd);
+	      addhd = -1;
+	    }
+	  RowStatusPtr[i - 1] = SQL_ROW_ERROR;
+	  err_flag = 1;
+	}
+
+    }
+    break;
 
     case SQL_FETCH_BY_BOOKMARK:
       /* array size와 무관하게 설정된 bookmark에 의해서 한 row씩 fetch
@@ -2039,7 +2146,7 @@ odbc_bulk_operations (ODBC_STATEMENT * stmt, short operation)
       for (i = 1; i <= row_array_size; ++i)
 	{
 	  recalculate_bind_pointer (&bookmark_desc_info, i, (UINT_PTR *) & value_ptr, (UINT_PTR *) & ind_ptr, NULL);
-	  bookmark = *((long *) value_ptr);
+	  bookmark = * ((long *) value_ptr);
 	  // cursor의 위치는 그대로.
 	  rc = odbc_fetch (stmt, SQL_FETCH_ABSOLUTE, bookmark, (long) i - 1, 1);
 	  if (rc < 0)
@@ -2064,7 +2171,9 @@ odbc_bulk_operations (ODBC_STATEMENT * stmt, short operation)
   *RowFetchedPtr = update_count;
 
   if (err_flag == 1)
-    return ODBC_ERROR;
+    {
+      return ODBC_ERROR;
+    }
 
   return ODBC_SUCCESS;
 }
@@ -2081,7 +2190,7 @@ odbc_bulk_operations (ODBC_STATEMENT * stmt, short operation)
 * 안된다.
 ************************************************************************/
 PUBLIC RETCODE
-odbc_set_pos (ODBC_STATEMENT * stmt, SQLSETPOSIROW row_number, SQLUSMALLINT operation, SQLUSMALLINT lock_type)
+odbc_set_pos (ODBC_STATEMENT *stmt, SQLSETPOSIROW row_number, SQLUSMALLINT operation, SQLUSMALLINT lock_type)
 {
   RETCODE rc;
   DescInfo *desc_info_ptr = NULL, bookmark_desc_info;
@@ -2195,7 +2304,9 @@ odbc_set_pos (ODBC_STATEMENT * stmt, SQLSETPOSIROW row_number, SQLUSMALLINT oper
     }
 
   if (error_flag == 1)
-    return ODBC_ERROR;
+    {
+      return ODBC_ERROR;
+    }
 
   return ODBC_SUCCESS;
 }
@@ -2211,10 +2322,12 @@ odbc_set_pos (ODBC_STATEMENT * stmt, SQLSETPOSIROW row_number, SQLUSMALLINT oper
 * SQLCloseCursor시 IRD가 delete되지 않기 때문이다.
 ************************************************************************/
 PUBLIC void
-reset_result_set (ODBC_STATEMENT * stmt)
+reset_result_set (ODBC_STATEMENT *stmt)
 {
   if (stmt->result_type == NULL_RESULT)
-    return;
+    {
+      return;
+    }
 
   // delete catalog result set
   if (stmt->catalog_result.value != NULL)
@@ -2243,7 +2356,7 @@ reset_result_set (ODBC_STATEMENT * stmt)
 * NOTE:
 ************************************************************************/
 PUBLIC void
-create_ird (ODBC_STATEMENT * stmt, T_CCI_COL_INFO * cci_col_info, int column_number)
+create_ird (ODBC_STATEMENT *stmt, T_CCI_COL_INFO *cci_col_info, int column_number)
 {
   T_CCI_U_TYPE cci_u_type;
   short col_type;
@@ -2256,7 +2369,9 @@ create_ird (ODBC_STATEMENT * stmt, T_CCI_COL_INFO * cci_col_info, int column_num
   short i;
 
   if (stmt == NULL || cci_col_info == NULL)
-    return;
+    {
+      return;
+    }
 
   if (cci_col_info != NULL)
     {
@@ -2341,7 +2456,9 @@ create_ird (ODBC_STATEMENT * stmt, T_CCI_COL_INFO * cci_col_info, int column_num
 		  if (cci_u_type == CCI_U_TYPE_STRING || cci_u_type == CCI_U_TYPE_CHAR)
 		    {
 		      if (col_precision >= stmt->conn->max_string_length)
-			col_precision = stmt->conn->max_string_length;
+			{
+			  col_precision = stmt->conn->max_string_length;
+			}
 		    }
 		  col_scale = CCI_GET_RESULT_INFO_SCALE (cci_col_info, i);
 		}
@@ -2350,7 +2467,8 @@ create_ird (ODBC_STATEMENT * stmt, T_CCI_COL_INFO * cci_col_info, int column_num
 	      table_name = CCI_GET_RESULT_INFO_CLASS_NAME (cci_col_info, i);
 
 	      if (CCI_GET_RESULT_INFO_IS_NON_NULL (cci_col_info, i) == 0)
-		{		// nullable
+		{
+		  // nullable
 		  col_nullable = SQL_NULLABLE;
 		}
 	      else if (CCI_GET_RESULT_INFO_IS_NON_NULL (cci_col_info, i) == 1)
@@ -2384,7 +2502,7 @@ create_ird (ODBC_STATEMENT * stmt, T_CCI_COL_INFO * cci_col_info, int column_num
 * NOTE:
 ************************************************************************/
 PRIVATE short
-next_param_data_at_exec (ODBC_STATEMENT * stmt, short param_pos)
+next_param_data_at_exec (ODBC_STATEMENT *stmt, short param_pos)
 {
   ODBC_RECORD *record = NULL;
   int i;
@@ -2400,7 +2518,7 @@ next_param_data_at_exec (ODBC_STATEMENT * stmt, short param_pos)
       record = find_record_from_desc (stmt->apd, i);
       if (record != NULL)
 	{
-	  if (IND_IS_DATA_AT_EXEC (*(record->indicator_ptr)))
+	  if (IND_IS_DATA_AT_EXEC (* (record->indicator_ptr)))
 	    {
 	      return i;
 	    }
@@ -2411,10 +2529,12 @@ next_param_data_at_exec (ODBC_STATEMENT * stmt, short param_pos)
 }
 
 PUBLIC void
-free_column_data (COLUMN_DATA * data, int option)
+free_column_data (COLUMN_DATA *data, int option)
 {
   if (data == NULL)
-    return;
+    {
+      return;
+    }
 
   switch (option)
     {
@@ -2451,10 +2571,12 @@ free_column_data (COLUMN_DATA * data, int option)
 * NOTE:
 ************************************************************************/
 PRIVATE void
-get_appl_desc_info (ODBC_DESC * desc, short col_index, DescInfo * desc_info_ptr)
+get_appl_desc_info (ODBC_DESC *desc, short col_index, DescInfo *desc_info_ptr)
 {
   if (desc == NULL || desc_info_ptr == NULL)
-    return;
+    {
+      return;
+    }
 
   memset (desc_info_ptr, 0, sizeof (DescInfo));
 
@@ -2467,19 +2589,21 @@ get_appl_desc_info (ODBC_DESC * desc, short col_index, DescInfo * desc_info_ptr)
     }
   else
     {
-      desc_info_ptr->offset_size = *(desc->bind_offset_ptr);
+      desc_info_ptr->offset_size = * (desc->bind_offset_ptr);
     }
 
   if (desc_info_ptr == NULL)
-    return;
+    {
+      return;
+    }
 
-  odbc_get_desc_field (desc, col_index, SQL_DESC_CONCISE_TYPE, &(desc_info_ptr->type), 0, NULL);
-  odbc_get_desc_field (desc, col_index, SQL_DESC_DATA_PTR, &(desc_info_ptr->value_ptr), 0, NULL);
-  odbc_get_desc_field (desc, col_index, SQL_DESC_INDICATOR_PTR, &(desc_info_ptr->ind_ptr), 0, NULL);
-  odbc_get_desc_field (desc, col_index, SQL_DESC_OCTET_LENGTH, &(desc_info_ptr->length), 0, NULL);
-  odbc_get_desc_field (desc, col_index, SQL_DESC_PRECISION, &(desc_info_ptr->precision), 0, NULL);
-  odbc_get_desc_field (desc, col_index, SQL_DESC_SCALE, &(desc_info_ptr->scale), 0, NULL);
-  odbc_get_desc_field (desc, col_index, SQL_DESC_OCTET_LENGTH_PTR, &(desc_info_ptr->octet_len_ptr), 0, NULL);
+  odbc_get_desc_field (desc, col_index, SQL_DESC_CONCISE_TYPE, & (desc_info_ptr->type), 0, NULL);
+  odbc_get_desc_field (desc, col_index, SQL_DESC_DATA_PTR, & (desc_info_ptr->value_ptr), 0, NULL);
+  odbc_get_desc_field (desc, col_index, SQL_DESC_INDICATOR_PTR, & (desc_info_ptr->ind_ptr), 0, NULL);
+  odbc_get_desc_field (desc, col_index, SQL_DESC_OCTET_LENGTH, & (desc_info_ptr->length), 0, NULL);
+  odbc_get_desc_field (desc, col_index, SQL_DESC_PRECISION, & (desc_info_ptr->precision), 0, NULL);
+  odbc_get_desc_field (desc, col_index, SQL_DESC_SCALE, & (desc_info_ptr->scale), 0, NULL);
+  odbc_get_desc_field (desc, col_index, SQL_DESC_OCTET_LENGTH_PTR, & (desc_info_ptr->octet_len_ptr), 0, NULL);
 }
 
 /************************************************************************
@@ -2491,9 +2615,9 @@ get_appl_desc_info (ODBC_DESC * desc, short col_index, DescInfo * desc_info_ptr)
 * NOTE:
 ************************************************************************/
 PRIVATE void
-recalculate_bind_pointer (DescInfo * desc_info_ptr,
+recalculate_bind_pointer (DescInfo *desc_info_ptr,
 			  SQLSETPOSIROW row_index,
-			  UINT_PTR * value_addr, UINT_PTR * ind_addr, UINT_PTR * octet_len_addr)
+			  UINT_PTR *value_addr, UINT_PTR *ind_addr, UINT_PTR *octet_len_addr)
 {
   long element_size;
 
@@ -2528,13 +2652,13 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
 	    }
 
 	  *value_addr =
-	    desc_info_ptr->value_ptr + desc_info_ptr->offset_size + (row_index - 1) * (desc_info_ptr->length);
+		  desc_info_ptr->value_ptr + desc_info_ptr->offset_size + (row_index - 1) * (desc_info_ptr->length);
 
 	  *ind_addr = desc_info_ptr->ind_ptr + desc_info_ptr->offset_size + (row_index - 1) * sizeof (int);
 #else
 	  *value_addr =
-	    (UINT_PTR) desc_info_ptr->value_ptr + desc_info_ptr->offset_size +
-	    (row_index - 1) * (desc_info_ptr->length);
+		  (UINT_PTR) desc_info_ptr->value_ptr + desc_info_ptr->offset_size +
+		  (row_index - 1) * (desc_info_ptr->length);
 
 	  *ind_addr = (UINT_PTR) desc_info_ptr->ind_ptr + desc_info_ptr->offset_size + (row_index - 1) * sizeof (long);
 #endif
@@ -2542,8 +2666,8 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
 	    {
 	      if (desc_info_ptr->octet_len_ptr)
 		*octet_len_addr =
-		  (UINT_PTR) desc_info_ptr->octet_len_ptr +
-		  desc_info_ptr->offset_size + (row_index - 1) * sizeof (long);
+			(UINT_PTR) desc_info_ptr->octet_len_ptr +
+			desc_info_ptr->offset_size + (row_index - 1) * sizeof (long);
 	      else
 #if defined (_WINDOWS)
 		(long *) *octet_len_addr = NULL;
@@ -2556,13 +2680,13 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
 	{
 	  element_size = desc_info_ptr->bind_type;
 	  *value_addr =
-	    (UINT_PTR) desc_info_ptr->value_ptr + desc_info_ptr->offset_size + (row_index - 1) * element_size;
+		  (UINT_PTR) desc_info_ptr->value_ptr + desc_info_ptr->offset_size + (row_index - 1) * element_size;
 	  *ind_addr = (UINT_PTR) desc_info_ptr->ind_ptr + desc_info_ptr->offset_size + (row_index - 1) * element_size;
 	  if (octet_len_addr)
 	    {
 	      if (desc_info_ptr->octet_len_ptr)
 		*octet_len_addr = (UINT_PTR) desc_info_ptr->octet_len_ptr +
-		  desc_info_ptr->offset_size + (row_index - 1) * element_size;
+				  desc_info_ptr->offset_size + (row_index - 1) * element_size;
 	      else
 #if defined(_WINDOWS)
 		(long *) *octet_len_addr = NULL;
@@ -2582,10 +2706,12 @@ recalculate_bind_pointer (DescInfo * desc_info_ptr,
  * NOTE:
  ************************************************************************/
 PRIVATE void
-reset_revised_sql (ODBC_STATEMENT * stmt)
+reset_revised_sql (ODBC_STATEMENT *stmt)
 {
   if (stmt == NULL)
-    return;
+    {
+      return;
+    }
 
   NA_FREE (stmt->revised_sql.sql_text);
   NA_FREE (stmt->revised_sql.oid_param_pos);
@@ -2613,7 +2739,9 @@ revised_param_pos (char *param_pos, int index)
   int revised_pos = 0;
 
   if (param_pos == NULL)
-    return 0;
+    {
+      return 0;
+    }
 
   pt = param_pos;
   i = 0;
@@ -2641,10 +2769,12 @@ revised_param_pos (char *param_pos, int index)
  * NOTE:
  ************************************************************************/
 PRIVATE char
-get_flag_of_cci_prepare (ODBC_STATEMENT * stmt)
+get_flag_of_cci_prepare (ODBC_STATEMENT *stmt)
 {
   if (stmt == NULL)
-    return 0;
+    {
+      return 0;
+    }
 
   if (IS_UPDATABLE (stmt->attr_cursor_type))
     {
@@ -2664,10 +2794,12 @@ get_flag_of_cci_prepare (ODBC_STATEMENT * stmt)
  * NOTE:
  ************************************************************************/
 PRIVATE char
-get_flag_of_cci_execute (ODBC_STATEMENT * stmt)
+get_flag_of_cci_execute (ODBC_STATEMENT *stmt)
 {
   if (stmt == NULL)
-    return 0;
+    {
+      return 0;
+    }
 
   if (stmt->query_plan)
     {
@@ -2693,7 +2825,7 @@ get_flag_of_cci_execute (ODBC_STATEMENT * stmt)
  * NOTE:
  ************************************************************************/
 PRIVATE void
-create_bookmark_ird (ODBC_STATEMENT * stmt)
+create_bookmark_ird (ODBC_STATEMENT *stmt)
 {
   short verbose_type;
   long display_size;
@@ -2704,7 +2836,9 @@ create_bookmark_ird (ODBC_STATEMENT * stmt)
   short scale;
 
   if (stmt == NULL)
-    return;
+    {
+      return;
+    }
 
   record = find_record_from_desc (stmt->ird, 0);
   if (record == NULL)
@@ -2754,8 +2888,8 @@ create_bookmark_ird (ODBC_STATEMENT * stmt)
  *    이미 param_array에는 memory가 할당된 상태이다.
  ************************************************************************/
 PRIVATE void
-make_param_array (ODBC_STATEMENT * stmt,
-		  short column_index, DescInfo * desc_info, ParamArray * param_array, int array_size)
+make_param_array (ODBC_STATEMENT *stmt,
+		  short column_index, DescInfo *desc_info, ParamArray *param_array, int array_size)
 {
   SQLSETPOSIROW h;
   unsigned long i;
@@ -2816,7 +2950,7 @@ make_param_array (ODBC_STATEMENT * stmt,
  * NOTE:
  ************************************************************************/
 PRIVATE void
-memory_alloc_param_array (ParamArray * param_array, int array_size)
+memory_alloc_param_array (ParamArray *param_array, int array_size)
 {
 #if defined (_WINDOWS)
   param_array->ind_array = UT_ALLOC (sizeof (int) * array_size);
@@ -2862,7 +2996,7 @@ memory_alloc_param_array (ParamArray * param_array, int array_size)
  * NOTE:
  ************************************************************************/
 PRIVATE RETCODE
-delete_row_by_cursor_pos (ODBC_STATEMENT * stmt, unsigned long cursor_pos)
+delete_row_by_cursor_pos (ODBC_STATEMENT *stmt, unsigned long cursor_pos)
 {
   int cci_rc = 0;
   T_CCI_ERROR cci_err_buf;
@@ -2884,7 +3018,9 @@ delete_row_by_cursor_pos (ODBC_STATEMENT * stmt, unsigned long cursor_pos)
 
 cci_error:
   if (cci_rc < 0)
-    odbc_set_diag_by_cci (stmt->diag, cci_rc, &cci_err_buf);
+    {
+      odbc_set_diag_by_cci (stmt->diag, cci_rc, &cci_err_buf);
+    }
   return ODBC_ERROR;
 }
 
@@ -2898,8 +3034,8 @@ cci_error:
  * NOTE:
  ************************************************************************/
 PRIVATE RETCODE
-odbc_set_pos_update (ODBC_STATEMENT * stmt,
-		     DescInfo * bookmark_desc_info_ptr, DescInfo * desc_info_ptr, SQLSETPOSIROW row_pos)
+odbc_set_pos_update (ODBC_STATEMENT *stmt,
+		     DescInfo *bookmark_desc_info_ptr, DescInfo *desc_info_ptr, SQLSETPOSIROW row_pos)
 {
 
   short max_col_num, j;
@@ -2912,12 +3048,14 @@ odbc_set_pos_update (ODBC_STATEMENT * stmt,
   void *cci_value = NULL;
 
   if (stmt == NULL || bookmark_desc_info_ptr == NULL || desc_info_ptr == NULL)
-    return ODBC_ERROR;
+    {
+      return ODBC_ERROR;
+    }
 
   max_col_num = stmt->ard->max_count;
 
   recalculate_bind_pointer (bookmark_desc_info_ptr, row_pos, (UINT_PTR *) & value_ptr, (UINT_PTR *) & ind_ptr, NULL);
-  bookmark = *((long *) value_ptr);
+  bookmark = * ((long *) value_ptr);
 
   for (j = 1; j <= stmt->ard->max_count; ++j)
     {
@@ -2964,7 +3102,7 @@ cci_error:
  * NOTE:
  ************************************************************************/
 PRIVATE RETCODE
-odbc_set_pos_delete (ODBC_STATEMENT * stmt, DescInfo * bookmark_desc_info_ptr, SQLSETPOSIROW row_pos)
+odbc_set_pos_delete (ODBC_STATEMENT *stmt, DescInfo *bookmark_desc_info_ptr, SQLSETPOSIROW row_pos)
 {
   RETCODE rc;
   void *value_ptr;
@@ -2972,14 +3110,18 @@ odbc_set_pos_delete (ODBC_STATEMENT * stmt, DescInfo * bookmark_desc_info_ptr, S
   long bookmark;
 
   if (stmt == NULL)
-    return ODBC_ERROR;
+    {
+      return ODBC_ERROR;
+    }
 
   recalculate_bind_pointer (bookmark_desc_info_ptr, row_pos, (UINT_PTR *) & value_ptr, (UINT_PTR *) & ind_ptr, NULL);
-  bookmark = *((long *) value_ptr);
+  bookmark = * ((long *) value_ptr);
 
   rc = delete_row_by_cursor_pos (stmt, bookmark);
   if (rc < 0)
-    return ODBC_ERROR;
+    {
+      return ODBC_ERROR;
+    }
 
   return ODBC_SUCCESS;
 }
@@ -2992,7 +3134,7 @@ odbc_set_pos_delete (ODBC_STATEMENT * stmt, DescInfo * bookmark_desc_info_ptr, S
  * NOTE:
  ************************************************************************/
 PRIVATE void
-free_param_array (ParamArray * param_ptr, int param_count, int array_count)
+free_param_array (ParamArray *param_ptr, int param_count, int array_count)
 {
   int i;
   int j;
@@ -3000,7 +3142,9 @@ free_param_array (ParamArray * param_ptr, int param_count, int array_count)
   T_CCI_BIT *bpt;
 
   if (param_ptr == NULL || param_count < 0)
-    return;
+    {
+      return;
+    }
 
   for (i = 0; i < param_count; ++i)
     {
@@ -3035,46 +3179,46 @@ free_param_array (ParamArray * param_ptr, int param_count, int array_count)
 
 #ifdef _DEBUG
 PRIVATE void
-debug_print_appl_desc (DescInfo * desc_info, void *value_ptr, long *ind_ptr)
+debug_print_appl_desc (DescInfo *desc_info, void *value_ptr, long *ind_ptr)
 {
   switch (desc_info->type)
     {
     case SQL_C_SHORT:		// for 2.x backward compatibility
     case SQL_C_SSHORT:
     case SQL_C_USHORT:
-      printf ("[short] %d ||", *(short *) value_ptr);
+      printf ("[short] %d ||", * (short *) value_ptr);
       break;
 
     case SQL_C_STINYINT:
     case SQL_C_UTINYINT:
     case SQL_C_TINYINT:	// for 2.x backward compatibility
-      printf ("[short] %d ||", *(char *) value_ptr);
+      printf ("[short] %d ||", * (char *) value_ptr);
       break;
 
     case SQL_C_LONG:		// for 2.x backward compatibility
     case SQL_C_SLONG:
     case SQL_C_ULONG:
-      printf ("[long] %ld || ", *(long *) value_ptr);
+      printf ("[long] %ld || ", * (long *) value_ptr);
       break;
     case SQL_C_SBIGINT:
     case SQL_C_UBIGINT:
-      printf ("[bigint] %lld || ", (long long) (*(__int64 *) value_ptr));
+      printf ("[bigint] %lld || ", (long long) (* (__int64 *) value_ptr));
       break;
 
-  /*---------------------------------------------------------------
-   *          floating point type
-   *--------------------------------------------------------------*/
+    /*---------------------------------------------------------------
+     *          floating point type
+     *--------------------------------------------------------------*/
     case SQL_C_FLOAT:
-      printf ("[float] %f || ", *(float *) value_ptr);
+      printf ("[float] %f || ", * (float *) value_ptr);
       break;
 
     case SQL_C_DOUBLE:
-      printf ("[double] %lf || ", *(double *) value_ptr);
+      printf ("[double] %lf || ", * (double *) value_ptr);
       break;
 
-  /*---------------------------------------------------------------
-   *          char & binary type
-   *--------------------------------------------------------------*/
+    /*---------------------------------------------------------------
+     *          char & binary type
+     *--------------------------------------------------------------*/
     case SQL_C_CHAR:
       printf ("[string] %s || ", (char *) value_ptr);
       break;

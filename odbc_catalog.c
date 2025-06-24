@@ -1,30 +1,30 @@
 /*
- * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution. 
+ * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
- * Redistribution and use in source and binary forms, with or without modification, 
- * are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- *   this list of conditions and the following disclaimer. 
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
  *
- * - Redistributions in binary form must reproduce the above copyright notice, 
- *   this list of conditions and the following disclaimer in the documentation 
- *   and/or other materials provided with the distribution. 
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
  *
- * - Neither the name of the <ORGANIZATION> nor the names of its contributors 
- *   may be used to endorse or promote products derived from this software without 
- *   specific prior written permission. 
+ * - Neither the name of the <ORGANIZATION> nor the names of its contributors
+ *   may be used to endorse or promote products derived from this software without
+ *   specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
- * IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
- * OF SUCH DAMAGE. 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+ * OF SUCH DAMAGE.
  *
  */
 #include <stdio.h>
@@ -193,7 +193,8 @@ typedef struct tagODBC_PROCEDURE_COLUMNS_VALUE
   int ordinal_position;
 } ODBC_PROCEDURE_COLUMNS_VALUE;
 
-PRIVATE ODBC_COL_INFO table_cinfo[] = {
+PRIVATE ODBC_COL_INFO table_cinfo[] =
+{
   {"TABLE_CAT", SQL_VARCHAR, 128, 128, 0},
   {"TABLE_SCHEM", SQL_VARCHAR, 128, 128, 0},
   {"TABLE_NAME", SQL_VARCHAR, 128, 128, 0},
@@ -202,7 +203,8 @@ PRIVATE ODBC_COL_INFO table_cinfo[] = {
   {NULL}
 };
 
-PRIVATE ODBC_COL_INFO column_cinfo[] = {
+PRIVATE ODBC_COL_INFO column_cinfo[] =
+{
   {"TABLE_CAT", SQL_VARCHAR, 128, 128, 0},
   {"TABLE_SCHEM", SQL_VARCHAR, 128, 128, 0},
   {"TABLE_NAME", SQL_VARCHAR, 128, 128, 0},
@@ -227,7 +229,8 @@ PRIVATE ODBC_COL_INFO column_cinfo[] = {
   {NULL}
 };
 
-PRIVATE ODBC_COL_INFO special_column_cinfo[] = {
+PRIVATE ODBC_COL_INFO special_column_cinfo[] =
+{
   {"SCOPE", SQL_SMALLINT, 5, 5, 0},
   {"COLUMN_NAME", SQL_VARCHAR, 128, 128, 0},
   {"DATA_TYPE", SQL_SMALLINT, 5, 5, 0},
@@ -239,7 +242,8 @@ PRIVATE ODBC_COL_INFO special_column_cinfo[] = {
   {NULL}
 };
 
-PRIVATE ODBC_COL_INFO statistics_cinfo[] = {
+PRIVATE ODBC_COL_INFO statistics_cinfo[] =
+{
   {"TABLE_CAT", SQL_VARCHAR, 128, 128, 0},
   {"TABLE_SCHEM", SQL_VARCHAR, 128, 128, 0},
   {"TABLE_NAME", SQL_VARCHAR, 128, 128, 0},
@@ -256,7 +260,8 @@ PRIVATE ODBC_COL_INFO statistics_cinfo[] = {
   {NULL}
 };
 
-PRIVATE ODBC_COL_INFO type_cinfo[] = {
+PRIVATE ODBC_COL_INFO type_cinfo[] =
+{
   {"TYPE_NAME", SQL_VARCHAR, 128, 128, 0},
   {"DATA_TYPE", SQL_SMALLINT, 5, 5, 0},
   {"COLUMN_SIZE", SQL_INTEGER, 10, 10, 0},
@@ -279,7 +284,8 @@ PRIVATE ODBC_COL_INFO type_cinfo[] = {
   {NULL}
 };
 
-PRIVATE ODBC_COL_INFO primary_keys_cinfo[] = {
+PRIVATE ODBC_COL_INFO primary_keys_cinfo[] =
+{
   {"TABLE_CAT", SQL_VARCHAR, 128, 128, 0},
   {"TABLE_SCHEM", SQL_VARCHAR, 128, 128, 0},
   {"TABLE_NAME", SQL_VARCHAR, 128, 128, 0},
@@ -289,7 +295,8 @@ PRIVATE ODBC_COL_INFO primary_keys_cinfo[] = {
   {NULL}
 };
 
-PRIVATE ODBC_COL_INFO foreign_keys_cinfo[] = {
+PRIVATE ODBC_COL_INFO foreign_keys_cinfo[] =
+{
   {"PKTABLE_CAT", SQL_VARCHAR, 128, 128, 0},
   {"PKTABLE_SCHEM", SQL_VARCHAR, 128, 128, 0},
   {"PKTABLE_NAME", SQL_VARCHAR, 128, 128, 0},
@@ -307,7 +314,8 @@ PRIVATE ODBC_COL_INFO foreign_keys_cinfo[] = {
   {NULL}
 };
 
-PRIVATE ODBC_COL_INFO table_privileges_cinfo[] = {
+PRIVATE ODBC_COL_INFO table_privileges_cinfo[] =
+{
   {"TABLE_CAT", SQL_VARCHAR, 128, 128, 0},
   {"TABLE_SCHEM", SQL_VARCHAR, 128, 128, 0},
   {"TABLE_NAME", SQL_VARCHAR, 128, 128, 0},
@@ -318,7 +326,8 @@ PRIVATE ODBC_COL_INFO table_privileges_cinfo[] = {
   {NULL}
 };
 
-PRIVATE ODBC_COL_INFO procedures_cinfo[] = {
+PRIVATE ODBC_COL_INFO procedures_cinfo[] =
+{
   {"PROCEDURE_CAT", SQL_VARCHAR, 128, 128, 0},
   {"PROCEDURE_SCHEM", SQL_VARCHAR, 128, 128, 0},
   {"PROCEDURE_NAME", SQL_VARCHAR, 128, 128, 0},
@@ -330,7 +339,8 @@ PRIVATE ODBC_COL_INFO procedures_cinfo[] = {
   {NULL}
 };
 
-PRIVATE ODBC_COL_INFO procedure_columns_cinfo[] = {
+PRIVATE ODBC_COL_INFO procedure_columns_cinfo[] =
+{
   {"PROCEDURE_CAT", SQL_VARCHAR, 128, 128, 0},
   {"PROCEDURE_SCHEM", SQL_VARCHAR, 128, 128, 0},
   {"PROCEDURE_NAME", SQL_VARCHAR, 128, 128, 0},
@@ -355,115 +365,150 @@ PRIVATE ODBC_COL_INFO procedure_columns_cinfo[] = {
   {NULL}
 };
 
-static ODBC_TYPE_INFO_VALUE type_info[] = {
-  {"CHAR", SQL_CHAR, MAX_CUBRID_CHAR_LEN, "'", "'", "length", SQL_NULLABLE,
-   SQL_FALSE, SQL_SEARCHABLE, -1, SQL_FALSE, SQL_FALSE, "CHAR", -1, -1,
-   SQL_CHAR, -1, -1, -1},
+static ODBC_TYPE_INFO_VALUE type_info[] =
+{
+  {
+    "CHAR", SQL_CHAR, MAX_CUBRID_CHAR_LEN, "'", "'", "length", SQL_NULLABLE,
+    SQL_FALSE, SQL_SEARCHABLE, -1, SQL_FALSE, SQL_FALSE, "CHAR", -1, -1,
+    SQL_CHAR, -1, -1, -1
+  },
 
-  {"VARCHAR", SQL_VARCHAR, MAX_CUBRID_CHAR_LEN, "'", "'", "length",
-   SQL_NULLABLE,
-   SQL_FALSE, SQL_SEARCHABLE, -1, SQL_FALSE, SQL_FALSE, "VARCHAR", -1, -1,
-   SQL_VARCHAR, -1, -1, -1},
+  {
+    "VARCHAR", SQL_VARCHAR, MAX_CUBRID_CHAR_LEN, "'", "'", "length",
+    SQL_NULLABLE,
+    SQL_FALSE, SQL_SEARCHABLE, -1, SQL_FALSE, SQL_FALSE, "VARCHAR", -1, -1,
+    SQL_VARCHAR, -1, -1, -1
+  },
 
-  {"BIT", SQL_BINARY, MAX_CUBRID_CHAR_LEN / 8, "X'", "'", "length",
-   SQL_NULLABLE,
-   SQL_FALSE, SQL_SEARCHABLE, -1, SQL_FALSE, SQL_FALSE, "BIT", -1, -1,
-   SQL_BINARY, -1, -1, -1},
+  {
+    "BIT", SQL_BINARY, MAX_CUBRID_CHAR_LEN / 8, "X'", "'", "length",
+    SQL_NULLABLE,
+    SQL_FALSE, SQL_SEARCHABLE, -1, SQL_FALSE, SQL_FALSE, "BIT", -1, -1,
+    SQL_BINARY, -1, -1, -1
+  },
 
-  {"BIT VARYING", SQL_VARBINARY, MAX_CUBRID_CHAR_LEN / 8, "X'", "'", "length",
-   SQL_NULLABLE,
-   SQL_FALSE, SQL_SEARCHABLE, -1, SQL_FALSE, SQL_FALSE, "BIT VARYING", -1, -1,
-   SQL_VARBINARY, -1, -1, -1},
+  {
+    "BIT VARYING", SQL_VARBINARY, MAX_CUBRID_CHAR_LEN / 8, "X'", "'", "length",
+    SQL_NULLABLE,
+    SQL_FALSE, SQL_SEARCHABLE, -1, SQL_FALSE, SQL_FALSE, "BIT VARYING", -1, -1,
+    SQL_VARBINARY, -1, -1, -1
+  },
 
-  {"NUMERIC", SQL_NUMERIC, 38, NULL, NULL, "precision,scale", SQL_NULLABLE,
-   SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "NUMERIC", 0,
-   38,
-   SQL_NUMERIC, -1, 10, -1},
+  {
+    "NUMERIC", SQL_NUMERIC, 38, NULL, NULL, "precision,scale", SQL_NULLABLE,
+    SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "NUMERIC", 0,
+    38,
+    SQL_NUMERIC, -1, 10, -1
+  },
 
-  {"DECIMAL", SQL_DECIMAL, 38, NULL, NULL, "precision,scale", SQL_NULLABLE,
-   SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "DECIMAL", 0,
-   38,
-   SQL_DECIMAL, -1, 10, -1},
+  {
+    "DECIMAL", SQL_DECIMAL, 38, NULL, NULL, "precision,scale", SQL_NULLABLE,
+    SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "DECIMAL", 0,
+    38,
+    SQL_DECIMAL, -1, 10, -1
+  },
 
-  {"INTEGER", SQL_INTEGER, 10, NULL, NULL, NULL, SQL_NULLABLE,
-   SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "INTEGER", -1,
-   -1,
-   SQL_INTEGER, -1, 10, -1},
+  {
+    "INTEGER", SQL_INTEGER, 10, NULL, NULL, NULL, SQL_NULLABLE,
+    SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "INTEGER", -1,
+    -1,
+    SQL_INTEGER, -1, 10, -1
+  },
 
-  {"SMALLINT", SQL_SMALLINT, 5, NULL, NULL, NULL, SQL_NULLABLE,
-   SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "SMALLINT", -1,
-   -1,
-   SQL_SMALLINT, -1, 10, -1},
+  {
+    "SMALLINT", SQL_SMALLINT, 5, NULL, NULL, NULL, SQL_NULLABLE,
+    SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "SMALLINT", -1,
+    -1,
+    SQL_SMALLINT, -1, 10, -1
+  },
 
-  {"REAL", SQL_REAL, 14, NULL, NULL, "precision", SQL_NULLABLE,
-   SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "REAL", -1, -1,
-   SQL_REAL, -1, 10, -1},
+  {
+    "REAL", SQL_REAL, 14, NULL, NULL, "precision", SQL_NULLABLE,
+    SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "REAL", -1, -1,
+    SQL_REAL, -1, 10, -1
+  },
 
-  {"FLOAT", SQL_FLOAT, 14, NULL, NULL, "precision", SQL_NULLABLE,
-   SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "FLOAT", -1,
-   -1,
-   SQL_FLOAT, -1, 10, -1},
+  {
+    "FLOAT", SQL_FLOAT, 14, NULL, NULL, "precision", SQL_NULLABLE,
+    SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "FLOAT", -1,
+    -1,
+    SQL_FLOAT, -1, 10, -1
+  },
 
-  {"DOUBLE", SQL_DOUBLE, 28, NULL, NULL, "precision", SQL_NULLABLE,
-   SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "DOUBLE", -1,
-   -1,
-   SQL_DOUBLE, -1, 10, -1},
+  {
+    "DOUBLE", SQL_DOUBLE, 28, NULL, NULL, "precision", SQL_NULLABLE,
+    SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "DOUBLE", -1,
+    -1,
+    SQL_DOUBLE, -1, 10, -1
+  },
 
-  {"DATE", SQL_TYPE_DATE, 10, "DATE '", "'", NULL, SQL_NULLABLE,
-   SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "DATE", -1, -1,
-   SQL_DATETIME, SQL_CODE_DATE, -1, -1},
+  {
+    "DATE", SQL_TYPE_DATE, 10, "DATE '", "'", NULL, SQL_NULLABLE,
+    SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "DATE", -1, -1,
+    SQL_DATETIME, SQL_CODE_DATE, -1, -1
+  },
 
-  {"TIME", SQL_TYPE_TIME, 8, "TIME '", "'", NULL, SQL_NULLABLE,
-   SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "TIME", -1, -1,
-   SQL_DATETIME, SQL_CODE_TIME, -1, -1},
+  {
+    "TIME", SQL_TYPE_TIME, 8, "TIME '", "'", NULL, SQL_NULLABLE,
+    SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "TIME", -1, -1,
+    SQL_DATETIME, SQL_CODE_TIME, -1, -1
+  },
 
-  {"TIMESTAMP", SQL_TYPE_TIMESTAMP, 19, "TIMESTAMP '", "'", NULL,
-   SQL_NULLABLE,
-   SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "TIMESTAMP",
-   -1, -1,
-   SQL_DATETIME, SQL_CODE_TIMESTAMP, -1, -1},
+  {
+    "TIMESTAMP", SQL_TYPE_TIMESTAMP, 19, "TIMESTAMP '", "'", NULL,
+    SQL_NULLABLE,
+    SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "TIMESTAMP",
+    -1, -1,
+    SQL_DATETIME, SQL_CODE_TIMESTAMP, -1, -1
+  },
 
-  {"BIGINT", SQL_BIGINT, 19, NULL, NULL, NULL, SQL_NULLABLE,
-   SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "BIGINT", -1,
-   -1,
-   SQL_INTEGER, -1, 10, -1},
+  {
+    "BIGINT", SQL_BIGINT, 19, NULL, NULL, NULL, SQL_NULLABLE,
+    SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "BIGINT", -1,
+    -1,
+    SQL_INTEGER, -1, 10, -1
+  },
 
-  {"DATETIME", SQL_TYPE_TIMESTAMP, 23, "DATETIME '", "'", NULL,
-   SQL_NULLABLE,
-   SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "DATETIME",
-   -1, -1,
-   SQL_DATETIME, SQL_CODE_TIMESTAMP, -1, -1},
+  {
+    "DATETIME", SQL_TYPE_TIMESTAMP, 23, "DATETIME '", "'", NULL,
+    SQL_NULLABLE,
+    SQL_FALSE, SQL_PRED_BASIC, SQL_FALSE, SQL_FALSE, SQL_FALSE, "DATETIME",
+    -1, -1,
+    SQL_DATETIME, SQL_CODE_TIMESTAMP, -1, -1
+  },
 
 #ifdef DELPHI
-  {"STRING", SQL_LONGVARCHAR, MAX_CUBRID_CHAR_LEN, "'", "'", "length",
-   SQL_NULLABLE,
-   SQL_FALSE, SQL_SEARCHABLE, -1, SQL_FALSE, SQL_FALSE, "STRING", -1, -1,
-   SQL_LONGVARCHAR, -1, -1, -1},
+  {
+    "STRING", SQL_LONGVARCHAR, MAX_CUBRID_CHAR_LEN, "'", "'", "length",
+    SQL_NULLABLE,
+    SQL_FALSE, SQL_SEARCHABLE, -1, SQL_FALSE, SQL_FALSE, "STRING", -1, -1,
+    SQL_LONGVARCHAR, -1, -1, -1
+  },
 #endif
 
   {NULL}
 };
 
-PRIVATE RETCODE make_table_result_set (ODBC_STATEMENT * stmt, int req_handle, int handle_type);
-PRIVATE RETCODE make_column_result_set (ODBC_STATEMENT * stmt, int req_handle);
-PRIVATE RETCODE make_stat_result_set (ODBC_STATEMENT * stmt, int req_handle, char *table_name, unsigned short unique);
-PRIVATE RETCODE make_sp_column_result_set (ODBC_STATEMENT * stmt, int req_handle, char *table_name);
-PRIVATE RETCODE make_primary_keys_result_set (ODBC_STATEMENT * stmt, int req_handle);
-PRIVATE RETCODE make_foreign_keys_result_set (ODBC_STATEMENT * stmt, int req_handle);
-PRIVATE RETCODE make_table_privileges_result_set (ODBC_STATEMENT * stmt, int req_handle);
-PRIVATE RETCODE make_procedures_result_set (ODBC_STATEMENT * stmt, int req_handle);
-PRIVATE RETCODE make_procedure_columns_result_set (ODBC_STATEMENT * stmt, int req_handle);
+PRIVATE RETCODE make_table_result_set (ODBC_STATEMENT *stmt, int req_handle, int handle_type);
+PRIVATE RETCODE make_column_result_set (ODBC_STATEMENT *stmt, int req_handle);
+PRIVATE RETCODE make_stat_result_set (ODBC_STATEMENT *stmt, int req_handle, char *table_name, unsigned short unique);
+PRIVATE RETCODE make_sp_column_result_set (ODBC_STATEMENT *stmt, int req_handle, char *table_name);
+PRIVATE RETCODE make_primary_keys_result_set (ODBC_STATEMENT *stmt, int req_handle);
+PRIVATE RETCODE make_foreign_keys_result_set (ODBC_STATEMENT *stmt, int req_handle);
+PRIVATE RETCODE make_table_privileges_result_set (ODBC_STATEMENT *stmt, int req_handle);
+PRIVATE RETCODE make_procedures_result_set (ODBC_STATEMENT *stmt, int req_handle);
+PRIVATE RETCODE make_procedure_columns_result_set (ODBC_STATEMENT *stmt, int req_handle);
 
-PRIVATE RETCODE odbc_get_table_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value);
-PRIVATE RETCODE odbc_get_column_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value);
-PRIVATE RETCODE odbc_get_stat_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value);
-PRIVATE RETCODE odbc_get_sp_column_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value);
-PRIVATE RETCODE odbc_get_type_info_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value);
-PRIVATE RETCODE odbc_get_primary_keys_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value);
-PRIVATE RETCODE odbc_get_foreign_keys_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value);
-PRIVATE RETCODE odbc_get_table_privileges_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value);
-PRIVATE RETCODE odbc_get_procedures_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value);
-PRIVATE RETCODE odbc_get_procedure_columns_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value);
+PRIVATE RETCODE odbc_get_table_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value);
+PRIVATE RETCODE odbc_get_column_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value);
+PRIVATE RETCODE odbc_get_stat_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value);
+PRIVATE RETCODE odbc_get_sp_column_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value);
+PRIVATE RETCODE odbc_get_type_info_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value);
+PRIVATE RETCODE odbc_get_primary_keys_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value);
+PRIVATE RETCODE odbc_get_foreign_keys_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value);
+PRIVATE RETCODE odbc_get_table_privileges_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value);
+PRIVATE RETCODE odbc_get_procedures_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value);
+PRIVATE RETCODE odbc_get_procedure_columns_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value);
 
 PRIVATE ODBC_TABLE_VALUE *create_table_value (void);
 PRIVATE ODBC_COLUMN_VALUE *create_column_value (void);
@@ -476,43 +521,43 @@ PRIVATE ODBC_TABLE_PRIVILEGES_VALUE *create_table_privileges_value (void);
 PRIVATE ODBC_PROCEDURES_VALUE *create_procedures_value (void);
 PRIVATE ODBC_PROCEDURE_COLUMNS_VALUE *create_procedure_columns_value (void);
 
-PRIVATE void free_table_value (ODBC_TABLE_VALUE * value);
-PRIVATE void free_column_value (ODBC_COLUMN_VALUE * value);
-PRIVATE void free_stat_value (ODBC_STAT_VALUE * value);
-PRIVATE void free_sp_column_value (ODBC_SP_COLUMN_VALUE * value);
-PRIVATE void free_type_info_value (ODBC_TYPE_INFO_VALUE * value);
-PRIVATE void free_primary_keys_value (ODBC_PRIMARY_KEYS_VALUE * value);
-PRIVATE void free_foreign_keys_value (ODBC_FOREIGN_KEYS_VALUE * value);
-PRIVATE void free_table_privileges_value (ODBC_TABLE_PRIVILEGES_VALUE * value);
-PRIVATE void free_procedures_value (ODBC_PROCEDURES_VALUE * value);
-PRIVATE void free_procedure_columns_value (ODBC_PROCEDURE_COLUMNS_VALUE * value);
+PRIVATE void free_table_value (ODBC_TABLE_VALUE *value);
+PRIVATE void free_column_value (ODBC_COLUMN_VALUE *value);
+PRIVATE void free_stat_value (ODBC_STAT_VALUE *value);
+PRIVATE void free_sp_column_value (ODBC_SP_COLUMN_VALUE *value);
+PRIVATE void free_type_info_value (ODBC_TYPE_INFO_VALUE *value);
+PRIVATE void free_primary_keys_value (ODBC_PRIMARY_KEYS_VALUE *value);
+PRIVATE void free_foreign_keys_value (ODBC_FOREIGN_KEYS_VALUE *value);
+PRIVATE void free_table_privileges_value (ODBC_TABLE_PRIVILEGES_VALUE *value);
+PRIVATE void free_procedures_value (ODBC_PROCEDURES_VALUE *value);
+PRIVATE void free_procedure_columns_value (ODBC_PROCEDURE_COLUMNS_VALUE *value);
 
-PRIVATE void free_table_node (ST_LIST * node);
-PRIVATE void free_column_node (ST_LIST * node);
-PRIVATE void free_stat_node (ST_LIST * node);
-PRIVATE void free_sp_column_node (ST_LIST * node);
-PRIVATE void free_type_info_node (ST_LIST * node);
-PRIVATE void free_primary_keys_node (ST_LIST * node);
-PRIVATE void free_foreign_keys_node (ST_LIST * node);
-PRIVATE void free_table_privileges_node (ST_LIST * node);
-PRIVATE void free_procedures_node (ST_LIST * node);
-PRIVATE void free_procedure_columns_node (ST_LIST * node);
+PRIVATE void free_table_node (ST_LIST *node);
+PRIVATE void free_column_node (ST_LIST *node);
+PRIVATE void free_stat_node (ST_LIST *node);
+PRIVATE void free_sp_column_node (ST_LIST *node);
+PRIVATE void free_type_info_node (ST_LIST *node);
+PRIVATE void free_primary_keys_node (ST_LIST *node);
+PRIVATE void free_foreign_keys_node (ST_LIST *node);
+PRIVATE void free_table_privileges_node (ST_LIST *node);
+PRIVATE void free_procedures_node (ST_LIST *node);
+PRIVATE void free_procedure_columns_node (ST_LIST *node);
 
-PRIVATE int retrieve_table_from_db_class (int cci_connection, char *table_name, T_CCI_ERROR * error);
+PRIVATE int retrieve_table_from_db_class (int cci_connection, char *table_name, T_CCI_ERROR *error);
 PRIVATE int schema_info_table_privileges (int cci_connection,
-					  int *cci_request, char *table_name, int db_ver, T_CCI_ERROR * error);
-PRIVATE int schema_info_procedures (int cci_connection, int *cci_request, char *proc_name, T_CCI_ERROR * error);
+    int *cci_request, char *table_name, int db_ver, T_CCI_ERROR *error);
+PRIVATE int schema_info_procedures (int cci_connection, int *cci_request, char *proc_name, T_CCI_ERROR *error);
 PRIVATE int schema_info_procedure_columns (int cci_connection,
-					   int *cci_request, char *proc_name, char *column_name, T_CCI_ERROR * error);
+    int *cci_request, char *proc_name, char *column_name, T_CCI_ERROR *error);
 PRIVATE int sql_execute (int cci_connection, int *cci_request,
-			 char *sql_statment, char *param_name[], int param_num, T_CCI_ERROR * error);
+			 char *sql_statment, char *param_name[], int param_num, T_CCI_ERROR *error);
 
-PRIVATE void catalog_result_set_init (ODBC_STATEMENT * stmt, RESULT_TYPE task_type);
-PRIVATE void catalog_set_ird (ODBC_STATEMENT * stmt, ODBC_COL_INFO * colum_info, int column_num);
+PRIVATE void catalog_result_set_init (ODBC_STATEMENT *stmt, RESULT_TYPE task_type);
+PRIVATE void catalog_set_ird (ODBC_STATEMENT *stmt, ODBC_COL_INFO *colum_info, int column_num);
 PRIVATE void err_msg_table_not_exist (char *err_msg, const char *db_name, const char *table_name);
 
 PUBLIC RETCODE
-odbc_tables (ODBC_STATEMENT * stmt, char *catalog_name, char *schema_name, char *table_name, char *table_type)
+odbc_tables (ODBC_STATEMENT *stmt, char *catalog_name, char *schema_name, char *table_name, char *table_type)
 {
   int t_type = 0;
   char search_pattern_flag;
@@ -534,13 +579,19 @@ odbc_tables (ODBC_STATEMENT * stmt, char *catalog_name, char *schema_name, char 
   else
     {
       if (strstr (table_type, "VIEW") != NULL)
-	SET_OPTION (t_type, TABLE_TYPE_VIEW);
+	{
+	  SET_OPTION (t_type, TABLE_TYPE_VIEW);
+	}
 
       if (strstr (table_type, "TABLE") != NULL)
-	SET_OPTION (t_type, TABLE_TYPE_TABLE);
+	{
+	  SET_OPTION (t_type, TABLE_TYPE_TABLE);
+	}
 
       if (strstr (table_type, "SYSTEM") != NULL)
-	SET_OPTION (t_type, TABLE_TYPE_SYSTEM);
+	{
+	  SET_OPTION (t_type, TABLE_TYPE_SYSTEM);
+	}
     }
 
   if (stmt->attr_metadata_id == SQL_TRUE)
@@ -590,7 +641,7 @@ error:
 }
 
 PUBLIC RETCODE
-odbc_columns (ODBC_STATEMENT * stmt, char *catalog_name, char *schema_name, char *table_name, char *column_name)
+odbc_columns (ODBC_STATEMENT *stmt, char *catalog_name, char *schema_name, char *table_name, char *column_name)
 {
   RETCODE rc;
   char search_pattern_flag;
@@ -638,13 +689,15 @@ cci_error:
   odbc_set_diag_by_cci (stmt->diag, cci_rc, &cci_err_buf);
 error:
   if (handle > 0)
-    cci_close_req_handle (handle);
+    {
+      cci_close_req_handle (handle);
+    }
 
   return ODBC_ERROR;
 }
 
 PUBLIC RETCODE
-odbc_statistics (ODBC_STATEMENT * stmt,
+odbc_statistics (ODBC_STATEMENT *stmt,
 		 char *catalog_name, char *schema_name,
 		 char *table_name, unsigned short unique, unsigned short reversed)
 {
@@ -694,7 +747,7 @@ error:
 }
 
 PUBLIC RETCODE
-odbc_special_columns (ODBC_STATEMENT * stmt,
+odbc_special_columns (ODBC_STATEMENT *stmt,
 		      short identifier_type,
 		      char *catalog_name, char *schema_name, char *table_name, short scope, short nullable)
 {
@@ -750,7 +803,7 @@ error:
 }
 
 PUBLIC RETCODE
-odbc_foreign_keys (ODBC_STATEMENT * stmt, char *pktablename, char *fktablename)
+odbc_foreign_keys (ODBC_STATEMENT *stmt, char *pktablename, char *fktablename)
 {
   int cci_retval = 0;
   int cci_request = 0;
@@ -823,20 +876,20 @@ odbc_foreign_keys (ODBC_STATEMENT * stmt, char *pktablename, char *fktablename)
   if (pk_table_name && fk_table_name)
     {
       cci_request =
-	cci_schema_info (stmt->conn->connhd, CCI_SCH_CROSS_REFERENCE,
-			 pk_table_name, fk_table_name, search_pattern_flag, &cci_error);
+	      cci_schema_info (stmt->conn->connhd, CCI_SCH_CROSS_REFERENCE,
+			       pk_table_name, fk_table_name, search_pattern_flag, &cci_error);
     }
   else if (pk_table_name)
     {
       cci_request =
-	cci_schema_info (stmt->conn->connhd, CCI_SCH_EXPORTED_KEYS,
-			 pk_table_name, NULL, search_pattern_flag, &cci_error);
+	      cci_schema_info (stmt->conn->connhd, CCI_SCH_EXPORTED_KEYS,
+			       pk_table_name, NULL, search_pattern_flag, &cci_error);
     }
   else if (fk_table_name)
     {
       cci_request =
-	cci_schema_info (stmt->conn->connhd, CCI_SCH_IMPORTED_KEYS,
-			 fk_table_name, NULL, search_pattern_flag, &cci_error);
+	      cci_schema_info (stmt->conn->connhd, CCI_SCH_IMPORTED_KEYS,
+			       fk_table_name, NULL, search_pattern_flag, &cci_error);
     }
 
   if (cci_request < 0)
@@ -865,7 +918,7 @@ error:
 }
 
 PUBLIC RETCODE
-odbc_primary_keys (ODBC_STATEMENT * stmt, char *catalog_name, char *schema_name, char *tablename)
+odbc_primary_keys (ODBC_STATEMENT *stmt, char *catalog_name, char *schema_name, char *tablename)
 {
   int cci_retval = 0;
   int cci_request = 0;
@@ -910,8 +963,8 @@ odbc_primary_keys (ODBC_STATEMENT * stmt, char *catalog_name, char *schema_name,
     }
 
   if ((cci_request =
-       cci_schema_info (stmt->conn->connhd, CCI_SCH_PRIMARY_KEY, table_name,
-			NULL, search_pattern_flag, &cci_error)) < 0)
+	       cci_schema_info (stmt->conn->connhd, CCI_SCH_PRIMARY_KEY, table_name,
+				NULL, search_pattern_flag, &cci_error)) < 0)
     {
       cci_retval = cci_request;
       goto cci_error;
@@ -937,7 +990,7 @@ error:
 }
 
 PUBLIC RETCODE
-odbc_table_privileges (ODBC_STATEMENT * stmt, char *catalog_name, char *schema_name, char *table_name)
+odbc_table_privileges (ODBC_STATEMENT *stmt, char *catalog_name, char *schema_name, char *table_name)
 {
   int cci_retval = 0;
   int cci_request = 0;
@@ -967,7 +1020,7 @@ odbc_table_privileges (ODBC_STATEMENT * stmt, char *catalog_name, char *schema_n
     }
 
   if ((cci_retval = schema_info_table_privileges (stmt->conn->connhd,
-						  &cci_request, table_name, db_ver, &cci_error)) < 0)
+		    &cci_request, table_name, db_ver, &cci_error)) < 0)
     {
       goto cci_error;
     }
@@ -992,7 +1045,7 @@ error:
 }
 
 PUBLIC RETCODE
-odbc_procedures (ODBC_STATEMENT * stmt, char *catalog_name, char *schema_name, char *proc_name)
+odbc_procedures (ODBC_STATEMENT *stmt, char *catalog_name, char *schema_name, char *proc_name)
 {
   int cci_retval = 0;
   int cci_request = 0;
@@ -1026,7 +1079,7 @@ error:
 }
 
 PUBLIC RETCODE
-odbc_procedure_columns (ODBC_STATEMENT * stmt,
+odbc_procedure_columns (ODBC_STATEMENT *stmt,
 			char *catalog_name, char *schema_name, char *proc_name, char *column_name)
 {
   int cci_retval = 0;
@@ -1037,7 +1090,7 @@ odbc_procedure_columns (ODBC_STATEMENT * stmt,
   catalog_set_ird (stmt, procedure_columns_cinfo, NC_CATALOG_PROCEDURE_COLUMNS);
 
   if ((cci_retval = schema_info_procedure_columns (stmt->conn->connhd,
-						   &cci_request, proc_name, column_name, &cci_error)) < 0)
+		    &cci_request, proc_name, column_name, &cci_error)) < 0)
     {
       goto cci_error;
     }
@@ -1062,7 +1115,7 @@ error:
 }
 
 PUBLIC RETCODE
-odbc_get_type_info (ODBC_STATEMENT * stmt, short data_type)
+odbc_get_type_info (ODBC_STATEMENT *stmt, short data_type)
 {
   ODBC_TYPE_INFO_VALUE *type_info_node;
   short i;
@@ -1089,7 +1142,9 @@ odbc_get_type_info (ODBC_STATEMENT * stmt, short data_type)
 	{
 	  type_info_node = create_type_info_value ();
 	  if (type_info_node == NULL)
-	    continue;
+	    {
+	      continue;
+	    }
 
 	  memcpy (type_info_node, type_info + i, sizeof (ODBC_TYPE_INFO_VALUE));
 	  type_info_node->type_name = UT_MAKE_STRING (type_info[i].type_name, -1);
@@ -1121,7 +1176,9 @@ odbc_get_type_info (ODBC_STATEMENT * stmt, short data_type)
 	    {
 	      type_info_node = create_type_info_value ();
 	      if (type_info_node == NULL)
-		continue;
+		{
+		  continue;
+		}
 
 	      memcpy (type_info_node, type_info + i, sizeof (ODBC_TYPE_INFO_VALUE));
 	      type_info_node->type_name = UT_MAKE_STRING (type_info[i].type_name, -1);
@@ -1150,7 +1207,7 @@ odbc_get_type_info (ODBC_STATEMENT * stmt, short data_type)
 }
 
 PUBLIC RETCODE
-odbc_get_catalog_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value)
+odbc_get_catalog_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value)
 {
   RETCODE rc = ODBC_SUCCESS;
 
@@ -1195,12 +1252,14 @@ odbc_get_catalog_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER *
 }
 
 PRIVATE RETCODE
-odbc_get_table_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value)
+odbc_get_table_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value)
 {
   ODBC_TABLE_VALUE *table_tuple;
 
   if (stmt->catalog_result.current == NULL)
-    return ODBC_NO_MORE_DATA;
+    {
+      return ODBC_NO_MORE_DATA;
+    }
 
   table_tuple = ((ST_LIST *) stmt->catalog_result.current)->value;
 
@@ -1244,12 +1303,14 @@ odbc_get_table_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c
 }
 
 PRIVATE RETCODE
-odbc_get_column_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value)
+odbc_get_column_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value)
 {
   ODBC_COLUMN_VALUE *column_tuple;
 
   if (stmt->catalog_result.current == NULL)
-    return ODBC_NO_MORE_DATA;
+    {
+      return ODBC_NO_MORE_DATA;
+    }
 
 
   column_tuple = ((ST_LIST *) stmt->catalog_result.current)->value;
@@ -1369,7 +1430,7 @@ odbc_get_column_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * 
 }
 
 PRIVATE RETCODE
-odbc_get_stat_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value)
+odbc_get_stat_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value)
 {
   ODBC_STAT_VALUE *stat_tuple;
 
@@ -1383,7 +1444,7 @@ odbc_get_stat_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_
   switch (col_index)
     {
     case 1:
-      /* catalog name , SQL_C_CHAR */
+    /* catalog name , SQL_C_CHAR */
     case 2:
       /* schema name, SQL_C_CHAR */
       c_value->value.str = NULL;
@@ -1465,12 +1526,14 @@ odbc_get_stat_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_
 }
 
 PRIVATE RETCODE
-odbc_get_sp_column_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value)
+odbc_get_sp_column_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value)
 {
   ODBC_SP_COLUMN_VALUE *spc_tuple;
 
   if (stmt->catalog_result.current == NULL)
-    return ODBC_NO_MORE_DATA;
+    {
+      return ODBC_NO_MORE_DATA;
+    }
 
   spc_tuple = ((ST_LIST *) stmt->catalog_result.current)->value;
 
@@ -1533,12 +1596,14 @@ odbc_get_sp_column_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER
 }
 
 PRIVATE RETCODE
-odbc_get_type_info_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value)
+odbc_get_type_info_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value)
 {
   ODBC_TYPE_INFO_VALUE *ti_tuple;
 
   if (stmt->catalog_result.current == NULL)
-    return ODBC_NO_MORE_DATA;
+    {
+      return ODBC_NO_MORE_DATA;
+    }
 
   ti_tuple = ((ST_LIST *) stmt->catalog_result.current)->value;
 
@@ -1558,9 +1623,13 @@ odbc_get_type_info_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER
       if (c_value->value.s == SQL_CHAR || c_value->value.s == SQL_VARCHAR)
 	{
 	  if (ti_tuple->column_size >= stmt->conn->max_string_length)
-	    c_value->value.l = stmt->conn->max_string_length;
+	    {
+	      c_value->value.l = stmt->conn->max_string_length;
+	    }
 	  else
-	    c_value->value.l = stmt->conn->max_string_length;
+	    {
+	      c_value->value.l = stmt->conn->max_string_length;
+	    }
 	}
       else
 	{
@@ -1748,19 +1817,21 @@ odbc_get_type_info_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER
 }
 
 PRIVATE RETCODE
-odbc_get_primary_keys_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value)
+odbc_get_primary_keys_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value)
 {
   ODBC_PRIMARY_KEYS_VALUE *primary_keys_tuple;
 
   if (stmt->catalog_result.current == NULL)
-    return ODBC_NO_MORE_DATA;
+    {
+      return ODBC_NO_MORE_DATA;
+    }
 
   primary_keys_tuple = ((ST_LIST *) stmt->catalog_result.current)->value;
 
   switch (col_index)
     {
     case 1:
-      /* catalog_name, SQL_C_CHAR */
+    /* catalog_name, SQL_C_CHAR */
     case 2:
       /* schema_name, SQL_C_CHAR */
       c_value->value.str = NULL;
@@ -1800,12 +1871,14 @@ odbc_get_primary_keys_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAI
 }
 
 PRIVATE RETCODE
-odbc_get_foreign_keys_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value)
+odbc_get_foreign_keys_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value)
 {
   ODBC_FOREIGN_KEYS_VALUE *foreign_keys_tuple;
 
   if (stmt->catalog_result.current == NULL)
-    return ODBC_NO_MORE_DATA;
+    {
+      return ODBC_NO_MORE_DATA;
+    }
 
   foreign_keys_tuple = ((ST_LIST *) stmt->catalog_result.current)->value;
 
@@ -1904,19 +1977,21 @@ odbc_get_foreign_keys_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAI
 }
 
 PRIVATE RETCODE
-odbc_get_table_privileges_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value)
+odbc_get_table_privileges_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value)
 {
   ODBC_TABLE_PRIVILEGES_VALUE *table_privileges_tuple;
 
   if (stmt->catalog_result.current == NULL)
-    return ODBC_NO_MORE_DATA;
+    {
+      return ODBC_NO_MORE_DATA;
+    }
 
   table_privileges_tuple = ((ST_LIST *) stmt->catalog_result.current)->value;
 
   switch (col_index)
     {
     case 1:
-      /* catalog_name, SQL_C_CHAR */
+    /* catalog_name, SQL_C_CHAR */
     case 2:
       /* schema_name, SQL_C_CHAR */
       c_value->value.str = NULL;
@@ -1962,12 +2037,14 @@ odbc_get_table_privileges_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CO
 }
 
 PRIVATE RETCODE
-odbc_get_procedures_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value)
+odbc_get_procedures_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value)
 {
   ODBC_PROCEDURES_VALUE *procedures_tuple;
 
   if (stmt->catalog_result.current == NULL)
-    return ODBC_NO_MORE_DATA;
+    {
+      return ODBC_NO_MORE_DATA;
+    }
 
   procedures_tuple = ((ST_LIST *) stmt->catalog_result.current)->value;
 
@@ -1992,9 +2069,9 @@ odbc_get_procedures_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINE
       c_value->type = SQL_C_CHAR;
       break;
     case 4:
-      /* num_input_params */
+    /* num_input_params */
     case 5:
-      /* num_output_params */
+    /* num_output_params */
     case 6:
       /* num_result_sets */
       c_value->value.str = NULL;
@@ -2022,12 +2099,14 @@ odbc_get_procedures_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINE
 }
 
 PRIVATE RETCODE
-odbc_get_procedure_columns_data (ODBC_STATEMENT * stmt, short col_index, VALUE_CONTAINER * c_value)
+odbc_get_procedure_columns_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_value)
 {
   ODBC_PROCEDURE_COLUMNS_VALUE *procedure_columns_tuple;
 
   if (stmt->catalog_result.current == NULL)
-    return ODBC_NO_MORE_DATA;
+    {
+      return ODBC_NO_MORE_DATA;
+    }
 
   procedure_columns_tuple = ((ST_LIST *) stmt->catalog_result.current)->value;
 
@@ -2162,7 +2241,9 @@ create_table_value (void)
 
   value = (ODBC_TABLE_VALUE *) UT_ALLOC (sizeof (ODBC_TABLE_VALUE));
   if (value == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
 
   memset (value, 0, sizeof (ODBC_TABLE_VALUE));
 
@@ -2170,7 +2251,7 @@ create_table_value (void)
 }
 
 PRIVATE void
-free_table_value (ODBC_TABLE_VALUE * value)
+free_table_value (ODBC_TABLE_VALUE *value)
 {
   if (value != NULL)
     {
@@ -2181,18 +2262,20 @@ free_table_value (ODBC_TABLE_VALUE * value)
 }
 
 PRIVATE void
-free_table_node (ST_LIST * node)
+free_table_node (ST_LIST *node)
 {
   if (node != NULL)
     {
       free_table_value ((ODBC_TABLE_VALUE *) (node->value));
       if (node->key != NULL)
-	UT_FREE (node->key);
+	{
+	  UT_FREE (node->key);
+	}
     }
 }
 
 PRIVATE RETCODE
-make_table_result_set (ODBC_STATEMENT * stmt, int req_handle, int type_option)
+make_table_result_set (ODBC_STATEMENT *stmt, int req_handle, int type_option)
 {
   int cci_ind;
   int rc;
@@ -2211,7 +2294,9 @@ make_table_result_set (ODBC_STATEMENT * stmt, int req_handle, int type_option)
       if (rc < 0)
 	{
 	  if (rc == ODBC_NO_MORE_DATA)
-	    break;
+	    {
+	      break;
+	    }
 	  else
 	    {
 	      goto error;
@@ -2235,10 +2320,10 @@ make_table_result_set (ODBC_STATEMENT * stmt, int req_handle, int type_option)
 
       if ((cci_value.i == 0 &&	// 0 system class
 	   !IS_OPTION_SETTED (type_option, TABLE_TYPE_SYSTEM)) || (cci_value.i == 1 &&	// 1 virtual class
-								   !IS_OPTION_SETTED (type_option, TABLE_TYPE_VIEW)) || (cci_value.i == 2 &&	// 2 class 
-															 !IS_OPTION_SETTED
-															 (type_option,
-															  TABLE_TYPE_TABLE)))
+	       !IS_OPTION_SETTED (type_option, TABLE_TYPE_VIEW)) || (cci_value.i == 2 &&	// 2 class
+		   !IS_OPTION_SETTED
+		   (type_option,
+		    TABLE_TYPE_TABLE)))
 	{
 	  continue;
 	}
@@ -2278,7 +2363,9 @@ make_table_result_set (ODBC_STATEMENT * stmt, int req_handle, int type_option)
       // create a tuple
       table_node = create_table_value ();
       if (table_node == NULL)
-	continue;
+	{
+	  continue;
+	}
 
       table_node->table_name = UT_MAKE_STRING (tablename, -1);
 
@@ -2317,7 +2404,9 @@ create_column_value (void)
 
   value = (ODBC_COLUMN_VALUE *) UT_ALLOC (sizeof (ODBC_COLUMN_VALUE));
   if (value == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
 
   memset (value, 0, sizeof (ODBC_COLUMN_VALUE));
 
@@ -2325,7 +2414,7 @@ create_column_value (void)
 }
 
 PRIVATE void
-free_column_value (ODBC_COLUMN_VALUE * value)
+free_column_value (ODBC_COLUMN_VALUE *value)
 {
   if (value != NULL)
     {
@@ -2338,18 +2427,20 @@ free_column_value (ODBC_COLUMN_VALUE * value)
 }
 
 PRIVATE void
-free_column_node (ST_LIST * node)
+free_column_node (ST_LIST *node)
 {
   if (node != NULL)
     {
       free_column_value ((ODBC_COLUMN_VALUE *) (node->value));
       if (node->key != NULL)
-	UT_FREE (node->key);
+	{
+	  UT_FREE (node->key);
+	}
     }
 }
 
 PRIVATE RETCODE
-make_column_result_set (ODBC_STATEMENT * stmt, int req_handle)
+make_column_result_set (ODBC_STATEMENT *stmt, int req_handle)
 {
 
   int cci_ind;
@@ -2371,7 +2462,9 @@ make_column_result_set (ODBC_STATEMENT * stmt, int req_handle)
       if (rc < 0)
 	{
 	  if (rc == ODBC_NO_MORE_DATA)
-	    break;
+	    {
+	      break;
+	    }
 	  else
 	    {
 	      goto error;
@@ -2388,7 +2481,9 @@ make_column_result_set (ODBC_STATEMENT * stmt, int req_handle)
       // create a tuple
       column_node = create_column_value ();
       if (column_node == NULL)
-	continue;
+	{
+	  continue;
+	}
 
       // get table name
       cci_rc = cci_get_data (req_handle, 11, CCI_A_TYPE_STR, &cci_value, &cci_ind);
@@ -2466,17 +2561,23 @@ make_column_result_set (ODBC_STATEMENT * stmt, int req_handle)
 
       column_node->column_size = odbc_column_size (column_node->concise_data_type, precision);
       if (column_node->column_size >= stmt->conn->max_string_length)
-	column_node->column_size = stmt->conn->max_string_length;
+	{
+	  column_node->column_size = stmt->conn->max_string_length;
+	}
 
       column_node->buffer_length = odbc_buffer_length (column_node->concise_data_type, precision);
       if (column_node->buffer_length >= stmt->conn->max_string_length)
-	column_node->buffer_length = stmt->conn->max_string_length;
+	{
+	  column_node->buffer_length = stmt->conn->max_string_length;
+	}
 
       column_node->decimal_digits = odbc_decimal_digits (column_node->concise_data_type, scale);
       column_node->num_prec_radix = odbc_num_prec_radix (column_node->concise_data_type);
       column_node->octet_length = odbc_octet_length (column_node->concise_data_type, precision);
       if (column_node->octet_length >= stmt->conn->max_string_length)
-	column_node->octet_length = stmt->conn->max_string_length;
+	{
+	  column_node->octet_length = stmt->conn->max_string_length;
+	}
 
       // get nullable
       cci_rc = cci_get_data (req_handle, 6, CCI_A_TYPE_INT, &cci_value, &cci_ind);
@@ -2485,7 +2586,8 @@ make_column_result_set (ODBC_STATEMENT * stmt, int req_handle)
 	  goto cci_error;
 	}
       if (cci_value.i == 1)
-	{			// non null
+	{
+	  // non null
 	  column_node->nullable = SQL_NO_NULLS;
 	}
       else
@@ -2508,7 +2610,8 @@ make_column_result_set (ODBC_STATEMENT * stmt, int req_handle)
 	  goto cci_error;
 	}
       if (cci_ind == -1)
-	{			// non null
+	{
+	  // non null
 	  column_node->default_value = NULL;
 	}
       else
@@ -2546,7 +2649,9 @@ create_stat_value (void)
 
   value = (ODBC_STAT_VALUE *) UT_ALLOC (sizeof (ODBC_STAT_VALUE));
   if (value == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
 
   memset (value, 0, sizeof (ODBC_STAT_VALUE));
 
@@ -2554,7 +2659,7 @@ create_stat_value (void)
 }
 
 PRIVATE void
-free_stat_value (ODBC_STAT_VALUE * value)
+free_stat_value (ODBC_STAT_VALUE *value)
 {
   if (value != NULL)
     {
@@ -2566,18 +2671,20 @@ free_stat_value (ODBC_STAT_VALUE * value)
 }
 
 PRIVATE void
-free_stat_node (ST_LIST * node)
+free_stat_node (ST_LIST *node)
 {
   if (node != NULL)
     {
       free_stat_value ((ODBC_STAT_VALUE *) (node->value));
       if (node->key != NULL)
-	UT_FREE (node->key);
+	{
+	  UT_FREE (node->key);
+	}
     }
 }
 
 PRIVATE RETCODE
-make_stat_result_set (ODBC_STATEMENT * stmt, int req_handle, char *table_name, unsigned short unique)
+make_stat_result_set (ODBC_STATEMENT *stmt, int req_handle, char *table_name, unsigned short unique)
 {
   int cci_ind;
   int retval;
@@ -2715,7 +2822,9 @@ create_sp_column_value (void)
 
   value = (ODBC_SP_COLUMN_VALUE *) UT_ALLOC (sizeof (ODBC_SP_COLUMN_VALUE));
   if (value == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
 
   memset (value, 0, sizeof (ODBC_SP_COLUMN_VALUE));
 
@@ -2723,7 +2832,7 @@ create_sp_column_value (void)
 }
 
 PRIVATE void
-free_sp_column_value (ODBC_SP_COLUMN_VALUE * value)
+free_sp_column_value (ODBC_SP_COLUMN_VALUE *value)
 {
   if (value != NULL)
     {
@@ -2734,18 +2843,20 @@ free_sp_column_value (ODBC_SP_COLUMN_VALUE * value)
 }
 
 PRIVATE void
-free_sp_column_node (ST_LIST * node)
+free_sp_column_node (ST_LIST *node)
 {
   if (node != NULL)
     {
       free_sp_column_value ((ODBC_SP_COLUMN_VALUE *) (node->value));
       if (node->key != NULL)
-	UT_FREE (node->key);
+	{
+	  UT_FREE (node->key);
+	}
     }
 }
 
 PRIVATE RETCODE
-make_sp_column_result_set (ODBC_STATEMENT * stmt, int req_handle, char *table_name)
+make_sp_column_result_set (ODBC_STATEMENT *stmt, int req_handle, char *table_name)
 {
   int retval;
   int cci_retval;
@@ -2808,8 +2919,8 @@ make_sp_column_result_set (ODBC_STATEMENT * stmt, int req_handle, char *table_na
 
       /* get column attribute info */
       if ((cci_req =
-	   cci_schema_info (stmt->conn->connhd, CCI_SCH_ATTRIBUTE, table_name,
-			    special_columns_node->column_name, 0, &cci_error)) < 0)
+		   cci_schema_info (stmt->conn->connhd, CCI_SCH_ATTRIBUTE, table_name,
+				    special_columns_node->column_name, 0, &cci_error)) < 0)
 	{
 	  odbc_set_diag_by_cci (stmt->diag, cci_retval, &cci_error);
 	  goto error;
@@ -2900,7 +3011,7 @@ create_primary_keys_value (void)
 }
 
 PRIVATE void
-free_primary_keys_value (ODBC_PRIMARY_KEYS_VALUE * value)
+free_primary_keys_value (ODBC_PRIMARY_KEYS_VALUE *value)
 {
   if (value != NULL)
     {
@@ -2913,7 +3024,7 @@ free_primary_keys_value (ODBC_PRIMARY_KEYS_VALUE * value)
 }
 
 PRIVATE void
-free_primary_keys_node (ST_LIST * node)
+free_primary_keys_node (ST_LIST *node)
 {
   if (node != NULL)
     {
@@ -2926,7 +3037,7 @@ free_primary_keys_node (ST_LIST * node)
 }
 
 PRIVATE RETCODE
-make_primary_keys_result_set (ODBC_STATEMENT * stmt, int req_handle)
+make_primary_keys_result_set (ODBC_STATEMENT *stmt, int req_handle)
 {
   int cci_ind;
   int retval;
@@ -3017,7 +3128,7 @@ create_foreign_keys_value (void)
 }
 
 PRIVATE void
-free_foreign_keys_value (ODBC_FOREIGN_KEYS_VALUE * value)
+free_foreign_keys_value (ODBC_FOREIGN_KEYS_VALUE *value)
 {
   if (value != NULL)
     {
@@ -3033,7 +3144,7 @@ free_foreign_keys_value (ODBC_FOREIGN_KEYS_VALUE * value)
 }
 
 PRIVATE void
-free_foreign_keys_node (ST_LIST * node)
+free_foreign_keys_node (ST_LIST *node)
 {
   if (node != NULL)
     {
@@ -3046,7 +3157,7 @@ free_foreign_keys_node (ST_LIST * node)
 }
 
 PRIVATE RETCODE
-make_foreign_keys_result_set (ODBC_STATEMENT * stmt, int req_handle)
+make_foreign_keys_result_set (ODBC_STATEMENT *stmt, int req_handle)
 {
   int cci_ind;
   int retval;
@@ -3086,7 +3197,7 @@ make_foreign_keys_result_set (ODBC_STATEMENT * stmt, int req_handle)
 	  goto cci_error;
 	}
       foreign_keys_node->pk_table_name =
-	UT_MAKE_STRING (stmt->conn->omit_schema ? remove_owner_name (cci_value.str) : cci_value.str, -1);
+	      UT_MAKE_STRING (stmt->conn->omit_schema ? remove_owner_name (cci_value.str) : cci_value.str, -1);
 
       /* pk column name */
       if ((cci_retval = cci_get_data (req_handle, 2, CCI_A_TYPE_STR, &cci_value, &cci_ind)) < 0)
@@ -3173,7 +3284,7 @@ create_table_privileges_value (void)
 }
 
 PRIVATE void
-free_table_privileges_value (ODBC_TABLE_PRIVILEGES_VALUE * value)
+free_table_privileges_value (ODBC_TABLE_PRIVILEGES_VALUE *value)
 {
   if (value != NULL)
     {
@@ -3188,7 +3299,7 @@ free_table_privileges_value (ODBC_TABLE_PRIVILEGES_VALUE * value)
 }
 
 PRIVATE void
-free_table_privileges_node (ST_LIST * node)
+free_table_privileges_node (ST_LIST *node)
 {
   if (node != NULL)
     {
@@ -3201,7 +3312,7 @@ free_table_privileges_node (ST_LIST * node)
 }
 
 PRIVATE RETCODE
-make_table_privileges_result_set (ODBC_STATEMENT * stmt, int req_handle)
+make_table_privileges_result_set (ODBC_STATEMENT *stmt, int req_handle)
 {
   int cci_ind;
   int retval;
@@ -3299,7 +3410,7 @@ create_procedures_value (void)
 }
 
 PRIVATE void
-free_procedures_value (ODBC_PROCEDURES_VALUE * value)
+free_procedures_value (ODBC_PROCEDURES_VALUE *value)
 {
   if (value != NULL)
     {
@@ -3310,7 +3421,7 @@ free_procedures_value (ODBC_PROCEDURES_VALUE * value)
 }
 
 PRIVATE void
-free_procedures_node (ST_LIST * node)
+free_procedures_node (ST_LIST *node)
 {
   if (node != NULL)
     {
@@ -3323,7 +3434,7 @@ free_procedures_node (ST_LIST * node)
 }
 
 PRIVATE RETCODE
-make_procedures_result_set (ODBC_STATEMENT * stmt, int req_handle)
+make_procedures_result_set (ODBC_STATEMENT *stmt, int req_handle)
 {
   int cci_ind;
   int retval;
@@ -3403,7 +3514,9 @@ create_procedure_columns_value (void)
 
   value = (ODBC_PROCEDURE_COLUMNS_VALUE *) UT_ALLOC (sizeof (ODBC_PROCEDURE_COLUMNS_VALUE));
   if (value == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
 
   memset (value, 0, sizeof (ODBC_PROCEDURE_COLUMNS_VALUE));
 
@@ -3411,7 +3524,7 @@ create_procedure_columns_value (void)
 }
 
 PRIVATE void
-free_procedure_columns_value (ODBC_PROCEDURE_COLUMNS_VALUE * value)
+free_procedure_columns_value (ODBC_PROCEDURE_COLUMNS_VALUE *value)
 {
   if (value != NULL)
     {
@@ -3425,18 +3538,20 @@ free_procedure_columns_value (ODBC_PROCEDURE_COLUMNS_VALUE * value)
 }
 
 PRIVATE void
-free_procedure_columns_node (ST_LIST * node)
+free_procedure_columns_node (ST_LIST *node)
 {
   if (node != NULL)
     {
       free_procedure_columns_value ((ODBC_PROCEDURE_COLUMNS_VALUE *) (node->value));
       if (node->key != NULL)
-	UT_FREE (node->key);
+	{
+	  UT_FREE (node->key);
+	}
     }
 }
 
 PRIVATE RETCODE
-make_procedure_columns_result_set (ODBC_STATEMENT * stmt, int req_handle)
+make_procedure_columns_result_set (ODBC_STATEMENT *stmt, int req_handle)
 {
   int retval;
   int cci_retval;
@@ -3535,7 +3650,7 @@ make_procedure_columns_result_set (ODBC_STATEMENT * stmt, int req_handle)
 	  || odbc_is_valid_sql_interval_type (procedure_columns_node->concise_data_type))
 	{
 	  procedure_columns_node->verbose_data_type =
-	    odbc_concise_to_verbose_type (procedure_columns_node->concise_data_type);
+		  odbc_concise_to_verbose_type (procedure_columns_node->concise_data_type);
 
 	  /* sql date/time subcode */
 	  procedure_columns_node->subcode = odbc_subcode_type (procedure_columns_node->concise_data_type);
@@ -3590,7 +3705,9 @@ create_type_info_value (void)
 
   value = (ODBC_TYPE_INFO_VALUE *) UT_ALLOC (sizeof (ODBC_TYPE_INFO_VALUE));
   if (value == NULL)
-    return NULL;
+    {
+      return NULL;
+    }
 
   memset (value, 0, sizeof (ODBC_TYPE_INFO_VALUE));
 
@@ -3598,7 +3715,7 @@ create_type_info_value (void)
 }
 
 PRIVATE void
-free_type_info_value (ODBC_TYPE_INFO_VALUE * value)
+free_type_info_value (ODBC_TYPE_INFO_VALUE *value)
 {
   if (value != NULL)
     {
@@ -3612,18 +3729,20 @@ free_type_info_value (ODBC_TYPE_INFO_VALUE * value)
 }
 
 PRIVATE void
-free_type_info_node (ST_LIST * node)
+free_type_info_node (ST_LIST *node)
 {
   if (node != NULL)
     {
       free_type_info_value ((ODBC_TYPE_INFO_VALUE *) (node->value));
       if (node->key != NULL)
-	UT_FREE (node->key);
+	{
+	  UT_FREE (node->key);
+	}
     }
 }
 
 PUBLIC void
-free_catalog_result (ST_LIST * result, RESULT_TYPE type)
+free_catalog_result (ST_LIST *result, RESULT_TYPE type)
 {
   void (*nodeDelete) (ST_LIST *) = NULL;
 
@@ -3671,7 +3790,7 @@ free_catalog_result (ST_LIST * result, RESULT_TYPE type)
 }
 
 PRIVATE int
-retrieve_table_from_db_class (int cci_connection, char *table_name, T_CCI_ERROR * error)
+retrieve_table_from_db_class (int cci_connection, char *table_name, T_CCI_ERROR *error)
 {
   int cci_request;
 
@@ -3706,14 +3825,14 @@ retrieve_table_from_db_class (int cci_connection, char *table_name, T_CCI_ERROR 
 }
 
 PRIVATE int
-schema_info_table_privileges (int cci_connection, int *cci_request, char *table_name, int db_ver, T_CCI_ERROR * error)
+schema_info_table_privileges (int cci_connection, int *cci_request, char *table_name, int db_ver, T_CCI_ERROR *error)
 {
   char *sql_statment_default =
-    "SELECT "
-    "object_name, grantor_name, grantee_name, auth_type, is_grantable " "FROM " "db_auth " "WHERE " "object_name = ?";
+	  "SELECT "
+	  "object_name, grantor_name, grantee_name, auth_type, is_grantable " "FROM " "db_auth " "WHERE " "object_name = ?";
   char *sql_statment_before_1103 =
-    "SELECT "
-    "class_name, grantor_name, grantee_name, auth_type, is_grantable " "FROM " "db_auth " "WHERE " "class_name = ?";
+	  "SELECT "
+	  "class_name, grantor_name, grantee_name, auth_type, is_grantable " "FROM " "db_auth " "WHERE " "class_name = ?";
   char *sql_statment = sql_statment_default;
 
   char *param_list[] = { table_name };
@@ -3726,7 +3845,7 @@ schema_info_table_privileges (int cci_connection, int *cci_request, char *table_
 }
 
 PRIVATE int
-schema_info_procedures (int cci_connection, int *cci_request, char *proc_name, T_CCI_ERROR * error)
+schema_info_procedures (int cci_connection, int *cci_request, char *proc_name, T_CCI_ERROR *error)
 {
   char *sql_statment;
   char *param_list[1] = { NULL };
@@ -3751,7 +3870,7 @@ schema_info_procedures (int cci_connection, int *cci_request, char *proc_name, T
 
 PRIVATE int
 schema_info_procedure_columns (int cci_connection, int *cci_request,
-			       char *proc_name, char *column_name, T_CCI_ERROR * error)
+			       char *proc_name, char *column_name, T_CCI_ERROR *error)
 {
   char *sql_statment;
   char *param_list[2] = { NULL };
@@ -3760,9 +3879,9 @@ schema_info_procedure_columns (int cci_connection, int *cci_request,
   if (proc_name != NULL && column_name != NULL)
     {
       sql_statment =
-	"SELECT "
-	"sp_name, arg_name, mode, data_type "
-	"FROM " "db_stored_procedure_args " "WHERE " "sp_name = ? AND arg_name = ?";
+	      "SELECT "
+	      "sp_name, arg_name, mode, data_type "
+	      "FROM " "db_stored_procedure_args " "WHERE " "sp_name = ? AND arg_name = ?";
 
       param_num = 2;
       param_list[0] = proc_name;
@@ -3771,7 +3890,7 @@ schema_info_procedure_columns (int cci_connection, int *cci_request,
   else if (proc_name != NULL)
     {
       sql_statment =
-	"SELECT " "sp_name, arg_name, mode, data_type " "FROM " "db_stored_procedure_args " "WHERE " "sp_name = ?";
+	      "SELECT " "sp_name, arg_name, mode, data_type " "FROM " "db_stored_procedure_args " "WHERE " "sp_name = ?";
 
       param_num = 1;
       param_list[0] = proc_name;
@@ -3779,7 +3898,7 @@ schema_info_procedure_columns (int cci_connection, int *cci_request,
   else if (column_name != NULL)
     {
       sql_statment =
-	"SELECT " "sp_name, arg_name, mode, data_type " "FROM " "db_stored_procedure_args " "WHERE " "arg_name = ?";
+	      "SELECT " "sp_name, arg_name, mode, data_type " "FROM " "db_stored_procedure_args " "WHERE " "arg_name = ?";
 
       param_num = 1;
       param_list[0] = column_name;
@@ -3796,7 +3915,7 @@ schema_info_procedure_columns (int cci_connection, int *cci_request,
 
 PRIVATE int
 sql_execute (int cci_connection, int *cci_request,
-	     char *sql_statment, char *param_list[], int param_num, T_CCI_ERROR * error)
+	     char *sql_statment, char *param_list[], int param_num, T_CCI_ERROR *error)
 {
   int cci_retval = 0;
   int i;
@@ -3811,7 +3930,7 @@ sql_execute (int cci_connection, int *cci_request,
       for (i = 0; i < param_num; i++)
 	{
 	  if ((cci_retval =
-	       cci_bind_param (*cci_request, i + 1, CCI_A_TYPE_STR, param_list[i], CCI_U_TYPE_STRING, 0)) < 0)
+		       cci_bind_param (*cci_request, i + 1, CCI_A_TYPE_STR, param_list[i], CCI_U_TYPE_STRING, 0)) < 0)
 	    {
 	      goto cci_error;
 	    }
@@ -3835,7 +3954,7 @@ cci_error:
 }
 
 PRIVATE void
-catalog_result_set_init (ODBC_STATEMENT * stmt, RESULT_TYPE task_type)
+catalog_result_set_init (ODBC_STATEMENT *stmt, RESULT_TYPE task_type)
 {
   reset_result_set (stmt);
 
@@ -3847,7 +3966,7 @@ catalog_result_set_init (ODBC_STATEMENT * stmt, RESULT_TYPE task_type)
 }
 
 PRIVATE void
-catalog_set_ird (ODBC_STATEMENT * stmt, ODBC_COL_INFO * colum_info, int column_num)
+catalog_set_ird (ODBC_STATEMENT *stmt, ODBC_COL_INFO *colum_info, int column_num)
 {
   int i;
 
