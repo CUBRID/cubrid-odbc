@@ -38,7 +38,7 @@ public:
       SQLAllocHandle (SQL_HANDLE_DBC, env, &dbc);
 
       retcode = SQLDriverConnect (dbc, NULL,
-				  L"DSN=CUBRID Driver Unicode;DB_NAME=demodb;SERVER=test-db-server;PORT=33000;USER=dba;PWD=;CHARSET=utf-8;AUTOCOMMIT=ON",
+				  L"DRIVER=CUBRID Driver Unicode;DB_NAME=demodb;SERVER=test-db-server;PORT=33000;UID=dba;PWD=;CHARSET=utf-8;AUTOCOMMIT=ON",
 				  SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
 
       if (retcode == SQL_ERROR)
@@ -162,7 +162,7 @@ public:
       retcode = SQLSetStmtAttr (hStmt, SQL_ATTR_PARAM_STATUS_PTR, ParamStatusArray, ARRAY_SIZE);
       retcode = SQLSetStmtAttr (hStmt, SQL_ATTR_PARAMS_PROCESSED_PTR, &ParamsProcessed, 0);
 
-      wchar_t address[ARRAY_SIZE][STR_SZ] = { L"í•œab", L"ab", L"123", L"6234", L"9", L"db", L"Abc", L"Bbcd" };
+      wchar_t address[ARRAY_SIZE][STR_SZ] = { L"ÇÑab", L"ab", L"123", L"6234", L"9", L"db", L"Abc", L"Bbcd" };
 
       BYTE *pBufData = (BYTE *)new wchar_t[MAXLEN * ARRAY_SIZE];
       BYTE *ppBuf = pBufData;
@@ -182,7 +182,7 @@ public:
       ppBuf = pBufData;
       for (int i = 0; i < ARRAY_SIZE; i++)	// insert additional rows
 	{
-	  swprintf (address[i], L"1-íë¸Œ %d", i);
+	  swprintf (address[i], L"1-Å¥ºê %d", i);
 	  memcpy (ppBuf, address[i], STR_SZ * sizeof (wchar_t));
 	  ppBuf = ppBuf + nMaxLen;
 	}
@@ -192,7 +192,7 @@ public:
       ppBuf = pBufData;
       for (int i = 0; i < ARRAY_SIZE; i++)	// insert additional rows
 	{
-	  swprintf (address[i], L"2-ë¦¬ë“œ %d", i);
+	  swprintf (address[i], L"2-¸®µå %d", i);
 	  memcpy (ppBuf, address[i], STR_SZ * sizeof (wchar_t));
 	  ppBuf = ppBuf + nMaxLen;
 	}
@@ -709,7 +709,7 @@ public:
       SQLHSTMT        hstmt;
       SQLINTEGER		retcode;
       SQLWCHAR		*user = L"PUBLIC";
-      int				cbTableNameMax;
+      SQLSMALLINT		cbTableNameMax;
       int				max_table_name_len (255);
       int				len;
       SQLWCHAR		query[512];
@@ -1046,13 +1046,13 @@ public:
       retcode = SQLAllocHandle (SQL_HANDLE_STMT, dbc, &hStmt);
       Assert::AreNotEqual ((int)retcode, SQL_ERROR);
 
-      retcode = SQLExecDirect (hStmt, L"DROP TABLE IF EXISTS [í…Œì´ë¸”] ", SQL_NTS);
+      retcode = SQLExecDirect (hStmt, L"DROP TABLE IF EXISTS [Å×ÀÌºí] ", SQL_NTS);
       Assert::AreNotEqual ((int)retcode, SQL_ERROR);
-      retcode = SQLExecDirect (hStmt, L"CREATE TABLE [í…Œì´ë¸”] ([ì´ë¦„] varchar(16), [ë‚˜ì´] integer)", SQL_NTS);
+      retcode = SQLExecDirect (hStmt, L"CREATE TABLE [Å×ÀÌºí] ([ÀÌ¸§] varchar(16), [³ªÀÌ] integer)", SQL_NTS);
       Assert::AreNotEqual ((int)retcode, SQL_ERROR);
-      retcode = SQLExecDirect (hStmt, L"INSERT INTO [í…Œì´ë¸”] VALUES ('í™ê¸¸ë™', 25)", SQL_NTS);
+      retcode = SQLExecDirect (hStmt, L"INSERT INTO [Å×ÀÌºí] VALUES ('È«±æµ¿', 25)", SQL_NTS);
       Assert::AreNotEqual ((int)retcode, SQL_ERROR);
-      retcode = SQLExecDirect (hStmt, L"SELECT [ì´ë¦„], [ë‚˜ì´] FROM [í…Œì´ë¸”] WHERE [ë‚˜ì´] > 19", SQL_NTS);
+      retcode = SQLExecDirect (hStmt, L"SELECT [ÀÌ¸§], [³ªÀÌ] FROM [Å×ÀÌºí] WHERE [³ªÀÌ] > 19", SQL_NTS);
       Assert::AreNotEqual ((int)retcode, SQL_ERROR);
 
       retcode = SQLFetch (hStmt);
@@ -1074,9 +1074,9 @@ public:
       if (strlen ((const char *)query_plan) > 0)
 	{
 	  wchar_t expected_window[198] =
-		  L"Join graph segments (f indicates final):\r\nseg[0]: [0]\r\nseg[1]: ì´ë¦„[0] (f)\r\nseg[2]: ë‚˜ì´[0] (f)\r\nJoin graph nodes:\r\nnode[0]: í…Œì´ë¸” í…Œì´ë¸”(1/1) (sargs 0) (loc 0)\r\nJoin graph terms:\r\nterm[0]: [í…Œì´ë¸”].[ë‚˜ì´] range";
+		  L"Join graph segments (f indicates final):\r\nseg[0]: [0]\r\nseg[1]: ÀÌ¸§[0] (f)\r\nseg[2]: ³ªÀÌ[0] (f)\r\nJoin graph nodes:\r\nnode[0]: Å×ÀÌºí Å×ÀÌºí(1/1) (sargs 0) (loc 0)\r\nJoin graph terms:\r\nterm[0]: [Å×ÀÌºí].[³ªÀÌ] range";
 	  wchar_t expected_linux[198] =
-		  L"Join graph segments (f indicates final):\nseg[0]: [0]\nseg[1]: ì´ë¦„[0] (f)\nseg[2]: ë‚˜ì´[0] (f)\nJoin graph nodes:\nnode[0]: í…Œì´ë¸” í…Œì´ë¸”(1/1) (sargs 0) (loc 0)\nJoin graph terms:\nterm[0]: [í…Œì´ë¸”].[ë‚˜ì´] range";
+		  L"Join graph segments (f indicates final):\nseg[0]: [0]\nseg[1]: ÀÌ¸§[0] (f)\nseg[2]: ³ªÀÌ[0] (f)\nJoin graph nodes:\nnode[0]: Å×ÀÌºí Å×ÀÌºí(1/1) (sargs 0) (loc 0)\nJoin graph terms:\nterm[0]: [Å×ÀÌºí].[³ªÀÌ] range";
 
 	  //for windows
 	  int c = wcsncmp (query_plan, expected_window, wcslen (expected_window));
@@ -1091,7 +1091,7 @@ public:
 	      std::wstring ws (wc);
 
 	      //for under version to 9.2.x
-	      if (((int)ws.find (L"í…Œì´ë¸”")) > 0 && ((int)ws.find (L"ì´ë¦„")) > 0 && ((int)ws.find (L"ë‚˜ì´")) > 0)
+	      if (((int)ws.find (L"Å×ÀÌºí")) > 0 && ((int)ws.find (L"ÀÌ¸§")) > 0 && ((int)ws.find (L"³ªÀÌ")) > 0)
 		{
 		  c = 0;
 		}
@@ -1400,6 +1400,91 @@ public:
 	      Assert::AreEqual ((int)nullable, SQL_NULLABLE);
 	    }
 	}
+      SQLFreeStmt (hStmt, SQL_DROP);
+      retcode = SQLDisconnect (hDbc);
+      retcode = SQLFreeHandle (SQL_HANDLE_DBC, hDbc);
+      retcode = SQLFreeHandle (SQL_HANDLE_ENV, hEnv);
+    }
+
+    TEST_METHOD (APIS_1055_SQLMoreResults_Bind_Issue)
+    {
+      SQLHENV		hEnv;
+      SQLHDBC		hDbc;
+      SQLHSTMT	hStmt;
+
+      RETCODE retcode (0);
+      int insert_count = 5;
+      int inserted_row_count = 0;
+      int selected_row_count = 0;
+
+      retcode = SQLAllocHandle (SQL_HANDLE_ENV, SQL_NULL_HANDLE, &hEnv);
+      retcode = SQLSetEnvAttr (hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+      retcode = SQLAllocHandle (SQL_HANDLE_DBC, hEnv, &hDbc);
+      retcode = SQLConnect (hDbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, L"", SQL_NTS);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+      retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hStmt);
+
+      retcode = SQLExecDirect (hStmt, L"DROP TABLE IF EXISTS apis1055", SQL_NTS);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+      retcode = SQLExecDirect (hStmt, L"CREATE TABLE apis1055 (id INT, name VARCHAR(255))", SQL_NTS);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
+      retcode = SQLPrepare (hStmt, (SQLWCHAR *) (wchar_t *)L"INSERT INTO apis1055(id, name) VALUES(?, ?)", SQL_NTS);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
+      SQLWCHAR name[256];
+      SQLLEN name_size = 0;
+      for (SQLLEN i = 0; i < insert_count; i++)
+	{
+	  swprintf (name, sizeof (name) / sizeof (SQLWCHAR), L"test%d", i);
+	  name_size = wcslen (name) * sizeof (SQLWCHAR);
+
+	  retcode = SQLBindParameter (hStmt, 1, SQL_PARAM_INPUT, SQL_C_LONG, SQL_INTEGER, 0, 0, &i, 0, NULL);
+	  retcode = SQLBindParameter (hStmt, 2, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_WVARCHAR, 255, 0, name, 0, &name_size);
+
+	  retcode = SQLExecute (hStmt);
+	  Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
+	  for (;;)
+	    {
+	      SQLLEN c;
+	      retcode = SQLRowCount (hStmt, &c);
+	      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+	      inserted_row_count += (int)c;
+
+	      if (SQLMoreResults (hStmt) == SQL_NO_DATA)
+		{
+		  break;
+		}
+	    }
+	}
+      Assert::AreEqual (inserted_row_count, insert_count);
+      retcode = SQLTransact (hEnv, hDbc, SQL_COMMIT);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
+      SQLWCHAR allSQL[] = L"SELECT * FROM apis1055";
+      retcode = SQLExecDirect (hStmt, allSQL, SQL_NTS);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
+      SQLSMALLINT numCols;
+      retcode = SQLNumResultCols (hStmt, &numCols);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+      Assert::AreEqual ((int)numCols, 2);
+
+      int out_id = 0;
+      SQLWCHAR int_name[256] = {0,};
+      SQLWCHAR out_name[256] = {0,};
+
+      while (SQLFetch (hStmt) == SQL_SUCCESS)
+	{
+	  SQLGetData (hStmt, 1, SQL_C_LONG, &out_id, 0, NULL);
+	  SQLGetData (hStmt, 2, SQL_C_WCHAR, out_name, 255, NULL);
+	  Assert::AreEqual ((int)out_id, selected_row_count);
+	  swprintf (int_name, L"test%d", selected_row_count);
+	  Assert::AreEqual (out_name, int_name);
+	  selected_row_count++;
+	}
+      Assert::AreEqual (selected_row_count, inserted_row_count);
       SQLFreeStmt (hStmt, SQL_DROP);
       retcode = SQLDisconnect (hDbc);
       retcode = SQLFreeHandle (SQL_HANDLE_DBC, hDbc);
