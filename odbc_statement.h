@@ -237,6 +237,7 @@ PUBLIC RETCODE odbc_param_data (ODBC_STATEMENT * stmt, void **valueptr_ptr);
 PUBLIC RETCODE odbc_put_data (ODBC_STATEMENT * stmt,
             void *data_ptr, SQLLEN strlen_or_ind);
 PUBLIC RETCODE odbc_close_cursor (ODBC_STATEMENT * stmt);
+PUBLIC RETCODE odbc_close_statement (ODBC_STATEMENT * stmt);
 PUBLIC RETCODE odbc_cancel (ODBC_STATEMENT * stmt);
 PUBLIC RETCODE odbc_bulk_operations (ODBC_STATEMENT * stmt, short pperation);
 PUBLIC RETCODE odbc_set_pos (ODBC_STATEMENT * stmt,

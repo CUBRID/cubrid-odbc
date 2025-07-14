@@ -349,7 +349,7 @@ connection_end_tran (ODBC_CONNECTION *conn, short completion_type)
   // delete all open cursor
   for (stmt = conn->statements; stmt; stmt = stmt->next)
     {
-      odbc_close_cursor (stmt);
+      odbc_close_statement (stmt);
     }
 
   return ODBC_SUCCESS;

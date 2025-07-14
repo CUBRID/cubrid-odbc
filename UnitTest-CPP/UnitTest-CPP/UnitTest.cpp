@@ -1490,5 +1490,44 @@ public:
       retcode = SQLFreeHandle (SQL_HANDLE_DBC, hDbc);
       retcode = SQLFreeHandle (SQL_HANDLE_ENV, hEnv);
     }
+
+    TEST_METHOD(APIS_1059_SQLFreeStmt_And_SQLCloseCursor)
+    {
+	SQLHENV		hEnv;
+	SQLHDBC		hDbc;
+	SQLHSTMT	hStmt;
+
+	RETCODE retcode(0);
+	CHAR msg[512];
+	WCHAR wmsg[512];
+
+	retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &hEnv);
+	retcode = SQLSetEnvAttr(hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+	retcode = SQLAllocHandle(SQL_HANDLE_DBC, hEnv, &hDbc);
+	retcode = SQLConnect(hDbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, L"", SQL_NTS);
+	Assert::AreNotEqual((int)retcode, SQL_ERROR);
+	retcode = SQLAllocHandle(SQL_HANDLE_STMT, hDbc, &hStmt);
+
+	retcode = SQLPrepare(hStmt, (SQLWCHAR *)(wchar_t *)L"INSERT INTO apis1053(id, name) VALUES(?, ?)", SQL_NTS);
+
+	retcode = SQLBindParameter(hStmt, 1, SQL_PARAM_INPUT, SQL_C_LONG, SQL_INTEGER, 0, 0, 0, 0, NULL);
+	retcode = SQLBindParameter(hStmt, 2, SQL_PARAM_INPUT, SQL_C_WCHAR, SQL_WVARCHAR, 255, 0, L"test", 0, NULL);
+	retcode = SQLExecute(hStmt);
+	Assert::AreNotEqual((int)retcode, SQL_ERROR);
+	retcode = SQLTransact(hEnv, hDbc, SQL_COMMIT);
+
+	retcode = SQLFreeStmt(hStmt, SQL_CLOSE);
+	Assert::AreNotEqual((int)retcode, SQL_ERROR);
+	retcode = SQLCloseCursor(hStmt);
+	Assert::AreEqual((int)retcode, SQL_ERROR);
+	SQLWCHAR Sqlstate[1024] = { 0, };
+	retcode = SQLGetDiagRec(SQL_HANDLE_STMT, hStmt, 1, Sqlstate, NULL, NULL, NULL, NULL);
+	Assert::AreNotEqual((int)retcode, SQL_ERROR);
+	wsprintf(wmsg, L"Sqlstate %s", Sqlstate);
+	Assert::AreEqual(Sqlstate, L"HY000");
+	retcode = SQLDisconnect(hDbc);
+	retcode = SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+	retcode = SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+    }
   };
 }
