@@ -1825,7 +1825,7 @@ odbc_put_data (ODBC_STATEMENT *stmt, void *data_ptr, SQLLEN strlen_or_ind)
 * name: odbc_close_cursor
 * arguments:
 * returns/side-effects:
-* description: 
+* description:
 * NOTE:
 ************************************************************************/
 PUBLIC RETCODE
@@ -1835,13 +1835,13 @@ odbc_close_cursor (ODBC_STATEMENT *stmt)
   int cci_rc;
   if (stmt->stmthd > 0)
     {
-      cci_fetch_buffer_clear(stmt->stmthd);
-      cci_rc = cci_close_query_result(stmt->stmthd, &cci_err_buf);
+      cci_fetch_buffer_clear (stmt->stmthd);
+      cci_rc = cci_close_query_result (stmt->stmthd, &cci_err_buf);
       if (cci_rc != CCI_ER_NO_ERROR)
-        {
-          odbc_set_diag_by_cci (stmt->diag, cci_rc, &cci_err_buf);
-          return ODBC_ERROR;
-        }
+	{
+	  odbc_set_diag_by_cci (stmt->diag, cci_rc, &cci_err_buf);
+	  return ODBC_ERROR;
+	}
 
       if (stmt->result_type != TYPE_INFO)
 	{

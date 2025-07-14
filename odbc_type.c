@@ -1651,8 +1651,8 @@ cci_value_to_odbc (void *c_value, short concise_type,
       bc_num num1 = NULL, num2 = NULL, quot = NULL, rem = NULL, res_tmp = NULL;
       char *pt, *pt2, *tmp_str_num = NULL;
       char str[64];		/* numeric value that is removed a period
-			       * cf) The max precision of numeric is 38 in CUBRID
-			       */
+			   * cf) The max precision of numeric is 38 in CUBRID
+			   */
       short i;
       int num_add_zero = 0;
 
