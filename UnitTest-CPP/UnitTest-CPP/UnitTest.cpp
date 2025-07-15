@@ -1508,8 +1508,8 @@ public:
       Assert::AreNotEqual ((int)retcode, SQL_ERROR);
       retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hStmt);
 
-      retcode = SQLExecDirect(hStmt, L"DROP TABLE IF EXISTS apis1053", SQL_NTS);
-      retcode = SQLExecDirect(hStmt, L"CREATE TABLE apis1053 (id INT, name VARCHAR)", SQL_NTS);
+      retcode = SQLExecDirect (hStmt, L"DROP TABLE IF EXISTS apis1053", SQL_NTS);
+      retcode = SQLExecDirect (hStmt, L"CREATE TABLE apis1053 (id INT, name VARCHAR)", SQL_NTS);
       retcode = SQLPrepare (hStmt, (SQLWCHAR *) (wchar_t *)L"INSERT INTO apis1053(id, name) VALUES(?, ?)", SQL_NTS);
 
       retcode = SQLBindParameter (hStmt, 1, SQL_PARAM_INPUT, SQL_C_LONG, SQL_INTEGER, 0, 0, 0, 0, NULL);
