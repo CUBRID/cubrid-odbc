@@ -1315,7 +1315,10 @@ public:
       retcode = SQLAllocHandle (SQL_HANDLE_ENV, SQL_NULL_HANDLE, &hEnv);
       retcode = SQLSetEnvAttr (hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
       retcode = SQLAllocHandle (SQL_HANDLE_DBC, hEnv, &hDbc);
-      retcode = SQLConnect (hDbc, L"CUBRID Driver Unicode", SQL_NTS, L"dba", SQL_NTS, L"", SQL_NTS);
+      retcode = SQLDriverConnect (hDbc, NULL,
+				  L"DRIVER=CUBRID Driver Unicode;DB_NAME=demodb;SERVER=test-db-server;PORT=33000;UID=dba;PWD=;CHARSET=MS949",
+				  SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+
       Assert::AreNotEqual ((int)retcode, SQL_ERROR);
       retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hStmt);
 
