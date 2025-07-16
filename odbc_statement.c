@@ -232,6 +232,7 @@ odbc_reset_statement (ODBC_STATEMENT *stmt, unsigned short option)
     case SQL_CLOSE:
       rc = odbc_close_cursor (stmt);
       break;
+
     case SQL_UNBIND:
       reset_descriptor (stmt->ard);
       stmt->ird->rows_processed_ptr = NULL;
@@ -286,7 +287,7 @@ odbc_free_statement (ODBC_STATEMENT *stmt)
 	      stmt->conn->statements = stmt->next;
 	    }
 	}
-      odbc_close_cursor (stmt);
+      odbc_close_statement (stmt);
     }
 
 
@@ -1829,6 +1830,37 @@ odbc_put_data (ODBC_STATEMENT *stmt, void *data_ptr, SQLLEN strlen_or_ind)
 ************************************************************************/
 PUBLIC RETCODE
 odbc_close_cursor (ODBC_STATEMENT *stmt)
+{
+  T_CCI_ERROR cci_err_buf;
+  int cci_rc;
+  if (stmt->stmthd > 0)
+    {
+      cci_fetch_buffer_clear (stmt->stmthd);
+      cci_rc = cci_close_query_result (stmt->stmthd, &cci_err_buf);
+      if (cci_rc != CCI_ER_NO_ERROR)
+	{
+	  odbc_set_diag_by_cci (stmt->diag, cci_rc, &cci_err_buf);
+	  return ODBC_ERROR;
+	}
+
+      if (stmt->result_type != TYPE_INFO)
+	{
+	  odbc_auto_commit (stmt->conn);
+	}
+    }
+  reset_result_set (stmt);
+  return ODBC_SUCCESS;
+}
+
+/************************************************************************
+* name: odbc_close_statement
+* arguments:
+* returns/side-effects:
+* description:
+* NOTE:
+************************************************************************/
+PUBLIC RETCODE
+odbc_close_statement (ODBC_STATEMENT *stmt)
 {
   if (stmt->stmthd > 0)
     {
