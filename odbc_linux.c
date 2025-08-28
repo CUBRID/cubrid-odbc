@@ -330,8 +330,6 @@ itoa (int value, char *string, int radix)
   return string;
 }
 
-char *copy_first2bytes (wchar_t * wstr, int size);
-
 int
 WideCharToMultiByte (int CodePage,
 		     int dwFlags,
@@ -359,9 +357,9 @@ WideCharToMultiByte (int CodePage,
     {
       mb_len = wstr_len * LENGTH_RATIO_WCHAR_TO_MULTIBYTE;
       if ((mb_str = (char *) calloc (1, wstr_len * LENGTH_RATIO_WCHAR_TO_MULTIBYTE)) == NULL)
-        {
-          return ERR_NO_MEMORY;
-        }
+	{
+	  return ERR_NO_MEMORY;
+	}
       mb_str_orig = mb_str;
     }
   else
@@ -397,7 +395,7 @@ WideCharToMultiByte (int CodePage,
 
 int
 MultiByteToWideChar (int CodePage, DWORD dwFlags, char *lpMultiByteStr, int cbMultiByte,
-         wchar_t *lpWideCharStr, int cchWideChar)
+		     wchar_t *lpWideCharStr, int cchWideChar)
 {
   char *unicode_charset = CODE_NAME_UNICODE;
   char *charset = CODE_NAME_UTF8;
@@ -423,9 +421,9 @@ MultiByteToWideChar (int CodePage, DWORD dwFlags, char *lpMultiByteStr, int cbMu
     {
       wstr_len = sizeof (wchar_t) * mb_len;
       if ((wstr = (wchar_t *) calloc (sizeof (wchar_t), mb_len)) == NULL)
-        {
-          return ERR_NO_MEMORY;
-        }
+	{
+	  return ERR_NO_MEMORY;
+	}
       wstr_orig = wstr;
     }
 
@@ -447,7 +445,7 @@ MultiByteToWideChar (int CodePage, DWORD dwFlags, char *lpMultiByteStr, int cbMu
 
   if (cchWideChar > 0 && rc >= 0)
     {
-      *((wchar_t *) wstr) = L'\0';
+      * ((wchar_t *) wstr) = L'\0';
     }
 
   if (cchWideChar == 0 && wstr_orig != NULL)
