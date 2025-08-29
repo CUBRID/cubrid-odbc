@@ -1010,7 +1010,7 @@ SQLColAttributeW (SQLHSTMT StatementHandle,
   OutputDebugString ("SQLColAttributeW called.\n");
 
   ret = SQLColAttribute2 (StatementHandle, ColumnNumber,
-			 FieldIdentifier, CharacterAttribute, BufferLength, StringLength, NumericAttribute);
+			  FieldIdentifier, CharacterAttribute, BufferLength, StringLength, NumericAttribute);
   if (CharacterAttribute)
     {
       BufferLength /= sizeof (SQLWCHAR);

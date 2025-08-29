@@ -270,13 +270,13 @@ SQLCloseCursor (SQLHSTMT StatementHandle)
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLColAttribute2 (SQLHSTMT StatementHandle,
-		 SQLUSMALLINT ColumnNumber,
-		 SQLUSMALLINT FieldIdentifier,
-		 SQLPOINTER CharacterAttribute, SQLSMALLINT BufferLength, SQLSMALLINT *StringLength,
+		  SQLUSMALLINT ColumnNumber,
+		  SQLUSMALLINT FieldIdentifier,
+		  SQLPOINTER CharacterAttribute, SQLSMALLINT BufferLength, SQLSMALLINT *StringLength,
 #if defined (_WIN64) || defined (__linux__)
-		 SQLLEN *NumericAttribute)
+		  SQLLEN *NumericAttribute)
 #else
-		 SQLPOINTER NumericAttribute)
+		  SQLPOINTER NumericAttribute)
 #endif
 {
   RETCODE rc = SQL_SUCCESS;
