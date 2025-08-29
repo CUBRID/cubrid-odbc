@@ -479,10 +479,10 @@ SQLDisconnect (SQLHDBC ConnectionHandle)
  */
 ODBC_INTERFACE RETCODE SQL_API
 SQLDriverConnect2 (HDBC hdbc,
-		  HWND hWnd,
-		  UCHAR *szConnStrIn,
-		  SWORD cbConnStrIn,
-		  UCHAR *szConnStrOut, SWORD cbConnStrOut, SQLSMALLINT *pcbConnStrOut, UWORD uwMode)
+		   HWND hWnd,
+		   UCHAR *szConnStrIn,
+		   SWORD cbConnStrIn,
+		   UCHAR *szConnStrOut, SWORD cbConnStrOut, SQLSMALLINT *pcbConnStrOut, UWORD uwMode)
 {
   RETCODE rc = ODBC_SUCCESS;
 
