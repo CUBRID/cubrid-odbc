@@ -51,6 +51,7 @@
 			} while (0)
 #define UT_ALLOC_BSTR(size)	UT_ALLOC(size * WCHAR_LENGTH)
 #define UT_FREE_BSTR(ptr)	UR_FREE(ptr)
+#define LENGTH_RATIO_WCHAR_TO_MULTIBYTE 3
 #endif
 
 #define   UT_REALLOC(ptr, size)   ut_realloc(ptr, size)
@@ -58,6 +59,14 @@
 #define   UT_MAKE_BINARY(ptr, length) ut_make_binary(ptr, length)
 #define   UT_APPEND_STRING(str1, str2, len2)  ut_append_string(str1, str2, len2)
 #define   UT_SET_DELIMITER      ";;"
+
+#define CODE_NAME_EUCKR   "EUCKR"
+#define CODE_NAME_UTF8    "UTF-8"
+#define CODE_NAME_UNICODE "UCS2"
+
+#define REQUIRED_SIZE_ONLY  0
+#define ER_ICONV_CODENAME	-1
+#define ER_ICONV_INVALID_SEQ	-2
 
 /* NC_FREE - NULL check free
  * NA_FREE - NULL assign free

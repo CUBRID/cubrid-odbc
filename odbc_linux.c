@@ -38,13 +38,8 @@ PUBLIC INT_PTR CALLBACK ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM 
 #define LINE_SIZE 512
 #define PROF_BUF_SIZE 4096
 
-#define LENGTH_RATIO_WCHAR_TO_MULTIBYTE 3 // we expect maximum 3 bytes required for a wide charcter
-#define REQUIRED_SIZE_ONLY  0
 #define ERR_CONV_FAILED     -1
 #define ERR_NO_MEMORY       -2
-#define CODE_NAME_EUCKR   "EUCKR"
-#define CODE_NAME_UTF8    "UTF-8"
-#define CODE_NAME_UNICODE "UCS2"
 #define NULL_CHAR ((char)'\0')
 
 /*
