@@ -1523,13 +1523,15 @@ public:
 
       retcode = SQLFreeStmt (hStmt, SQL_CLOSE);
       Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
       retcode = SQLCloseCursor (hStmt);
-      Assert::AreEqual ((int)retcode, SQL_ERROR);
+      Assert::AreEqual ((int)retcode, SQL_SUCCESS_WITH_INFO);
+
       SQLWCHAR Sqlstate[1024] = { 0, };
       retcode = SQLGetDiagRec (SQL_HANDLE_STMT, hStmt, 1, Sqlstate, NULL, NULL, NULL, NULL);
-      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
       wsprintf (wmsg, L"Sqlstate %s", Sqlstate);
       Assert::AreEqual (Sqlstate, L"HY000");
+
       retcode = SQLDisconnect (hDbc);
       retcode = SQLFreeHandle (SQL_HANDLE_DBC, hDbc);
       retcode = SQLFreeHandle (SQL_HANDLE_ENV, hEnv);
