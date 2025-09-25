@@ -34,9 +34,11 @@
 #include    "odbc_portable.h"
 
 #if defined (_WINDOWS)
-#define WCHAR_LENGTH	(sizeof (wchar_t))
-#define UT_ALLOC(size)	ut_alloc(size)
-#define UT_FREE(ptr)	ut_free(ptr)
+#define WCHAR_LENGTH		(sizeof (wchar_t))
+#define UT_ALLOC(size)		ut_alloc(size)
+#define UT_FREE(ptr)		ut_free(ptr)
+#define UT_ALLOC_BSTR(size)	ut_alloc_bstr(size)
+#define UT_FREE_BSTR(ptr)	ut_free_bstr(ptr)
 #else
 #define WCHAR_LENGTH	(sizeof (uint16_t))
 #define UT_ALLOC(size)	((char *) calloc (1, size))
@@ -47,15 +49,14 @@
 					ptr = NULL;	\
 				}			\
 			} while (0)
+#define UT_ALLOC_BSTR(size)	UT_ALLOC(size * WCHAR_LENGTH)
+#define UT_FREE_BSTR(ptr)	UR_FREE(ptr)
 #endif
 
 #define   UT_REALLOC(ptr, size)   ut_realloc(ptr, size)
 #define   UT_MAKE_STRING(ptr, length) ut_make_string(ptr, length)
 #define   UT_MAKE_BINARY(ptr, length) ut_make_binary(ptr, length)
 #define   UT_APPEND_STRING(str1, str2, len2)  ut_append_string(str1, str2, len2)
-
-#define           UT_ALLOC_BSTR(size)   ut_alloc_bstr(size)
-#define           UT_FREE_BSTR(ptr)     ut_free_bstr(ptr)
 #define   UT_SET_DELIMITER      ";;"
 
 /* NC_FREE - NULL check free
