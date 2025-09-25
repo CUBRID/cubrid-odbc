@@ -1137,6 +1137,39 @@ str_value_assign (const char *in_value, char *out_buf, SQLLEN out_buf_len, SQLLE
 }
 
 
+PUBLIC RETCODE
+wchar_value_assign (const char *str, char *out_buf, SQLLEN out_buf_len, SQLLEN *str_len_ptr)
+{
+  RETCODE rc = ODBC_SUCCESS;
+  int i;
+  SQLLEN length = -1;
+  int size;
+
+  if (str != NULL)
+    {
+      size = strlen (str);
+      if (out_buf != NULL && out_buf_len > 0)
+        {
+          if (bytes_to_wide_char (str, size, (wchar_t **) (&out_buf), out_buf_len, &length, CODE_NAME_UNICODE) < 0)
+	    {
+	      rc = ODBC_ERROR;
+	    }
+        }
+
+      if ((unsigned int) out_buf_len <= length)
+        {
+          rc = ODBC_SUCCESS_WITH_INFO;
+        }
+    }
+
+  if (str_len_ptr != NULL)
+    {
+
+      *str_len_ptr = str ? length : SQL_NULL_DATA;
+    }
+
+  return rc;
+}
 /************************************************************************
  * name: bin_value_assign
  * arguments:
