@@ -78,7 +78,7 @@ SQLDriverConnectW (SQLHDBC hdbc, SQLHWND hwnd,
     }
   memset (pt_out, 0, out_max);
 
-  rc = SQLDriverConnect2 (hdbc, hwnd, pt_in, in_len, pt_out, out_max, out_len, completion);
+  rc = SQLDriverConnect (hdbc, hwnd, pt_in, in_len, pt_out, out_max, out_len, completion);
   if (out)
     {
       bytes_to_wide_char (pt_out, strlen (pt_out), &out, out_max, &temp_out_len, conn->charset);
@@ -567,7 +567,7 @@ SQLPrepareW (SQLHSTMT hstmt, SQLWCHAR *str, SQLINTEGER str_len)
 
   wide_char_to_bytes (str, str_len, &sql_state, &sql_state_len, stmt_handle->conn->charset);
 
-  ret = SQLPrepare2 (hstmt, sql_state, sql_state_len);
+  ret = SQLPrepare (hstmt, sql_state, sql_state_len);
   UT_FREE (sql_state);
   return ret;
 }
@@ -1009,8 +1009,8 @@ SQLColAttributeW (SQLHSTMT StatementHandle,
   ODBC_STATEMENT *stmt = (ODBC_STATEMENT *) StatementHandle;
   OutputDebugString ("SQLColAttributeW called.\n");
 
-  ret = SQLColAttribute2 (StatementHandle, ColumnNumber,
-			  FieldIdentifier, CharacterAttribute, BufferLength, StringLength, NumericAttribute);
+  ret = SQLColAttribute (StatementHandle, ColumnNumber,
+			 FieldIdentifier, CharacterAttribute, BufferLength, StringLength, NumericAttribute);
   if (CharacterAttribute)
     {
       BufferLength /= sizeof (SQLWCHAR);

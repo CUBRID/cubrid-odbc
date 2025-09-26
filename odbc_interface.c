@@ -269,14 +269,14 @@ SQLCloseCursor (SQLHSTMT StatementHandle)
 
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLColAttribute2 (SQLHSTMT StatementHandle,
-		  SQLUSMALLINT ColumnNumber,
-		  SQLUSMALLINT FieldIdentifier,
-		  SQLPOINTER CharacterAttribute, SQLSMALLINT BufferLength, SQLSMALLINT *StringLength,
+SQLColAttribute (SQLHSTMT StatementHandle,
+		 SQLUSMALLINT ColumnNumber,
+		 SQLUSMALLINT FieldIdentifier,
+		 SQLPOINTER CharacterAttribute, SQLSMALLINT BufferLength, SQLSMALLINT *StringLength,
 #if defined (_WIN64) || defined (__linux__)
-		  SQLLEN *NumericAttribute)
+		 SQLLEN *NumericAttribute)
 #else
-		  SQLPOINTER NumericAttribute)
+		 SQLPOINTER NumericAttribute)
 #endif
 {
   RETCODE rc = SQL_SUCCESS;
@@ -301,21 +301,6 @@ SQLColAttribute2 (SQLHSTMT StatementHandle,
   DEBUG_TIMESTAMP (END_SQLColAttribute);
 
   ODBC_RETURN (rc, StatementHandle);
-}
-
-ODBC_INTERFACE RETCODE SQL_API
-SQLColAttribute (SQLHSTMT StatementHandle,
-		 SQLUSMALLINT ColumnNumber,
-		 SQLUSMALLINT FieldIdentifier,
-		 SQLPOINTER CharacterAttribute, SQLSMALLINT BufferLength, SQLSMALLINT *StringLength,
-#if defined (_WIN64) || defined (__linux__)
-		 SQLLEN *NumericAttribute)
-#else
-		 SQLPOINTER NumericAttribute)
-#endif
-{
-  return SQLColAttribute2 (StatementHandle, ColumnNumber, FieldIdentifier, CharacterAttribute, BufferLength,
-			   StringLength, NumericAttribute);
 }
 #endif
 
@@ -478,11 +463,11 @@ SQLDisconnect (SQLHDBC ConnectionHandle)
  *    - PWD entry는 file DSN에 추가되지 않는다.
  */
 ODBC_INTERFACE RETCODE SQL_API
-SQLDriverConnect2 (HDBC hdbc,
-		   HWND hWnd,
-		   UCHAR *szConnStrIn,
-		   SWORD cbConnStrIn,
-		   UCHAR *szConnStrOut, SWORD cbConnStrOut, SQLSMALLINT *pcbConnStrOut, UWORD uwMode)
+SQLDriverConnect (HDBC hdbc,
+		  HWND hWnd,
+		  UCHAR *szConnStrIn,
+		  SWORD cbConnStrIn,
+		  UCHAR *szConnStrOut, SWORD cbConnStrOut, SQLSMALLINT *pcbConnStrOut, UWORD uwMode)
 {
   RETCODE rc = ODBC_SUCCESS;
 
@@ -832,16 +817,6 @@ SQLDriverConnect2 (HDBC hdbc,
   DEBUG_TIMESTAMP (END_SQLDriverConnect);
 
   ODBC_RETURN (rc, hdbc);
-}
-
-ODBC_INTERFACE RETCODE SQL_API
-SQLDriverConnect (HDBC hdbc,
-		  HWND hWnd,
-		  UCHAR *szConnStrIn,
-		  SWORD cbConnStrIn,
-		  UCHAR *szConnStrOut, SWORD cbConnStrOut, SQLSMALLINT *pcbConnStrOut, UWORD uwMode)
-{
-  return SQLDriverConnect2 (hdbc, hWnd, szConnStrIn, cbConnStrIn, szConnStrOut, cbConnStrOut, pcbConnStrOut, uwMode);
 }
 
 #if (ODBCVER >= 0x0300)
@@ -1496,7 +1471,7 @@ SQLParamData (SQLHSTMT StatementHandle, SQLPOINTER *Value)
 
 // 오직 SQLPrepare만 prepared된 상태로 만들수 있다.
 ODBC_INTERFACE RETCODE SQL_API
-SQLPrepare2 (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER TextLength)
+SQLPrepare (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER TextLength)
 {
   RETCODE rc = SQL_SUCCESS;
   SQLCHAR *stStatementText = NULL;
@@ -1533,12 +1508,6 @@ SQLPrepare2 (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER TextLe
   DEBUG_TIMESTAMP (END_SQLPrepare);
 
   ODBC_RETURN (rc, StatementHandle);
-}
-
-ODBC_INTERFACE RETCODE SQL_API
-SQLPrepare (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER TextLength)
-{
-  return SQLPrepare2 (StatementHandle, StatementText, TextLength);
 }
 
 ODBC_INTERFACE RETCODE SQL_API
