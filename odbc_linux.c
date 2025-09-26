@@ -36,11 +36,8 @@ static int get_section_from_file (const char *ini, const char *section, char *va
 PUBLIC INT_PTR CALLBACK ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam);
 
 #define LINE_SIZE 512
+#define TBUF_SIZE 8192
 #define PROF_BUF_SIZE 4096
-
-#define ERR_CONV_FAILED     -1
-#define ERR_NO_MEMORY       -2
-#define NULL_CHAR ((char)'\0')
 
 /*
  * ODBC Driver function not supported
@@ -145,6 +142,26 @@ INT_PTR
 DialogBoxParam (HINSTANCE hInst, LPCSTR tmpNaae, HWND hWndP, INT_PTR CALLBACK lpDialogFunc, LPARAM dwInit)
 {
   return NULL;
+}
+
+
+WCHAR *
+SysAllocStringLen (const WCHAR *strIn, UINT ui)
+{
+  WCHAR *p;
+
+  p = calloc (1, ui * sizeof (WCHAR));
+  return p;
+}
+
+void
+SysFreeString (WCHAR *bstr)
+{
+  if (bstr)
+    {
+      free (bstr);
+      bstr = NULL;
+    }
 }
 
 void
@@ -305,131 +322,139 @@ itoa (int value, char *string, int radix)
   return string;
 }
 
-int
-WideCharToMultiByte (int CodePage,
-		     int dwFlags,
-		     wchar_t *lpWideCharStr,
-		     int cchWideChar, char *lpMultiByteStr, int cbMultiByte, char *lpDefaultChar, char *lpUsedDefaultChar)
-{
-  char *charset = CODE_NAME_UTF8;
-  char *unicode_charset = CODE_NAME_UNICODE;
-  uint16_t *wstr = lpWideCharStr;
-  char *mb_str = lpMultiByteStr;
-  char *mb_str_orig;
-  size_t wstr_len, mb_len, out_bytes_left;
-  iconv_t cd;
-  int rc;
-  int bytes_required;
-
-  if (cchWideChar == 0)
-    {
-      return ERR_CONV_FAILED;
-    }
-
-  wstr_len = cchWideChar < 0 ? wcslen (lpWideCharStr) * sizeof (wchar_t) : cchWideChar * 2;
-
-  if (cbMultiByte == REQUIRED_SIZE_ONLY)
-    {
-      mb_len = wstr_len * LENGTH_RATIO_WCHAR_TO_MULTIBYTE;
-      if ((mb_str = (char *) calloc (1, wstr_len * LENGTH_RATIO_WCHAR_TO_MULTIBYTE)) == NULL)
-	{
-	  return ERR_NO_MEMORY;
-	}
-      mb_str_orig = mb_str;
-    }
-  else
-    {
-      mb_len = cbMultiByte;
-    }
-
-  out_bytes_left = mb_len;
-
-  if (CodePage == CP_EUC_KR)
-    {
-      charset = CODE_NAME_EUCKR;
-    }
-
-  if ((cd = iconv_open (charset, unicode_charset)) < 0)
-    {
-      return ERR_CONV_FAILED;
-    }
-
-  rc = iconv (cd, (char **)&wstr, &wstr_len, &mb_str, &out_bytes_left);
-
-  bytes_required = rc < 0 ? ERR_CONV_FAILED : (mb_len - out_bytes_left);
-
-  if (cbMultiByte == 0 && mb_str != NULL)
-    {
-      bytes_required += sizeof (NULL_CHAR);
-      free (mb_str_orig);
-    }
-
-  rc = iconv_close (cd);
-  return (cd < 0 ? ERR_CONV_FAILED : bytes_required);
-}
 
 int
-MultiByteToWideChar (int CodePage, DWORD dwFlags, char *lpMultiByteStr, int cbMultiByte,
+MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int cbMultiByte,
 		     wchar_t *lpWideCharStr, int cchWideChar)
 {
-  char *unicode_charset = CODE_NAME_UNICODE;
-  char *charset = CODE_NAME_UTF8;
-  wchar_t *wstr = lpWideCharStr;
-  wchar_t *wstr_orig = NULL;
-  char *mb_str = lpMultiByteStr;
-  size_t wstr_len = cchWideChar;
-  size_t mb_len, out_bytes_left;
-  int bytes_required;
+  char *default_unicode_charset = "UTF-16LE";
+  char *charset = "UTF-8";
+  void *iconv_out = lpWideCharStr;
+  char *iconv_in = lpMultiByteStr;
+  size_t iconv_in_len = cbMultiByte;
+  size_t iconv_out_len = cchWideChar * sizeof (wchar_t);
+  size_t iconv_out_org = iconv_out_len;
+  wchar_t _buf[TBUF_SIZE];
+  char outbuf[TBUF_SIZE], *op = outbuf;
   iconv_t cd;
-  int rc;
-  int mb_length;
+  int ret, required;
 
-  if (cbMultiByte == 0)
+  memset (outbuf, 0, TBUF_SIZE);
+  if (cchWideChar == 0)
     {
-      return ERR_CONV_FAILED;
+      iconv_out_len = TBUF_SIZE;
+      iconv_out_org = TBUF_SIZE;
+      iconv_out = &_buf[0];
     }
 
-  mb_len = cbMultiByte < 0 ? strlen (lpMultiByteStr) : cbMultiByte;
-  mb_length = mb_len;
-
-  if (cchWideChar == REQUIRED_SIZE_ONLY)
+  switch (codepage)
     {
-      wstr_len = sizeof (wchar_t) * mb_len;
-      if ((wstr = (wchar_t *) calloc (sizeof (wchar_t), mb_len)) == NULL)
-	{
-	  return ERR_NO_MEMORY;
-	}
-      wstr_orig = wstr;
+    case CP_EUC_KR:
+      charset = "EUCKR";
+      break;
+    case CP_UTF8:
+    case CP_ACP:
+      charset = "UTF-8";
+      break;
+    default:
+      charset = "UTF-8";
+      break;
     }
 
-  out_bytes_left = wstr_len;
-
-  if (CodePage == CP_EUC_KR)
+  if ((cd = iconv_open (default_unicode_charset, charset)) < 0)
     {
-      charset = CODE_NAME_EUCKR;
+      return -1;
     }
 
-  if ((cd = iconv_open (unicode_charset, charset)) < 0)
+  ret = iconv (cd, &iconv_in, &iconv_in_len, &op, &iconv_out_len);
+  iconv_close (cd);
+
+  if (ret < 0)
     {
-      return ERR_CONV_FAILED;
+      return -1;
     }
 
-  rc = iconv (cd, &mb_str, &mb_len, &wstr, &out_bytes_left);
+  required = (iconv_out_org - iconv_out_len);
 
-  bytes_required = rc < 0 ? ERR_CONV_FAILED : (wstr_len - out_bytes_left);
-
-  if (cchWideChar > 0 && rc >= 0)
+  if (cchWideChar != 0)
     {
-      * ((wchar_t *) wstr) = L'\0';
+      memcpy (iconv_out, op, required);
     }
 
-  if (cchWideChar == 0 && wstr_orig != NULL)
+  return required;
+}
+
+
+int
+WideCharToMultiByte (int wincode,
+		     int dw,
+		     wchar_t *str,
+		     int size, char *out_buffer, int cbMultiByte, char *lpdefaultchar, char *lpusedfdefaultchar)
+{
+  char *charset;
+  char *default_unicode_charset = "UTF-16";	// UCS2, UCS2-LE
+  iconv_t cd;
+  char *iconv_out = out_buffer;
+  unsigned char *iconv_in = (unsigned char *) str;
+
+  size_t iconv_in_len = (size_t) size;
+  size_t iconv_out_len = (size_t) cbMultiByte;
+  size_t iconv_out_org = (size_t) cbMultiByte;
+  int ret, required;
+  char _buf[TBUF_SIZE];
+  char inbuf[TBUF_SIZE], *ip = inbuf;
+
+  memset (inbuf, 0, TBUF_SIZE);
+
+  if (size > 0)
     {
-      bytes_required += sizeof (wchar_t);
-      free (wstr_orig);
+      memcpy (inbuf, &iconv_in[0], size);
     }
 
-  rc = iconv_close (cd);
+  memset (_buf, 0, TBUF_SIZE);
 
-  return (cd < 0 ? ERR_CONV_FAILED : bytes_required);
+  if (out_buffer == NULL)
+    {
+      iconv_out = _buf;
+      iconv_out_org = (size_t) TBUF_SIZE;
+      iconv_out_len = (size_t) TBUF_SIZE;
+    }
+
+  if (size < 0)
+    {
+      size = TBUF_SIZE / sizeof (wchar_t);
+    }
+
+  switch (wincode)
+    {
+    case CP_UTF8:
+      charset = "UTF-8";
+      break;
+    case CP_EUC_KR:
+      charset = "EUCKR";
+      break;
+    default:
+      charset = "UTF-8";
+      break;
+    }
+
+  if ((cd = iconv_open (charset, default_unicode_charset)) < 0)
+    {
+      return -1;
+    }
+
+  memset (iconv_out, 0, iconv_out_len);
+  ret = iconv (cd, &ip, &iconv_in_len, &iconv_out, &iconv_out_len);
+
+  iconv_close (cd);
+
+  if (ret < 0)
+    {
+      return -1;
+    }
+
+  required = iconv_out_org - iconv_out_len;
+
+  return required;
+
 }
