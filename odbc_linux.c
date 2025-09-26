@@ -30,8 +30,7 @@
 #include  "odbc_resource.h"
 #include  "odbc_connection.h"
 #include  "odbc_util.h"
-
-static int get_section_from_file (const char *ini, const char *section, char *value_p, int size);
+#include  "ini.h"
 
 PUBLIC INT_PTR CALLBACK ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -82,41 +81,48 @@ SQLGetPrivateProfileString (LPCSTR lpszSection,
 			    LPCSTR lpszEntry,
 			    LPCSTR lpszDefault, LPSTR lpszRetBuffer, int cbRetBuffer, LPCSTR lpszFilename)
 {
-  int rc = SQL_ERROR;
-  char inifile[_MAX_PATH];
-  char filename[_MAX_PATH];
-  char element_list[PROF_BUF_SIZE];
-  char *envp, *p;
+  int rc = SQL_SUCCESS;
+  char *envp;
+  HINI hIni;
+  char szFileName [512];
+  struct stat sb;
+  int found = 0;
 
   OutputDebugString ("SQLGetPrivateProfileString called");
 
-  envp = getenv ("ODBCINI");
-  if (envp != NULL)
+  if (stat (lpszFilename, &sb) == 0)
     {
-      snprintf (inifile, _MAX_PATH, "%s", envp);
+      snprintf (szFileName, sizeof (szFileName), "%s", lpszFilename);
+    }
+  else if ((envp = getenv ("ODBCINI")) != NULL)
+    {
+      snprintf (szFileName, sizeof (szFileName), "%s", envp);
     }
   else
     {
-      tolower_str (filename, lpszFilename);
-      snprintf (inifile, _MAX_PATH, "%s/.%s", getenv ("HOME"), filename);
+      snprintf (szFileName, sizeof (szFileName), "%s/.odbc.ini", getenv ("HOME"));
     }
 
-  memset (element_list, 0, PROF_BUF_SIZE);
-  if (get_section_from_file (inifile, lpszSection, element_list, PROF_BUF_SIZE) < 0)
+  if (iniOpen( &hIni, szFileName, "#;", '[', ']', '=', TRUE) != INI_SUCCESS)
+   {
+     return rc;
+   }
+
+  if (iniPropertySeek( hIni, lpszSection, lpszEntry, "") == INI_SUCCESS)
     {
-      return -1;
+      found = 1;
     }
 
-  if ((p = element_value_by_key (element_list, lpszEntry)) == NULL)
+  if (lpszRetBuffer && cbRetBuffer > 0)
     {
-      return rc;
+      snprintf (lpszRetBuffer, cbRetBuffer, "%s", found ? hIni->hCurProperty->szValue : lpszDefault);
+      rc = strlen (lpszRetBuffer);
     }
 
-  strcpy (lpszRetBuffer, p);
+  iniClose (hIni);
 
   return rc;
 }
-
 /*
  * Version Introduced: ODBC 1.0 Standards Compliance: Deprecated
  */
@@ -148,92 +154,6 @@ void
 OutputDebugString (const char *str, ...)
 {
   return;
-}
-
-/*
- * Linux Specific
- */
-
-static int
-get_section_from_file (const char *ini, const char *section, char *value_p, int size)
-{
-  FILE *fp, *fopen ();
-  char buf[LINE_SIZE];
-  char *p, *pt;
-  int rc = -1;
-  int found = 0;
-
-  if (ini == NULL || section == NULL || value_p == NULL || size < 1)
-    {
-      return -1;
-    }
-
-  if ((fp = fopen (ini, "r")) == NULL)
-    {
-      return 1;
-    }
-
-  while (!feof (fp))
-    {
-      if (fgets (buf, LINE_SIZE, fp))
-	{
-	  if (buf[0] == '[')
-	    {
-	      p = strchr (buf, ']');
-	      if (p != NULL)
-		{
-		  *p = '\0';
-		  if (strcasecmp (&buf[1], section) == 0)
-		    {
-		      found = 1;
-		      break;
-		    }
-		}
-	    }
-	  else
-	    {
-	      continue;
-	    }
-	}
-    }
-
-  if (!found)
-    {
-      return -1;
-    }
-
-  while (!feof (fp))
-    {
-      if (fgets (buf, LINE_SIZE, fp))
-	{
-	  p = strchr (buf, '\n');
-	  if (p)
-	    {
-	      *p = '\0';
-	    }
-
-	  if (buf[0] == '\0' || buf[0] == '#' || buf[0] == '[')
-	    {
-	      rc = 0;
-	      break;
-	    }
-
-	  strcat (value_p, buf);
-	  strcat (value_p, ";");
-	  rc = 0;
-	}
-    }
-
-  fclose (fp);
-  for (pt = value_p; *pt != '\0'; ++pt)
-    {
-      if (*pt == ';')		// connection string delimiter
-	{
-	  *pt = '\0';
-	}
-    }
-
-  return rc;
 }
 
 /*
