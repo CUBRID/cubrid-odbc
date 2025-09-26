@@ -144,26 +144,6 @@ DialogBoxParam (HINSTANCE hInst, LPCSTR tmpNaae, HWND hWndP, INT_PTR CALLBACK lp
   return NULL;
 }
 
-
-WCHAR *
-SysAllocStringLen (const WCHAR *strIn, UINT ui)
-{
-  WCHAR *p;
-
-  p = calloc (1, ui * sizeof (WCHAR));
-  return p;
-}
-
-void
-SysFreeString (WCHAR *bstr)
-{
-  if (bstr)
-    {
-      free (bstr);
-      bstr = NULL;
-    }
-}
-
 void
 OutputDebugString (const char *str, ...)
 {
