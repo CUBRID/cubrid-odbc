@@ -213,9 +213,9 @@ sqlwcharlen (const WCHAR *wstr)
   while (p)
     {
       if (*p == 0)
-        {
-          break;
-        }
+	{
+	  break;
+	}
 
       p = p + WCHAR_LENGTH;
       ++len;
@@ -1149,17 +1149,17 @@ wchar_value_assign (const char *str, char *out_buf, SQLLEN out_buf_len, SQLLEN *
     {
       size = strlen (str);
       if (out_buf != NULL && out_buf_len > 0)
-        {
-          if (bytes_to_wide_char (str, size, (wchar_t **) (&out_buf), out_buf_len, &length, CODE_NAME_UNICODE) < 0)
+	{
+	  if (bytes_to_wide_char (str, size, (wchar_t **) (&out_buf), out_buf_len, &length, CODE_NAME_UNICODE) < 0)
 	    {
 	      rc = ODBC_ERROR;
 	    }
-        }
+	}
 
       if ((unsigned int) out_buf_len <= length)
-        {
-          rc = ODBC_SUCCESS_WITH_INFO;
-        }
+	{
+	  rc = ODBC_SUCCESS_WITH_INFO;
+	}
     }
 
   if (str_len_ptr != NULL)
@@ -1535,7 +1535,11 @@ wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length,
 
   if (str == NULL)
     {
-      if (out_length) *out_length = 0;
+      if (out_length)
+	{
+	  *out_length = 0;
+	}
+
       return ODBC_SUCCESS;
     }
 
@@ -1558,7 +1562,7 @@ wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length,
 
   if ((rc = iconv (cd, (char **)&wbuf, &wbuf_len, &mbuf, &out_bytes_left)) < 0)
     {
-       return ER_ICONV_INVALID_SEQ;
+      return ER_ICONV_INVALID_SEQ;
     }
 
   iconv_close (cd);
@@ -1665,9 +1669,9 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
       wbuf_len = (num_chars + 1) * WCHAR_LENGTH;
       wbuf = (uint16_t *) calloc (1, wbuf_len);
       if (wbuf == NULL)
-        {
-          return CCI_ER_NO_MORE_MEMORY;
-        }
+	{
+	  return CCI_ER_NO_MORE_MEMORY;
+	}
       wbuf_orig = wbuf;
     }
 
@@ -1691,8 +1695,7 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
   if (buffer_length == 0 || buffer_length > (bytes_required + 1))
     {
       * ((wchar_t *) wbuf) = L'\0';
-
-        *buffer = wbuf_orig;
+      *buffer = wbuf_orig;
     }
 
 ret:
