@@ -33,6 +33,8 @@
 #include  "ini.h"
 
 PUBLIC INT_PTR CALLBACK ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam);
+static char * find_key (char *string, char *key);
+static void dsn2connstr (CUBRIDDSNItem *dsn, char *connstr);
 
 #define LINE_SIZE 512
 #define TBUF_SIZE 8192
@@ -123,6 +125,130 @@ SQLGetPrivateProfileString (LPCSTR lpszSection,
 
   return rc;
 }
+
+ODBC_INTERFACE RETCODE SQL_API
+SQLDriverConnectLinux (HDBC hdbc,
+                   HWND hWnd,
+                   UCHAR *szConnStrIn,
+                   SWORD cbConnStrIn,
+                   UCHAR *szConnStrOut, SWORD cbConnStrOut, SQLSMALLINT *pcbConnStrOut, UWORD uwMode)
+{
+  HINI    hIni;
+  RETCODE rc = ODBC_SUCCESS;
+  char ini_file[_MAX_PATH];
+  const char *ptDSN, *ptDBName, *ptUser, *ptPWD, *ptServer, *ptPort;
+  int port, fetch_size = 1;
+  const char *ptCharSet = CODE_NAME_UNICODE;
+  const char *ptAutoCommit="true";
+  const char *ptOmitSchema="no";
+  const char *ConnStrIn = NULL;
+  CUBRIDDSNItem dsn;
+  char connstr_buf[1024]="";
+
+  memset (&dsn, 0, sizeof (dsn));
+  snprintf (ini_file, sizeof (ini_file), "%s/.odbc.ini", getenv ("HOME"));
+
+  if (iniOpen( &hIni, ini_file, "#;", '[', ']', '=', TRUE) != INI_SUCCESS)
+    {
+      return ODBC_ERROR;
+    }
+
+  if ((ptDSN = find_key (szConnStrIn, KEYWORD_DSN)) == NULL)
+    {
+      return ODBC_ERROR;
+    }
+
+  snprintf (dsn.dsn, ITEMBUFLEN, "%s", ptDSN);
+
+  if ((ptDBName = find_key (szConnStrIn, KEYWORD_DBNAME)) == NULL)
+    {
+      if (iniPropertySeek(hIni, ptDSN, KEYWORD_DBNAME, "") == INI_SUCCESS)
+	{
+	  snprintf (dsn.db_name, ITEMBUFLEN, "%s", hIni->hCurProperty->szValue);
+	  ptDBName = dsn.db_name;
+	}
+    }
+  else
+    {
+      snprintf (dsn.db_name, ITEMBUFLEN, "%s", ptDBName);
+    }
+
+  if ((ptUser = find_key (szConnStrIn, KEYWORD_USER)) == NULL)
+    {
+      if (iniPropertySeek( hIni, ptDSN, KEYWORD_USER, "" ) == INI_SUCCESS)
+	{
+	  snprintf (dsn.user, ITEMBUFLEN, "%s", hIni->hCurProperty->szValue);
+	  ptUser = dsn.user;
+	}
+    }
+  else
+    {
+      snprintf (dsn.user, ITEMBUFLEN, "%s", ptUser);
+    }
+
+  if ((ptPWD = find_key (szConnStrIn, KEYWORD_PASSWORD)) == NULL)
+    {
+      if (iniPropertySeek( hIni, ptDSN, KEYWORD_PASSWORD, "" ) == INI_SUCCESS)
+	{
+	  snprintf (dsn.password, ITEMBUFLEN, "%s", hIni->hCurProperty->szValue);
+	  ptPWD = dsn.password;
+	}
+    }
+  else
+    {
+      snprintf (dsn.password, ITEMBUFLEN, "%s", ptPWD);
+    }
+
+  if ((ptServer = find_key (szConnStrIn, KEYWORD_SERVER)) == NULL)
+    {
+      if (iniPropertySeek( hIni, ptDSN, KEYWORD_SERVER, "" ) == INI_SUCCESS)
+	{
+	  snprintf (dsn.server, ITEMBUFLEN, "%s", hIni->hCurProperty->szValue);
+	  ptServer = dsn.server;
+	}
+    }
+  else
+    {
+      snprintf (dsn.server, ITEMBUFLEN, "%s", ptServer);
+    }
+
+  if ((ptPort = find_key (szConnStrIn, KEYWORD_PORT)) == NULL)
+    {
+      if (iniPropertySeek( hIni, ptDSN, KEYWORD_PORT, "" ) == INI_SUCCESS)
+	{
+	  snprintf (dsn.port, ITEMBUFLEN, "%s", hIni->hCurProperty->szValue);
+	  ptPort = dsn.port;
+	}
+    }
+  else
+    {
+      snprintf (dsn.port, ITEMBUFLEN, "%s", ptPort);
+    }
+
+  port = atoi (ptPort);
+
+  iniClose (hIni);
+
+  dsn2connstr (&dsn, connstr_buf);
+
+  rc = odbc_connect_new (hdbc, ptDSN, ptDBName, ptUser,
+			 ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, ptOmitSchema, ConnStrIn);
+
+
+
+  if ((szConnStrOut) && cbConnStrOut > 0)
+    {
+      snprintf (szConnStrOut, MIN (strlen (connstr_buf), (unsigned) cbConnStrOut), "%s", connstr_buf);
+    }
+
+  if (pcbConnStrOut)
+    {
+      *pcbConnStrOut = MIN (strlen (connstr_buf), (unsigned) cbConnStrOut);
+    }
+
+  return rc;
+}
+
 /*
  * Version Introduced: ODBC 1.0 Standards Compliance: Deprecated
  */
@@ -357,4 +483,55 @@ WideCharToMultiByte (int wincode,
 
   return required;
 
+}
+
+static char *
+find_key (char *string, char *key)
+{
+  char *ptr, *p;
+  int len;
+
+  ptr = element_value_by_key (string, key);
+
+  if (ptr == NULL)
+    return NULL;
+
+   len = strlen (ptr);
+
+   p = (char *) calloc (1, len);
+   if (p == NULL)
+     return NULL;
+
+   snprintf (p, len, "%s", ptr);
+   ptr = strchr (p, ';');
+   if (ptr)
+      *ptr = '\0';
+
+   return p;
+}
+
+static void
+dsn2connstr (CUBRIDDSNItem *dsn, char *connstr)
+{
+  if (connstr == NULL)
+    {
+      return;
+    }
+
+  if (strlen (dsn->dsn))
+    {
+      sprintf (connstr, "%s=%s;", KEYWORD_DSN, dsn->dsn);
+    }
+
+  APPEND_TO_CONNSTR (connstr, KEYWORD_DBNAME, dsn->db_name);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_USER, dsn->user);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_PASSWORD, dsn->password);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_SERVER, dsn->server);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_PORT, dsn->port);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_FETCH_SIZE, dsn->fetch_size);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_CHARSET, dsn->charset);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_AUTOCOMMIT, dsn->autocommit);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_OMIT_SCHEMA, dsn->omit_schema);
+
+  return;
 }

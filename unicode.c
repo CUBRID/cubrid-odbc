@@ -78,7 +78,11 @@ SQLDriverConnectW (SQLHDBC hdbc, SQLHWND hwnd,
     }
   memset (pt_out, 0, out_max);
 
+#if defined (_WINDOWS)
   rc = SQLDriverConnect (hdbc, hwnd, pt_in, in_len, pt_out, out_max, out_len, completion);
+#else
+  rc = SQLDriverConnectLinux (hdbc, hwnd, pt_in, in_len, pt_out, out_max, out_len, completion);
+#endif
   if (out)
     {
       bytes_to_wide_char (pt_out, strlen (pt_out), &out, out_max, &temp_out_len, conn->charset);
