@@ -49,7 +49,6 @@
 #endif
 
 static int is_korean (unsigned char ch);
-static void dsn2connstr (CUBRIDDSNItem *dsn, char *connstr);
 
 #pragma comment(lib, "legacy_stdio_definitions.lib")
 
@@ -1940,36 +1939,4 @@ connected_db_ver (const char *version_string)
     }
 
   return vers;
-}
-
-/************************************************************************
- * name: dsn2connstr
- * arguments: dsn structure
- * returns/side-effects:
-************************************************************************/
-
-static void
-dsn2connstr (CUBRIDDSNItem *dsn, char *connstr)
-{
-  if (connstr == NULL)
-    {
-      return;
-    }
-
-  if (strlen (dsn->dsn))
-    {
-      sprintf (connstr, "%s=%s;", KEYWORD_DSN, dsn->dsn);
-    }
-
-  APPEND_TO_CONNSTR (connstr, KEYWORD_DBNAME, dsn->db_name);
-  APPEND_TO_CONNSTR (connstr, KEYWORD_USER, dsn->user);
-  APPEND_TO_CONNSTR (connstr, KEYWORD_PASSWORD, dsn->password);
-  APPEND_TO_CONNSTR (connstr, KEYWORD_SERVER, dsn->server);
-  APPEND_TO_CONNSTR (connstr, KEYWORD_PORT, dsn->port);
-  APPEND_TO_CONNSTR (connstr, KEYWORD_FETCH_SIZE, dsn->fetch_size);
-  APPEND_TO_CONNSTR (connstr, KEYWORD_CHARSET, dsn->charset);
-  APPEND_TO_CONNSTR (connstr, KEYWORD_AUTOCOMMIT, dsn->autocommit);
-  APPEND_TO_CONNSTR (connstr, KEYWORD_OMIT_SCHEMA, dsn->omit_schema);
-
-  return;
 }
