@@ -68,6 +68,16 @@
 #define ER_ICONV_CODENAME	-1
 #define ER_ICONV_INVALID_SEQ	-2
 
+#define APPEND_TO_CONNSTR(str,key,val)				\
+	do {							\
+	     char buf[512];					\
+	     if (strlen (val))					\
+	       {						\
+		 snprintf (buf, 512, "%s=%s;", key, val);	\
+		 strcat (str, buf);				\
+	       }						\
+	   } while (0)
+
 /* NC_FREE - NULL check free
  * NA_FREE - NULL assign free
  * MOVE_STRING - free & copy string
