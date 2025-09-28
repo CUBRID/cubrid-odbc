@@ -39,6 +39,27 @@ static void dsn2connstr (CUBRIDDSNItem *dsn, char *connstr);
 #define LINE_SIZE 512
 #define TBUF_SIZE 8192
 #define PROF_BUF_SIZE 4096
+#define FETCH_SIZE_DEFAULT 1
+#define AUTOCOMMIT_DEFAULT "false"
+#define OMIT_SCHEMA_DEFAULT "off"
+
+#define DSN_LOOKUP(conn,ptDSN,hIni,key,dsn_item)						\
+	do {											\
+	     char *pDSN_item;									\
+	     if ((pDSN_item = find_key (conn, key)) == NULL)					\
+	       {										\
+		 if (iniPropertySeek( hIni, ptDSN, key, "" ) == INI_SUCCESS)			\
+		   {										\
+		     snprintf (dsn_item, ITEMBUFLEN, "%s", hIni->hCurProperty->szValue);	\
+		   }										\
+	       }										\
+	     else										\
+	       {										\
+		 snprintf (dsn_item, ITEMBUFLEN, "%s", pDSN_item);				\
+		 UT_FREE (pDSN_item);								\
+	       }										\
+	   } while (0)
+
 
 /*
  * ODBC Driver function not supported
@@ -136,14 +157,14 @@ SQLDriverConnectLinux (HDBC hdbc,
   HINI    hIni;
   RETCODE rc = ODBC_SUCCESS;
   char ini_file[_MAX_PATH];
-  const char *ptDSN, *ptDBName, *ptUser, *ptPWD, *ptServer, *ptPort;
-  int port, fetch_size = 1;
-  const char *ptCharSet = CODE_NAME_UNICODE;
-  const char *ptAutoCommit="true";
-  const char *ptOmitSchema="no";
+  const char *ptDSN;
+  int port, fetch_size;
   const char *ConnStrIn = NULL;
   CUBRIDDSNItem dsn;
-  char connstr_buf[1024]="";
+  char connstr_buf[1024] = "";
+  char charset[ITEMBUFLEN] = CODE_NAME_UNICODE;
+  char autocommit[ITEMBUFLEN] = AUTOCOMMIT_DEFAULT;
+  char omit_schema[ITEMBUFLEN] = OMIT_SCHEMA_DEFAULT;
 
   memset (&dsn, 0, sizeof (dsn));
   snprintf (ini_file, sizeof (ini_file), "%s/.odbc.ini", getenv ("HOME"));
@@ -160,81 +181,32 @@ SQLDriverConnectLinux (HDBC hdbc,
 
   snprintf (dsn.dsn, ITEMBUFLEN, "%s", ptDSN);
 
-  if ((ptDBName = find_key (szConnStrIn, KEYWORD_DBNAME)) == NULL)
-    {
-      if (iniPropertySeek(hIni, ptDSN, KEYWORD_DBNAME, "") == INI_SUCCESS)
-	{
-	  snprintf (dsn.db_name, ITEMBUFLEN, "%s", hIni->hCurProperty->szValue);
-	  ptDBName = dsn.db_name;
-	}
-    }
-  else
-    {
-      snprintf (dsn.db_name, ITEMBUFLEN, "%s", ptDBName);
-    }
-
-  if ((ptUser = find_key (szConnStrIn, KEYWORD_USER)) == NULL)
-    {
-      if (iniPropertySeek( hIni, ptDSN, KEYWORD_USER, "" ) == INI_SUCCESS)
-	{
-	  snprintf (dsn.user, ITEMBUFLEN, "%s", hIni->hCurProperty->szValue);
-	  ptUser = dsn.user;
-	}
-    }
-  else
-    {
-      snprintf (dsn.user, ITEMBUFLEN, "%s", ptUser);
-    }
-
-  if ((ptPWD = find_key (szConnStrIn, KEYWORD_PASSWORD)) == NULL)
-    {
-      if (iniPropertySeek( hIni, ptDSN, KEYWORD_PASSWORD, "" ) == INI_SUCCESS)
-	{
-	  snprintf (dsn.password, ITEMBUFLEN, "%s", hIni->hCurProperty->szValue);
-	  ptPWD = dsn.password;
-	}
-    }
-  else
-    {
-      snprintf (dsn.password, ITEMBUFLEN, "%s", ptPWD);
-    }
-
-  if ((ptServer = find_key (szConnStrIn, KEYWORD_SERVER)) == NULL)
-    {
-      if (iniPropertySeek( hIni, ptDSN, KEYWORD_SERVER, "" ) == INI_SUCCESS)
-	{
-	  snprintf (dsn.server, ITEMBUFLEN, "%s", hIni->hCurProperty->szValue);
-	  ptServer = dsn.server;
-	}
-    }
-  else
-    {
-      snprintf (dsn.server, ITEMBUFLEN, "%s", ptServer);
-    }
-
-  if ((ptPort = find_key (szConnStrIn, KEYWORD_PORT)) == NULL)
-    {
-      if (iniPropertySeek( hIni, ptDSN, KEYWORD_PORT, "" ) == INI_SUCCESS)
-	{
-	  snprintf (dsn.port, ITEMBUFLEN, "%s", hIni->hCurProperty->szValue);
-	  ptPort = dsn.port;
-	}
-    }
-  else
-    {
-      snprintf (dsn.port, ITEMBUFLEN, "%s", ptPort);
-    }
-
-  port = atoi (ptPort);
+  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_DBNAME, dsn.db_name);
+  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_USER, dsn.user);
+  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_PASSWORD, dsn.password);
+  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_SERVER, dsn.server);
+  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_PORT, dsn.port);
+  port = atoi (dsn.port);
+  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_CHARSET, dsn.charset);
+  snprintf (charset, sizeof (charset), "%s", strlen (dsn.charset) ? dsn.charset : CODE_NAME_UNICODE);
+  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_AUTOCOMMIT, dsn.autocommit);
+  snprintf (autocommit, sizeof (autocommit), "%s", strlen (dsn.autocommit) ? dsn.autocommit : AUTOCOMMIT_DEFAULT);
+  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_OMIT_SCHEMA, dsn.omit_schema);
+  snprintf (omit_schema, sizeof (omit_schema), "%s", strlen (dsn.omit_schema) ? dsn.omit_schema : OMIT_SCHEMA_DEFAULT);
+  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_FETCH_SIZE, dsn.fetch_size);
+  fetch_size = strlen (dsn.fetch_size) ? atoi (dsn.fetch_size) : FETCH_SIZE_DEFAULT;
 
   iniClose (hIni);
 
   dsn2connstr (&dsn, connstr_buf);
 
-  rc = odbc_connect_new (hdbc, ptDSN, ptDBName, ptUser,
-			 ptPWD, ptServer, port, fetch_size, ptCharSet, ptAutoCommit, ptOmitSchema, ConnStrIn);
+PRINT_DEBUG ("dsn = %s, db = %s, user = %s, pass = %s, server = %s, port = %d, fetch-sie = %d, charset = %s, autocommit = %s, omit_scema = %s", 
+                        dsn.dsn, dsn.db_name, dsn.user, dsn.password, dsn.server, port,
+                         fetch_size, charset, autocommit, omit_schema);
+  rc = odbc_connect_new (hdbc, dsn.dsn, dsn.db_name, dsn.user, dsn.password, dsn.server, port,
+			 fetch_size, charset, autocommit, omit_schema, ConnStrIn);
 
-
+  UT_FREE (ptDSN);
 
   if ((szConnStrOut) && cbConnStrOut > 0)
     {
@@ -488,26 +460,32 @@ WideCharToMultiByte (int wincode,
 static char *
 find_key (char *string, char *key)
 {
-  char *ptr, *p;
+  char *value_p, *buf, *ptr;
   int len;
 
-  ptr = element_value_by_key (string, key);
+  value_p = element_value_by_key (string, key);
 
-  if (ptr == NULL)
-    return NULL;
+  if (value_p == NULL)
+    {
+      return NULL;
+    }
 
-   len = strlen (ptr);
+   len = strlen (value_p);
 
-   p = (char *) calloc (1, len);
-   if (p == NULL)
-     return NULL;
+   if ((buf = UT_ALLOC (len)) == NULL)
+     {
+       return NULL;
+     }
 
-   snprintf (p, len, "%s", ptr);
-   ptr = strchr (p, ';');
+   snprintf (buf, len, "%s", value_p);
+
+   ptr = strchr (buf, ';');
    if (ptr)
-      *ptr = '\0';
+     {
+       *ptr = '\0';
+     }
 
-   return p;
+   return buf;
 }
 
 static void
