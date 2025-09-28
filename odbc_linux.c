@@ -33,7 +33,7 @@
 #include  "ini.h"
 
 PUBLIC INT_PTR CALLBACK ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam);
-static char * find_key (char *string, char *key);
+static char *find_key (char *string, char *key);
 static void dsn2connstr (CUBRIDDSNItem *dsn, char *connstr);
 
 #define LINE_SIZE 512
@@ -125,13 +125,12 @@ SQLGetPrivateProfileString (LPCSTR lpszSection,
     {
       snprintf (szFileName, sizeof (szFileName), "%s/.odbc.ini", getenv ("HOME"));
     }
+  if (iniOpen ( &hIni, szFileName, "#;", '[', ']', '=', TRUE) != INI_SUCCESS)
+    {
+      return rc;
+    }
 
-  if (iniOpen( &hIni, szFileName, "#;", '[', ']', '=', TRUE) != INI_SUCCESS)
-   {
-     return rc;
-   }
-
-  if (iniPropertySeek( hIni, lpszSection, lpszEntry, "") == INI_SUCCESS)
+  if (iniPropertySeek (hIni, lpszSection, lpszEntry, "") == INI_SUCCESS)
     {
       found = 1;
     }
@@ -149,10 +148,10 @@ SQLGetPrivateProfileString (LPCSTR lpszSection,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLDriverConnectLinux (HDBC hdbc,
-                   HWND hWnd,
-                   UCHAR *szConnStrIn,
-                   SWORD cbConnStrIn,
-                   UCHAR *szConnStrOut, SWORD cbConnStrOut, SQLSMALLINT *pcbConnStrOut, UWORD uwMode)
+		       HWND hWnd,
+		       UCHAR *szConnStrIn,
+		       SWORD cbConnStrIn,
+		       UCHAR *szConnStrOut, SWORD cbConnStrOut, SQLSMALLINT *pcbConnStrOut, UWORD uwMode)
 {
   HINI    hIni;
   RETCODE rc = ODBC_SUCCESS;
@@ -169,7 +168,7 @@ SQLDriverConnectLinux (HDBC hdbc,
   memset (&dsn, 0, sizeof (dsn));
   snprintf (ini_file, sizeof (ini_file), "%s/.odbc.ini", getenv ("HOME"));
 
-  if (iniOpen( &hIni, ini_file, "#;", '[', ']', '=', TRUE) != INI_SUCCESS)
+  if (iniOpen (&hIni, ini_file, "#;", '[', ']', '=', TRUE) != INI_SUCCESS)
     {
       return ODBC_ERROR;
     }
@@ -200,9 +199,6 @@ SQLDriverConnectLinux (HDBC hdbc,
 
   dsn2connstr (&dsn, connstr_buf);
 
-PRINT_DEBUG ("dsn = %s, db = %s, user = %s, pass = %s, server = %s, port = %d, fetch-sie = %d, charset = %s, autocommit = %s, omit_scema = %s", 
-                        dsn.dsn, dsn.db_name, dsn.user, dsn.password, dsn.server, port,
-                         fetch_size, charset, autocommit, omit_schema);
   rc = odbc_connect_new (hdbc, dsn.dsn, dsn.db_name, dsn.user, dsn.password, dsn.server, port,
 			 fetch_size, charset, autocommit, omit_schema, ConnStrIn);
 
@@ -470,22 +466,22 @@ find_key (char *string, char *key)
       return NULL;
     }
 
-   len = strlen (value_p);
+  len = strlen (value_p);
 
-   if ((buf = UT_ALLOC (len)) == NULL)
-     {
-       return NULL;
-     }
+  if ((buf = UT_ALLOC (len)) == NULL)
+    {
+      return NULL;
+    }
 
-   snprintf (buf, len, "%s", value_p);
+  snprintf (buf, len, "%s", value_p);
 
-   ptr = strchr (buf, ';');
-   if (ptr)
-     {
-       *ptr = '\0';
-     }
+  ptr = strchr (buf, ';');
+  if (ptr)
+    {
+      *ptr = '\0';
+    }
 
-   return buf;
+  return buf;
 }
 
 static void
