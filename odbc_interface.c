@@ -1471,7 +1471,7 @@ SQLParamData (SQLHSTMT StatementHandle, SQLPOINTER *Value)
 
 // 오직 SQLPrepare만 prepared된 상태로 만들수 있다.
 ODBC_INTERFACE RETCODE SQL_API
-SQLPrepare (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER TextLength)
+SQLPrepare_internal (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER TextLength)
 {
   RETCODE rc = SQL_SUCCESS;
   SQLCHAR *stStatementText = NULL;
@@ -1508,6 +1508,13 @@ SQLPrepare (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER TextLen
   DEBUG_TIMESTAMP (END_SQLPrepare);
 
   ODBC_RETURN (rc, StatementHandle);
+}
+
+// 오직 SQLPrepare만 prepared된 상태로 만들수 있다.
+ODBC_INTERFACE RETCODE SQL_API
+SQLPrepare (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER TextLength)
+{
+  return SQLPrepare_internal (StatementHandle, StatementText, TextLength);
 }
 
 ODBC_INTERFACE RETCODE SQL_API

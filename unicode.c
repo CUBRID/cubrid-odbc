@@ -571,7 +571,8 @@ SQLPrepareW (SQLHSTMT hstmt, SQLWCHAR *str, SQLINTEGER str_len)
 
   wide_char_to_bytes (str, str_len, &sql_state, &sql_state_len, stmt_handle->conn->charset);
 
-  ret = SQLPrepare (hstmt, sql_state, sql_state_len);
+  ret = SQLPrepare_internal (hstmt, sql_state, sql_state_len);
+
   UT_FREE (sql_state);
   return ret;
 }
