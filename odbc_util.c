@@ -1547,7 +1547,7 @@ wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length,
   wbuf_len = (num_wchars) * WCHAR_LENGTH;
   mbuf_len = num_wchars * LENGTH_RATIO_WCHAR_TO_MULTIBYTE + 1;
 
-  if ((mbuf_orig = (char *) calloc (1, mbuf_len)) == NULL)
+  if ((mbuf_orig = (char *) UT_ALLOC (mbuf_len)) == NULL)
     {
       return -1;
     }
@@ -1666,8 +1666,8 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
   wbuf = (char *) *buffer;
   if (buffer_length == 0)
     {
-      wbuf_len = (num_chars + 1) * WCHAR_LENGTH;
-      wbuf = (uint16_t *) calloc (1, wbuf_len);
+      wbuf_len = num_chars * WCHAR_LENGTH + sizeof (wchar_t);
+      wbuf = UT_ALLOC (wbuf_len);
       if (wbuf == NULL)
 	{
 	  return CCI_ER_NO_MORE_MEMORY;
