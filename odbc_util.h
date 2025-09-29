@@ -41,16 +41,16 @@
 #define UT_FREE_BSTR(ptr)	ut_free_bstr(ptr)
 #else
 #define WCHAR_LENGTH	(sizeof (uint16_t))
-#define UT_ALLOC(size)	((char *) calloc (1, size))
+#define UT_ALLOC(size)	((void *) calloc (1, size))
 #define UT_FREE(ptr)					\
 			do {                        	\
-				if ( ptr != NULL ) {	\
+				if (ptr != NULL) {	\
 					free (ptr);	\
 					ptr = NULL;	\
 				}			\
 			} while (0)
 #define UT_ALLOC_BSTR(size)	UT_ALLOC(size * WCHAR_LENGTH)
-#define UT_FREE_BSTR(ptr)	UR_FREE(ptr)
+#define UT_FREE_BSTR(ptr)	UT_FREE(ptr)
 #define LENGTH_RATIO_WCHAR_TO_MULTIBYTE 3
 #endif
 
