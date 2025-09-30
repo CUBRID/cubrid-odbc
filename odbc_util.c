@@ -1566,15 +1566,26 @@ wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length,
 
   iconv_close (cd);
 
-  if (target)
-    {
-      *target = mbuf_orig;
-    }
+  bytes_required = mbuf_len - out_bytes_left;
 
   if (out_length)
     {
-      *out_length = mbuf_len - out_bytes_left;
+      *out_length = bytes_required;
     }
+
+  if (target)
+    {
+      if (mbuf_len > bytes_required)
+	{
+	  *target = UT_REALLOC (mbuf_orig, bytes_required);
+	}
+      else
+	{
+	  *target = mbuf_orig;
+	}
+    }
+
+  PRINT_DEBUG ("wide_char_to_bytes: mbuf_len = %d, out = %d", mbuf_len, mbuf_len - out_bytes_left);
 
   return ODBC_SUCCESS;
 }
