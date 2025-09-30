@@ -625,11 +625,40 @@ SQLPrepareW (SQLHSTMT hstmt, SQLWCHAR *str, SQLINTEGER str_len)
   return ret;
 }
 #else
-SQLPrepareW (SQLHSTMT hstmt, SQLWCHAR *str, SQLINTEGER str_len)
+SQLPrepareW (SQLHSTMT hstmt, SQLWCHAR *wqry, SQLINTEGER wqry_len)
 {
   RETCODE ret = ODBC_ERROR;
+  char *query = NULL;
+  int query_len = 0;
+  ODBC_STATEMENT *stmt_handle;
 
-  return ret;
+  OutputDebugString ("SQLPrepareW called.\n");
+
+  stmt_handle = (ODBC_STATEMENT *) hstmt;
+  odbc_free_diag (stmt_handle->diag, RESET);
+
+  ret = wide_char_to_bytes (wqry, wqry_len, &query, &query_len, stmt_handle->conn->charset);
+  if (ret != ODBC_SUCCESS)
+    {
+      goto ret;
+    }
+
+  if (stricmp (query, "@QP@") == 0 || stricmp (query, "@QE@") == 0)
+    {
+      stmt_handle->sql_text = UT_MAKE_STRING (query, query_len);
+      stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN | query[2] == 'E' ? CCI_EXEC_QUERY_ALL : 0;
+      return ODBC_SUCCESS;
+    }
+
+  ret = odbc_prepare (stmt_handle, query);
+  stmt_handle->is_prepared = _TRUE_;
+
+ret:
+  UT_FREE (query);
+
+  DEBUG_TIMESTAMP (END_SQLPrepare);
+
+  ODBC_RETURN (ret, stmt_handle);
 }
 #endif
 
