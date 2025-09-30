@@ -1369,6 +1369,9 @@ c_value_to_bound_ptr (void *bound_ptr, SQLLEN buffer_length, VALUE_CONTAINER *c_
     case SQL_C_CHAR:
       str_value_assign (c_value->value.str, bound_ptr, buffer_length, NULL);
       break;
+    case SQL_C_WCHAR:
+      wchar_value_assign (c_value->value.str, bound_ptr, buffer_length, &(c_value->length));
+      break;
     case SQL_C_BINARY:
       bin_value_assign (c_value->value.str, c_value->length, bound_ptr, buffer_length, NULL);
       break;
