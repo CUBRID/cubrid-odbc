@@ -1806,6 +1806,7 @@ odbc_value_converter (VALUE_CONTAINER *target_value, VALUE_CONTAINER *src_value)
 	{
 	case SQL_C_CHAR:
 	case SQL_C_BINARY:
+        case SQL_C_WCHAR:
 	  target_value->value.str = UT_MAKE_STRING (src_value->value.str, -1);
 	  target_value->length = src_value->length;
 	  break;
