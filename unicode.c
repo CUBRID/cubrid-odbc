@@ -30,6 +30,8 @@
 
 #if defined (_WINDOWS)
 #include    <windows.h>
+#else
+#include    <string.h>
 #endif
 #include    <stdio.h>
 
