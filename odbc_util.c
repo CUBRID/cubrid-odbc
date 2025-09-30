@@ -1141,16 +1141,15 @@ PUBLIC RETCODE
 wchar_value_assign (const char *str, char *out_buf, SQLLEN out_buf_len, SQLLEN *str_len_ptr)
 {
   RETCODE rc = ODBC_SUCCESS;
-  int i;
   SQLLEN length = -1;
-  int size;
+  int str_len;
 
   if (str != NULL)
     {
-      size = strlen (str);
+      str_len = strlen (str);
       if (out_buf != NULL && out_buf_len > 0)
 	{
-	  if (bytes_to_wide_char (str, size, (wchar_t **) (&out_buf), out_buf_len, &length, CODE_NAME_UNICODE) < 0)
+	  if (bytes_to_wide_char (str, str_len, (wchar_t **) (&out_buf), out_buf_len, &length, CODE_NAME_UNICODE) < 0)
 	    {
 	      rc = ODBC_ERROR;
 	    }
