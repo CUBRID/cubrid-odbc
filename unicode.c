@@ -389,9 +389,9 @@ SQLColumnsW (SQLHSTMT hstmt,
 }
 #else
 SQLColumnsW (SQLHSTMT hstmt,
-             SQLWCHAR *catalog, SQLSMALLINT catalog_len,
-             SQLWCHAR *schema, SQLSMALLINT schema_len,
-             SQLWCHAR *table, SQLSMALLINT table_len, SQLWCHAR *column, SQLSMALLINT column_len)
+	     SQLWCHAR *catalog, SQLSMALLINT catalog_len,
+	     SQLWCHAR *schema, SQLSMALLINT schema_len,
+	     SQLWCHAR *table, SQLSMALLINT table_len, SQLWCHAR *column, SQLSMALLINT column_len)
 {
   RETCODE ret = ODBC_ERROR;
   char *cb_catalog = NULL, *cb_schema = NULL, *cb_table = NULL, *cb_column = NULL;
@@ -401,8 +401,6 @@ SQLColumnsW (SQLHSTMT hstmt,
   OutputDebugString ("SQLColumnsW called.\n");
 
   odbc_free_diag (stmt_handle->diag, RESET);
-
-  PRINT_DEBUG ("catalog_len = %d, schema_len = %d, table_len = %d, column_len = %d", catalog_len, schema_len, table_len, column_len);
 
   if (catalog_len != 0)
     {
@@ -607,6 +605,7 @@ SQLGetCursorNameW (SQLHSTMT hstmt, SQLWCHAR *cursor, SQLSMALLINT cursor_max, SQL
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLPrepareW (SQLHSTMT hstmt, SQLWCHAR *str, SQLINTEGER str_len)
 {
   RETCODE ret = ODBC_ERROR;
@@ -620,11 +619,19 @@ SQLPrepareW (SQLHSTMT hstmt, SQLWCHAR *str, SQLINTEGER str_len)
 
   wide_char_to_bytes (str, str_len, &sql_state, &sql_state_len, stmt_handle->conn->charset);
 
-  ret = SQLPrepare_internal (hstmt, sql_state, sql_state_len);
+  ret = SQLPrepare (hstmt, sql_state, sql_state_len);
 
   UT_FREE (sql_state);
   return ret;
 }
+#else
+SQLPrepareW (SQLHSTMT hstmt, SQLWCHAR *str, SQLINTEGER str_len)
+{
+  RETCODE ret = ODBC_ERROR;
+
+  return ret;
+}
+#endif
 
 /************************************************************************
 * name: SQLPrimaryKeysW
