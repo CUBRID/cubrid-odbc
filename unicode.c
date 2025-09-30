@@ -249,6 +249,7 @@ ret:
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLGetDiagRecW (SQLSMALLINT HandleType,
 		SQLHANDLE Handle,
 		SQLSMALLINT RecNumber,
@@ -307,7 +308,76 @@ SQLGetDiagRecW (SQLSMALLINT HandleType,
   UT_FREE (message_text_buffer);
   return ret;
 }
+#else
+SQLGetDiagRecW (SQLSMALLINT HandleType,
+		SQLHANDLE Handle,
+		SQLSMALLINT RecNumber,
+		SQLWCHAR *Sqlstate,
+		SQLINTEGER *NativeError, SQLWCHAR *MessageText, SQLSMALLINT BufferLength, SQLSMALLINT *TextLength)
+{
+  SQLCHAR sql_state[SQL_SQLSTATE_SIZE + 1] = "", *message_text_buffer = NULL;
+  int sql_state_len = 0;
+  int out_length;
+  SQLSMALLINT message_text_buffer_len = 0;
+  RETCODE rc = ODBC_SUCCESS;
+  ODBC_ENV *env;
 
+  OutputDebugString ("SQLGetDiagRecW called\n");
+
+  ODBC_CONNECTION *conn = (ODBC_CONNECTION *) Handle;
+
+  env = (ODBC_ENV *) Handle;
+
+  if (HandleType == SQL_HANDLE_STMT)
+    {
+      conn = env->conn;
+    }
+
+  message_text_buffer = UT_ALLOC (BufferLength);
+  if (message_text_buffer == NULL && BufferLength > 0)
+    {
+      odbc_set_diag (env->diag, "HY001", 0, "malloc failed");
+      return ODBC_ERROR;
+    }
+
+  rc = odbc_get_diag_rec (HandleType, Handle, RecNumber, sql_state,
+			  NativeError, MessageText, BufferLength, &message_text_buffer_len);
+
+  if (rc == SQL_NO_DATA)
+    {
+      env = (ODBC_ENV *) Handle;
+      odbc_free_diag (env->diag, INIT);
+      goto ret;
+    }
+
+  if (Sqlstate)
+    {
+      int len;
+      SQLWCHAR *wsqlstate = NULL;
+
+      rc = bytes_to_wide_char (sql_state, strlen (sql_state), &wsqlstate, 0, &len, conn->charset);
+      if (rc == ODBC_SUCCESS && len > 0)
+	{
+	  memcpy (Sqlstate, wsqlstate, len);
+	}
+
+      UT_FREE (wsqlstate);
+    }
+
+  bytes_to_wide_char (message_text_buffer,
+		      message_text_buffer_len, &MessageText, BufferLength, &out_length, conn->charset);
+
+  if (TextLength)
+    {
+      *TextLength = out_length;
+    }
+
+ret:
+  UT_FREE (message_text_buffer);
+
+  return rc;
+}
+#endif
 /************************************************************************
 * name: SQLNativeSqlW
 * arguments:
