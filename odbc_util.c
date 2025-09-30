@@ -1585,8 +1585,6 @@ wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length,
 	}
     }
 
-  PRINT_DEBUG ("wide_char_to_bytes: mbuf_len = %d, out = %d", mbuf_len, mbuf_len - out_bytes_left);
-
   return ODBC_SUCCESS;
 }
 #endif
