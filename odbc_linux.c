@@ -509,3 +509,26 @@ dsn2connstr (CUBRIDDSNItem *dsn, char *connstr)
 
   return;
 }
+
+PUBLIC char *
+ut_make_string_linux (const char *src, int length)
+{
+  char *new = NULL;
+  size_t size;
+
+  if (src == NULL)
+    {
+      return NULL;
+    }
+
+  size = (size_t) (length < 0 ? strlen (src) : length) + 1;
+
+  if ((new = (char *) UT_ALLOC (size)) == NULL)
+    {
+      return NULL;
+    }
+
+  snprintf (new, size, "%s", src);
+
+  return new;
+}
