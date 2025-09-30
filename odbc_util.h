@@ -40,7 +40,6 @@
 #define UT_ALLOC_BSTR(size)	ut_alloc_bstr(size)
 #define UT_FREE_BSTR(ptr)	ut_free_bstr(ptr)
 #define UT_MAKE_STRING(ptr, length) ut_make_string(ptr, length)
-#define UT_REALLOC(ptr, size)	ut_realloc(ptr, size)
 #else
 #define WCHAR_LENGTH	(sizeof (uint16_t))
 #define UT_ALLOC(size)	((void *) calloc (1, size))
@@ -54,11 +53,11 @@
 #define UT_ALLOC_BSTR(size)	UT_ALLOC(size * WCHAR_LENGTH)
 #define UT_FREE_BSTR(ptr)	UT_FREE(ptr)
 #define UT_MAKE_STRING(ptr, length)	ut_make_string_linux(ptr, length)
-#define UT_REALLOC(ptr,size)	((void *)realloc(ptr, size))
 #define LENGTH_RATIO_WCHAR_TO_MULTIBYTE 3
 #endif
 
 
+#define   UT_REALLOC(ptr, size)   ut_realloc(ptr, size)
 #define   UT_MAKE_BINARY(ptr, length) ut_make_binary(ptr, length)
 #define   UT_APPEND_STRING(str1, str2, len2)  ut_append_string(str1, str2, len2)
 #define   UT_SET_DELIMITER      ";;"
