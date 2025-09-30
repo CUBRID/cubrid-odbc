@@ -54,7 +54,7 @@
 #define UT_ALLOC_BSTR(size)	UT_ALLOC(size * WCHAR_LENGTH)
 #define UT_FREE_BSTR(ptr)	UT_FREE(ptr)
 #define UT_MAKE_STRING(ptr, length)	ut_make_string_linux(ptr, length)
-#define UT_REALLOC(ptr,size)	(realloc(ptr, size))
+#define UT_REALLOC(ptr,size)	((void *)realloc(ptr, size))
 #define LENGTH_RATIO_WCHAR_TO_MULTIBYTE 3
 #endif
 
