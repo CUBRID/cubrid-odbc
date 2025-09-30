@@ -355,6 +355,7 @@ SQLNativeSqlW (SQLHDBC hdbc, SQLWCHAR *in, SQLINTEGER in_len, SQLWCHAR *out, SQL
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLColumnsW (SQLHSTMT hstmt,
 	     SQLWCHAR *catalog, SQLSMALLINT catalog_len,
 	     SQLWCHAR *schema, SQLSMALLINT schema_len,
@@ -386,7 +387,53 @@ SQLColumnsW (SQLHSTMT hstmt,
   UT_FREE (cb_column);
   return ret;
 }
+#else
+SQLColumnsW (SQLHSTMT hstmt,
+             SQLWCHAR *catalog, SQLSMALLINT catalog_len,
+             SQLWCHAR *schema, SQLSMALLINT schema_len,
+             SQLWCHAR *table, SQLSMALLINT table_len, SQLWCHAR *column, SQLSMALLINT column_len)
+{
+  RETCODE ret = ODBC_ERROR;
+  char *cb_catalog = NULL, *cb_schema = NULL, *cb_table = NULL, *cb_column = NULL;
+  int cb_catalog_len = 0, cb_schema_len = 0, cb_table_len = 0, cb_column_len = 0;
+  ODBC_STATEMENT *stmt_handle = (ODBC_STATEMENT *) hstmt;
 
+  OutputDebugString ("SQLColumnsW called.\n");
+
+  odbc_free_diag (stmt_handle->diag, RESET);
+
+  PRINT_DEBUG ("catalog_len = %d, schema_len = %d, table_len = %d, column_len = %d", catalog_len, schema_len, table_len, column_len);
+
+  if (catalog_len != 0)
+    {
+      wide_char_to_bytes (catalog, catalog_len, &cb_catalog, &cb_catalog_len, stmt_handle->conn->charset);
+    }
+
+  if (schema_len != 0)
+    {
+      wide_char_to_bytes (schema, schema_len, &cb_schema, &cb_schema_len, stmt_handle->conn->charset);
+    }
+
+  if (table_len != 0)
+    {
+      wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, stmt_handle->conn->charset);
+    }
+
+  if (column_len != 0)
+    {
+      wide_char_to_bytes (column, column_len, &cb_column, &cb_column_len, stmt_handle->conn->charset);
+    }
+
+  ret = odbc_columns (hstmt, cb_catalog, cb_schema, cb_table, cb_column);
+
+  UT_FREE (cb_catalog);
+  UT_FREE (cb_schema);
+  UT_FREE (cb_table);
+  UT_FREE (cb_column);
+
+  ODBC_RETURN (ret, hstmt);
+}
+#endif
 /************************************************************************
 * name: SQLDescribeColW
 * arguments:
