@@ -1840,6 +1840,10 @@ odbc_close_cursor (ODBC_STATEMENT *stmt)
       if (cci_rc != CCI_ER_NO_ERROR)
 	{
 	  odbc_set_diag_by_cci (stmt->diag, cci_rc, &cci_err_buf);
+	  if (cci_rc == CCI_ER_RESULT_SET_CLOSED)
+	    {
+	      return ODBC_SUCCESS_WITH_INFO;
+	    }
 	  return ODBC_ERROR;
 	}
 
