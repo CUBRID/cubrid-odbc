@@ -50,12 +50,9 @@ extern BOOL _odbcinst_SystemINI(char *pszFileName, BOOL bVerify);
 extern BOOL _odbcinst_UserINI( char *pszFileName, BOOL bVerify);
 static ODBCINI_DSN_LOOKUP_RESULT ini_fileopen (const char *dsn, HINI *hInip);
 
-#define LINE_SIZE 512
-#define TBUF_SIZE 8192
-#define PROF_BUF_SIZE 4096
-#define FETCH_SIZE_DEFAULT 1
-#define AUTOCOMMIT_DEFAULT "false"
-#define OMIT_SCHEMA_DEFAULT "off"
+#define FETCH_SIZE_DEFAULT	1
+#define AUTOCOMMIT_DEFAULT	"false"
+#define OMIT_SCHEMA_DEFAULT	"off"
 
 #define DSN_LOOKUP(conn,ptDSN,hIni,key,dsn_item)						\
 	do {											\
