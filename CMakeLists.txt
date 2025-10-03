@@ -163,7 +163,9 @@ ADD_COMPILE_OPTIONS(-m64 -Wall)
 
 INCLUDE_DIRECTORIES(${CCI_SOURCE}/src/cci ${LIBUNIXODBC_INCLUDES})
 
-LINK_DIRECTORIES(${CCI_LIBDIR} ${CMAKE_CURRENT_BINARY_DIR}/libodbc-prefix/src/libodbc-build/ini/.libs)
+set (UNIXODBC_LIBS ${CMAKE_CURRENT_BINARY_DIR}/libodbc-prefix/src/libodbc-build/ini/.libs)
+set (UNIXODBC_LIBS2 ${CMAKE_CURRENT_BINARY_DIR}/libodbc-prefix/src/libodbc-build/odbcinst/.libs)
+LINK_DIRECTORIES(${CCI_LIBDIR} ${UNIXODBC_LIBS} ${UNIXODBC_LIBS2})
 ADD_LIBRARY(${CMAKE_PROJECT_NAME} SHARED ${CUBRID_ODBC_SOURCES})
 ADD_LIBRARY(${CUBRID_ODBC_UNICODE} SHARED ${CUBRID_ODBC_UNICODE_SOURCES})
 
@@ -172,7 +174,7 @@ target_compile_definitions(${CUBRID_ODBC_UNICODE} PRIVATE -DGCC -DLINUX -DCUBRID
 
 target_link_libraries(${CMAKE_PROJECT_NAME} cascci pthread stdc++)
 SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES SOVERSION ${CUBRID_ODBC_VERSION})
-target_link_libraries(${CUBRID_ODBC_UNICODE} cascci inilc pthread stdc++)
+target_link_libraries(${CUBRID_ODBC_UNICODE} cascci inilc odbcinst pthread stdc++)
 SET_TARGET_PROPERTIES(${CUBRID_ODBC_UNICODE} PROPERTIES SOVERSION ${CUBRID_ODBC_VERSION})
 
 message("Target directory: ${CMAKE_BINARY_DIR}/package/lib")

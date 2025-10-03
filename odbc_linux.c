@@ -32,9 +32,23 @@
 #include  "odbc_util.h"
 #include  "ini.h"
 
+typedef enum
+{
+  ODBCINI_DSN_NOT_FOUND = 0,
+  ODBCINI_DSN_FOUND_USER,
+  ODBCINI_DSN_FOUND_SYSTEM
+} ODBCINI_DSN_LOOKUP_RESULT;
+
 PUBLIC INT_PTR CALLBACK ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam);
 static char *find_key (char *string, char *key);
 static void dsn2connstr (CUBRIDDSNItem *dsn, char *connstr);
+extern char *odbcinst_system_file_path(char *b1);
+extern char *odbcinst_system_file_name(char *b2);
+extern char *odbcinst_user_file_path( char *buffer );
+extern char *odbcinst_user_file_name( char *buffer );
+extern BOOL _odbcinst_SystemINI(char *pszFileName, BOOL bVerify);
+extern BOOL _odbcinst_UserINI( char *pszFileName, BOOL bVerify);
+static ODBCINI_DSN_LOOKUP_RESULT ini_fileopen (const char *dsn, HINI *hInip);
 
 #define LINE_SIZE 512
 #define TBUF_SIZE 8192
@@ -59,6 +73,7 @@ static void dsn2connstr (CUBRIDDSNItem *dsn, char *connstr);
 		 UT_FREE (pDSN_item);								\
 	       }										\
 	   } while (0)
+
 
 
 /*
@@ -155,7 +170,6 @@ SQLDriverConnectLinux (HDBC hdbc,
 {
   HINI    hIni;
   RETCODE rc = ODBC_SUCCESS;
-  char ini_file[_MAX_PATH];
   const char *ptDSN;
   int port, fetch_size;
   const char *ConnStrIn = NULL;
@@ -166,19 +180,17 @@ SQLDriverConnectLinux (HDBC hdbc,
   char omit_schema[ITEMBUFLEN] = OMIT_SCHEMA_DEFAULT;
 
   memset (&dsn, 0, sizeof (dsn));
-  snprintf (ini_file, sizeof (ini_file), "%s/.odbc.ini", getenv ("HOME"));
-
-  if (iniOpen (&hIni, ini_file, "#;", '[', ']', '=', TRUE) != INI_SUCCESS)
-    {
-      return ODBC_ERROR;
-    }
-
   if ((ptDSN = find_key (szConnStrIn, KEYWORD_DSN)) == NULL)
     {
       return ODBC_ERROR;
     }
-
   snprintf (dsn.dsn, ITEMBUFLEN, "%s", ptDSN);
+
+  memset (&hIni, 0, sizeof (hIni));
+  if ((rc = ini_fileopen (ptDSN, &hIni)) == ODBCINI_DSN_NOT_FOUND)
+    {
+      return ODBC_ERROR;
+    }
 
   DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_DBNAME, dsn.db_name);
   DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_USER, dsn.user);
@@ -394,4 +406,53 @@ ut_make_string_linux (const char *src, int length)
   snprintf (new, size, "%s", src);
 
   return new;
+}
+
+/************************************************************************
+ * * name: ini_fileopen
+ * * arguments:
+ * *   const char *dsn
+ * *   HINI *hInip
+ * * returns/side-effects:
+ * * description:
+ * Lookup dsn file, if a dsn exists in multiple ini files following
+ * order will be applied.
+ * 1. $ODBCINI
+ * 2. $HOME/.odbc.ini
+ * 3. system ini
+************************************************************************/
+
+static ODBCINI_DSN_LOOKUP_RESULT
+ini_fileopen (const char *dsn, HINI *hInip)
+{
+  char szIniName[_MAX_PATH];
+  int rc = ODBCINI_DSN_NOT_FOUND;
+
+  if (_odbcinst_UserINI( szIniName, FALSE ))
+    {
+      if (iniOpen (hInip, szIniName, "#;", '[', ']', '=', TRUE) == INI_SUCCESS)
+	{
+	  if (iniPropertySeek ((HINI) *hInip, dsn, "", "") == INI_SUCCESS)
+	    {
+	      return ODBCINI_DSN_FOUND_USER;
+	    }
+
+	  iniClose ((HINI) *hInip);
+	}
+    }
+
+  if (_odbcinst_SystemINI( szIniName, FALSE ))
+    {
+      if (iniOpen (hInip, szIniName, "#;", '[', ']', '=', TRUE) == INI_SUCCESS)
+	{
+	  if (iniPropertySeek ((HINI) *hInip, dsn, "", "") == INI_SUCCESS)
+	    {
+	      return ODBCINI_DSN_FOUND_SYSTEM;
+	    }
+
+	  iniClose ((HINI) *hInip);
+	}
+    }
+
+  return ODBCINI_DSN_NOT_FOUND;
 }
