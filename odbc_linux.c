@@ -425,7 +425,7 @@ ini_fileopen (const char *dsn, HINI *hInip)
   char szIniName[_MAX_PATH];
   int rc = ODBCINI_DSN_NOT_FOUND;
 
-  if (_odbcinst_UserINI( szIniName, FALSE ))
+  if (_odbcinst_UserINI (szIniName, FALSE))
     {
       if (iniOpen (hInip, szIniName, "#;", '[', ']', '=', TRUE) == INI_SUCCESS)
 	{
@@ -438,7 +438,7 @@ ini_fileopen (const char *dsn, HINI *hInip)
 	}
     }
 
-  if (_odbcinst_SystemINI( szIniName, FALSE ))
+  if (_odbcinst_SystemINI (szIniName, FALSE))
     {
       if (iniOpen (hInip, szIniName, "#;", '[', ']', '=', TRUE) == INI_SUCCESS)
 	{
