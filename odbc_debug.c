@@ -114,8 +114,8 @@ sqltype_name (SQLSMALLINT sqltype)
     char *name;
   } SQLTYPENAME;
 
-   SQLTYPENAME sql_typename_list [] =
-   {
+  SQLTYPENAME sql_typename_list [] =
+  {
     {SQL_C_WCHAR,	"SQL_C_WCHAR"},
     {SQL_C_CHAR,	"SQL_C_CHAR"},
     {SQL_C_SSHORT,	"SQL_C_SSHORT"},
@@ -143,6 +143,6 @@ sqltype_name (SQLSMALLINT sqltype)
     {
       snprintf (buf, sizeof (buf), "%d", sqltype);
     }
-  
+
   return (i == len) ? buf : sql_typename_list[i].name;
 }
