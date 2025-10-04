@@ -176,7 +176,7 @@ add_dependencies(${CUBRID_ODBC_UNICODE} ${LIBUNIXODBC_TARGET})
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DGCC -DLINUX)
 target_compile_definitions(${CUBRID_ODBC_UNICODE} PRIVATE -DGCC -DLINUX -DCUBRID_ODBC_UNICODE)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} cascci pthread stdc++)
+target_link_libraries(${CMAKE_PROJECT_NAME} cascci inilc odbcinst pthread stdc++)
 SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES SOVERSION ${CUBRID_ODBC_VERSION})
 target_link_libraries(${CUBRID_ODBC_UNICODE} cascci inilc odbcinst pthread stdc++)
 SET_TARGET_PROPERTIES(${CUBRID_ODBC_UNICODE} PROPERTIES SOVERSION ${CUBRID_ODBC_VERSION})
