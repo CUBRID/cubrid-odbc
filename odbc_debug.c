@@ -6,11 +6,13 @@ char *
 sqlinfo_name (int infotype)
 {
   typedef struct
-    {
-      int type;
-      char *name;
-    } SQLINFONAMES;
-   SQLINFONAMES sql_infotype_list [] = {
+  {
+    int type;
+    char *name;
+  } SQLINFONAMES;
+
+  SQLINFONAMES sql_infotype_list [] =
+  {
     {SQL_DRIVER_HDBC,			"SQL_DRIVER_HDBC"},
     {SQL_DRIVER_HENV,			"SQL_DRIVER_HENV"},
     {SQL_DRIVER_HSTMT,			"SQL_DRIVER_HSTMT"},
@@ -94,9 +96,9 @@ sqlinfo_name (int infotype)
   for (i = 0; i < len; i++)
     {
       if (infotype == sql_infotype_list[i].type)
-        {
-          break;
-        }
+	{
+	  break;
+	}
     }
 
   return i == len ? unknown_id : sql_infotype_list[i].name;
@@ -107,11 +109,13 @@ char *
 sqltype_name (SQLSMALLINT sqltype)
 {
   typedef struct
-    {
-      int sqltype;
-      char *name;
-    } SQLTYPENAME;
-   SQLTYPENAME sql_typename_list [] = {
+  {
+    int sqltype;
+    char *name;
+  } SQLTYPENAME;
+
+   SQLTYPENAME sql_typename_list [] =
+   {
     {SQL_C_WCHAR,	"SQL_C_WCHAR"},
     {SQL_C_CHAR,	"SQL_C_CHAR"},
     {SQL_C_SSHORT,	"SQL_C_SSHORT"},
@@ -130,9 +134,9 @@ sqltype_name (SQLSMALLINT sqltype)
   for (i = 0; i < len; i++)
     {
       if (sqltype == sql_typename_list[i].sqltype)
-        {
-          break;
-        }
+	{
+	  break;
+	}
     }
 
   if (i == len)
