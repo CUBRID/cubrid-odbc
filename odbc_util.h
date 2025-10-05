@@ -225,6 +225,9 @@ typedef struct tagST_LIST
   struct tagST_LIST *next;
 } ST_LIST;
 
+extern PUBLIC char *sqltype_name (short sqltype);
+extern PUBLIC char *sqlinfo_name (int infotype);
+
 PUBLIC void InitStr (D_STRING *str);
 PUBLIC void FreeStr (D_STRING *str);
 
