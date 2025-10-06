@@ -31,6 +31,7 @@
 #include  "odbc_connection.h"
 #include  "odbc_util.h"
 #include  "ini.h"
+#include  "odbcinstext.h"
 
 typedef enum
 {
@@ -125,21 +126,22 @@ SQLGetPrivateProfileString (LPCSTR lpszSection,
 
   OutputDebugString ("SQLGetPrivateProfileString called");
 
-  if (stat (lpszFilename, &sb) == 0)
+  memset (&hIni, 0, sizeof (hIni));
+
+  if (lpszFilename && stat (lpszFilename, &sb) == 0)
     {
       snprintf (szFileName, sizeof (szFileName), "%s", lpszFilename);
-    }
-  else if ((envp = getenv ("ODBCINI")) != NULL)
-    {
-      snprintf (szFileName, sizeof (szFileName), "%s", envp);
+      if (iniOpen ( &hIni, szFileName, "#;", '[', ']', '=', TRUE) != INI_SUCCESS)
+	{
+	  return rc;
+	}
     }
   else
     {
-      snprintf (szFileName, sizeof (szFileName), "%s/.odbc.ini", getenv ("HOME"));
-    }
-  if (iniOpen ( &hIni, szFileName, "#;", '[', ']', '=', TRUE) != INI_SUCCESS)
-    {
-      return rc;
+      if ((rc = ini_fileopen (lpszSection, &hIni)) == ODBCINI_DSN_NOT_FOUND)
+	{
+	  return SQL_ERROR;
+	}
     }
 
   if (iniPropertySeek (hIni, lpszSection, lpszEntry, "") == INI_SUCCESS)
