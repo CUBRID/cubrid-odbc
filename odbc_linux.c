@@ -331,7 +331,7 @@ static char *
 find_key (char *string, char *key)
 {
   char *value_p, *buf, *ptr;
-  int len;
+  size_t len;
 
   value_p = element_value_by_key (string, key);
 
@@ -342,12 +342,12 @@ find_key (char *string, char *key)
 
   len = strlen (value_p);
 
-  if ((buf = UT_ALLOC (len)) == NULL)
+  if ((buf = UT_ALLOC (len + 1)) == NULL)
     {
       return NULL;
     }
 
-  snprintf (buf, len, "%s", value_p);
+  strncpy (buf, value_p, len);
 
   ptr = strchr (buf, ';');
   if (ptr)
