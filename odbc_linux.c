@@ -228,6 +228,52 @@ SQLDriverConnectLinux (HDBC hdbc,
   return rc;
 }
 
+ODBC_INTERFACE RETCODE SQL_API
+SQLConnectLinux (SQLHDBC ConnectionHandle,
+            SQLCHAR *DataSource,
+            SQLSMALLINT NameLength1,
+            SQLCHAR *UserName, SQLSMALLINT NameLength2, SQLCHAR *Authentication, SQLSMALLINT NameLength3)
+{
+  RETCODE rc = SQL_SUCCESS;
+  SQLCHAR *stDataSource = NULL;
+  SQLCHAR *stUserName = NULL;
+  SQLCHAR *stAuthentication = NULL;
+  SQLCHAR stDBName[ITEMBUFLEN];
+  SQLCHAR stServerName[ITEMBUFLEN];
+  SQLINTEGER Port, FetchSize;
+  SQLCHAR stCharSet[ITEMBUFLEN];
+  SQLCHAR stAutocommit[ITEMBUFLEN];
+  SQLCHAR stOmitSchema[ITEMBUFLEN];
+  SQLCHAR *user = NULL, *pass = NULL;
+
+  if (UserName == NULL || NameLength2 <= 0)
+    {
+      NameLength2 = SQL_MAX_USER_NAME_LEN + 1;
+      NameLength3 = SQL_MAX_OPTION_STRING_LENGTH;
+      stUserName = user = UT_ALLOC (NameLength2);
+      stAuthentication = pass = UT_ALLOC (NameLength3);
+    }
+  else
+    {
+      stUserName = UT_MAKE_STRING (UserName, NameLength2);
+      stAuthentication = UT_MAKE_STRING (Authentication, NameLength3);
+    }
+
+  get_dsn_info (DataSource, stDBName, sizeof (stDBName), user, NameLength2, pass, NameLength3,
+                stServerName, sizeof (stServerName), &Port, &FetchSize,
+                stCharSet, sizeof (stCharSet), stAutocommit, sizeof (stAutocommit),
+                stOmitSchema, sizeof (stOmitSchema));
+
+  rc = odbc_connect_new ((ODBC_CONNECTION *) ConnectionHandle, stDataSource,
+                         stDBName, stUserName, stAuthentication, stServerName,
+                         Port, FetchSize, stCharSet, stAutocommit, stOmitSchema, NULL);
+
+  UT_FREE (stUserName);
+  UT_FREE (stAuthentication);
+
+  return rc;
+}
+
 /*
  * Version Introduced: ODBC 1.0 Standards Compliance: Deprecated
  */

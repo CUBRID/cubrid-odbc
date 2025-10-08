@@ -120,7 +120,11 @@ SQLConnectW (SQLHDBC hdbc, SQLWCHAR *dsn, SQLSMALLINT dsn_len,
   wide_char_to_bytes (auth, auth_len, &cb_auth, &cb_auth_len, conn->charset);
   wide_char_to_bytes (dsn, dsn_len, &cb_dsn, &cb_dsn_len, conn->charset);
 
+#if defined (_WINDOWS)
   ret = SQLConnect (hdbc, cb_dsn, cb_dsn_len, cb_user, cb_user_len, cb_auth, cb_auth_len);
+#else
+  ret = SQLConnectLinux (hdbc, cb_dsn, cb_dsn_len, cb_user, cb_user_len, cb_auth, cb_auth_len);
+#endif
 
   UT_FREE (cb_user);
   UT_FREE (cb_auth);
