@@ -234,6 +234,7 @@ sqlwcharlen (const WCHAR *wstr)
 * description:
 * NOTE:
 ************************************************************************/
+#if defined (_WINDOWS)
 PUBLIC WCHAR *
 ut_alloc_bstr (SQLLEN size)
 {
@@ -254,6 +255,7 @@ ut_alloc_bstr (SQLLEN size)
 
   return new;
 }
+#endif
 
 /************************************************************************
 * name: ut_free_bstr
@@ -262,6 +264,7 @@ ut_alloc_bstr (SQLLEN size)
 * description:
 * NOTE:
 ************************************************************************/
+#if defined (_WINDOWS)
 PUBLIC void
 ut_free_bstr (WCHAR *ptr)
 {
@@ -280,6 +283,7 @@ ut_free_bstr (WCHAR *ptr)
       SysFreeString (ptr);
     }
 }
+#endif
 
 /************************************************************************
 * name: ut_alloc
@@ -1420,6 +1424,7 @@ get_connect_attr (ODBC_CONNECTION_ATTR *attr, const char *conn_str_in, char *buf
 * description:
 * NOTE:
 ************************************************************************/
+#if defined (_WINDOWS)
 int
 encode_string_to_charset (wchar_t *str, int size, char **target, int *out_length, char *charset)
 {
@@ -1498,7 +1503,7 @@ encode_string_to_utf8 (wchar_t *str, int size, char **target, int *out_length)
 
   return ODBC_SUCCESS;
 }
-
+#endif
 /************************************************************************
  * name: encode_string
  * arguments:
