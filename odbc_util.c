@@ -1544,6 +1544,11 @@ wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length,
 	  *out_length = 0;
 	}
 
+      if (target)
+	{
+	  *target = NULL;
+	}
+
       return ODBC_SUCCESS;
     }
 
