@@ -274,6 +274,39 @@ SQLConnectLinux (SQLHDBC ConnectionHandle,
   return rc;
 }
 
+ODBC_INTERFACE RETCODE SQL_API
+SQLExecDirectLinux (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER TextLength)
+{
+  RETCODE rc = SQL_SUCCESS;
+  ODBC_STATEMENT *stmt_handle;
+
+  stmt_handle = (ODBC_STATEMENT *) StatementHandle;
+  odbc_free_diag (stmt_handle->diag, RESET);
+
+  if (strcasecmp (StatementText, "@QP@") == 0)
+    {
+      stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN;
+      return ODBC_SUCCESS;
+    }
+
+  if (strcasecmp (StatementText, "@QE@") == 0)
+    {
+      stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN | CCI_EXEC_QUERY_ALL;
+      return ODBC_SUCCESS;
+    }
+
+  stmt_handle->is_prepared = _FALSE_;
+
+  rc = odbc_prepare (stmt_handle, StatementText);
+  ERROR_GOTO (rc, error);
+
+  rc = odbc_execute (stmt_handle);
+  ERROR_GOTO (rc, error);
+
+error:
+  ODBC_RETURN (rc, StatementHandle);
+}
+
 /*
  * Version Introduced: ODBC 1.0 Standards Compliance: Deprecated
  */

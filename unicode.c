@@ -150,7 +150,12 @@ SQLExecDirectW (SQLHSTMT StatementHandle, SQLWCHAR *StatementText, SQLINTEGER Te
 
   wide_char_to_bytes (StatementText, TextLength, &sql_text, &sql_len, stmt->conn->charset);
   OutputDebugString ("SQLExecDirectW called\n");
+#if defined (_WINDOWS)
   ret = SQLExecDirect (StatementHandle, sql_text, sql_len);
+#else
+  ret = SQLExecDirectLinux (StatementHandle, sql_text, sql_len);
+#endif
+
   UT_FREE (sql_text);
 
   return ret;
