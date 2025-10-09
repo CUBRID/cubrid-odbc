@@ -187,3 +187,21 @@ error:
   ODBC_RETURN (rc, StatementHandle);
 }
 
+ODBC_INTERFACE RETCODE SQL_API
+SQLDescribeColLinux (SQLHSTMT StatementHandle,
+		     SQLUSMALLINT ColumnNumber,
+		     SQLCHAR *ColumnName,
+		     SQLSMALLINT BufferLength,
+		     SQLSMALLINT *NameLength,
+		     SQLSMALLINT *DataType, SQLULEN *ColumnSize, SQLSMALLINT *DecimalDigits, SQLSMALLINT *Nullable)
+{
+  RETCODE rc = SQL_SUCCESS;
+  ODBC_STATEMENT *stmt_handle = (ODBC_STATEMENT *) StatementHandle;;
+
+  odbc_free_diag (stmt_handle->diag, RESET);
+
+  rc = odbc_describe_col (stmt_handle, ColumnNumber,
+			  ColumnName, BufferLength, NameLength, DataType, ColumnSize, DecimalDigits, Nullable);
+
+  ODBC_RETURN (rc, StatementHandle);
+}

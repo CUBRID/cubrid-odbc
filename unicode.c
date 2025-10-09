@@ -539,7 +539,11 @@ SQLDescribeColW (SQLHSTMT hstmt, SQLUSMALLINT column,
     }
   memset (name_buffer, 0, name_max);
 
+#if defined (_WINDOWS)
   ret = SQLDescribeCol (hstmt, column, name_buffer, name_max, &name_buffer_len, type, size, scale, nullable);
+#else
+  ret = SQLDescribeColLinux (hstmt, column, name_buffer, name_max, &name_buffer_len, type, size, scale, nullable);
+#endif
   if (ret == ODBC_ERROR)
     {
       UT_FREE (name_buffer);
@@ -552,7 +556,7 @@ SQLDescribeColW (SQLHSTMT hstmt, SQLUSMALLINT column,
     {
       if (name != NULL)
 	{
-	  *name_len = (SQLSMALLINT) (out_length / sizeof (wchar_t));
+	  *name_len = (SQLSMALLINT) (out_length / WCHAR_LENGTH);
 	}
       else
 	{
