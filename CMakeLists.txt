@@ -44,7 +44,7 @@ set(CUBRID_ODBC_SOURCES
   odbc_type.c
   odbc_util.c
   )
-set(CUBRID_ODBC_UNICODE_SOURCES ${CUBRID_ODBC_SOURCES} unicode.c)
+set(CUBRID_ODBC_UNICODE_SOURCES ${CUBRID_ODBC_SOURCES} unicode.c odbc_linux_unicode.c)
 
 set(VERSION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/odbc_version.i")
 set(CCI_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/cci-src")

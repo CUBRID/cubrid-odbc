@@ -32,47 +32,7 @@
 #include  "odbc_util.h"
 #include  "ini.h"
 #include  "odbcinstext.h"
-
-typedef enum
-{
-  ODBCINI_DSN_NOT_FOUND = 0,
-  ODBCINI_DSN_FOUND_USER,
-  ODBCINI_DSN_FOUND_SYSTEM
-} ODBCINI_DSN_LOOKUP_RESULT;
-
-PUBLIC INT_PTR CALLBACK ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam);
-static char *find_key (char *string, char *key);
-static void dsn2connstr (CUBRIDDSNItem *dsn, char *connstr);
-extern char *odbcinst_system_file_path (char *b1);
-extern char *odbcinst_system_file_name (char *b2);
-extern char *odbcinst_user_file_path (char *buffer);
-extern char *odbcinst_user_file_name (char *buffer);
-extern BOOL _odbcinst_SystemINI (char *pszFileName, BOOL bVerify);
-extern BOOL _odbcinst_UserINI (char *pszFileName, BOOL bVerify);
-static ODBCINI_DSN_LOOKUP_RESULT ini_fileopen (const char *dsn, HINI *hInip);
-
-#define FETCH_SIZE_DEFAULT	1
-#define AUTOCOMMIT_DEFAULT	"false"
-#define OMIT_SCHEMA_DEFAULT	"off"
-
-#define DSN_LOOKUP(conn,ptDSN,hIni,key,dsn_item)						\
-	do {											\
-	     char *pDSN_item;									\
-	     if ((pDSN_item = find_key (conn, key)) == NULL)					\
-	       {										\
-		 if (iniPropertySeek( hIni, ptDSN, key, "" ) == INI_SUCCESS)			\
-		   {										\
-		     snprintf (dsn_item, ITEMBUFLEN, "%s", hIni->hCurProperty->szValue);	\
-		   }										\
-	       }										\
-	     else										\
-	       {										\
-		 snprintf (dsn_item, ITEMBUFLEN, "%s", pDSN_item);				\
-		 UT_FREE (pDSN_item);								\
-	       }										\
-	   } while (0)
-
-
+#include  "odbc_linux.h"
 
 /*
  * ODBC Driver function not supported
@@ -158,153 +118,6 @@ SQLGetPrivateProfileString (LPCSTR lpszSection,
   iniClose (hIni);
 
   return rc;
-}
-
-ODBC_INTERFACE RETCODE SQL_API
-SQLDriverConnectLinux (HDBC hdbc,
-		       HWND hWnd,
-		       UCHAR *szConnStrIn,
-		       SWORD cbConnStrIn,
-		       UCHAR *szConnStrOut, SWORD cbConnStrOut, SQLSMALLINT *pcbConnStrOut, UWORD uwMode)
-{
-  HINI    hIni;
-  RETCODE rc = ODBC_SUCCESS;
-  const char *ptDSN;
-  int port, fetch_size;
-  const char *ConnStrIn = NULL;
-  CUBRIDDSNItem dsn;
-  char connstr_buf[1024] = "";
-  char charset[ITEMBUFLEN] = CODE_NAME_UNICODE;
-  char autocommit[ITEMBUFLEN] = AUTOCOMMIT_DEFAULT;
-  char omit_schema[ITEMBUFLEN] = OMIT_SCHEMA_DEFAULT;
-
-  memset (&dsn, 0, sizeof (dsn));
-  if ((ptDSN = find_key (szConnStrIn, KEYWORD_DSN)) == NULL)
-    {
-      return ODBC_ERROR;
-    }
-  snprintf (dsn.dsn, ITEMBUFLEN, "%s", ptDSN);
-
-  memset (&hIni, 0, sizeof (hIni));
-  if ((rc = ini_fileopen (ptDSN, &hIni)) == ODBCINI_DSN_NOT_FOUND)
-    {
-      return ODBC_ERROR;
-    }
-
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_DBNAME, dsn.db_name);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_USER, dsn.user);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_PASSWORD, dsn.password);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_SERVER, dsn.server);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_PORT, dsn.port);
-  port = atoi (dsn.port);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_CHARSET, dsn.charset);
-  snprintf (charset, sizeof (charset), "%s", strlen (dsn.charset) ? dsn.charset : CODE_NAME_UNICODE);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_AUTOCOMMIT, dsn.autocommit);
-  snprintf (autocommit, sizeof (autocommit), "%s", strlen (dsn.autocommit) ? dsn.autocommit : AUTOCOMMIT_DEFAULT);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_OMIT_SCHEMA, dsn.omit_schema);
-  snprintf (omit_schema, sizeof (omit_schema), "%s", strlen (dsn.omit_schema) ? dsn.omit_schema : OMIT_SCHEMA_DEFAULT);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_FETCH_SIZE, dsn.fetch_size);
-  fetch_size = strlen (dsn.fetch_size) ? atoi (dsn.fetch_size) : FETCH_SIZE_DEFAULT;
-
-  iniClose (hIni);
-
-  dsn2connstr (&dsn, connstr_buf);
-
-  rc = odbc_connect_new (hdbc, dsn.dsn, dsn.db_name, dsn.user, dsn.password, dsn.server, port,
-			 fetch_size, charset, autocommit, omit_schema, ConnStrIn);
-
-  UT_FREE (ptDSN);
-
-  if ((szConnStrOut) && cbConnStrOut > 0)
-    {
-      snprintf (szConnStrOut, MIN (strlen (connstr_buf), (unsigned) cbConnStrOut), "%s", connstr_buf);
-    }
-
-  if (pcbConnStrOut)
-    {
-      *pcbConnStrOut = MIN (strlen (connstr_buf), (unsigned) cbConnStrOut);
-    }
-
-  return rc;
-}
-
-ODBC_INTERFACE RETCODE SQL_API
-SQLConnectLinux (SQLHDBC ConnectionHandle,
-		 SQLCHAR *DataSource,
-		 SQLSMALLINT NameLength1,
-		 SQLCHAR *UserName, SQLSMALLINT NameLength2, SQLCHAR *Authentication, SQLSMALLINT NameLength3)
-{
-  RETCODE rc = SQL_SUCCESS;
-  SQLCHAR *stDataSource = NULL;
-  SQLCHAR *stUserName = NULL;
-  SQLCHAR *stAuthentication = NULL;
-  SQLCHAR stDBName[ITEMBUFLEN];
-  SQLCHAR stServerName[ITEMBUFLEN];
-  SQLINTEGER Port, FetchSize;
-  SQLCHAR stCharSet[ITEMBUFLEN];
-  SQLCHAR stAutocommit[ITEMBUFLEN];
-  SQLCHAR stOmitSchema[ITEMBUFLEN];
-  SQLCHAR *user = NULL, *pass = NULL;
-
-  if (UserName == NULL || NameLength2 <= 0)
-    {
-      NameLength2 = SQL_MAX_USER_NAME_LEN + 1;
-      NameLength3 = SQL_MAX_OPTION_STRING_LENGTH;
-      stUserName = user = UT_ALLOC (NameLength2);
-      stAuthentication = pass = UT_ALLOC (NameLength3);
-    }
-  else
-    {
-      stUserName = UT_MAKE_STRING (UserName, NameLength2);
-      stAuthentication = UT_MAKE_STRING (Authentication, NameLength3);
-    }
-
-  get_dsn_info (DataSource, stDBName, sizeof (stDBName), user, NameLength2, pass, NameLength3,
-		stServerName, sizeof (stServerName), &Port, &FetchSize,
-		stCharSet, sizeof (stCharSet), stAutocommit, sizeof (stAutocommit),
-		stOmitSchema, sizeof (stOmitSchema));
-
-  rc = odbc_connect_new ((ODBC_CONNECTION *) ConnectionHandle, stDataSource,
-			 stDBName, stUserName, stAuthentication, stServerName,
-			 Port, FetchSize, stCharSet, stAutocommit, stOmitSchema, NULL);
-
-  UT_FREE (stUserName);
-  UT_FREE (stAuthentication);
-
-  return rc;
-}
-
-ODBC_INTERFACE RETCODE SQL_API
-SQLExecDirectLinux (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER TextLength)
-{
-  RETCODE rc = SQL_SUCCESS;
-  ODBC_STATEMENT *stmt_handle;
-
-  stmt_handle = (ODBC_STATEMENT *) StatementHandle;
-  odbc_free_diag (stmt_handle->diag, RESET);
-
-  if (strcasecmp (StatementText, "@QP@") == 0)
-    {
-      stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN;
-      return ODBC_SUCCESS;
-    }
-
-  if (strcasecmp (StatementText, "@QE@") == 0)
-    {
-      stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN | CCI_EXEC_QUERY_ALL;
-      return ODBC_SUCCESS;
-    }
-
-  stmt_handle->is_prepared = _FALSE_;
-
-  rc = odbc_prepare (stmt_handle, StatementText);
-  ERROR_GOTO (rc, error);
-
-  rc = odbc_execute (stmt_handle);
-  ERROR_GOTO (rc, error);
-
-error:
-  ODBC_RETURN (rc, StatementHandle);
 }
 
 /*
@@ -406,7 +219,7 @@ itoa (int value, char *string, int radix)
   return string;
 }
 
-static char *
+char *
 find_key (char *string, char *key)
 {
   char *value_p, *buf, *ptr;
@@ -437,7 +250,7 @@ find_key (char *string, char *key)
   return buf;
 }
 
-static void
+void
 dsn2connstr (CUBRIDDSNItem *dsn, char *connstr)
 {
   if (connstr == NULL)
@@ -500,7 +313,7 @@ ut_make_string_linux (const char *src, int length)
  * 3. system ini
 ************************************************************************/
 
-static ODBCINI_DSN_LOOKUP_RESULT
+ODBCINI_DSN_LOOKUP_RESULT
 ini_fileopen (const char *dsn, HINI *hInip)
 {
   char szIniName[_MAX_PATH];
