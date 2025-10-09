@@ -230,9 +230,9 @@ SQLDriverConnectLinux (HDBC hdbc,
 
 ODBC_INTERFACE RETCODE SQL_API
 SQLConnectLinux (SQLHDBC ConnectionHandle,
-            SQLCHAR *DataSource,
-            SQLSMALLINT NameLength1,
-            SQLCHAR *UserName, SQLSMALLINT NameLength2, SQLCHAR *Authentication, SQLSMALLINT NameLength3)
+		 SQLCHAR *DataSource,
+		 SQLSMALLINT NameLength1,
+		 SQLCHAR *UserName, SQLSMALLINT NameLength2, SQLCHAR *Authentication, SQLSMALLINT NameLength3)
 {
   RETCODE rc = SQL_SUCCESS;
   SQLCHAR *stDataSource = NULL;
@@ -260,13 +260,13 @@ SQLConnectLinux (SQLHDBC ConnectionHandle,
     }
 
   get_dsn_info (DataSource, stDBName, sizeof (stDBName), user, NameLength2, pass, NameLength3,
-                stServerName, sizeof (stServerName), &Port, &FetchSize,
-                stCharSet, sizeof (stCharSet), stAutocommit, sizeof (stAutocommit),
-                stOmitSchema, sizeof (stOmitSchema));
+		stServerName, sizeof (stServerName), &Port, &FetchSize,
+		stCharSet, sizeof (stCharSet), stAutocommit, sizeof (stAutocommit),
+		stOmitSchema, sizeof (stOmitSchema));
 
   rc = odbc_connect_new ((ODBC_CONNECTION *) ConnectionHandle, stDataSource,
-                         stDBName, stUserName, stAuthentication, stServerName,
-                         Port, FetchSize, stCharSet, stAutocommit, stOmitSchema, NULL);
+			 stDBName, stUserName, stAuthentication, stServerName,
+			 Port, FetchSize, stCharSet, stAutocommit, stOmitSchema, NULL);
 
   UT_FREE (stUserName);
   UT_FREE (stAuthentication);
