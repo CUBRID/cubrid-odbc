@@ -1167,11 +1167,12 @@ SQLGetDiagFieldW (SQLSMALLINT handle_type, SQLHANDLE handle,
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLColAttributeW (SQLHSTMT StatementHandle,
 		  SQLUSMALLINT ColumnNumber,
 		  SQLUSMALLINT FieldIdentifier,
 		  SQLPOINTER CharacterAttribute, SQLSMALLINT BufferLength, SQLSMALLINT *StringLength,
-#if defined(_WIN64) || defined(__linux__)
+#if defined(_WIN64)
 		  SQLLEN *NumericAttribute)
 #else
 		  SQLPOINTER NumericAttribute)
@@ -1204,6 +1205,50 @@ SQLColAttributeW (SQLHSTMT StatementHandle,
     }
   return ret;
 }
+#else
+SQLColAttributeW (SQLHSTMT StatementHandle,
+		  SQLUSMALLINT ColumnNumber,
+		  SQLUSMALLINT FieldIdentifier,
+		  SQLPOINTER CharacterAttribute, SQLSMALLINT BufferLength, SQLSMALLINT *StringLength,
+		  SQLLEN *NumericAttribute)
+{
+  RETCODE ret = ODBC_ERROR;
+  SQLWCHAR *wvalue;
+  ODBC_STATEMENT *stmt = (ODBC_STATEMENT *) StatementHandle;
+  SQLSMALLINT *strlen_p, _strlen = -1;
+
+  OutputDebugString ("SQLColAttributeW called.\n");
+
+  strlen_p = StringLength ? StringLength : (SQLSMALLINT *) &_strlen;
+
+  odbc_free_diag (stmt->diag, RESET);
+
+  ret = odbc_col_attribute (stmt, ColumnNumber,
+                           FieldIdentifier, CharacterAttribute, BufferLength, strlen_p, NumericAttribute);
+
+  if (CharacterAttribute)
+    {
+      BufferLength /= WCHAR_LENGTH;
+      if (StringLength != NULL)
+	{
+	  *StringLength = (SQLSMALLINT) (*StringLength) * sizeof (SQLWCHAR);
+	}
+
+      if (CharacterAttribute && StringLength)
+	{
+	  bytes_to_wide_char (CharacterAttribute, *StringLength / WCHAR_LENGTH, &wvalue, 0, NULL, stmt->conn->charset);
+	  if (wvalue != NULL)
+	    {
+	      (void) memcpy ((char *) CharacterAttribute, (const char *) wvalue, *StringLength);
+	      ((SQLWCHAR *) CharacterAttribute)[*StringLength / 2] = 0;
+	      UT_FREE_BSTR (wvalue);
+	    }
+	}
+    }
+
+  return ret;
+}
+#endif /* _WINDOWS */
 #endif
 
 /************************************************************************
