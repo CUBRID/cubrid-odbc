@@ -33,6 +33,10 @@
 
 #include    "odbc_portable.h"
 
+#if !defined (_WINDOWS)
+#include <stdlib.h>
+#endif
+
 #if defined (_WINDOWS)
 #define WCHAR_LENGTH		(sizeof (wchar_t))
 #define UT_ALLOC(size)		ut_alloc(size)

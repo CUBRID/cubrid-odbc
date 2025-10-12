@@ -354,22 +354,22 @@ ut_free (void *ptr)
 PUBLIC void *
 ut_realloc (void *ptr, int size)
 {
-  void *new = NULL;
+  void *newptr = NULL;
 
-  new = realloc (ptr, size);
+  newptr = realloc (ptr, size);
 
 #ifdef _DEBUG
-  if (new == NULL)
+  if (newptr == NULL)
     {
       printf ("Realloc : NULL\n");
     }
   else
     {
-      printf ("Realloc : %p\n", new);
+      printf ("Realloc : %p\n", newptr);
     }
 #endif
 
-  return new;
+  return newptr;
 }
 
 
