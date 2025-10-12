@@ -1224,7 +1224,7 @@ SQLColAttributeW (SQLHSTMT StatementHandle,
   odbc_free_diag (stmt->diag, RESET);
 
   ret = odbc_col_attribute (stmt, ColumnNumber,
-                           FieldIdentifier, CharacterAttribute, BufferLength, strlen_p, NumericAttribute);
+			    FieldIdentifier, CharacterAttribute, BufferLength, strlen_p, NumericAttribute);
 
   if (CharacterAttribute)
     {
