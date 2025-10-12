@@ -93,7 +93,7 @@ typedef WCHAR OLECHAR;
 #endif
 
 #if !defined (TRUE)
-typedef enum { TRUE = 1, FALSE = 0 } bool;
+enum { TRUE = 1, FALSE = 0 };
 #endif
 
 #endif
