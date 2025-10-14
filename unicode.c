@@ -1151,6 +1151,7 @@ SQLSetConnectOptionW (SQLHDBC hdbc, SQLUSMALLINT option, SQLULEN param)
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLGetConnectAttrW (SQLHDBC hdbc, SQLINTEGER attribute, SQLPOINTER value, SQLINTEGER value_max, SQLINTEGER *value_len)
 {
   RETCODE ret = ODBC_ERROR;
@@ -1159,6 +1160,20 @@ SQLGetConnectAttrW (SQLHDBC hdbc, SQLINTEGER attribute, SQLPOINTER value, SQLINT
   ret = SQLGetConnectAttr (hdbc, attribute, value, value_max, value_len);
   return ret;
 }
+#else
+SQLGetConnectAttrW (SQLHDBC hdbc, SQLINTEGER attribute, SQLPOINTER value, SQLINTEGER value_max, SQLINTEGER *value_len)
+{
+  RETCODE ret = ODBC_ERROR;
+
+  OutputDebugString ("SQLGetConnectAttrW called.\n");
+
+  odbc_free_diag (((ODBC_CONNECTION *) hdbc)->diag, RESET);
+
+  ret = odbc_get_connect_attr ((ODBC_CONNECTION *) hdbc, attribute, value, value_max, value_len);
+
+  ODBC_RETURN (ret, hdbc);
+}
+#endif
 
 /************************************************************************
 * name: SQLGetDiagFieldW
