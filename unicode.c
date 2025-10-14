@@ -1090,11 +1090,30 @@ SQLGetStmtAttrW (SQLHSTMT StatementHandle,
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLSetConnectAttrW (SQLHDBC hdbc, SQLINTEGER attribute, SQLPOINTER value, SQLINTEGER value_len)
 {
   OutputDebugString ("SQLSetConnectAttrW called.\n");
   return SQLSetConnectAttr (hdbc, attribute, value, value_len);
 }
+#else
+SQLSetConnectAttrW (SQLHDBC hdbc, SQLINTEGER attribute, SQLPOINTER value, SQLINTEGER value_len)
+{
+  RETCODE rc = SQL_SUCCESS;
+
+  OutputDebugString ("SQLSetConnectAttrW for called\n");
+
+  DEBUG_TIMESTAMP (START_SQLSetConnectAttr);
+
+  odbc_free_diag (((ODBC_CONNECTION *) hdbc)->diag, RESET);
+
+  rc = odbc_set_connect_attr ((ODBC_CONNECTION *) hdbc, attribute, value, value_len);
+
+  DEBUG_TIMESTAMP (END_SQLSetConnectAttr);
+
+  return rc;
+}
+#endif
 
 /************************************************************************
 * name: SQLSetStmtAttrW
