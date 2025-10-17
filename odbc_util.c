@@ -1587,7 +1587,7 @@ wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length,
     {
       if (mbuf_len > bytes_required)
 	{
-	  *target = UT_REALLOC (mbuf_orig, bytes_required);
+	  *target = UT_REALLOC (mbuf_orig, bytes_required + 1);
 	}
       else
 	{
