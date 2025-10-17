@@ -279,7 +279,7 @@ dsn2connstr (CUBRIDDSNItem *dsn, char *connstr)
 PUBLIC char *
 ut_make_string_linux (const char *src, int length)
 {
-  char *new = NULL;
+  char *newptr = NULL;
   size_t size;
 
   if (src == NULL)
@@ -289,14 +289,14 @@ ut_make_string_linux (const char *src, int length)
 
   size = (size_t) (length < 0 ? strlen (src) : length) + 1;
 
-  if ((new = (char *) UT_ALLOC (size)) == NULL)
+  if ((newptr = (char *) UT_ALLOC (size)) == NULL)
     {
       return NULL;
     }
 
-  snprintf (new, size, "%s", src);
+  snprintf (newptr, size, "%s", src);
 
-  return new;
+  return newptr;
 }
 
 /************************************************************************
