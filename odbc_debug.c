@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <sql.h>
 #include <sqlext.h>
 
@@ -120,8 +119,20 @@ sqltype_name (SQLSMALLINT sqltype)
     {SQL_C_CHAR,	"SQL_C_CHAR"},
     {SQL_C_SSHORT,	"SQL_C_SSHORT"},
     {SQL_C_SLONG,	"SQL_C_SLONG"},
-    {SQL_C_CHAR,	"SQL_C_CHAR"},
+    {SQL_C_LONG,	"SQL_C_LONG"},
+    {SQL_C_SHORT,	"SQL_C_SHORT"},
     {SQL_C_FLOAT,	"SQL_C_FLOAT"},
+    {SQL_C_BINARY,	"SQL_C_BINARY"},
+    {SQL_C_USHORT,	"SQL_C_USHORT"},
+    {SQL_C_SLONG,	"SQL_C_SLONG"},
+    {SQL_C_ULONG,	"SQL_C_ULONG"},
+    {SQL_C_SBIGINT,	"SQL_C_SBIGINT"},
+    {SQL_C_UBIGINT,	"SQL_C_UBIGINT"},
+    {SQL_C_DOUBLE,	"SQL_C_DOUBLE"},
+    {SQL_C_NUMERIC,	"SQL_C_NUMERIC"},
+    {SQL_C_BIT,		"SQL_C_BIT"},
+    {SQL_C_NUMERIC,	"SQL_C_NUMERIC"},
+    {SQL_C_BIT,		"SQL_C_BIT"},
     {SQL_C_DATE,	"SQL_C_DATE"},
     {SQL_C_TIME,	"SQL_C_TIME"},
     {SQL_C_TIMESTAMP,	"SQL_C_TIMESTAMP"},
