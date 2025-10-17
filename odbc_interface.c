@@ -204,7 +204,7 @@ SQLBindParameter (SQLHSTMT StatementHandle,
 	}
       else
 	{
-	  *StrLen_or_IndPtr = *StrLen_or_IndPtr / sizeof (wchar_t);
+	  *StrLen_or_IndPtr = *StrLen_or_IndPtr / WCHAR_LENGTH;
 	}
 
     }
