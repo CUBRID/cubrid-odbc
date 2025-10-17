@@ -13,6 +13,7 @@ extern char *odbcinst_system_file_path (char *b1);
 extern char *odbcinst_system_file_name (char *b2);
 extern char *odbcinst_user_file_path (char *buffer);
 extern char *odbcinst_user_file_name (char *buffer);
+extern char *find_key (char *string, char *key);
 extern BOOL _odbcinst_SystemINI (char *pszFileName, BOOL bVerify);
 extern BOOL _odbcinst_UserINI (char *pszFileName, BOOL bVerify);
 extern ODBCINI_DSN_LOOKUP_RESULT ini_fileopen (const char *dsn, HINI *hInip);
