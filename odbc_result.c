@@ -1355,7 +1355,7 @@ c_value_to_bound_ptr (void *bound_ptr, SQLLEN buffer_length, VALUE_CONTAINER *c_
     case SQL_C_LONG:
     case SQL_C_ULONG:
     case SQL_C_SLONG:
-      * ((long *) bound_ptr) = c_value->value.l;
+      * ((sqlc_long_t *) bound_ptr) = c_value->value.l;
       break;
     case SQL_C_UBIGINT:
     case SQL_C_SBIGINT:
