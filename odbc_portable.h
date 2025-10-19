@@ -33,11 +33,14 @@
 
 #if defined (_WINDOWS)
 #include "windows.h"
+typedef long sqlc_long_t;
 #else
 #define CUBRID_LINUX_ODBC
+typedef int sqlc_long_t;
 #include <wchar.h>
 #include <stdint.h>
 #endif
+
 #include "sqlext.h"
 
 #define ODBC_INTERFACE

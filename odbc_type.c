@@ -104,12 +104,6 @@ typedef struct tagC_DATA_TYPE_INFO
   long c_type_size;
 } C_DATA_TYPE_INFO;
 
-#if defined (_WINDOWS)
-typedef long sqlc_long_t;
-#else
-typedef int sqlc_long_t;
-#endif
-
 PRIVATE DATA_TYPE_INFO odbc_data_type_info_set[] =
 {
   {
