@@ -527,12 +527,16 @@ SQLDriverConnect (HDBC hdbc,
 
   DEBUG_TIMESTAMP (START_SQLDriverConnect);
 
-  if ((cbConnStrIn == SQL_NTS) && (szConnStrIn))
+  if ((cbConnStrIn == SQL_NTS) && (szConnStrIn != NULL))
     {
       cbConnStrIn = strlen (szConnStrIn);
     }
 
-  strncpy (ConnStrIn, szConnStrIn, cbConnStrIn);
+  if (szConnStrIn != NULL)
+    {
+      strncpy (ConnStrIn, szConnStrIn, cbConnStrIn);
+    }
+
   ConnStrIn[cbConnStrIn] = '\0';	// for end of list, if cbConnStrIn isn't end
   // with ';'
   for (pt = ConnStrIn; *pt != '\0'; ++pt)

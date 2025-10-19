@@ -994,7 +994,7 @@ odbc_table_privileges (ODBC_STATEMENT *stmt, char *catalog_name, char *schema_na
 {
   int cci_retval = 0;
   int cci_request = 0;
-  int db_ver;
+  int db_ver = 0;
   T_CCI_ERROR cci_error;
 
   char err_msg[SQL_MAX_MESSAGE_LENGTH + 1];
@@ -1014,7 +1014,7 @@ odbc_table_privileges (ODBC_STATEMENT *stmt, char *catalog_name, char *schema_na
       goto cci_error;
     }
 
-  if (stmt && stmt->conn)
+  if (stmt != NULL && stmt->conn)
     {
       db_ver = connected_db_ver (stmt->conn->db_ver);
     }
