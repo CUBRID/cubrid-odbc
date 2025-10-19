@@ -74,7 +74,7 @@ typedef union tagUNI_C_TYPE_VALUE
 {
   char c;
   short s;
-  long l;
+  sqlc_long_t l;
   __int64 bi;
   float f;
   double d;
