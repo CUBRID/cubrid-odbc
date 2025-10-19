@@ -1003,7 +1003,7 @@ replace_oid (char *sql_text, char **org_param_pos_pt, char **oid_param_pos_pt, c
 	  pt_tmp = pt;
 	  while ((pt_tmp = strchr (pt_tmp + 1, '\'')) != NULL)
 	    {
-	      if (*(pt_tmp - 1) != '\\')
+	      if (* (pt_tmp - 1) != '\\')
 		{
 		  break;
 		}
