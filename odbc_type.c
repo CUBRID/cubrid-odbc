@@ -1909,7 +1909,7 @@ odbc_value_converter (VALUE_CONTAINER *target_value, VALUE_CONTAINER *src_value)
       switch (target_value->type)
 	{
 	case SQL_C_CHAR:
-	  sprintf (buf, "%ld", src_value->value.l);
+	  sprintf (buf, "%d", src_value->value.l);
 	  target_value->value.str = UT_MAKE_STRING (buf, -1);
 	  target_value->length = strlen (buf) + 1;
 	  break;
