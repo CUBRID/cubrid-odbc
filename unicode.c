@@ -1105,13 +1105,28 @@ SQLBrowseConnectW (SQLHDBC hdbc, SQLWCHAR *in, SQLSMALLINT in_len,
 ************************************************************************/
 #if (ODBCVER >= 0x0300)
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLGetStmtAttrW (SQLHSTMT StatementHandle,
 		 SQLINTEGER Attribute, SQLPOINTER Value, SQLINTEGER BufferLength, SQLINTEGER *StringLength)
 {
   OutputDebugString ("SQLGetStmtAttrW called\n");
   return SQLGetStmtAttr (StatementHandle, Attribute, Value, BufferLength, StringLength);
 }
+#else
+SQLGetStmtAttrW (SQLHSTMT StatementHandle,
+		 SQLINTEGER Attribute, SQLPOINTER Value, SQLINTEGER BufferLength, SQLINTEGER *StringLength)
+{
+  RETCODE ret = SQL_SUCCESS;
+  ODBC_STATEMENT *stmt = (ODBC_STATEMENT *) StatementHandle;
 
+  OutputDebugString ("SQLGetStmtAttrW called\n");
+
+  odbc_free_diag (stmt->diag, RESET);
+  ret = odbc_get_stmt_attr (stmt, Attribute, Value, BufferLength, StringLength);
+
+  ODBC_RETURN (ret, stmt);
+}
+#endif
 /************************************************************************
 * name: SQLSetConnectAttrW
 * arguments:
@@ -1153,12 +1168,26 @@ SQLSetConnectAttrW (SQLHDBC hdbc, SQLINTEGER attribute, SQLPOINTER value, SQLINT
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLSetStmtAttrW (SQLHSTMT hstmt, SQLINTEGER attribute, SQLPOINTER value, SQLINTEGER value_len)
 {
   OutputDebugString ("SQLSetStmtAttrW called.\n");
   return SQLSetStmtAttr (hstmt, attribute, value, value_len);
 }
+#else
+SQLSetStmtAttrW (SQLHSTMT hstmt, SQLINTEGER attribute, SQLPOINTER value, SQLINTEGER value_len)
+{
+  RETCODE ret = SQL_SUCCESS;
+  ODBC_STATEMENT *stmt = (ODBC_STATEMENT *) hstmt;
 
+  OutputDebugString ("SQLGetStmtAttrW called\n");
+
+  odbc_free_diag (stmt->diag, RESET);
+  ret = odbc_set_stmt_attr (stmt, attribute, value, value_len, 0);
+
+  ODBC_RETURN (ret, stmt);
+}
+#endif
 /************************************************************************
 * name: SQLSetConnectOptionW
 * arguments:
