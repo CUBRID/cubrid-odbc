@@ -1167,11 +1167,25 @@ SQLSetStmtAttrW (SQLHSTMT hstmt, SQLINTEGER attribute, SQLPOINTER value, SQLINTE
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLSetConnectOptionW (SQLHDBC hdbc, SQLUSMALLINT option, SQLULEN param)
 {
   OutputDebugString ("SQLSetConnectOptionW called.\n");
   return SQLSetConnectOption (hdbc, option, param);
 }
+#else
+SQLSetConnectOptionW (SQLHDBC hdbc, SQLUSMALLINT option, SQLULEN param)
+{
+  RETCODE ret = SQL_SUCCESS;
+
+  OutputDebugString ("SQLSetConnectOptionW called.\n");
+
+  odbc_free_diag (((ODBC_CONNECTION *) hdbc)->diag, RESET);
+
+  return ret;
+}
+#endif
+
 
 /************************************************************************
 * name: SQLGetConnectAttrW
