@@ -654,6 +654,7 @@ SQLGetConnectOptionW (SQLHDBC hdbc, SQLUSMALLINT option, SQLPOINTER param)
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLGetCursorNameW (SQLHSTMT hstmt, SQLWCHAR *cursor, SQLSMALLINT cursor_max, SQLSMALLINT *cursor_len)
 {
   RETCODE ret = ODBC_ERROR;
@@ -687,7 +688,42 @@ SQLGetCursorNameW (SQLHSTMT hstmt, SQLWCHAR *cursor, SQLSMALLINT cursor_max, SQL
   UT_FREE (cursor_name);
   return ret;
 }
+#else
+SQLGetCursorNameW (SQLHSTMT hstmt, SQLWCHAR *cursor, SQLSMALLINT cursor_max, SQLSMALLINT *cursor_len)
+{
+  RETCODE ret = ODBC_ERROR;
+  char *cursor_name = NULL;
+  SQLSMALLINT cursor_name_len = 0;
+  ODBC_STATEMENT *stmt = (ODBC_STATEMENT *) hstmt;
+  int out_length;
+  SQLLEN tmp_NameLength;
 
+  OutputDebugString ("SQLGetCursorNameW called.\n");
+  cursor_name = UT_ALLOC (cursor_max);
+  if (cursor_name == NULL && cursor_max > 0)
+    {
+      odbc_set_diag (stmt->diag, "HY001", 0, "malloc failed");
+      return ODBC_ERROR;
+    }
+
+  ret = odbc_get_cursor_name (stmt, cursor_name, cursor_max, &cursor_name_len);
+  if (ret == ODBC_ERROR)
+    {
+      UT_FREE (cursor_name);
+      return ret;
+    }
+
+  bytes_to_wide_char (cursor_name, cursor_name_len, &cursor, cursor_max, &out_length, stmt->conn->charset);
+  if (cursor_len)
+    {
+      *cursor_len = (SQLSMALLINT) out_length;
+    }
+
+  UT_FREE (cursor_name);
+
+  return ret;
+}
+#endif
 /************************************************************************
 * name: SQLPrepareW
 * arguments:
