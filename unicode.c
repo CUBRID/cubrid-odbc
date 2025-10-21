@@ -768,7 +768,15 @@ SQLPrimaryKeysW (SQLHSTMT hstmt,
   wide_char_to_bytes (schema, schema_len, &cb_schema, &cb_schema_len, stmt->conn->charset);
   wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, stmt->conn->charset);
 
+#if defined (_WINDOWS)
   ret = SQLPrimaryKeys (hstmt, cb_catalog, cb_catalog_len, cb_schema, cb_schema_len, cb_table, cb_table_len);
+#else
+  ret = odbc_primary_keys (stmt, cb_catalog, cb_schema, cb_table);
+    if (stmt->conn->attr_autocommit == SQL_AUTOCOMMIT_ON)	// refer APIS-900 for this
+      {
+	odbc_auto_commit (stmt->conn);
+      }
+#endif
 
   UT_FREE (cb_catalog);
   UT_FREE (cb_schema);
