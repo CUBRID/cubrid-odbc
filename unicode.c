@@ -706,6 +706,7 @@ SQLGetCursorNameW (SQLHSTMT hstmt, SQLWCHAR *cursor, SQLSMALLINT cursor_max, SQL
       return ODBC_ERROR;
     }
 
+  odbc_free_diag (stmt->diag, RESET);
   ret = odbc_get_cursor_name (stmt, cursor_name, cursor_max, &cursor_name_len);
   if (ret == ODBC_ERROR)
     {
