@@ -800,6 +800,7 @@ SQLPrimaryKeysW (SQLHSTMT hstmt,
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLSetCursorNameW (SQLHSTMT hstmt, SQLWCHAR *name, SQLSMALLINT name_len)
 {
   RETCODE ret = ODBC_ERROR;
@@ -813,7 +814,24 @@ SQLSetCursorNameW (SQLHSTMT hstmt, SQLWCHAR *name, SQLSMALLINT name_len)
 
   return ret;
 }
+#else
+SQLSetCursorNameW (SQLHSTMT hstmt, SQLWCHAR *name, SQLSMALLINT name_len)
+{
+  RETCODE ret = ODBC_ERROR;
+  SQLCHAR *cb_name = NULL;
+  int cb_name_len = 0;
+  ODBC_STATEMENT *stmt = (ODBC_STATEMENT *) hstmt;
 
+  OutputDebugString ("SQLSetCursorName called\n");
+
+  wide_char_to_bytes (name, name_len, &cb_name, &cb_name_len, NULL);
+  odbc_free_diag (stmt->diag, RESET);
+
+  ret = odbc_set_cursor_name (stmt, cb_name, cb_name_len);
+
+  return ret;
+}
+#endif
 /************************************************************************
 * name: SQLSpecialColumnsW
 * arguments:
