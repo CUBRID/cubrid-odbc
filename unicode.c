@@ -609,10 +609,18 @@ SQLForeignKeysW (SQLHSTMT hstmt,
       NA_FREE (cb_fk_table);
     }
 
+#if defined (_WINDOWS)
   ret = SQLForeignKeys (hstmt,
 			cb_pk_catalog, cb_pk_catalog_len, cb_pk_schema, cb_pk_schema_len,
 			cb_pk_table, cb_pk_table_len, cb_fk_catalog, cb_fk_catalog_len,
 			cb_fk_schema, cb_fk_schema_len, cb_fk_table, cb_fk_table_len);
+#else
+  ret = odbc_foreign_keys (stmt, cb_pk_table, cb_fk_table);
+  if (stmt->conn->attr_autocommit == SQL_AUTOCOMMIT_ON)
+    {
+      odbc_auto_commit (stmt->conn);
+    }
+#endif
 
   UT_FREE (cb_pk_catalog);
   UT_FREE (cb_pk_schema);
