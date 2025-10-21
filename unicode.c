@@ -921,8 +921,12 @@ SQLTablesW (SQLHSTMT hstmt,
   wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, stmt->conn->charset);
   wide_char_to_bytes (type, type_len, &cb_type, &cb_type_len, stmt->conn->charset);
 
+#if defined (_WINDOWS)
   ret = SQLTables (hstmt,
 		   cb_catalog, cb_catalog_len, cb_schema, cb_schema_len, cb_table, cb_table_len, cb_type, cb_type_len);
+#else
+  ret = odbc_tables (hstmt, cb_catalog, cb_schema, cb_table, cb_type);
+#endif
 
   UT_FREE (cb_catalog);
   UT_FREE (cb_schema);
