@@ -893,9 +893,14 @@ SQLSpecialColumnsW (SQLHSTMT hstmt, SQLUSMALLINT type,
   wide_char_to_bytes (schema, schema_len, &cb_schema, &cb_schema_len, stmt->conn->charset);
   wide_char_to_bytes (table, table_len, &cb_table, &cb_table_len, stmt->conn->charset);
 
+#if defined (_WINDOWS)
   ret = SQLSpecialColumns (hstmt, type,
 			   cb_catalog, cb_catalog_len,
 			   cb_schema, cb_schema_len, cb_table, cb_table_len, scope, nullable);
+#else
+  odbc_free_diag (stmt->diag, RESET);
+  ret = odbc_special_columns (stmt, type, cb_catalog, cb_schema, cb_table, scope, nullable);
+#endif
 
   UT_FREE (cb_catalog);
   UT_FREE (cb_schema);
@@ -933,8 +938,6 @@ SQLStatisticsW (SQLHSTMT hstmt,
 #else
   ret = odbc_statistics (hstmt, cb_catalog, cb_schema, cb_table, unique, accuracy);
 #endif
-
-  PRINT_DEBUG ("SQLStatisticsW: ret = %d", ret);
 
   UT_FREE (cb_catalog);
   UT_FREE (cb_schema);
