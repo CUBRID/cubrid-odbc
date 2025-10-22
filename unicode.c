@@ -1127,7 +1127,7 @@ SQLGetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLWCHAR *name,
   ODBC_DESC *desc_handle = hdesc;
   int out_length;
 
-  OutputDebugString ("SQLDescribeColW called.\n");
+  OutputDebugString ("SQLGetDescRecW called.\n");
 
   name_buffer = UT_ALLOC (name_max);
   if (name_buffer == NULL && name_max > 0)
@@ -1168,7 +1168,7 @@ SQLGetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLWCHAR *name,
   ODBC_DESC *desc = hdesc;
   int out_length;
 
-  OutputDebugString ("SQLDescribeColW called.\n");
+  OutputDebugString ("SQLGetDescRecW called.\n");
 
   name_buffer = UT_ALLOC (name_max);
   if (name_buffer == NULL && name_max > 0)
@@ -1187,7 +1187,7 @@ SQLGetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLWCHAR *name,
       return ret;
     }
 
-  bytes_to_wide_char (name_buffer, name_buffer_len, &name, name_max, &out_length, desc->conn->charset);
+  bytes_to_wide_char (name_buffer, name_buffer_len, &name, name_max, &out_length, NULL);
 
   if (name_len)
     {
