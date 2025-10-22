@@ -1065,6 +1065,7 @@ SQLGetDescFieldW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT field,
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLGetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLWCHAR *name,
 		SQLSMALLINT name_max, SQLSMALLINT *name_len, SQLSMALLINT *type,
 		SQLSMALLINT *subtype, SQLLEN *length, SQLSMALLINT *precision,
@@ -1105,6 +1106,49 @@ SQLGetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLWCHAR *name,
   UT_FREE (name_buffer);
   return ret;
 }
+#else
+SQLGetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLWCHAR *name,
+		SQLSMALLINT name_max, SQLSMALLINT *name_len, SQLSMALLINT *type,
+		SQLSMALLINT *subtype, SQLLEN *length, SQLSMALLINT *precision,
+		SQLSMALLINT *scale, SQLSMALLINT *nullable)
+{
+  RETCODE ret = ODBC_ERROR;
+  SQLCHAR *name_buffer = NULL;
+  SQLSMALLINT name_buffer_len = 0;
+  ODBC_DESC *desc = hdesc;
+  int out_length;
+
+  OutputDebugString ("SQLDescribeColW called.\n");
+
+  name_buffer = UT_ALLOC (name_max);
+  if (name_buffer == NULL && name_max > 0)
+    {
+      odbc_set_diag (desc->diag, "HY001", 0, "malloc failed");
+      return ODBC_ERROR;
+    }
+
+  odbc_free_diag (((ODBC_DESC *) desc)->diag, RESET);
+
+  ret = odbc_get_desc_rec (desc, record,
+			   name_buffer, name_max, &name_buffer_len, type, subtype, length, precision, scale, nullable);
+  if (ret == ODBC_ERROR)
+    {
+      UT_FREE (name_buffer);
+      return ret;
+    }
+
+  bytes_to_wide_char (name_buffer, name_buffer_len, &name, name_max, &out_length, desc->conn->charset);
+
+  if (name_len)
+    {
+      *name_len = (SQLSMALLINT) out_length;
+    }
+
+  UT_FREE (name_buffer);
+
+  ODBC_RETURN (ret, desc);
+}
+#endif
 
 /************************************************************************
 * name: SQLSetDescFieldW
