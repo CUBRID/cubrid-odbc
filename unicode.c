@@ -1426,6 +1426,7 @@ SQLGetConnectAttrW (SQLHDBC hdbc, SQLINTEGER attribute, SQLPOINTER value, SQLINT
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLGetDiagFieldW (SQLSMALLINT handle_type, SQLHANDLE handle,
 		  SQLSMALLINT record, SQLSMALLINT field, SQLPOINTER info, SQLSMALLINT info_max, SQLSMALLINT *info_len)
 {
@@ -1435,6 +1436,24 @@ SQLGetDiagFieldW (SQLSMALLINT handle_type, SQLHANDLE handle,
   ret = SQLGetDiagField (handle_type, handle, record, field, info, info_max, info_len);
   return ret;
 }
+#else
+SQLGetDiagFieldW (SQLSMALLINT handle_type, SQLHANDLE handle,
+		  SQLSMALLINT record, SQLSMALLINT field, SQLPOINTER info, SQLSMALLINT info_max, SQLSMALLINT *info_len)
+{
+  RETCODE ret = ODBC_ERROR;
+  SQLLEN tmp_StringLength;
+
+  OutputDebugString ("SQLGetDiagFieldW called.\n");
+
+  ret = odbc_get_diag_field (handle_type, handle, record, field, info, info_max, &tmp_StringLength);
+  if (info_len != NULL)
+    {
+      *info_len = (SQLSMALLINT) tmp_StringLength;
+    }
+
+  return ret;
+}
+#endif
 
 /************************************************************************
 * name: SQLColAttributeW
