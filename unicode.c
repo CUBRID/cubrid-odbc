@@ -1241,6 +1241,7 @@ SQLSetDescFieldW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT field, SQLPOIN
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLSetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT type,
 		SQLSMALLINT subtype, SQLLEN length, SQLSMALLINT precision,
 		SQLSMALLINT scale, SQLPOINTER data_ptr, SQLLEN *octet_length_ptr, SQLLEN *indicator_ptr)
@@ -1250,6 +1251,22 @@ SQLSetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT type,
   return SQLSetDescRec (hdesc,
 			record, type, subtype, length, precision, scale, data_ptr, octet_length_ptr, indicator_ptr);
 }
+#else
+SQLSetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT type,
+		SQLSMALLINT subtype, SQLLEN length, SQLSMALLINT precision,
+		SQLSMALLINT scale, SQLPOINTER data_ptr, SQLLEN *octet_length_ptr, SQLLEN *indicator_ptr)
+{
+  RETCODE ret = ODBC_ERROR;
+
+  OutputDebugString ("SQLSetDescRecW called\n");
+  odbc_free_diag (((ODBC_DESC *) hdesc)->diag, RESET);
+
+  ret = odbc_set_desc_rec ((ODBC_DESC *) hdesc, record, type,
+                          subtype, length, precision, scale, data_ptr, octet_length_ptr, indicator_ptr);
+
+  ODBC_RETURN (ret, hdesc);
+}
+#endif
 
 /************************************************************************
 * name: SQLBrowseConnectW
