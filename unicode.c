@@ -1027,6 +1027,7 @@ SQLTablesW (SQLHSTMT hstmt,
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLGetDescFieldW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT field,
 		  SQLPOINTER value, SQLINTEGER value_max, SQLINTEGER *value_len)
 {
@@ -1056,6 +1057,55 @@ SQLGetDescFieldW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT field,
   UT_FREE (cb_value);
   return ret;
 }
+#else
+SQLGetDescFieldW (SQLHDESC hdesc, SQLSMALLINT RecNumber, SQLSMALLINT FieldIdentifier,
+		  SQLPOINTER ValuePtr, SQLINTEGER BufferLength, SQLINTEGER *StringLengthPtr)
+{
+  RETCODE ret = ODBC_ERROR;
+  SQLPOINTER cb_value = ValuePtr ;
+  int cb_value_len = 0;
+  ODBC_DESC *hdc = (ODBC_DESC *) hdesc;
+  SQLLEN len = 0;
+
+  OutputDebugString ("SQLGetDescFieldW called.\n");
+
+  if (IS_STR_VALPTR (BufferLength))
+    {
+      cb_value = UT_ALLOC (BufferLength);
+      if (cb_value == NULL)
+	{
+	  odbc_set_diag (hdc->diag, "HY001", 0, "malloc failed");
+	  return ODBC_ERROR;
+	}
+    }
+
+  odbc_free_diag (((ODBC_DESC *) hdc)->diag, RESET);
+
+  ret = odbc_get_desc_field (hdc, RecNumber, FieldIdentifier, cb_value, BufferLength, &len);
+
+  if (ret == ODBC_ERROR)
+    {
+      if (IS_STR_VALPTR (BufferLength))
+	{
+	  UT_FREE (cb_value);
+	}
+      return ret;
+    }
+
+  if (StringLengthPtr != NULL)
+    {
+      *StringLengthPtr = (SQLINTEGER) len;
+    }
+
+  if (IS_STR_VALPTR (BufferLength))
+    {
+      bytes_to_wide_char (cb_value, cb_value_len, (wchar_t **) & ValuePtr, BufferLength, StringLengthPtr, NULL);
+      UT_FREE (cb_value);
+    }
+
+  ODBC_RETURN (ret, hdc);
+}
+#endif
 
 /************************************************************************
 * name: SQLGetDescRecW
