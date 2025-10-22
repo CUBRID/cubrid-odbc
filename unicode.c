@@ -1262,7 +1262,7 @@ SQLSetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT type,
   odbc_free_diag (((ODBC_DESC *) hdesc)->diag, RESET);
 
   ret = odbc_set_desc_rec ((ODBC_DESC *) hdesc, record, type,
-                          subtype, length, precision, scale, data_ptr, octet_length_ptr, indicator_ptr);
+			   subtype, length, precision, scale, data_ptr, octet_length_ptr, indicator_ptr);
 
   ODBC_RETURN (ret, hdesc);
 }
