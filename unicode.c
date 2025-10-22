@@ -1208,12 +1208,30 @@ SQLGetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLWCHAR *name,
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLSetDescFieldW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT field, SQLPOINTER value, SQLINTEGER value_len)
 {
   //RETCODE ret = ODBC_ERROR;
   OutputDebugString ("SQLSetDescFieldW called.\n");
   return SQLSetDescField (hdesc, record, field, value, value_len);
 }
+#else
+SQLSetDescFieldW (SQLHDESC hdesc, SQLSMALLINT record, SQLSMALLINT field, SQLPOINTER value, SQLINTEGER value_len)
+{
+  RETCODE ret = ODBC_ERROR;
+  SQLSMALLINT is_driver;
+
+  OutputDebugString ("SQLSetDescFieldW called.\n");
+  odbc_free_diag (((ODBC_DESC *) hdesc)->diag, RESET);
+
+  is_driver = odbc_is_ird ((ODBC_DESC *) hdesc) &&
+	      (field == SQL_DESC_ARRAY_STATUS_PTR && field == SQL_DESC_ROWS_PROCESSED_PTR) ? 1 : 0;
+
+  ret = odbc_set_desc_field ((ODBC_DESC *) hdesc, record, field, value, value_len, is_driver);
+
+  ODBC_RETURN (ret, hdesc);
+}
+#endif
 
 /************************************************************************
 * name: SQLSetDescRecW
