@@ -395,6 +395,7 @@ ret:
 * NOTE:
 ************************************************************************/
 ODBC_INTERFACE RETCODE SQL_API
+#if defined (_WINDOWS)
 SQLNativeSqlW (SQLHDBC hdbc, SQLWCHAR *in, SQLINTEGER in_len, SQLWCHAR *out, SQLINTEGER out_max, SQLINTEGER *out_len)
 {
   RETCODE ret = ODBC_ERROR;
@@ -425,6 +426,40 @@ SQLNativeSqlW (SQLHDBC hdbc, SQLWCHAR *in, SQLINTEGER in_len, SQLWCHAR *out, SQL
   UT_FREE (sql_text_buffer);
   return ret;
 }
+#else
+SQLNativeSqlW (SQLHDBC hdbc, SQLWCHAR *in, SQLINTEGER in_len, SQLWCHAR *out, SQLINTEGER out_max, SQLINTEGER *out_len)
+{
+  RETCODE ret = ODBC_ERROR;
+  SQLCHAR *sql_state, *sql_text_buffer = NULL;
+  int sql_state_len;
+  ODBC_CONNECTION *conn = (ODBC_CONNECTION *) hdbc;
+  SQLINTEGER TextLength2Ptr;
+
+  OutputDebugString ("SQLNativeSqlW called.\n");
+  ret = wide_char_to_bytes (in, in_len, &sql_state, &sql_state_len, conn->charset);
+  sql_text_buffer = UT_ALLOC (out_max);
+  if (sql_text_buffer == NULL && out_max > 0)
+    {
+      odbc_set_diag (conn->diag, "HY001", 0, "malloc failed");
+      return ODBC_ERROR;
+    }
+  odbc_free_diag (((ODBC_CONNECTION *) conn)->diag, RESET);
+
+  ret = odbc_native_sql (conn, sql_state, sql_text_buffer, out_max, &TextLength2Ptr);
+  if (ret == ODBC_ERROR)
+    {
+      UT_FREE (sql_text_buffer);
+      return ret;
+    }
+
+  ret = bytes_to_wide_char (sql_text_buffer, SQL_NTS, &out, out_max, out_len, conn->charset);
+
+  PRINT_DEBUG ("ret = %d, obuf = |%s|, outlen = %d", ret, sql_text_buffer, *out_len);
+
+  UT_FREE (sql_text_buffer);
+  return ret;
+}
+#endif
 
 /************************************************************************
 * name: SQLColumnsW
