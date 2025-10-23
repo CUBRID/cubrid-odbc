@@ -208,6 +208,9 @@
 #define DEBUG_LOG(value)
 #endif
 
+/* distinguish ValuePtr type by BufferLength, SQLGetDescField */
+#define	IS_STR_VALPTR(BufferLength) ((BufferLength > SQL_NTS))
+
 /* Dynamic string */
 typedef struct __st_dynamic_string
 {
