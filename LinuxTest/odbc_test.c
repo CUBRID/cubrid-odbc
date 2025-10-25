@@ -97,18 +97,18 @@ testcase_exists (char *casename)
 
   if (num_testcases == 0)
     {
-      FALSE;
+      NOT_EXISTS;
     }
 
   for (i = 0; i < num_testcases; i++)
     {
       if (strcmp (odbc_testcases[i].name, casename) == 0)
 	{
-	  return TRUE;
+	  return EXISTS;
 	}
     }
 
-  return FALSE;
+  return NOT_EXISTS;
 }
 
 static int

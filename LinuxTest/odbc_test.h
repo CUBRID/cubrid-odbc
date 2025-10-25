@@ -11,7 +11,7 @@
 
 int load_linux_odbc_testcases (void);
 int testcase_exists (char *);
-enum { TRUE = 1, FALSE = 0};
+enum { EXISTS = 1, NOT_EXISTS = 0};
 typedef struct
 {
     char        name[PATHMAX];

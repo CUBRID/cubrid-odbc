@@ -1014,7 +1014,7 @@ odbc_table_privileges (ODBC_STATEMENT *stmt, char *catalog_name, char *schema_na
       goto cci_error;
     }
 
-  if (stmt != NULL && stmt->conn)
+  if (stmt != NULL && stmt->conn != NULL)
     {
       db_ver = connected_db_ver (stmt->conn->db_ver);
     }
