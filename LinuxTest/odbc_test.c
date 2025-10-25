@@ -24,7 +24,7 @@ int main (int argc, char *argv[])
       run_all = 0;
     }
 
-  if (find_dsn(dsn))
+  if (find_dsn (dsn))
     {
       return 1;
     }
@@ -129,7 +129,10 @@ find_dsn (char *dsn)
   if (fp == NULL || fgets (buf, PATHMAX, fp) == NULL)
     {
       strcpy (dsn, DEFAULT_DSN);
-      if (fp) fclose (fp);
+      if (fp != NULL)
+	{
+	  fclose (fp);
+	}
       return 0;
     }
 
@@ -140,7 +143,7 @@ find_dsn (char *dsn)
     }
   strcpy (dsn, buf);
 
-  printf ("DSN = %s\n", dsn);
+  printf ("using DSN: %s\n", dsn);
 
   fclose (fp);
 
