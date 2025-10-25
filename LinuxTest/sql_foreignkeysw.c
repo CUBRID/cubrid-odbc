@@ -48,19 +48,20 @@ sql_foreignkeysw (int case_num, char *dsn)
   retcode = bytes_to_wide_char (table, SQL_NTS, &table_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
 
-  SQLBindCol(hstmt, 7, SQL_C_WCHAR, szForeignKeyTable, sizeof (szForeignKeyTable), NULL);
-  SQLBindCol(hstmt, 8, SQL_C_WCHAR, szForeignKeyColumn, sizeof (szForeignKeyColumn), NULL);
-  SQLBindCol(hstmt, 12, SQL_C_WCHAR, szForeignKey, sizeof (szForeignKey), NULL);
+  SQLBindCol (hstmt, 7, SQL_C_WCHAR, szForeignKeyTable, sizeof (szForeignKeyTable), NULL);
+  SQLBindCol (hstmt, 8, SQL_C_WCHAR, szForeignKeyColumn, sizeof (szForeignKeyColumn), NULL);
+  SQLBindCol (hstmt, 12, SQL_C_WCHAR, szForeignKey, sizeof (szForeignKey), NULL);
 
   retcode = SQLForeignKeysW (hstmt, NULL, 0, NULL, 0, table_buf, SQL_NTS, NULL, 0, NULL, 0, NULL, 0);
   AreNotEqual (retcode, SQL_ERROR);
 
-  while (SQLFetch(hstmt) == SQL_SUCCESS) {
-    wide_char_to_bytes (szForeignKeyTable, SQL_NTS, &fk_table_name, NULL, "UCS2");
-    wide_char_to_bytes (szForeignKeyColumn, SQL_NTS, &column, NULL, "UCS2");
-    wide_char_to_bytes (szForeignKey, SQL_NTS, &fk, NULL, "UCS2");
-    printf("\tTable name = %s, fk = %s (%s)\n", fk_table_name, fk, column);
-  }
+  while (SQLFetch (hstmt) == SQL_SUCCESS)
+    {
+      wide_char_to_bytes (szForeignKeyTable, SQL_NTS, &fk_table_name, NULL, "UCS2");
+      wide_char_to_bytes (szForeignKeyColumn, SQL_NTS, &column, NULL, "UCS2");
+      wide_char_to_bytes (szForeignKey, SQL_NTS, &fk, NULL, "UCS2");
+      printf ("\tTable name = %s, fk = %s (%s)\n", fk_table_name, fk, column);
+    }
 
   retcode = SQLDisconnect (hDbc);
   AreNotEqual (retcode, SQL_ERROR);

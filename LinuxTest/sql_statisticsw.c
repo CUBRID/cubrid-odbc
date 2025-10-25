@@ -50,15 +50,15 @@ sql_statisticsw (int case_num, char *dsn)
   retcode = SQLStatisticsW (hstmt, NULL, 0, NULL, 0, table_buf, SQL_NTS, SQL_INDEX_ALL, SQL_QUICK);
   AreNotEqual (retcode, SQL_ERROR);
 
-  SQLBindCol(hstmt, 6, SQL_C_WCHAR, szIndexName, sizeof (szIndexName), NULL); // INDEX_NAME
-  SQLBindCol(hstmt, 9, SQL_C_WCHAR, szColumnName, sizeof (szColumnName), NULL); // COLUMN_NAME
-  SQLBindCol(hstmt, 11, SQL_C_SLONG, &sCardinality, 0, NULL);        // CARDINAL
+  SQLBindCol (hstmt, 6, SQL_C_WCHAR, szIndexName, sizeof (szIndexName), NULL); // INDEX_NAME
+  SQLBindCol (hstmt, 9, SQL_C_WCHAR, szColumnName, sizeof (szColumnName), NULL); // COLUMN_NAME
+  SQLBindCol (hstmt, 11, SQL_C_SLONG, &sCardinality, 0, NULL);       // CARDINAL
 
-  while (SQLFetch(hstmt) == SQL_SUCCESS)
+  while (SQLFetch (hstmt) == SQL_SUCCESS)
     {
       wide_char_to_bytes (szIndexName, SQL_NTS, &index, NULL, "UCS2");
       wide_char_to_bytes (szColumnName, SQL_NTS, &column, NULL, "UCS2");
-      printf("\tindex name: %s, col = %s (%s), cardinality = %d\n", index, table, column, sCardinality);
+      printf ("\tindex name: %s, col = %s (%s), cardinality = %d\n", index, table, column, sCardinality);
     }
 
   retcode = SQLDisconnect (hDbc);

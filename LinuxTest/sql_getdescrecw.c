@@ -101,7 +101,7 @@ sql_getdescrecw (int case_num, char *dsn)
 	  printf ("\tScale %i, ", (int)Scale);
 	  printf ("\tNullable %i\n", (int)Nullable);
 	}
-	  }
+    }
 fin:
   retcode = SQLDisconnect (hDbc);
   AreNotEqual (retcode, SQL_ERROR);

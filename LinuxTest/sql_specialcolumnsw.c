@@ -50,21 +50,21 @@ sql_specialcolumnsw (int case_num, char *dsn)
   retcode = bytes_to_wide_char (table, SQL_NTS, &table_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
 
-  SQLBindCol(hstmt, 1, SQL_C_SHORT, &scope, sizeof(scope), &len_scope);
-  SQLBindCol(hstmt, 2, SQL_C_WCHAR,  columname, sizeof(columname), &len_columname);
-  SQLBindCol(hstmt, 4, SQL_C_WCHAR, typename, ID_LEN, &len_typename);
-  SQLBindCol(hstmt, 8, SQL_C_SHORT, &pseudo_column, sizeof(pseudo_column), &len_pseudo_column);
+  SQLBindCol (hstmt, 1, SQL_C_SHORT, &scope, sizeof (scope), &len_scope);
+  SQLBindCol (hstmt, 2, SQL_C_WCHAR,  columname, sizeof (columname), &len_columname);
+  SQLBindCol (hstmt, 4, SQL_C_WCHAR, typename, ID_LEN, &len_typename);
+  SQLBindCol (hstmt, 8, SQL_C_SHORT, &pseudo_column, sizeof (pseudo_column), &len_pseudo_column);
 
   retcode = SQLSpecialColumnsW (hstmt, SQL_BEST_ROWID, NULL, 0, NULL, 0, table_buf, SQL_NTS,
 				SQL_SCOPE_CURROW, SQL_NULLABLE);
   AreNotEqual (retcode, SQL_ERROR);
 
-  while (SQLFetch(hstmt) == SQL_SUCCESS)
+  while (SQLFetch (hstmt) == SQL_SUCCESS)
     {
       wide_char_to_bytes (columname, SQL_NTS, &m_columname, NULL, "UCS2");
       wide_char_to_bytes (typename, SQL_NTS, &m_typename, NULL, "UCS2");
-      printf("Table name = %s, scope = %d, column = %s, type = %s, pseudo_column = %d\n",
-	     table, scope, m_columname, m_typename, pseudo_column);
+      printf ("Table name = %s, scope = %d, column = %s, type = %s, pseudo_column = %d\n",
+	      table, scope, m_columname, m_typename, pseudo_column);
     }
 
   retcode = SQLDisconnect (hDbc);

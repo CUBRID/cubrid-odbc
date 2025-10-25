@@ -47,17 +47,17 @@ sql_primarykeysw (int case_num, char *dsn)
   retcode = bytes_to_wide_char (table, SQL_NTS, &table_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
 
-  SQLBindCol(hstmt, 3, SQL_C_WCHAR, szTableName, sizeof (szTableName), NULL); // INDEX_NAME
-   SQLBindCol(hstmt, 4, SQL_C_WCHAR, szColumnName, sizeof (szColumnName), NULL); // COLUMN_NAME
+  SQLBindCol (hstmt, 3, SQL_C_WCHAR, szTableName, sizeof (szTableName), NULL); // INDEX_NAME
+  SQLBindCol (hstmt, 4, SQL_C_WCHAR, szColumnName, sizeof (szColumnName), NULL); // COLUMN_NAME
 
   retcode = SQLPrimaryKeysW (hstmt, NULL, 0, NULL, 0, table_buf, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
-  while (SQLFetch(hstmt) == SQL_SUCCESS)
+  while (SQLFetch (hstmt) == SQL_SUCCESS)
     {
       wide_char_to_bytes (szTableName, SQL_NTS, &pk_table_name, NULL, "UCS2");
       wide_char_to_bytes (szColumnName, SQL_NTS, &column, NULL, "UCS2");
-      printf("Table name = %s, pk column = (%s)\n", pk_table_name, column);
+      printf ("Table name = %s, pk column = (%s)\n", pk_table_name, column);
     }
 
   retcode = SQLDisconnect (hDbc);

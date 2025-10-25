@@ -63,27 +63,26 @@ sql_describecolw (int case_num, char *dsn)
   for (i = 0; i < num_columns; i++)
     {
       retcode = SQLDescribeColW (
-				 hstmt,                    // Select Statement (Prepared)
-				 i+1,                      // Columnn Number
-				 ColumnName,            // Column Name (returned)
-				 sizeof (ColumnName) / sizeof (SQLWCHAR),         // size of Column Name buffer
-				 &ColumnNameLen,        // Actual size of column name
-				 &ColumnDataType,       // SQL Data type of column
-				 &ColumnDataSize,       // Data size of column in table
-				 &ColumnDataDigits,     // Number of decimal digits
-				 &ColumnDataNullable);  // Whether column nullable
+			hstmt,                    // Select Statement (Prepared)
+			i+1,                      // Columnn Number
+			ColumnName,            // Column Name (returned)
+			sizeof (ColumnName) / sizeof (SQLWCHAR),         // size of Column Name buffer
+			&ColumnNameLen,        // Actual size of column name
+			&ColumnDataType,       // SQL Data type of column
+			&ColumnDataSize,       // Data size of column in table
+			&ColumnDataDigits,     // Number of decimal digits
+			&ColumnDataNullable);  // Whether column nullable
       AreNotEqual (retcode, SQL_ERROR);
 
       wide_char_to_bytes (ColumnName, SQL_NTS, &buf, NULL, "UCS2");
       printf ("Column [%d] = %s (name_len = %d), type = %s, size = %d, num_digit = %d, nullable = %d\n",
-	       i + 1, buf, (int) ColumnNameLen, sqltype_name (ColumnDataType),
-	       ColumnDataSize, ColumnDataDigits, ColumnDataNullable);
+	      i + 1, buf, (int) ColumnNameLen, sqltype_name (ColumnDataType),
+	      ColumnDataSize, ColumnDataDigits, ColumnDataNullable);
     }
 
-
-	/*
- 	 * will print only 1st column of the table, it shoubd be type of INTEGER
- 	 */
+  /*
+   * will print only 1st column of the table, it shoubd be type of INTEGER
+   */
 
   while (SQLFetch (hstmt) == SQL_SUCCESS)
     {

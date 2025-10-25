@@ -54,7 +54,7 @@ sql_getdescfieldw (int case_num, char *dsn)
   printf ("\tNum. desc fields (SQL_DESC_COUNT) = %d\n", desc_count);
 
   retcode = SQLDisconnect (hDbc);
-   AreNotEqual (retcode, SQL_ERROR);
+  AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLFreeHandle (SQL_HANDLE_DBC, hDbc);
   retcode = SQLFreeHandle (SQL_HANDLE_ENV, hEnv);

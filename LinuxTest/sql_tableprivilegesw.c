@@ -51,22 +51,22 @@ sql_tableprivilegesw (int case_num, char *dsn)
   retcode = bytes_to_wide_char (table, SQL_NTS, &table_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
 
-  SQLBindCol(hstmt, 4, SQL_C_WCHAR, GRANTOR, sizeof (GRANTOR), NULL);
-  SQLBindCol(hstmt, 5, SQL_C_WCHAR, GRANTEE, sizeof (GRANTEE), NULL);
-  SQLBindCol(hstmt, 6, SQL_C_WCHAR, PRIVILEGE, sizeof (PRIVILEGE), NULL);
-  SQLBindCol(hstmt, 7, SQL_C_WCHAR, IS_GRANTABLE, sizeof (IS_GRANTABLE), NULL);
+  SQLBindCol (hstmt, 4, SQL_C_WCHAR, GRANTOR, sizeof (GRANTOR), NULL);
+  SQLBindCol (hstmt, 5, SQL_C_WCHAR, GRANTEE, sizeof (GRANTEE), NULL);
+  SQLBindCol (hstmt, 6, SQL_C_WCHAR, PRIVILEGE, sizeof (PRIVILEGE), NULL);
+  SQLBindCol (hstmt, 7, SQL_C_WCHAR, IS_GRANTABLE, sizeof (IS_GRANTABLE), NULL);
 
   retcode = SQLTablePrivilegesW (hstmt, NULL, 0, NULL, 0, table_buf, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
-  while (SQLFetch(hstmt) == SQL_SUCCESS)
+  while (SQLFetch (hstmt) == SQL_SUCCESS)
     {
       wide_char_to_bytes (GRANTOR, SQL_NTS, &m_grantor, NULL, "UCS2");
       wide_char_to_bytes (GRANTEE, SQL_NTS, &m_grantee, NULL, "UCS2");
       wide_char_to_bytes (PRIVILEGE, SQL_NTS, &m_privilege, NULL, "UCS2");
       wide_char_to_bytes (IS_GRANTABLE, SQL_NTS, &m_is_grantable, NULL, "UCS2");
-      printf("\tTable name = %s, GRANTOR = %s, GRANTEE = %s, PRIVILEGE = %s, IS_GRANTABLE = %s\n",
-	     table, m_grantor, m_grantee, m_privilege, m_is_grantable);
+      printf ("\tTable name = %s, GRANTOR = %s, GRANTEE = %s, PRIVILEGE = %s, IS_GRANTABLE = %s\n",
+	      table, m_grantor, m_grantee, m_privilege, m_is_grantable);
     }
 
   retcode = SQLDisconnect (hDbc);
