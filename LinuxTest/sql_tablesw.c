@@ -37,12 +37,12 @@ sql_tablesw (int case_num, char *dsn)
 
   SQLAllocHandle (SQL_HANDLE_STMT, dbc, &stmt);
 
-  retcode = SQLTablesW (stmt, NULL, 0, NULL, 0, NULL, 0, (SQLCHAR*)"", SQL_NTS);
+  retcode = SQLTablesW (stmt, NULL, 0, NULL, 0, NULL, 0, (SQLCHAR *)"", SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
   SQLBindCol (stmt, 3, SQL_C_WCHAR, table_name, sizeof(table_name), NULL);
 
-  while ((retcode = SQLFetch(stmt)) == SQL_SUCCESS)
+  while ((retcode = SQLFetch (stmt)) == SQL_SUCCESS)
     {
       wide_char_to_bytes (table_name, SQL_NTS, &buf, NULL, "UCS2");
       printf ("\ttable [%d]: |%s|\n", i++, buf);
