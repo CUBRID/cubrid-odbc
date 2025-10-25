@@ -25,7 +25,9 @@ int main (int argc, char *argv[])
     }
 
   if (find_dsn(dsn))
-	  return 1;
+    {
+      return 1;
+    }
 
   odbc_testcases = (testcase_t *) calloc (sizeof (testcase_t), MAX_TEST_CASES);
   loaded_cases = load_linux_odbc_testcases ();
@@ -86,7 +88,7 @@ load_linux_odbc_testcases ()
 	}
 
       strcpy (odbc_testcases[num_testcases].name, dp->d_name);
-      odbc_testcases[num_testcases++].func = dlsym(dh, dp->d_name);
+      odbc_testcases[num_testcases++].func = dlsym (dh, dp->d_name);
     }
 }
 
@@ -114,28 +116,33 @@ testcase_exists (char *casename)
 static int
 find_dsn (char *dsn)
 {
-	FILE *fp;
-	char buf [PATHMAX];
-	char *p;
+  FILE *fp;
+  char buf [PATHMAX];
+  char *p;
 
-	if (dsn == NULL)
-	  return 1;
+  if (dsn == NULL)
+    {
+      return 1;
+    }
 
-	fp = fopen (DSNFILE, "r");
-	if (fp == NULL || fgets (buf, PATHMAX, fp) == NULL)
-	  {
-	    strcpy (dsn, DEFAULT_DSN);
-	    if (fp) fclose (fp);
-	    return 0;
-	  }
+  fp = fopen (DSNFILE, "r");
+  if (fp == NULL || fgets (buf, PATHMAX, fp) == NULL)
+    {
+      strcpy (dsn, DEFAULT_DSN);
+      if (fp) fclose (fp);
+      return 0;
+    }
 
-	p = strchr (buf, '\n');
-	if (p) *p = '\0';
-	strcpy (dsn, buf);
+  p = strchr (buf, '\n');
+  if (p != NULL)
+    {
+      *p = '\0';
+    }
+  strcpy (dsn, buf);
 
-	printf ("DSN = %s\n", dsn);
+  printf ("DSN = %s\n", dsn);
 
-	fclose (fp);
+  fclose (fp);
 
-	return 0;
+  return 0;
 }

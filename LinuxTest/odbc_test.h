@@ -14,9 +14,8 @@ int testcase_exists (char *);
 enum { EXISTS = 1, NOT_EXISTS = 0};
 typedef struct
 {
-    char        name[PATHMAX];
-    char	arg1[PATHMAX];
-    char	arg2[PATHMAX];
-
-    SQLRETURN   (*func)();
+  char name[PATHMAX];
+  char arg1[PATHMAX];
+  char arg2[PATHMAX];
+  SQLRETURN   (*func)();
 } testcase_t;
