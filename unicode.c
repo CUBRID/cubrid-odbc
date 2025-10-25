@@ -454,8 +454,6 @@ SQLNativeSqlW (SQLHDBC hdbc, SQLWCHAR *in, SQLINTEGER in_len, SQLWCHAR *out, SQL
 
   ret = bytes_to_wide_char (sql_text_buffer, SQL_NTS, &out, out_max, out_len, conn->charset);
 
-  PRINT_DEBUG ("ret = %d, obuf = |%s|, outlen = %d", ret, sql_text_buffer, *out_len);
-
   UT_FREE (sql_text_buffer);
   return ret;
 }
