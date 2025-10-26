@@ -1,5 +1,11 @@
+#ifndef ODBC_TEST_H
+#define	ODBC_TEST_H
+#include <stdio.h>
+#include <wchar.h>
 #include <sql.h>
 #include <sqlext.h>
+#include <string.h>
+#include "test_util.h"
 
 #define LINUXODBC_TESTLIB "libcubrid-odbc-test.so"
 #define	DEFAULT_DSN "link2u"
@@ -9,6 +15,8 @@
 #define PATHMAX 1024
 #define DSNFILE "dsn.txt"
 
+RETCODE run_query_w (SQLHSTMT hstmt, SQLCHAR *query);
+
 enum { EXISTS = 1, NOT_EXISTS = 0};
 typedef struct
 {
@@ -17,3 +25,4 @@ typedef struct
   char arg2[PATHMAX];
   SQLRETURN   (*func)();
 } testcase_t;
+#endif

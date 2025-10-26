@@ -171,3 +171,16 @@ sqlwcharlen (const wchar_t *wstr)
 
   return len;
 }
+
+RETCODE
+run_query_w (SQLHSTMT hstmt, SQLCHAR *query)
+{
+  RETCODE retcode;
+  SQLWCHAR *query_buf;
+
+  bytes_to_wide_char (query, strlen (query), &query_buf, 0, NULL, "UCS2");
+  retcode = SQLExecDirectW (hstmt, query_buf, SQL_NTS);
+
+  UT_FREE (query_buf);
+  return retcode;
+}
