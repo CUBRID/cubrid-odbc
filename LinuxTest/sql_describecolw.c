@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <wchar.h>
-#include <sql.h>
-#include <sqlext.h>
-#include <string.h>
-#include "test_util.h"
+#include "odbc_test.h"
 
 /*
  * usage:
@@ -22,9 +17,12 @@ sql_describecolw (int case_num, char *dsn)
   SQLHDBC           hDbc;
   SQLHSTMT  hstmt;
   wchar_t *dsn_buf;
-  SQLCHAR *qry = "SELECT * from t1";
+  SQLCHAR *qry = "SELECT * from test_tbl1";
   SQLWCHAR *query_buf;
   SQLSMALLINT num_columns;
+
+  SQLCHAR *q0 = "DROP TABLE IF EXISTS test_tbl1";
+  SQLCHAR *q1 = "CREATE TABLE test_tbl1 (col1 INTEGER NOT NULL, col2 VARCHAR (100))";
 
   SQLWCHAR	ColumnName[MAX_COL_NAME_LEN];
   SQLSMALLINT	ColumnNameLen;
@@ -51,6 +49,9 @@ sql_describecolw (int case_num, char *dsn)
 
   retcode = bytes_to_wide_char (qry, SQL_NTS, &query_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
+
+  retcode = run_query_w (hstmt, q0);
+  retcode = run_query_w (hstmt, q1);
 
   retcode = SQLExecDirectW (hstmt, query_buf, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);

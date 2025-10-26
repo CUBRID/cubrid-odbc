@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <wchar.h>
-#include <sql.h>
-#include <sqlext.h>
-#include <string.h>
-#include "test_util.h"
+#include "odbc_test.h"
 
 /*
  * usage:
@@ -17,7 +12,6 @@ sql_connectw (int case_num, char *dsn)
   RETCODE retcode;
   SQLHENV           hEnv;
   SQLHDBC           hDbc;
-  SQLHSTMT  hStmt;
   wchar_t *dsn_buf;
 
   retcode = SQLAllocEnv (&hEnv);
