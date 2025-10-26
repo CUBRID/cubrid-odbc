@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <wchar.h>
-#include <sql.h>
-#include <sqlext.h>
-#include <string.h>
-#include "test_util.h"
+#include "odbc_test.h"
 
 /*
  * usage:
@@ -20,10 +15,10 @@ sql_primarykeysw (int case_num, char *dsn)
 {
   RETCODE retcode;
   SQLHENV           hEnv;
-  SQLHDBC           hDbc;
+  SQLHDBC           hdbc;
   SQLHSTMT  hstmt;
   wchar_t *dsn_buf;
-  SQLCHAR *table = "s1";
+  SQLCHAR *table = "p1";
   SQLWCHAR *table_buf;
   SQLSMALLINT num_columns;
 
@@ -33,16 +28,28 @@ sql_primarykeysw (int case_num, char *dsn)
   SQLLEN sColumnSize, sCardinality;
   SQLCHAR		*pk_table_name, *column;
 
+  SQLCHAR *q0 = "DROP TABLE IF EXISTS p1";
+  SQLCHAR *q1 = "CREATE TABLE p1 (col1 INTEGER NOT NULL, col2 VARCHAR (100), col3 INTEGER, col4 BIGINT, PRIMARY KEY (col1))";
+  SQLCHAR *q2 = "CREATE INDEX idx_p1_1 ON p1 (col3)";
+  SQLCHAR *q3 = "CREATE INDEX idx_p1_2 ON p1 (col4)";
+  SQLCHAR *q4 = "INSERT INTO p1 SELECT rownum, 'test' || rownum, rownum+1000, rownum+5000 FROM db_class";
+
   retcode = SQLAllocEnv (&hEnv);
   retcode = SQLSetEnvAttr (hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
-  retcode = SQLAllocConnect (hEnv, &hDbc);
+  retcode = SQLAllocConnect (hEnv, &hdbc);
   AreNotEqual (retcode, SQL_ERROR);
 
   bytes_to_wide_char (dsn, SQL_NTS, &dsn_buf, 0, NULL, "UCS2");
-  retcode = SQLConnectW (hDbc, dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
+  retcode = SQLConnectW (hdbc, dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
-  retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hstmt);
+  retcode = SQLAllocHandle (SQL_HANDLE_STMT, hdbc, &hstmt);
+
+  retcode = run_query_w (hstmt, q0);
+  retcode = run_query_w (hstmt, q1);
+  retcode = run_query_w (hstmt, q2);
+  retcode = run_query_w (hstmt, q3);
+  retcode = run_query_w (hstmt, q4);
 
   retcode = bytes_to_wide_char (table, SQL_NTS, &table_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
@@ -60,10 +67,10 @@ sql_primarykeysw (int case_num, char *dsn)
       printf ("Table name = %s, pk column = (%s)\n", pk_table_name, column);
     }
 
-  retcode = SQLDisconnect (hDbc);
+  retcode = SQLDisconnect (hdbc);
   AreNotEqual (retcode, SQL_ERROR);
 
-  retcode = SQLFreeHandle (SQL_HANDLE_DBC, hDbc);
+  retcode = SQLFreeHandle (SQL_HANDLE_DBC, hdbc);
   retcode = SQLFreeHandle (SQL_HANDLE_ENV, hEnv);
   AreNotEqual (retcode, SQL_ERROR);
 
