@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <wchar.h>
-#include <sql.h>
-#include <sqlext.h>
-#include <string.h>
-#include "test_util.h"
+#include "odbc_test.h"
 
 /*
  * usage:
@@ -14,6 +9,9 @@
 
 #define MAX_COLS 10
 #define MAX_COL_NAME_LEN 256
+#define	PARENT_TABLE "parent1"
+#define	FK_TABLE1 "fk1"
+#define	FK_TABLE2 "fk2"
 
 int
 sql_foreignkeysw (int case_num, char *dsn)
@@ -23,7 +21,7 @@ sql_foreignkeysw (int case_num, char *dsn)
   SQLHDBC           hDbc;
   SQLHSTMT  hstmt;
   wchar_t *dsn_buf;
-  SQLCHAR *table = "s1";
+  SQLCHAR *table = PARENT_TABLE;
   SQLWCHAR *table_buf;
   SQLSMALLINT num_columns;
 
@@ -31,6 +29,19 @@ sql_foreignkeysw (int case_num, char *dsn)
   SQLWCHAR	szForeignKeyColumn[MAX_COL_NAME_LEN];
   SQLWCHAR	szForeignKey[MAX_COL_NAME_LEN];
   SQLCHAR		*fk_table_name, *column, *fk;
+  
+  SQLCHAR *q0 = "DROP TABLE IF EXISTS " PARENT_TABLE;
+  SQLCHAR *q1 = "DROP TABLE IF EXISTS " FK_TABLE1;
+  SQLCHAR *q2 = "DROP TABLE IF EXISTS " FK_TABLE2;
+  SQLCHAR *q3 = "CREATE TABLE parent1 (col1 INTEGER, col2 VARCHAR (100), PRIMARY KEY (col1))";
+  SQLCHAR *q4 = "CREATE TABLE " FK_TABLE1 "("
+				"col1 INT,"
+				"column2 INT,"
+				"CONSTRAINT FK_MEMBER_IDX FOREIGN KEY (column2) REFERENCES parent1(col1))";
+  SQLCHAR *q5 = "CREATE TABLE " FK_TABLE2 "("
+				"col1 INT,"
+				"column2 INT,"
+				"CONSTRAINT FK_MEMBER_IDX FOREIGN KEY (column2) REFERENCES parent1(col1))";
 
   int id, i = 1;
 
@@ -44,6 +55,19 @@ sql_foreignkeysw (int case_num, char *dsn)
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hstmt);
+
+  retcode = run_query_w (hstmt, q2);
+  AreNotEqual (retcode, SQL_ERROR);
+  retcode = run_query_w (hstmt, q1);
+  AreNotEqual (retcode, SQL_ERROR);
+  retcode = run_query_w (hstmt, q0);
+  AreNotEqual (retcode, SQL_ERROR);
+  retcode = run_query_w (hstmt, q3);
+  AreNotEqual (retcode, SQL_ERROR);
+  retcode = run_query_w (hstmt, q4);
+  AreNotEqual (retcode, SQL_ERROR);
+  retcode = run_query_w (hstmt, q5);
+  AreNotEqual (retcode, SQL_ERROR);
 
   retcode = bytes_to_wide_char (table, SQL_NTS, &table_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
