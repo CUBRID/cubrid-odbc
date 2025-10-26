@@ -7,6 +7,7 @@
 
 #define MAX_COLS 10
 #define MAX_COL_NAME_LEN 256
+#define TABLE_NAME "test_t1"
 
 int
 sql_statisticsw (int case_num, char *dsn)
@@ -16,7 +17,7 @@ sql_statisticsw (int case_num, char *dsn)
   SQLHDBC           hDbc;
   SQLHSTMT  hstmt;
   wchar_t *dsn_buf;
-  SQLCHAR *table = "s1";
+  SQLCHAR *table = TABLE_NAME;
   SQLWCHAR *table_buf;
   SQLSMALLINT num_columns;
 
@@ -25,6 +26,11 @@ sql_statisticsw (int case_num, char *dsn)
   SQLUSMALLINT uIndexQualifier, sType;
   SQLLEN sColumnSize, sCardinality;
   SQLCHAR		*index, *column;
+
+  SQLCHAR *q0 = "DROP TABLE IF EXISTS " TABLE_NAME;
+  SQLCHAR *q1 = "CREATE TABLE " TABLE_NAME "(col1 INT, col2 VARCHAR (100), col3 INT, col4 BIGINT, PRIMARY KEY (col1))";
+  SQLCHAR *q2 = "CREATE UNIQUE INDEX idx3_test_t1 ON " TABLE_NAME "(col3)";
+  SQLCHAR *q3 = "CREATE INDEX idx4_test_t1 ON " TABLE_NAME "(col4)";
 
   int id, i = 1;
 
@@ -38,6 +44,15 @@ sql_statisticsw (int case_num, char *dsn)
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hstmt);
+
+  retcode = run_query_w (hstmt, q0);
+  AreNotEqual (retcode, SQL_ERROR);
+  retcode = run_query_w (hstmt, q1);
+  AreNotEqual (retcode, SQL_ERROR);
+  retcode = run_query_w (hstmt, q2);
+  AreNotEqual (retcode, SQL_ERROR);
+  retcode = run_query_w (hstmt, q3);
+  AreNotEqual (retcode, SQL_ERROR);
 
   retcode = bytes_to_wide_char (table, SQL_NTS, &table_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
