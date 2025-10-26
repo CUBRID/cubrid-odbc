@@ -1,11 +1,4 @@
-// 연결 처리, SQLTables 함수 호출, 결과 집합 검색을 포함하는 C 예제
-
-#include <stdio.h>
-#include <wchar.h>
-#include <sql.h>
-#include <sqlext.h>
-#include <string.h>
-#include "test_util.h"
+#include "odbc_test.h"
 
 /*
  * usage:

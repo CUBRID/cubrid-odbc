@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <wchar.h>
-#include <sql.h>
-#include <sqlext.h>
-#include <string.h>
-#include "test_util.h"
-
+#include "odbc_test.h"
 /*
  * usage:
  *  2. run
