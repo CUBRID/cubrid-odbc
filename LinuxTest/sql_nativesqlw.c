@@ -14,7 +14,7 @@ sql_nativesqlw (int case_num, char *dsn)
   SQLHDBC           hDbc;
   SQLHSTMT  hstmt;
   wchar_t *dsn_buf;
-  SQLCHAR *qry = "SELECT * from t1";
+  SQLCHAR *qry = "SELECT * from db_class";
   SQLWCHAR *query_buf, OutStatementText[1024];
   SQLINTEGER TextLength2Ptr;
   SQLCHAR *m_query;
