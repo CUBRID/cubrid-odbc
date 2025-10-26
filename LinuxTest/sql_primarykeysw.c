@@ -29,7 +29,8 @@ sql_primarykeysw (int case_num, char *dsn)
   SQLCHAR		*pk_table_name, *column;
 
   SQLCHAR *q0 = "DROP TABLE IF EXISTS p1";
-  SQLCHAR *q1 = "CREATE TABLE p1 (col1 INTEGER NOT NULL, col2 VARCHAR (100), col3 INTEGER, col4 BIGINT, PRIMARY KEY (col1))";
+  SQLCHAR *q1 =
+	  "CREATE TABLE p1 (col1 INTEGER NOT NULL, col2 VARCHAR (100), col3 INTEGER, col4 BIGINT, PRIMARY KEY (col1))";
   SQLCHAR *q2 = "CREATE INDEX idx_p1_1 ON p1 (col3)";
   SQLCHAR *q3 = "CREATE INDEX idx_p1_2 ON p1 (col4)";
   SQLCHAR *q4 = "INSERT INTO p1 SELECT rownum, 'test' || rownum, rownum+1000, rownum+5000 FROM db_class";
