@@ -9,8 +9,6 @@
 #define PATHMAX 1024
 #define DSNFILE "dsn.txt"
 
-int load_linux_odbc_testcases (void);
-int testcase_exists (char *);
 enum { EXISTS = 1, NOT_EXISTS = 0};
 typedef struct
 {

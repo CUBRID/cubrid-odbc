@@ -7,17 +7,18 @@
 #include "odbc_test.h"
 
 testcase_t *odbc_testcases;
-int num_testcases = 0;
 int case_num = 1;
 static int find_dsn (char *dsn);
+static int testcase_exists (char *casename, int num_testcases);
+static int load_linux_odbc_testcases (void);
 
 int main (int argc, char *argv[])
 {
   int i;
-  int loaded_cases = 0;
   int run_all = 1;
   int name_len;
   char dsn[PATHMAX];
+  int num_testcases = 0;
 
   if (argc != 2)
     {
@@ -30,7 +31,7 @@ int main (int argc, char *argv[])
     }
 
   odbc_testcases = (testcase_t *) calloc (sizeof (testcase_t), MAX_TEST_CASES);
-  loaded_cases = load_linux_odbc_testcases ();
+  num_testcases = load_linux_odbc_testcases ();
   for  (i = 0; i < num_testcases; i++)
     {
       name_len = strlen (odbc_testcases[i].name);
@@ -48,7 +49,7 @@ int main (int argc, char *argv[])
     }
 }
 
-int
+static int
 load_linux_odbc_testcases ()
 {
   DIR *dirp;
@@ -57,6 +58,7 @@ load_linux_odbc_testcases ()
   char *p;
   struct dirent *dp;
   void *dh;
+  int num_testcases = 0;
 
   if (getcwd (cwd, PATHMAX) == NULL || (dirp = opendir (cwd)) == NULL)
     {
@@ -82,7 +84,7 @@ load_linux_odbc_testcases ()
 	  *p = '\0';
 	}
 
-      if (testcase_exists (dp->d_name))
+      if (testcase_exists (dp->d_name, num_testcases))
 	{
 	  continue;
 	}
@@ -90,10 +92,12 @@ load_linux_odbc_testcases ()
       strcpy (odbc_testcases[num_testcases].name, dp->d_name);
       odbc_testcases[num_testcases++].func = dlsym (dh, dp->d_name);
     }
+
+  return num_testcases;
 }
 
-int
-testcase_exists (char *casename)
+static int
+testcase_exists (char *casename, int num_testcases)
 {
   int i;
 
