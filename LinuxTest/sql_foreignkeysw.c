@@ -29,19 +29,19 @@ sql_foreignkeysw (int case_num, char *dsn)
   SQLWCHAR	szForeignKeyColumn[MAX_COL_NAME_LEN];
   SQLWCHAR	szForeignKey[MAX_COL_NAME_LEN];
   SQLCHAR		*fk_table_name, *column, *fk;
-  
+
   SQLCHAR *q0 = "DROP TABLE IF EXISTS " PARENT_TABLE;
   SQLCHAR *q1 = "DROP TABLE IF EXISTS " FK_TABLE1;
   SQLCHAR *q2 = "DROP TABLE IF EXISTS " FK_TABLE2;
   SQLCHAR *q3 = "CREATE TABLE parent1 (col1 INTEGER, col2 VARCHAR (100), PRIMARY KEY (col1))";
   SQLCHAR *q4 = "CREATE TABLE " FK_TABLE1 "("
-				"col1 INT,"
-				"column2 INT,"
-				"CONSTRAINT FK_MEMBER_IDX FOREIGN KEY (column2) REFERENCES parent1(col1))";
+		"col1 INT,"
+		"column2 INT,"
+		"CONSTRAINT FK_MEMBER_IDX FOREIGN KEY (column2) REFERENCES parent1(col1))";
   SQLCHAR *q5 = "CREATE TABLE " FK_TABLE2 "("
-				"col1 INT,"
-				"column2 INT,"
-				"CONSTRAINT FK_MEMBER_IDX FOREIGN KEY (column2) REFERENCES parent1(col1))";
+		"col1 INT,"
+		"column2 INT,"
+		"CONSTRAINT FK_MEMBER_IDX FOREIGN KEY (column2) REFERENCES parent1(col1))";
 
   int id, i = 1;
 
