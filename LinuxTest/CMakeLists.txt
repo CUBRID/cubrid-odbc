@@ -50,7 +50,7 @@ set (TARGET odbc_test)
 
 ADD_COMPILE_OPTIONS(-m64 -Wall)
 
-LINK_DIRECTORIES(/usr/local/lib /home/kshan/lib)
+LINK_DIRECTORIES(/usr/local/lib)
 
 ADD_LIBRARY(${CMAKE_PROJECT_NAME} SHARED ${CUBRID_ODBC_TEST_SOURCES})
 
