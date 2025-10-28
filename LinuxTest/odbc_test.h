@@ -9,7 +9,7 @@
 
 #define LINUXODBC_TESTLIB "libcubrid-odbc-test.so"
 #define	DEFAULT_DSN "link2u"
-#define IS_LOADED(idx)       (odbc_testcases[idx].func!=NULL)
+#define IS_TESTCASE_LOADED(idx)       (odbc_testcases[idx].func!=NULL)
 #define CASE_PREFIX "sql_"
 #define	MAX_TEST_CASES 512
 #define PATHMAX 1024

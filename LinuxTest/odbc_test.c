@@ -19,6 +19,7 @@ int main (int argc, char *argv[])
   int name_len;
   char dsn[PATHMAX];
   int num_testcases = 0;
+  int ret, num_success = 0;
 
   if (argc != 2)
     {
@@ -40,13 +41,19 @@ int main (int argc, char *argv[])
 	  continue;
 	}
 
-      if (IS_LOADED (i))
+      if (IS_TESTCASE_LOADED (i))
 	{
 	  printf ("running testcase #%d: %s\n", case_num, odbc_testcases[i].name);
-	  (odbc_testcases[i].func) (case_num, dsn);
+	  ret = (odbc_testcases[i].func) (case_num, dsn);
+	  if (ret == SQL_SUCCESS)
+	    {
+	      num_success++;
+	    }
 	  case_num++;
 	}
     }
+
+  printf ("Total num cases = %d, num success = %d, num failed = %d\n", (case_num - 1), num_success, (case_num - num_success -1));
 }
 
 static int
