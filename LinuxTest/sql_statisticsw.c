@@ -32,7 +32,7 @@ sql_statisticsw (int case_num, char *dsn)
   SQLCHAR *q2 = "CREATE UNIQUE INDEX idx3_test_t1 ON " TABLE_NAME "(col3)";
   SQLCHAR *q3 = "CREATE INDEX idx4_test_t1 ON " TABLE_NAME "(col4)";
   SQLCHAR *q4 = "INSERT INTO " TABLE_NAME " SELECT ROWNUM, 'test ' || ROWNUM, ROWNUM + 9999, ROWNUM + 999999 FROM "
-	"db_class a, db_class b";
+		"db_class a, db_class b";
 
   int id, i = 1;
 
