@@ -57,9 +57,11 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
 
   if (rc < 0)
     {
+      iconv_close (cd);
       return -1;
     }
 
+  iconv_close (cd);
   bytes_required = rc < 0 ? 0 : (wbuf_len - out_bytes_left);
 
   if (buffer_length == 0 || buffer_length > (bytes_required + 1))
