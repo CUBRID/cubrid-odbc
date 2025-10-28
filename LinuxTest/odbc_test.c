@@ -53,7 +53,9 @@ int main (int argc, char *argv[])
 	}
     }
 
-  printf ("Total num cases = %d, num success = %d, num failed = %d\n", (case_num - 1), num_success, (case_num - num_success -1));
+  printf ("Total num cases = %d, num success = %d, num failed = %d\n", (case_num - 1), num_success,
+	  (case_num - num_success -1));
+
 }
 
 static int
