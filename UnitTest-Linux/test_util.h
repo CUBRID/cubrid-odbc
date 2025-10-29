@@ -6,7 +6,7 @@ static int caseno=1;
     do {				\
 	if (v == expect || v == SQL_INVALID_HANDLE)		\
 	  {				\
-	    printf ("testcase%d-%d: NOK (retcode = %d)\n", case_num, caseno++, v);	\
+	    printf ("testcase%d-%d: NOK (got %d)\n", case_num, caseno++, v);	\
 	    return (1);			\
 	  }				\
 	else				\
@@ -15,6 +15,21 @@ static int caseno=1;
 	  }				\
         }				\
     while (0)
+
+#define AreEqual(v,expect)		\
+    do {				\
+	if (v != expect || v == SQL_INVALID_HANDLE)		\
+	  {				\
+	    printf ("testcase%d-%d: NOK (expect %d, got %d)\n", case_num, caseno++, expect, v);	\
+	    return (1);			\
+	  }				\
+	else				\
+	  {				\
+	    printf ("testcase%d-%d: OK\n", case_num, caseno++);	\
+	  }				\
+        }				\
+    while (0)
+
 int bytes_to_wide_char (char *str, int size, wchar_t **buf, int buf_len, int *out_len, char *charset);
 #define LENGTH_RATIO_WCHAR_TO_MULTIBYTE 3
 
