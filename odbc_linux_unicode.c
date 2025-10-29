@@ -51,15 +51,31 @@ SQLDriverConnectLinux (HDBC hdbc,
   RETCODE rc = ODBC_SUCCESS;
   const char *ptDSN;
   int port, fetch_size;
-  const char *ConnStrIn = NULL;
   CUBRIDDSNItem dsn;
   char connstr_buf[1024] = "";
   char charset[ITEMBUFLEN] = CODE_NAME_UNICODE;
   char autocommit[ITEMBUFLEN] = AUTOCOMMIT_DEFAULT;
   char omit_schema[ITEMBUFLEN] = OMIT_SCHEMA_DEFAULT;
+  char *pt;
+  char ConnStrIn[BUF_SIZE * 4];
+  size_t connstr_len;
+
+  connstr_len = cbConnStrIn > 0 ? cbConnStrIn : strlen (szConnStrIn);
+  if (szConnStrIn != NULL)
+    {
+      strncpy (ConnStrIn, szConnStrIn, connstr_len);
+    }
+
+  for (pt = ConnStrIn; *pt != '\0'; ++pt)
+    {
+      if (*pt == ';')		// connection string delimiter
+	{
+	  *pt = '\0';
+	}
+    }
 
   memset (&dsn, 0, sizeof (dsn));
-  if ((ptDSN = find_key (szConnStrIn, KEYWORD_DSN)) == NULL)
+  if ((ptDSN = find_key (ConnStrIn, KEYWORD_DSN)) == NULL)
     {
       return ODBC_ERROR;
     }
@@ -71,19 +87,19 @@ SQLDriverConnectLinux (HDBC hdbc,
       return ODBC_ERROR;
     }
 
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_DBNAME, dsn.db_name);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_USER, dsn.user);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_PASSWORD, dsn.password);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_SERVER, dsn.server);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_PORT, dsn.port);
+  DSN_LOOKUP (ConnStrIn, ptDSN, hIni, KEYWORD_DBNAME, dsn.db_name);
+  DSN_LOOKUP (ConnStrIn, ptDSN, hIni, KEYWORD_USER, dsn.user);
+  DSN_LOOKUP (ConnStrIn, ptDSN, hIni, KEYWORD_PASSWORD, dsn.password);
+  DSN_LOOKUP (ConnStrIn, ptDSN, hIni, KEYWORD_SERVER, dsn.server);
+  DSN_LOOKUP (ConnStrIn, ptDSN, hIni, KEYWORD_PORT, dsn.port);
   port = atoi (dsn.port);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_CHARSET, dsn.charset);
+  DSN_LOOKUP (ConnStrIn, ptDSN, hIni, KEYWORD_CHARSET, dsn.charset);
   snprintf (charset, sizeof (charset), "%s", strlen (dsn.charset) ? dsn.charset : CODE_NAME_UNICODE);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_AUTOCOMMIT, dsn.autocommit);
+  DSN_LOOKUP (ConnStrIn, ptDSN, hIni, KEYWORD_AUTOCOMMIT, dsn.autocommit);
   snprintf (autocommit, sizeof (autocommit), "%s", strlen (dsn.autocommit) ? dsn.autocommit : AUTOCOMMIT_DEFAULT);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_OMIT_SCHEMA, dsn.omit_schema);
+  DSN_LOOKUP (ConnStrIn, ptDSN, hIni, KEYWORD_OMIT_SCHEMA, dsn.omit_schema);
   snprintf (omit_schema, sizeof (omit_schema), "%s", strlen (dsn.omit_schema) ? dsn.omit_schema : OMIT_SCHEMA_DEFAULT);
-  DSN_LOOKUP (szConnStrIn, ptDSN, hIni, KEYWORD_FETCH_SIZE, dsn.fetch_size);
+  DSN_LOOKUP (ConnStrIn, ptDSN, hIni, KEYWORD_FETCH_SIZE, dsn.fetch_size);
   fetch_size = strlen (dsn.fetch_size) ? atoi (dsn.fetch_size) : FETCH_SIZE_DEFAULT;
 
   iniClose (hIni);
