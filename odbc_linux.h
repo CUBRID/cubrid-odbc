@@ -23,7 +23,7 @@ extern ODBCINI_DSN_LOOKUP_RESULT ini_fileopen (const char *dsn, HINI *hInip);
 	     char *pDSN_item;									\
 	     if ((pDSN_item = find_key (conn, key)) == NULL)					\
 	       {										\
-		 if (iniPropertySeek( hIni, ptDSN, key, "" ) == INI_SUCCESS)			\
+		 if (ptDSN != NULL && iniPropertySeek( hIni, ptDSN, key, "" ) == INI_SUCCESS)	\
 		   {										\
 		     snprintf (dsn_item, ITEMBUFLEN, "%s", hIni->hCurProperty->szValue);	\
 		   }										\

@@ -59,6 +59,7 @@ SQLDriverConnectLinux (HDBC hdbc,
   char *pt;
   char ConnStrIn[BUF_SIZE * 4];
   size_t connstr_len;
+  ODBCINI_DSN_LOOKUP_RESULT retcode;
 
   connstr_len = cbConnStrIn > 0 ? cbConnStrIn : strlen (szConnStrIn);
   if (szConnStrIn != NULL)
@@ -75,16 +76,17 @@ SQLDriverConnectLinux (HDBC hdbc,
     }
 
   memset (&dsn, 0, sizeof (dsn));
-  if ((ptDSN = find_key (ConnStrIn, KEYWORD_DSN)) == NULL)
+  ptDSN = find_key (ConnStrIn, KEYWORD_DSN);
+
+  if (ptDSN)
     {
-      return ODBC_ERROR;
+      snprintf (dsn.dsn, ITEMBUFLEN, "%s", ptDSN);
     }
-  snprintf (dsn.dsn, ITEMBUFLEN, "%s", ptDSN);
 
   memset (&hIni, 0, sizeof (hIni));
-  if ((rc = ini_fileopen (ptDSN, &hIni)) == ODBCINI_DSN_NOT_FOUND)
+  if (ptDSN)
     {
-      return ODBC_ERROR;
+      retcode = ini_fileopen (ptDSN, &hIni);
     }
 
   DSN_LOOKUP (ConnStrIn, ptDSN, hIni, KEYWORD_DBNAME, dsn.db_name);
@@ -102,7 +104,10 @@ SQLDriverConnectLinux (HDBC hdbc,
   DSN_LOOKUP (ConnStrIn, ptDSN, hIni, KEYWORD_FETCH_SIZE, dsn.fetch_size);
   fetch_size = strlen (dsn.fetch_size) ? atoi (dsn.fetch_size) : FETCH_SIZE_DEFAULT;
 
-  iniClose (hIni);
+  if (retcode != ODBCINI_DSN_NOT_FOUND)
+    {
+      iniClose (hIni);
+    }
 
   dsn2connstr (&dsn, connstr_buf);
 
