@@ -41,6 +41,7 @@ set(CUBRID_ODBC_TEST_SOURCES
   sql_nativesqlw.c
   sql_specialcolumnsw.c
   sql_tablesw.c
+  sql_autocommit.c
   )
 
 set (CMAKE_CXX_FLAGS "-Wall")
