@@ -12,8 +12,9 @@ sql_autocommit (int case_num, char *dsn)
   SQLINTEGER diag_rec;
   SQLINTEGER autocommit;
   SQLWCHAR *dsn_buf;
-  SQLCHAR *connstr="DRIVER=CUBRID ODBC Driver Unicode;DB_NAME=demodb;SERVER=192.168.2.39;PORT=33000;UID=dba;PWD=;CHARSET=utf-8;AUTOCOMMIT=ON";
-
+  SQLCHAR *connstr=
+	  "DRIVER=CUBRID ODBC Driver Unicode;DB_NAME=demodb;SERVER=192.168.2.39;PORT=33000;"
+	  "UID=dba;PWD=;CHARSET=utf-8;AUTOCOMMIT=ON";
   /* Allocate an environment handle */
   SQLAllocHandle (SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
   /* We want ODBC 3 support */
@@ -23,7 +24,7 @@ sql_autocommit (int case_num, char *dsn)
   AreNotEqual (retcode, SQL_ERROR);
 
   bytes_to_wide_char (connstr, SQL_NTS, &dsn_buf, 0, NULL, "UCS2");
- 
+
   retcode = SQLDriverConnectW (dbc, NULL, dsn_buf, SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
 
   if (retcode == SQL_ERROR)
