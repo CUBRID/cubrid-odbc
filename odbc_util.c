@@ -192,7 +192,7 @@ FreeStr (D_STRING *str)
 * description:
 * NOTE:
 ************************************************************************/
-#if defined (WINDOWS)
+#if defined (_WINDOWS)
 PUBLIC int
 sqlwcharlen (const WCHAR *wstr)
 {
@@ -1736,7 +1736,7 @@ ret:
  * description:
  * NOTE:
  ************************************************************************/
-#if defined (WINDOWS)
+#if defined (_WINDOWS)
 int
 get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, int *out_length, char *characterset)
 {
