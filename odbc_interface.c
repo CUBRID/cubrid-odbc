@@ -204,7 +204,7 @@ SQLBindParameter (SQLHSTMT StatementHandle,
 	}
       else
 	{
-	  *StrLen_or_IndPtr = *StrLen_or_IndPtr / sizeof (wchar_t);
+	  *StrLen_or_IndPtr = *StrLen_or_IndPtr / WCHAR_LENGTH;
 	}
 
     }
@@ -362,6 +362,7 @@ SQLConnect (SQLHDBC ConnectionHandle,
   SQLCHAR stCharSet[ITEMBUFLEN];
   SQLCHAR stAutocommit[ITEMBUFLEN];
   SQLCHAR stOmitSchema[ITEMBUFLEN];
+  SQLCHAR *user = NULL, *pass = NULL;
 
 
   OutputDebugString ("SQLConnect called\n");
@@ -374,10 +375,25 @@ SQLConnect (SQLHDBC ConnectionHandle,
 
   odbc_free_diag (((ODBC_CONNECTION *) ConnectionHandle)->diag, RESET);
 
+#if defined (_WINDOWS)
   get_dsn_info (stDataSource, stDBName, sizeof (stDBName), NULL, 0, NULL, 0,
 		stServerName, sizeof (stServerName), &Port, &FetchSize,
 		stCharSet, sizeof (stCharSet), stAutocommit, sizeof (stAutocommit),
 		stOmitSchema, sizeof (stOmitSchema));
+#else
+  if (stUserName == NULL)
+    {
+      NameLength2 = SQL_MAX_USER_NAME_LEN + 1;
+      NameLength3 = SQL_MAX_OPTION_STRING_LENGTH;
+      stUserName = user = UT_ALLOC (NameLength2);
+      stAuthentication = pass = UT_ALLOC (NameLength3);
+    }
+
+  get_dsn_info (stDataSource, stDBName, sizeof (stDBName), user, NameLength2, pass, NameLength3,
+		stServerName, sizeof (stServerName), &Port, &FetchSize,
+		stCharSet, sizeof (stCharSet), stAutocommit, sizeof (stAutocommit),
+		stOmitSchema, sizeof (stOmitSchema));
+#endif
   rc = odbc_connect_new ((ODBC_CONNECTION *) ConnectionHandle, stDataSource,
 			 stDBName, stUserName, stAuthentication, stServerName,
 			 Port, FetchSize, stCharSet, stAutocommit, stOmitSchema, NULL);
@@ -511,12 +527,16 @@ SQLDriverConnect (HDBC hdbc,
 
   DEBUG_TIMESTAMP (START_SQLDriverConnect);
 
-  if ((cbConnStrIn == SQL_NTS) && (szConnStrIn))
+  if ((cbConnStrIn == SQL_NTS) && (szConnStrIn != NULL))
     {
       cbConnStrIn = strlen (szConnStrIn);
     }
 
-  strncpy (ConnStrIn, szConnStrIn, cbConnStrIn);
+  if (szConnStrIn != NULL)
+    {
+      strncpy (ConnStrIn, szConnStrIn, cbConnStrIn);
+    }
+
   ConnStrIn[cbConnStrIn] = '\0';	// for end of list, if cbConnStrIn isn't end
   // with ';'
   for (pt = ConnStrIn; *pt != '\0'; ++pt)

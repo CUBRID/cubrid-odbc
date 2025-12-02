@@ -32,6 +32,10 @@
 #include    <stdlib.h>
 #include    <string.h>
 
+#if !defined (_WINDOWS)
+#include <iconv.h>
+#endif
+
 #include    "odbc_portable.h"
 #include    "odbc_util.h"
 #include    "odbc_statement.h"
@@ -188,6 +192,7 @@ FreeStr (D_STRING *str)
 * description:
 * NOTE:
 ************************************************************************/
+#if defined (_WINDOWS)
 PUBLIC int
 sqlwcharlen (const WCHAR *wstr)
 {
@@ -198,6 +203,27 @@ sqlwcharlen (const WCHAR *wstr)
     }
   return len;
 }
+#else
+PUBLIC int
+sqlwcharlen (const WCHAR *wstr)
+{
+  int len = 0;
+  char *p = (char *) wstr;
+
+  while (p)
+    {
+      if (*p == 0)
+	{
+	  break;
+	}
+
+      p = p + WCHAR_LENGTH;
+      ++len;
+    }
+
+  return len;
+}
+#endif
 
 /************************************************************************
 * name: ut_alloc_bstr
@@ -208,6 +234,7 @@ sqlwcharlen (const WCHAR *wstr)
 * description:
 * NOTE:
 ************************************************************************/
+#if defined (_WINDOWS)
 PUBLIC WCHAR *
 ut_alloc_bstr (SQLLEN size)
 {
@@ -228,6 +255,7 @@ ut_alloc_bstr (SQLLEN size)
 
   return new;
 }
+#endif
 
 /************************************************************************
 * name: ut_free_bstr
@@ -236,6 +264,7 @@ ut_alloc_bstr (SQLLEN size)
 * description:
 * NOTE:
 ************************************************************************/
+#if defined (_WINDOWS)
 PUBLIC void
 ut_free_bstr (WCHAR *ptr)
 {
@@ -254,6 +283,7 @@ ut_free_bstr (WCHAR *ptr)
       SysFreeString (ptr);
     }
 }
+#endif
 
 /************************************************************************
 * name: ut_alloc
@@ -324,22 +354,22 @@ ut_free (void *ptr)
 PUBLIC void *
 ut_realloc (void *ptr, int size)
 {
-  void *new = NULL;
+  void *newptr = NULL;
 
-  new = realloc (ptr, size);
+  newptr = realloc (ptr, size);
 
 #ifdef _DEBUG
-  if (new == NULL)
+  if (newptr == NULL)
     {
       printf ("Realloc : NULL\n");
     }
   else
     {
-      printf ("Realloc : %p\n", new);
+      printf ("Realloc : %p\n", newptr);
     }
 #endif
 
-  return new;
+  return newptr;
 }
 
 
@@ -971,9 +1001,9 @@ replace_oid (char *sql_text, char **org_param_pos_pt, char **oid_param_pos_pt, c
 	case '\'':
 	  // find the matched string marker
 	  pt_tmp = pt;
-	  while (pt_tmp = strchr (pt_tmp + 1, '\''))
+	  while ((pt_tmp = strchr (pt_tmp + 1, '\'')) != NULL)
 	    {
-	      if (pt_tmp == NULL || * (pt_tmp - 1) != '\\')
+	      if (* (pt_tmp - 1) != '\\')
 		{
 		  break;
 		}
@@ -1111,6 +1141,38 @@ str_value_assign (const char *in_value, char *out_buf, SQLLEN out_buf_len, SQLLE
 }
 
 
+PUBLIC RETCODE
+wchar_value_assign (const char *str, char *out_buf, SQLLEN out_buf_len, SQLLEN *str_len_ptr)
+{
+  RETCODE rc = ODBC_SUCCESS;
+  SQLLEN length = -1;
+  int str_len;
+
+  if (str != NULL)
+    {
+      str_len = strlen (str);
+      if (out_buf != NULL && out_buf_len > 0)
+	{
+	  if (bytes_to_wide_char (str, str_len, (wchar_t **) (&out_buf), out_buf_len, &length, CODE_NAME_UNICODE) < 0)
+	    {
+	      rc = ODBC_ERROR;
+	    }
+	}
+
+      if ((unsigned int) out_buf_len <= length)
+	{
+	  rc = ODBC_SUCCESS_WITH_INFO;
+	}
+    }
+
+  if (str_len_ptr != NULL)
+    {
+
+      *str_len_ptr = str ? length : SQL_NULL_DATA;
+    }
+
+  return rc;
+}
 /************************************************************************
  * name: bin_value_assign
  * arguments:
@@ -1362,6 +1424,7 @@ get_connect_attr (ODBC_CONNECTION_ATTR *attr, const char *conn_str_in, char *buf
 * description:
 * NOTE:
 ************************************************************************/
+#if defined (_WINDOWS)
 int
 encode_string_to_charset (wchar_t *str, int size, char **target, int *out_length, char *charset)
 {
@@ -1440,7 +1503,7 @@ encode_string_to_utf8 (wchar_t *str, int size, char **target, int *out_length)
 
   return ODBC_SUCCESS;
 }
-
+#endif
 /************************************************************************
  * name: encode_string
  * arguments:
@@ -1448,6 +1511,7 @@ encode_string_to_utf8 (wchar_t *str, int size, char **target, int *out_length)
  * description:
  * NOTE:
  ************************************************************************/
+#if defined (_WINDOWS)
 int
 wide_char_to_bytes (wchar_t *str, int size, char **target, int *out_length, char *characterset)
 {
@@ -1458,6 +1522,82 @@ wide_char_to_bytes (wchar_t *str, int size, char **target, int *out_length, char
 
   return encode_string_to_charset (str, size, target, out_length, characterset);
 }
+#else
+int
+wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length, char *characterset)
+{
+  iconv_t cd;
+  size_t wbuf_len;
+  size_t mbuf_len;
+  char *mbuf, *mbuf_orig;
+  char *wbuf = (char *) str;
+  size_t bytes_required;
+  size_t out_bytes_left;
+  int rc;
+  int alloc = 0;
+  int num_wchars;
+
+  if (str == NULL)
+    {
+      if (out_length)
+	{
+	  *out_length = 0;
+	}
+
+      if (target)
+	{
+	  *target = NULL;
+	}
+
+      return ODBC_SUCCESS;
+    }
+
+  num_wchars = num_chars > 0 ? num_chars : sqlwcharlen (str);
+  wbuf_len = (num_wchars) * WCHAR_LENGTH;
+  mbuf_len = num_wchars * LENGTH_RATIO_WCHAR_TO_MULTIBYTE + 1;
+
+  if ((mbuf_orig = (char *) UT_ALLOC (mbuf_len)) == NULL)
+    {
+      return -1;
+    }
+
+  mbuf = mbuf_orig;
+  out_bytes_left = mbuf_len;
+
+  if ((cd = iconv_open (CODE_NAME_UTF8, CODE_NAME_UNICODE)) < 0)
+    {
+      return ER_ICONV_CODENAME;
+    }
+
+  if ((rc = iconv (cd, (char **)&wbuf, &wbuf_len, &mbuf, &out_bytes_left)) < 0)
+    {
+      return ER_ICONV_INVALID_SEQ;
+    }
+
+  iconv_close (cd);
+
+  bytes_required = mbuf_len - out_bytes_left;
+
+  if (out_length)
+    {
+      *out_length = bytes_required;
+    }
+
+  if (target)
+    {
+      if (mbuf_len > bytes_required)
+	{
+	  *target = UT_REALLOC (mbuf_orig, bytes_required + 1);
+	}
+      else
+	{
+	  *target = mbuf_orig;
+	}
+    }
+
+  return ODBC_SUCCESS;
+}
+#endif
 
 /************************************************************************
  * name: decode_string
@@ -1466,6 +1606,7 @@ wide_char_to_bytes (wchar_t *str, int size, char **target, int *out_length, char
  * description:
  * NOTE:
  ************************************************************************/
+#if defined (_WINDOWS)
 int
 bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, int *out_length, char *characterset)
 {
@@ -1519,6 +1660,74 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
     }
   return ODBC_SUCCESS;
 }
+#else
+int
+bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, int *out_length, char *characterset)
+{
+  size_t wbuf_len = buffer_length;
+  size_t mbuf_len;
+  char *wbuf, *wbuf_orig;
+  char *mbuf = str;
+  iconv_t cd;
+  size_t out_bytes_left;
+  int rc;
+  size_t bytes_required = 0;
+  int num_chars;
+
+  if (str == NULL || buffer == NULL || (buffer_length > 0 && *buffer == NULL))
+    {
+      goto ret;
+    }
+
+  num_chars = size > 0 ? size : strlen (str);
+
+  wbuf = (char *) *buffer;
+  if (buffer_length == 0)
+    {
+      wbuf_len = num_chars * WCHAR_LENGTH + sizeof (wchar_t);
+      wbuf = UT_ALLOC (wbuf_len);
+      if (wbuf == NULL)
+	{
+	  return CCI_ER_NO_MORE_MEMORY;
+	}
+      wbuf_orig = wbuf;
+    }
+
+  mbuf_len = size > 0 ? size : (num_chars + 1);
+  out_bytes_left = wbuf_len;
+
+  if ((cd = iconv_open (CODE_NAME_UNICODE, CODE_NAME_UTF8)) < 0)
+    {
+      return ER_ICONV_CODENAME;
+    }
+
+  rc = iconv (cd, &mbuf, &mbuf_len, &wbuf, &out_bytes_left);
+
+  if (rc < 0)
+    {
+      iconv_close (cd);
+      return ER_ICONV_INVALID_SEQ;
+    }
+
+  iconv_close (cd);
+
+  bytes_required = rc < 0 ? 0 : (wbuf_len - out_bytes_left);
+
+  if (buffer_length == 0 || buffer_length > (bytes_required + 1))
+    {
+      * ((wchar_t *) wbuf) = L'\0';
+      *buffer = wbuf_orig;
+    }
+
+ret:
+  if (out_length != NULL)
+    {
+      *out_length = bytes_required;
+    }
+
+  return ODBC_SUCCESS;
+}
+#endif
 
 /************************************************************************
  * name: decode_string
@@ -1527,6 +1736,7 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
  * description:
  * NOTE:
  ************************************************************************/
+#if defined (_WINDOWS)
 int
 get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, int *out_length, char *characterset)
 {
@@ -1568,6 +1778,22 @@ get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, 
     }
   return ODBC_SUCCESS;
 }
+#else
+int
+get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, int *out_length, char *characterset)
+{
+  int rc = ODBC_SUCCESS;
+
+  if (str == NULL || buffer == NULL)
+    {
+      return ODBC_SUCCESS;
+    }
+
+  rc = bytes_to_wide_char ((char *) str, size, (wchar_t **) buffer, buffer_length, out_length, "UCS2");
+
+  return ODBC_SUCCESS;
+}
+#endif
 
 PUBLIC _BOOL_
 is_odd_number (int num)

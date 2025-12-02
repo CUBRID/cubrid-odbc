@@ -1,30 +1,30 @@
 /*
- * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution. 
+ * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
- * Redistribution and use in source and binary forms, with or without modification, 
- * are permitted provided that the following conditions are met: 
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
  *
- * - Redistributions of source code must retain the above copyright notice, 
- *   this list of conditions and the following disclaimer. 
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
  *
- * - Redistributions in binary form must reproduce the above copyright notice, 
- *   this list of conditions and the following disclaimer in the documentation 
- *   and/or other materials provided with the distribution. 
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
  *
- * - Neither the name of the <ORGANIZATION> nor the names of its contributors 
- *   may be used to endorse or promote products derived from this software without 
- *   specific prior written permission. 
+ * - Neither the name of the <ORGANIZATION> nor the names of its contributors
+ *   may be used to endorse or promote products derived from this software without
+ *   specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
- * IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
- * OF SUCH DAMAGE. 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+ * OF SUCH DAMAGE.
  *
  */
 
@@ -33,18 +33,58 @@
 
 #include    "odbc_portable.h"
 
-#define   UT_ALLOC(size)        ut_alloc(size)
+#if !defined (_WINDOWS)
+#include <stdlib.h>
+#endif
+
+#if defined (_WINDOWS)
+#define WCHAR_LENGTH		(sizeof (wchar_t))
+#define UT_ALLOC(size)		ut_alloc(size)
+#define UT_FREE(ptr)		ut_free(ptr)
+#define UT_ALLOC_BSTR(size)	ut_alloc_bstr(size)
+#define UT_FREE_BSTR(ptr)	ut_free_bstr(ptr)
+#define UT_MAKE_STRING(ptr, length) ut_make_string(ptr, length)
+#else
+#define WCHAR_LENGTH	(sizeof (uint16_t))
+#define UT_ALLOC(size)	((void *) calloc (1, size))
+#define UT_FREE(ptr)					\
+			do {                        	\
+				if (ptr != NULL) {	\
+					free (ptr);	\
+					ptr = NULL;	\
+				}			\
+			} while (0)
+#define UT_ALLOC_BSTR(size)	UT_ALLOC(size * WCHAR_LENGTH)
+#define UT_FREE_BSTR(ptr)	UT_FREE(ptr)
+#define UT_MAKE_STRING(ptr, length)	ut_make_string_linux(ptr, length)
+#define LENGTH_RATIO_WCHAR_TO_MULTIBYTE 3
+#endif
+
+
 #define   UT_REALLOC(ptr, size)   ut_realloc(ptr, size)
-#define   UT_FREE(ptr)        ut_free(ptr)
-#define   UT_MAKE_STRING(ptr, length) ut_make_string(ptr, length)
 #define   UT_MAKE_BINARY(ptr, length) ut_make_binary(ptr, length)
 #define   UT_APPEND_STRING(str1, str2, len2)  ut_append_string(str1, str2, len2)
-
-#define           UT_ALLOC_BSTR(size)   ut_alloc_bstr(size)
-#define           UT_FREE_BSTR(ptr)     ut_free_bstr(ptr) 
 #define   UT_SET_DELIMITER      ";;"
 
-/* NC_FREE - NULL check free 
+#define CODE_NAME_EUCKR   "EUCKR"
+#define CODE_NAME_UTF8    "UTF-8"
+#define CODE_NAME_UNICODE "UCS2"
+
+#define REQUIRED_SIZE_ONLY  0
+#define ER_ICONV_CODENAME	-1
+#define ER_ICONV_INVALID_SEQ	-2
+
+#define APPEND_TO_CONNSTR(str,key,val)				\
+	do {							\
+	     char buf[512];					\
+	     if (strlen (val))					\
+	       {						\
+		 snprintf (buf, 512, "%s=%s;", key, val);	\
+		 strcat (str, buf);				\
+	       }						\
+	   } while (0)
+
+/* NC_FREE - NULL check free
  * NA_FREE - NULL assign free
  * MOVE_STRING - free & copy string
  * NC_FREE_WH - NULL check free with handler
@@ -122,9 +162,8 @@
     } while (0)
 
 #define DEBUG_FILE_KEY          "c:\\temp\\time_log.txt"
-#define DEBUG_TIMESTAMP(value)
 
-                #define DEBUG_TIMESTAMP(value)                          \
+#define DEBUG_TIMESTAMP(value)                          \
                         do {                                            \
                             struct _timeb now;                          \
                             FILE        *fp = NULL;                     \
@@ -169,6 +208,9 @@
 #define DEBUG_LOG(value)
 #endif
 
+/* distinguish ValuePtr type by BufferLength, SQLGetDescField */
+#define	IS_STR_VALPTR(BufferLength) ((BufferLength > SQL_NTS))
+
 /* Dynamic string */
 typedef struct __st_dynamic_string
 {
@@ -190,85 +232,89 @@ typedef struct tagST_LIST
   struct tagST_LIST *next;
 } ST_LIST;
 
-PUBLIC void InitStr (D_STRING * str);
-PUBLIC void FreeStr (D_STRING * str);
+extern PUBLIC char *sqltype_name (short sqltype);
+extern PUBLIC char *sqlinfo_name (int infotype);
 
-PUBLIC ERR_CODE MemcatImproved (D_STRING * dest, char *src, int srcSize);
+PUBLIC void InitStr (D_STRING *str);
+PUBLIC void FreeStr (D_STRING *str);
+
+PUBLIC ERR_CODE MemcatImproved (D_STRING *dest, char *src, int srcSize);
 
 PUBLIC void *ut_alloc (SQLLEN size);
 PUBLIC void ut_free (void *ptr);
 PUBLIC void *ut_realloc (void *ptr, int size);
 PUBLIC char *ut_make_string (const char *src, int length);
+PUBLIC char *ut_make_string_linux (const char *src, int length);
 PUBLIC char *ut_append_string (char *str1, char *str2, int len2);
 PUBLIC char *ut_make_binary (const char *src, int length);
-PUBLIC WCHAR*  ut_alloc_bstr (SQLLEN size);
+PUBLIC WCHAR *ut_alloc_bstr (SQLLEN size);
 PUBLIC void ut_free_bstr  (WCHAR *ptr);
-PUBLIC int sqlwcharlen(const WCHAR *wstr);
+PUBLIC int sqlwcharlen (const WCHAR *wstr);
 PUBLIC int element_from_setstring (char **current, char *buf);
 
 PUBLIC int add_element_to_setstring (char *setstring, char *element, int size);
 
 PUBLIC char *odbc_trim (char *str);
 PUBLIC RETCODE str_value_assign (const char *in_value,
-         char *out_buf,
-         SQLLEN out_buf_len, SQLLEN * val_len_ptr);
+				 char *out_buf,
+				 SQLLEN out_buf_len, SQLLEN *val_len_ptr);
 PUBLIC RETCODE bin_value_assign (const void *in_value,
-         SQLLEN in_val_len,
-         char *out_buf,
-         SQLLEN out_buf_len, SQLLEN * val_len_ptr);
+				 SQLLEN in_val_len,
+				 char *out_buf,
+				 SQLLEN out_buf_len, SQLLEN *val_len_ptr);
 
 PUBLIC short is_oidstr (char *str);
 PUBLIC short is_oidstr_array (char **array, int size);
 PUBLIC int replace_oid (char *sql_text, char **org_param_pos_pt,
-      char **oid_param_pos_pt, char **oid_param_val_pt);
+			char **oid_param_pos_pt, char **oid_param_val_pt);
 
 PUBLIC char *remove_owner_name (char *tablename);
 
-extern ERR_CODE ListTailAdd (ST_LIST * head, void *key, void *val,
-           ERR_CODE (*assignFunc) (ST_LIST *, void *,
-                 void *));
+extern ERR_CODE ListTailAdd (ST_LIST *head, void *key, void *val,
+			     ERR_CODE (*assignFunc) (ST_LIST *, void *,
+				 void *));
 
-extern void ListDelete (ST_LIST * head, void (*nodeDelete) (ST_LIST *));
-extern ERR_CODE ListCreate (ST_LIST ** head);
+extern void ListDelete (ST_LIST *head, void (*nodeDelete) (ST_LIST *));
+extern ERR_CODE ListCreate (ST_LIST **head);
 
-extern ST_LIST *HeadNode (ST_LIST * dummyHead);
-extern ST_LIST *NextNode (ST_LIST * node);
+extern ST_LIST *HeadNode (ST_LIST *dummyHead);
+extern ST_LIST *NextNode (ST_LIST *node);
 
 #ifdef _DEBUG
-extern void ListPrint (ST_LIST * head, void (*nodePrint) (ST_LIST *));
+extern void ListPrint (ST_LIST *head, void (*nodePrint) (ST_LIST *));
 #endif
 
 /* node assign function */
-extern ERR_CODE NodeAssign (ST_LIST * node, void *key, void *value);
+extern ERR_CODE NodeAssign (ST_LIST *node, void *key, void *value);
 
 /*-------------  connection string util ------------------------*/
 PUBLIC const char *next_element (const char *element_list);
 PUBLIC const char *element_value (const char *element);
 PUBLIC const char *element_value_by_key (const char *element_list,
-           const char *key);
+    const char *key);
 #if defined (WINDOWS)
-PUBLIC void get_connect_attr (struct st_odbc_connection_attr* attr, 
-                           const char* ConnStrIn, char* buffer);
+PUBLIC void get_connect_attr (struct st_odbc_connection_attr *attr,
+			      const char *ConnStrIn, char *buffer);
 #endif
-PUBLIC int wide_char_to_bytes (wchar_t *str, 
-                       int size, 
-                       char **target, 
-                       int* out_length, 
-                       char* characterset);
-PUBLIC int bytes_to_wide_char (char *str, 
-                       int size, 
-                       wchar_t **buffer, 
-                       int buffer_length,  
-                       int* out_length, 
-                       char* characterset);
-PUBLIC int get_wide_char_result (char *str, 
-             int size, 
-             wchar_t **buffer, 
-             int buffer_length, 
-             int* out_length, 
-             char* characterset);
+PUBLIC int wide_char_to_bytes (wchar_t *str,
+			       int size,
+			       char **target,
+			       int *out_length,
+			       char *characterset);
+PUBLIC int bytes_to_wide_char (char *str,
+			       int size,
+			       wchar_t **buffer,
+			       int buffer_length,
+			       int *out_length,
+			       char *characterset);
+PUBLIC int get_wide_char_result (char *str,
+				 int size,
+				 wchar_t **buffer,
+				 int buffer_length,
+				 int *out_length,
+				 char *characterset);
 /*--------------------------------------------------------------*/
-PUBLIC _BOOL_ is_odd_number(int num);
+PUBLIC _BOOL_ is_odd_number (int num);
 
 #ifdef CUBRID_ODBC_UNICODE
 PUBLIC int check_if_even_number (SQLUSMALLINT info_type, SQLSMALLINT buffer_length);

@@ -161,8 +161,8 @@ PRIVATE DATA_TYPE_INFO odbc_data_type_info_set[] =
   },
 
   {
-    "INTEGER", SQL_INTEGER, SQL_C_LONG, 0, 10, sizeof (long), 11,
-    0, 10, NULL, sizeof (long), NULL, 11, NULL
+    "INTEGER", SQL_INTEGER, SQL_C_LONG, 0, 10, sizeof (sqlc_long_t), 11,
+    0, 10, NULL, sizeof (sqlc_long_t), NULL, 11, NULL
   },
 
   {
@@ -1551,8 +1551,8 @@ cci_value_to_odbc (void *c_value, short concise_type,
 	  break;
 	}
 
-      * (long *) c_value = cci_value->i;
-      length = sizeof (long);
+      * (sqlc_long_t *) c_value = cci_value->i;
+      length = sizeof (sqlc_long_t);
       break;
     case SQL_C_ULONG:
       if (cci_value->i > ULONG_MAX || cci_value->i < 0)
@@ -1562,8 +1562,8 @@ cci_value_to_odbc (void *c_value, short concise_type,
 	  break;
 	}
 
-      * (long *) c_value = cci_value->i;
-      length = sizeof (long);
+      * (sqlc_long_t *) c_value = cci_value->i;
+      length = sizeof (sqlc_long_t);
       break;
     case SQL_C_SBIGINT:
       if (cci_value->i > LLONG_MAX || cci_value->i < LLONG_MIN)
@@ -1806,6 +1806,7 @@ odbc_value_converter (VALUE_CONTAINER *target_value, VALUE_CONTAINER *src_value)
 	{
 	case SQL_C_CHAR:
 	case SQL_C_BINARY:
+	case SQL_C_WCHAR:
 	  target_value->value.str = UT_MAKE_STRING (src_value->value.str, -1);
 	  target_value->length = src_value->length;
 	  break;
@@ -1819,7 +1820,7 @@ odbc_value_converter (VALUE_CONTAINER *target_value, VALUE_CONTAINER *src_value)
 	case SQL_C_SLONG:
 	case SQL_C_ULONG:
 	  target_value->value.l = atol (src_value->value.str);
-	  target_value->length = sizeof (long);
+	  target_value->length = sizeof (sqlc_long_t);
 	  break;
 	case SQL_C_SBIGINT:
 	case SQL_C_UBIGINT:
@@ -1871,8 +1872,8 @@ odbc_value_converter (VALUE_CONTAINER *target_value, VALUE_CONTAINER *src_value)
 	case SQL_C_LONG:
 	case SQL_C_SLONG:
 	case SQL_C_ULONG:
-	  target_value->value.l = (long) src_value->value.s;
-	  target_value->length = sizeof (long);
+	  target_value->value.l = (sqlc_long_t) src_value->value.s;
+	  target_value->length = sizeof (sqlc_long_t);
 	  break;
 	case SQL_C_SBIGINT:
 	case SQL_C_UBIGINT:
@@ -1908,7 +1909,11 @@ odbc_value_converter (VALUE_CONTAINER *target_value, VALUE_CONTAINER *src_value)
       switch (target_value->type)
 	{
 	case SQL_C_CHAR:
+#if defined (_WINDOWS)
 	  sprintf (buf, "%ld", src_value->value.l);
+#else
+	  sprintf (buf, "%d", src_value->value.l);
+#endif
 	  target_value->value.str = UT_MAKE_STRING (buf, -1);
 	  target_value->length = strlen (buf) + 1;
 	  break;
@@ -1927,7 +1932,7 @@ odbc_value_converter (VALUE_CONTAINER *target_value, VALUE_CONTAINER *src_value)
 	case SQL_C_SLONG:
 	case SQL_C_ULONG:
 	  target_value->value.l = src_value->value.l;
-	  target_value->length = sizeof (long);
+	  target_value->length = sizeof (sqlc_long_t);
 	  break;
 	case SQL_C_SBIGINT:
 	case SQL_C_UBIGINT:
@@ -1979,8 +1984,8 @@ odbc_value_converter (VALUE_CONTAINER *target_value, VALUE_CONTAINER *src_value)
 	case SQL_C_LONG:
 	case SQL_C_SLONG:
 	case SQL_C_ULONG:
-	  target_value->value.l = (long) src_value->value.bi;
-	  target_value->length = sizeof (long);
+	  target_value->value.l = (sqlc_long_t) src_value->value.bi;
+	  target_value->length = sizeof (sqlc_long_t);
 	  break;
 	case SQL_C_FLOAT:
 	  target_value->value.f = (float) src_value->value.bi;
@@ -2026,8 +2031,8 @@ odbc_value_converter (VALUE_CONTAINER *target_value, VALUE_CONTAINER *src_value)
 	case SQL_C_LONG:
 	case SQL_C_SLONG:
 	case SQL_C_ULONG:
-	  target_value->value.l = (long) src_value->value.f;
-	  target_value->length = sizeof (long);
+	  target_value->value.l = (sqlc_long_t) src_value->value.f;
+	  target_value->length = sizeof (sqlc_long_t);
 	  break;
 	case SQL_C_SBIGINT:
 	case SQL_C_UBIGINT:
@@ -2077,8 +2082,8 @@ odbc_value_converter (VALUE_CONTAINER *target_value, VALUE_CONTAINER *src_value)
 	case SQL_C_LONG:
 	case SQL_C_SLONG:
 	case SQL_C_ULONG:
-	  target_value->value.l = (long) src_value->value.d;
-	  target_value->length = sizeof (long);
+	  target_value->value.l = (sqlc_long_t) src_value->value.d;
+	  target_value->length = sizeof (sqlc_long_t);
 	  break;
 	case SQL_C_SBIGINT:
 	case SQL_C_UBIGINT:
@@ -2130,8 +2135,8 @@ odbc_value_converter (VALUE_CONTAINER *target_value, VALUE_CONTAINER *src_value)
 	case SQL_C_LONG:
 	case SQL_C_SLONG:
 	case SQL_C_ULONG:
-	  memcpy (&target_value->value.l, src_value->value.bin, sizeof (long));
-	  target_value->length = sizeof (long);
+	  memcpy (&target_value->value.l, src_value->value.bin, sizeof (sqlc_long_t));
+	  target_value->length = sizeof (sqlc_long_t);
 	  break;
 	case SQL_C_SBIGINT:
 	case SQL_C_UBIGINT:

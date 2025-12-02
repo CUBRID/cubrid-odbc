@@ -994,7 +994,7 @@ odbc_table_privileges (ODBC_STATEMENT *stmt, char *catalog_name, char *schema_na
 {
   int cci_retval = 0;
   int cci_request = 0;
-  int db_ver;
+  int db_ver = 0;
   T_CCI_ERROR cci_error;
 
   char err_msg[SQL_MAX_MESSAGE_LENGTH + 1];
@@ -1014,7 +1014,7 @@ odbc_table_privileges (ODBC_STATEMENT *stmt, char *catalog_name, char *schema_na
       goto cci_error;
     }
 
-  if (stmt && stmt->conn)
+  if (stmt != NULL && stmt->conn != NULL)
     {
       db_ver = connected_db_ver (stmt->conn->db_ver);
     }
@@ -1345,12 +1345,12 @@ odbc_get_column_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_
       break;
     case 7:			// column size, SQL_C_LONG
       c_value->value.l = column_tuple->column_size;
-      c_value->length = sizeof (long);
+      c_value->length = sizeof (sqlc_long_t);
       c_value->type = SQL_C_LONG;
       break;
     case 8:			// buffer length, SQL_C_LONG
       c_value->value.l = column_tuple->buffer_length;
-      c_value->length = sizeof (long);
+      c_value->length = sizeof (sqlc_long_t);
       c_value->type = SQL_C_LONG;
       break;
     case 9:			// decimal disits, SQL_C_SHORT
@@ -1407,12 +1407,12 @@ odbc_get_column_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_
       break;
     case 16:			// char octet length, SQL_C_LONG
       c_value->value.l = column_tuple->octet_length;
-      c_value->length = sizeof (long);
+      c_value->length = sizeof (sqlc_long_t);
       c_value->type = SQL_C_LONG;
       break;
     case 17:			// ordinal position, SQL_C_LONG
       c_value->value.l = column_tuple->ordinal_position;
-      c_value->length = sizeof (long);
+      c_value->length = sizeof (sqlc_long_t);
       c_value->type = SQL_C_LONG;
       break;
     case 18:			// is nullable, SQL_C_CHAR
@@ -1502,13 +1502,13 @@ odbc_get_stat_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER *c_va
     case 11:
       /* cardinality, SQL_C_LONG */
       c_value->value.l = stat_tuple->cardinality;
-      c_value->length = sizeof (long);
+      c_value->length = sizeof (sqlc_long_t);
       c_value->type = SQL_C_LONG;
       break;
     case 12:
       /* pages, SQL_C_LONG */
       c_value->value.l = stat_tuple->pages;
-      c_value->length = sizeof (long);
+      c_value->length = sizeof (sqlc_long_t);
       c_value->type = SQL_C_LONG;
       break;
     case 13:
@@ -1566,13 +1566,13 @@ odbc_get_sp_column_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER 
     case 5:
       /* column size, SQL_C_LONG */
       c_value->value.l = spc_tuple->column_size;
-      c_value->length = sizeof (long);
+      c_value->length = sizeof (sqlc_long_t);
       c_value->type = SQL_C_LONG;
       break;
     case 6:
       /* buffer length, SQL_C_LONG */
       c_value->value.l = spc_tuple->buffer_length;
-      c_value->length = sizeof (long);
+      c_value->length = sizeof (sqlc_long_t);
       c_value->type = SQL_C_LONG;
       break;
     case 7:
@@ -1637,7 +1637,7 @@ odbc_get_type_info_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER 
 	}
       //c_value->value.l = ti_tuple->column_size;
 
-      c_value->length = sizeof (long);
+      c_value->length = sizeof (sqlc_long_t);
       c_value->type = SQL_C_LONG;
       break;
     case 4:			// literal prefix
@@ -1791,7 +1791,7 @@ odbc_get_type_info_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER 
       else
 	{
 	  c_value->value.l = ti_tuple->num_prec_radix;
-	  c_value->length = sizeof (long);
+	  c_value->length = sizeof (sqlc_long_t);
 	}
       c_value->type = SQL_C_LONG;
       break;
@@ -1804,7 +1804,7 @@ odbc_get_type_info_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CONTAINER 
       else
 	{
 	  c_value->value.l = ti_tuple->interval_precision;
-	  c_value->length = sizeof (long);
+	  c_value->length = sizeof (sqlc_long_t);
 	}
       c_value->type = SQL_C_LONG;
       break;
@@ -2157,13 +2157,13 @@ odbc_get_procedure_columns_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CO
     case 8:
       /* column_size */
       c_value->value.l = procedure_columns_tuple->column_size;
-      c_value->length = sizeof (long);
+      c_value->length = sizeof (sqlc_long_t);
       c_value->type = SQL_C_LONG;
       break;
     case 9:
       /* buffer_length */
       c_value->value.l = procedure_columns_tuple->buffer_length;
-      c_value->length = sizeof (long);
+      c_value->length = sizeof (sqlc_long_t);
       c_value->type = SQL_C_LONG;
       break;
     case 10:
@@ -2211,13 +2211,13 @@ odbc_get_procedure_columns_data (ODBC_STATEMENT *stmt, short col_index, VALUE_CO
     case 17:
       /* octet_length */
       c_value->value.l = procedure_columns_tuple->octet_length;
-      c_value->length = sizeof (long);
+      c_value->length = sizeof (sqlc_long_t);
       c_value->type = SQL_C_LONG;
       break;
     case 18:
       /* octet_length */
       c_value->value.l = procedure_columns_tuple->ordinal_position;
-      c_value->length = sizeof (long);
+      c_value->length = sizeof (sqlc_long_t);
       c_value->type = SQL_C_LONG;
       break;
     case 19:

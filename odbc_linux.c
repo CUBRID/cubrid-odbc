@@ -30,14 +30,9 @@
 #include  "odbc_resource.h"
 #include  "odbc_connection.h"
 #include  "odbc_util.h"
-
-static int get_section_from_file (const char *ini, const char *section, char *value_p, int size);
-
-PUBLIC INT_PTR CALLBACK ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam);
-
-#define LINE_SIZE 512
-#define TBUF_SIZE 8192
-#define PROF_BUF_SIZE 4096
+#include  "ini.h"
+#include  "odbcinstext.h"
+#include  "odbc_linux.h"
 
 /*
  * ODBC Driver function not supported
@@ -82,37 +77,45 @@ SQLGetPrivateProfileString (LPCSTR lpszSection,
 			    LPCSTR lpszEntry,
 			    LPCSTR lpszDefault, LPSTR lpszRetBuffer, int cbRetBuffer, LPCSTR lpszFilename)
 {
-  int rc = SQL_ERROR;
-  char inifile[_MAX_PATH];
-  char filename[_MAX_PATH];
-  char element_list[PROF_BUF_SIZE];
-  char *envp, *p;
+  int rc = SQL_SUCCESS;
+  char *envp;
+  HINI hIni;
+  char szFileName [512];
+  struct stat sb;
+  int found = 0;
 
   OutputDebugString ("SQLGetPrivateProfileString called");
 
-  envp = getenv ("ODBCINI");
-  if (envp != NULL)
+  memset (&hIni, 0, sizeof (hIni));
+
+  if (lpszFilename && stat (lpszFilename, &sb) == 0)
     {
-      snprintf (inifile, _MAX_PATH, "%s", envp);
+      snprintf (szFileName, sizeof (szFileName), "%s", lpszFilename);
+      if (iniOpen ( &hIni, szFileName, "#;", '[', ']', '=', TRUE) != INI_SUCCESS)
+	{
+	  return rc;
+	}
     }
   else
     {
-      tolower_str (filename, lpszFilename);
-      snprintf (inifile, _MAX_PATH, "%s/.%s", getenv ("HOME"), filename);
+      if ((rc = ini_fileopen (lpszSection, &hIni)) == ODBCINI_DSN_NOT_FOUND)
+	{
+	  return SQL_ERROR;
+	}
     }
 
-  memset (element_list, 0, PROF_BUF_SIZE);
-  if (get_section_from_file (inifile, lpszSection, element_list, PROF_BUF_SIZE) < 0)
+  if (iniPropertySeek (hIni, lpszSection, lpszEntry, "") == INI_SUCCESS)
     {
-      return -1;
+      found = 1;
     }
 
-  if ((p = element_value_by_key (element_list, lpszEntry)) == NULL)
+  if (lpszRetBuffer && cbRetBuffer > 0)
     {
-      return rc;
+      snprintf (lpszRetBuffer, cbRetBuffer, "%s", found ? hIni->hCurProperty->szValue : lpszDefault);
+      rc = strlen (lpszRetBuffer);
     }
 
-  strcpy (lpszRetBuffer, p);
+  iniClose (hIni);
 
   return rc;
 }
@@ -144,116 +147,10 @@ DialogBoxParam (HINSTANCE hInst, LPCSTR tmpNaae, HWND hWndP, INT_PTR CALLBACK lp
   return NULL;
 }
 
-
-WCHAR *
-SysAllocStringLen (const WCHAR *strIn, UINT ui)
-{
-  WCHAR *p;
-
-  p = calloc (1, ui * sizeof (WCHAR));
-  return p;
-}
-
-void
-SysFreeString (WCHAR *bstr)
-{
-  if (bstr)
-    {
-      free (bstr);
-      bstr = NULL;
-    }
-}
-
 void
 OutputDebugString (const char *str, ...)
 {
   return;
-}
-
-/*
- * Linux Specific
- */
-
-static int
-get_section_from_file (const char *ini, const char *section, char *value_p, int size)
-{
-  FILE *fp, *fopen ();
-  char buf[LINE_SIZE];
-  char *p, *pt;
-  int rc = -1;
-  int found = 0;
-
-  if (ini == NULL || section == NULL || value_p == NULL || size < 1)
-    {
-      return -1;
-    }
-
-  if ((fp = fopen (ini, "r")) == NULL)
-    {
-      return 1;
-    }
-
-  while (!feof (fp))
-    {
-      if (fgets (buf, LINE_SIZE, fp))
-	{
-	  if (buf[0] == '[')
-	    {
-	      p = strchr (buf, ']');
-	      if (p != NULL)
-		{
-		  *p = '\0';
-		  if (strcasecmp (&buf[1], section) == 0)
-		    {
-		      found = 1;
-		      break;
-		    }
-		}
-	    }
-	  else
-	    {
-	      continue;
-	    }
-	}
-    }
-
-  if (!found)
-    {
-      return -1;
-    }
-
-  while (!feof (fp))
-    {
-      if (fgets (buf, LINE_SIZE, fp))
-	{
-	  p = strchr (buf, '\n');
-	  if (p)
-	    {
-	      *p = '\0';
-	    }
-
-	  if (buf[0] == '\0' || buf[0] == '#' || buf[0] == '[')
-	    {
-	      rc = 0;
-	      break;
-	    }
-
-	  strcat (value_p, buf);
-	  strcat (value_p, ";");
-	  rc = 0;
-	}
-    }
-
-  fclose (fp);
-  for (pt = value_p; *pt != '\0'; ++pt)
-    {
-      if (*pt == ';')		// connection string delimiter
-	{
-	  *pt = '\0';
-	}
-    }
-
-  return rc;
 }
 
 /*
@@ -322,139 +219,131 @@ itoa (int value, char *string, int radix)
   return string;
 }
 
-
-int
-MultiByteToWideChar (int codepage, DWORD dwFlags, char *lpMultiByteStr, int cbMultiByte,
-		     wchar_t *lpWideCharStr, int cchWideChar)
+char *
+find_key (char *string, char *key)
 {
-  char *default_unicode_charset = "UTF-16LE";
-  char *charset = "UTF-8";
-  void *iconv_out = lpWideCharStr;
-  char *iconv_in = lpMultiByteStr;
-  size_t iconv_in_len = cbMultiByte;
-  size_t iconv_out_len = cchWideChar * sizeof (wchar_t);
-  size_t iconv_out_org = iconv_out_len;
-  wchar_t _buf[TBUF_SIZE];
-  char outbuf[TBUF_SIZE], *op = outbuf;
-  iconv_t cd;
-  int ret, required;
+  char *value_p, *buf, *ptr;
+  size_t len;
 
-  memset (outbuf, 0, TBUF_SIZE);
-  if (cchWideChar == 0)
+  value_p = element_value_by_key (string, key);
+
+  if (value_p == NULL)
     {
-      iconv_out_len = TBUF_SIZE;
-      iconv_out_org = TBUF_SIZE;
-      iconv_out = &_buf[0];
+      return NULL;
     }
 
-  switch (codepage)
+  len = strlen (value_p);
+
+  if ((buf = UT_ALLOC (len + 1)) == NULL)
     {
-    case CP_EUC_KR:
-      charset = "EUCKR";
-      break;
-    case CP_UTF8:
-    case CP_ACP:
-      charset = "UTF-8";
-      break;
-    default:
-      charset = "UTF-8";
-      break;
+      return NULL;
     }
 
-  if ((cd = iconv_open (default_unicode_charset, charset)) < 0)
+  strncpy (buf, value_p, len);
+
+  ptr = strchr (buf, ';');
+  if (ptr)
     {
-      return -1;
+      *ptr = '\0';
     }
 
-  ret = iconv (cd, &iconv_in, &iconv_in_len, &op, &iconv_out_len);
-  iconv_close (cd);
-
-  if (ret < 0)
-    {
-      return -1;
-    }
-
-  required = (iconv_out_org - iconv_out_len);
-
-  if (cchWideChar != 0)
-    {
-      memcpy (iconv_out, op, required);
-    }
-
-  return required;
+  return buf;
 }
 
-
-int
-WideCharToMultiByte (int wincode,
-		     int dw,
-		     wchar_t *str,
-		     int size, char *out_buffer, int cbMultiByte, char *lpdefaultchar, char *lpusedfdefaultchar)
+void
+dsn2connstr (CUBRIDDSNItem *dsn, char *connstr)
 {
-  char *charset;
-  char *default_unicode_charset = "UTF-16";	// UCS2, UCS2-LE
-  iconv_t cd;
-  char *iconv_out = out_buffer;
-  unsigned char *iconv_in = (unsigned char *) str;
-
-  size_t iconv_in_len = (size_t) size;
-  size_t iconv_out_len = (size_t) cbMultiByte;
-  size_t iconv_out_org = (size_t) cbMultiByte;
-  int ret, required;
-  char _buf[TBUF_SIZE];
-  char inbuf[TBUF_SIZE], *ip = inbuf;
-
-  memset (inbuf, 0, TBUF_SIZE);
-
-  if (size > 0)
+  if (connstr == NULL)
     {
-      memcpy (inbuf, &iconv_in[0], size);
+      return;
     }
 
-  memset (_buf, 0, TBUF_SIZE);
-
-  if (out_buffer == NULL)
+  if (strlen (dsn->dsn))
     {
-      iconv_out = _buf;
-      iconv_out_org = (size_t) TBUF_SIZE;
-      iconv_out_len = (size_t) TBUF_SIZE;
+      sprintf (connstr, "%s=%s;", KEYWORD_DSN, dsn->dsn);
     }
 
-  if (size < 0)
+  APPEND_TO_CONNSTR (connstr, KEYWORD_DBNAME, dsn->db_name);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_USER, dsn->user);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_PASSWORD, dsn->password);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_SERVER, dsn->server);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_PORT, dsn->port);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_FETCH_SIZE, dsn->fetch_size);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_CHARSET, dsn->charset);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_AUTOCOMMIT, dsn->autocommit);
+  APPEND_TO_CONNSTR (connstr, KEYWORD_OMIT_SCHEMA, dsn->omit_schema);
+
+  return;
+}
+
+PUBLIC char *
+ut_make_string_linux (const char *src, int length)
+{
+  char *newptr = NULL;
+  size_t size;
+
+  if (src == NULL)
     {
-      size = TBUF_SIZE / sizeof (wchar_t);
+      return NULL;
     }
 
-  switch (wincode)
+  size = (size_t) (length < 0 ? strlen (src) : length) + 1;
+
+  if ((newptr = (char *) UT_ALLOC (size)) == NULL)
     {
-    case CP_UTF8:
-      charset = "UTF-8";
-      break;
-    case CP_EUC_KR:
-      charset = "EUCKR";
-      break;
-    default:
-      charset = "UTF-8";
-      break;
+      return NULL;
     }
 
-  if ((cd = iconv_open (charset, default_unicode_charset)) < 0)
+  snprintf (newptr, size, "%s", src);
+
+  return newptr;
+}
+
+/************************************************************************
+ * * name: ini_fileopen
+ * * arguments:
+ * *   const char *dsn
+ * *   HINI *hInip
+ * * returns/side-effects:
+ * * description:
+ * Lookup dsn file, if a dsn exists in multiple ini files following
+ * order will be applied.
+ * 1. $ODBCINI
+ * 2. $HOME/.odbc.ini
+ * 3. system ini
+************************************************************************/
+
+ODBCINI_DSN_LOOKUP_RESULT
+ini_fileopen (const char *dsn, HINI *hInip)
+{
+  char szIniName[_MAX_PATH];
+  int rc = ODBCINI_DSN_NOT_FOUND;
+
+  if (_odbcinst_UserINI (szIniName, FALSE))
     {
-      return -1;
+      if (iniOpen (hInip, szIniName, "#;", '[', ']', '=', TRUE) == INI_SUCCESS)
+	{
+	  if (iniPropertySeek ((HINI) *hInip, dsn, "", "") == INI_SUCCESS)
+	    {
+	      return ODBCINI_DSN_FOUND_USER;
+	    }
+
+	  iniClose ((HINI) *hInip);
+	}
     }
 
-  memset (iconv_out, 0, iconv_out_len);
-  ret = iconv (cd, &ip, &iconv_in_len, &iconv_out, &iconv_out_len);
-
-  iconv_close (cd);
-
-  if (ret < 0)
+  if (_odbcinst_SystemINI (szIniName, FALSE))
     {
-      return -1;
+      if (iniOpen (hInip, szIniName, "#;", '[', ']', '=', TRUE) == INI_SUCCESS)
+	{
+	  if (iniPropertySeek ((HINI) *hInip, dsn, "", "") == INI_SUCCESS)
+	    {
+	      return ODBCINI_DSN_FOUND_SYSTEM;
+	    }
+
+	  iniClose ((HINI) *hInip);
+	}
     }
 
-  required = iconv_out_org - iconv_out_len;
-
-  return required;
-
+  return ODBCINI_DSN_NOT_FOUND;
 }

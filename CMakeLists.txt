@@ -31,6 +31,7 @@ set(WITH_LIBUNIXODBC  ${WITH_EXTERNAL_PREFIX})
 
 set(CUBRID_ODBC_SOURCES
   odbc_linux.c
+  odbc_debug.c
   odbc_catalog.c
   odbc_connection.c
   odbc_descriptor.c
@@ -43,7 +44,7 @@ set(CUBRID_ODBC_SOURCES
   odbc_type.c
   odbc_util.c
   )
-set(CUBRID_ODBC_UNICODE_SOURCES ${CUBRID_ODBC_SOURCES} unicode.c)
+set(CUBRID_ODBC_UNICODE_SOURCES ${CUBRID_ODBC_SOURCES} unicode.c odbc_linux_unicode.c)
 
 set(VERSION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/odbc_version.i")
 set(CCI_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/cci-src")
@@ -143,15 +144,16 @@ if(WITH_LIBUNIXODBC STREQUAL "EXTERNAL")
       TIMEOUT              600
       DOWNLOAD_NO_PROGRESS 1
       DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-      CONFIGURE_COMMAND    <SOURCE_DIR>/configure --prefix=${CMAKE_CURRENT_BINARY_DIR}/external # ${DEFAULT_CONFIGURE_OPTS}
+      CONFIGURE_COMMAND    <SOURCE_DIR>/configure --prefix=${CMAKE_CURRENT_BINARY_DIR}/external --sysconfdir=/usr/local/etc
       BUILD_COMMAND        $(MAKE) AUTOCONF=: AUTOHEADER=: AUTOMAKE=: ACLOCAL=:
       INSTALL_COMMAND      $(MAKE) install AUTOCONF=: AUTOHEADER=: AUTOMAKE=: ACLOCAL=:
       )
-    set(LIBUNIXODBC_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/external/include)
+    set(LIBUNIXODBC_INCLUDES ${CMAKE_CURRENT_BINARY_DIR}/libodbc-prefix/src/libodbc/include)
   endif(UNIX)
 else(WITH_LIBUNIXODBC STREQUAL "EXTERNAL")
     message(FATAL_ERROR "Invalid WITH_LIBUNIXODBC option value ${WITH_LIBUNIXODBC}")
 endif(WITH_LIBUNIXODBC STREQUAL "EXTERNAL")
+
 
 message(STATUS "BIN = ${CMAKE_CURRENT_BINARY_DIR}")
 set (CMAKE_CXX_FLAGS "-Wall")
@@ -162,16 +164,21 @@ ADD_COMPILE_OPTIONS(-m64 -Wall)
 
 INCLUDE_DIRECTORIES(${CCI_SOURCE}/src/cci ${LIBUNIXODBC_INCLUDES})
 
-LINK_DIRECTORIES(${CCI_LIBDIR})
+set (UNIXODBC_INI_LIB  ${CMAKE_CURRENT_BINARY_DIR}/libodbc-prefix/src/libodbc-build/ini/.libs)
+set (UNIXODBC_INST_LIB ${CMAKE_CURRENT_BINARY_DIR}/libodbc-prefix/src/libodbc-build/odbcinst/.libs)
+LINK_DIRECTORIES(${CCI_LIBDIR} ${UNIXODBC_INI_LIB} ${UNIXODBC_INST_LIB})
 ADD_LIBRARY(${CMAKE_PROJECT_NAME} SHARED ${CUBRID_ODBC_SOURCES})
 ADD_LIBRARY(${CUBRID_ODBC_UNICODE} SHARED ${CUBRID_ODBC_UNICODE_SOURCES})
+
+add_dependencies(${CMAKE_PROJECT_NAME} ${LIBUNIXODBC_TARGET})
+add_dependencies(${CUBRID_ODBC_UNICODE} ${LIBUNIXODBC_TARGET})
 
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DGCC -DLINUX)
 target_compile_definitions(${CUBRID_ODBC_UNICODE} PRIVATE -DGCC -DLINUX -DCUBRID_ODBC_UNICODE)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} cascci pthread stdc++)
+target_link_libraries(${CMAKE_PROJECT_NAME} cascci inilc odbcinst pthread stdc++)
 SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES SOVERSION ${CUBRID_ODBC_VERSION})
-target_link_libraries(${CUBRID_ODBC_UNICODE} cascci pthread stdc++)
+target_link_libraries(${CUBRID_ODBC_UNICODE} cascci inilc odbcinst pthread stdc++)
 SET_TARGET_PROPERTIES(${CUBRID_ODBC_UNICODE} PROPERTIES SOVERSION ${CUBRID_ODBC_VERSION})
 
 message("Target directory: ${CMAKE_BINARY_DIR}/package/lib")
