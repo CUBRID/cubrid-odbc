@@ -2,6 +2,8 @@
 setlocal enabledelayedexpansion
 
 set WORKSPACE=%~dp0
+set SRC_DIR=%WORKSPACE%\src
+set PROJECT_DIR=%WORKSPACE%\project
 set INSTALL_DIRS=output
 
 set GIT_PATH=C:\Program Files\Git\bin\git.exe
@@ -37,25 +39,45 @@ if EXIST "%WORKSPACE%\.git" (
 echo Build Version is [%VERSION% (%MAJOR_VERSION%.%MINOR_VERSION%.%PATCH_VERSION%.%EXTRA_VERSION%)]
 set VERSION=%MAJOR_VERSION%.%MINOR_VERSION%.%PATCH_VERSION%.%EXTRA_VERSION%
 
-echo #define MAJOR_VERSION %MAJOR_VERSION% > %WORKSPACE%\%INCLUDE_VERSION_FILE%
-echo #define MINOR_VERSION %MINOR_VERSION% >> %WORKSPACE%\%INCLUDE_VERSION_FILE%
-echo #define PATCH_VERSION %PATCH_VERSION% >> %WORKSPACE%\%INCLUDE_VERSION_FILE%
-echo #define BUILD_SERIAL_NUMBER %EXTRA_VERSION% >> %WORKSPACE%\%INCLUDE_VERSION_FILE%
+echo #define MAJOR_VERSION %MAJOR_VERSION% > %SRC_DIR%\%INCLUDE_VERSION_FILE%
+echo #define MINOR_VERSION %MINOR_VERSION% >> %SRC_DIR%\%INCLUDE_VERSION_FILE%
+echo #define PATCH_VERSION %PATCH_VERSION% >> %SRC_DIR%\%INCLUDE_VERSION_FILE%
+echo #define BUILD_SERIAL_NUMBER %EXTRA_VERSION% >> %SRC_DIR%\%INCLUDE_VERSION_FILE%
 
-echo #define VERSION_STRING "%MAJOR_VERSION%.%MINOR_VERSION%.%PATCH_VERSION%.%EXTRA_VERSION%" >> %WORKSPACE%\%INCLUDE_VERSION_FILE%
+echo #define VERSION_STRING "%MAJOR_VERSION%.%MINOR_VERSION%.%PATCH_VERSION%.%EXTRA_VERSION%" >> %SRC_DIR%\%INCLUDE_VERSION_FILE%
 
 call "%VS2017COMNTOOLS%VsDevCmd.bat"
+
+if exist %INSTALL_DIRS% (
+  rmdir /s /q %INSTALL_DIRS%
+)
+
 mkdir %INSTALL_DIRS%
 
-devenv cubrid_odbc_14.sln /rebuild "Release|Win32"
-devenv cubrid_odbc_14.sln /rebuild "Release|x64"
-devenv cubrid_odbc_14.sln /rebuild "Debug|Win32"
-devenv cubrid_odbc_14.sln /rebuild "Debug|x64"
+rem Find latest Windows 10 SDK
+set "SDK_ROOT=C:\Program Files (x86)\Windows Kits\10\Include"
+set "LATEST_SDK_VERSION="
+if exist "%SDK_ROOT%" (
+    for /f "delims=" %%D in ('dir /b /ad /on "%SDK_ROOT%\10.*"') do set "LATEST_SDK_VERSION=%%D"
+)
+
+if "%LATEST_SDK_VERSION%"=="" (
+    echo "Warning: Cannot find Windows 10 SDK. Using default."
+    set SDK_OPT=
+) else (
+    echo "Found latest Windows 10 SDK: %LATEST_SDK_VERSION%"
+    set SDK_OPT=/p:WindowsTargetPlatformVersion=%LATEST_SDK_VERSION%
+)
+
+msbuild %PROJECT_DIR%\cubrid_odbc_14.sln /t:Rebuild /p:Configuration=Release /p:Platform=Win32 %SDK_OPT%
+msbuild %PROJECT_DIR%\cubrid_odbc_14.sln /t:Rebuild /p:Configuration=Release /p:Platform=x64 %SDK_OPT%
+@REM msbuild %PROJECT_DIR%\cubrid_odbc_14.sln /t:Rebuild /p:Configuration=Debug /p:Platform=Win32 %SDK_OPT%
+@REM msbuild %PROJECT_DIR%\cubrid_odbc_14.sln /t:Rebuild /p:Configuration=Debug /p:Platform=x64 %SDK_OPT%
  
-copy build\Win32_Debug\cubrid_odbc.dll  %INSTALL_DIRS%\cubrid_odbc32_d.dll
-copy build\Win32_Release\cubrid_odbc.dll  %INSTALL_DIRS%\cubrid_odbc32.dll
-copy build\x64_Debug\cubrid_odbc.dll  %INSTALL_DIRS%\cubrid_odbc64_d.dll
-copy build\x64_Release\cubrid_odbc.dll  %INSTALL_DIRS%\cubrid_odbc64.dll
+copy %PROJECT_DIR%\build\Win32_Release\cubrid_odbc.dll  %INSTALL_DIRS%\cubrid_odbc32.dll
+copy %PROJECT_DIR%\build\x64_Release\cubrid_odbc.dll  %INSTALL_DIRS%\cubrid_odbc64.dll
+@REM copy %PROJECT_DIR%\build\Win32_Debug\cubrid_odbc.dll  %INSTALL_DIRS%\cubrid_odbc32_d.dll
+@REM copy %PROJECT_DIR%\build\x64_Debug\cubrid_odbc.dll  %INSTALL_DIRS%\cubrid_odbc64_d.dll
 
 copy installer\installer.nsi %INSTALL_DIRS%\installer.nsi
 copy installer\license.txt %INSTALL_DIRS%\license.txt

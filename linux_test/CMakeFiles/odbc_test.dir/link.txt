@@ -1,0 +1,1 @@
+/bin/cc -ldl CMakeFiles/odbc_test.dir/odbc_test.c.o -o odbc_test   -L/usr/local/lib  -L/home/kshan/lib 

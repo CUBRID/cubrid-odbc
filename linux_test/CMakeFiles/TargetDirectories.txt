@@ -1,0 +1,4 @@
+/home/hwanyseo/source/fork/cubrid-odbc/linux_test/CMakeFiles/cubrid-odbc-test.dir
+/home/hwanyseo/source/fork/cubrid-odbc/linux_test/CMakeFiles/odbc_test.dir
+/home/hwanyseo/source/fork/cubrid-odbc/linux_test/CMakeFiles/edit_cache.dir
+/home/hwanyseo/source/fork/cubrid-odbc/linux_test/CMakeFiles/rebuild_cache.dir

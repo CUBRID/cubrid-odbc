@@ -30,23 +30,23 @@ set(WITH_LIBUNIXODBC_URL "https://github.com/CUBRID/3rdparty/raw/develop/unixODB
 set(WITH_LIBUNIXODBC  ${WITH_EXTERNAL_PREFIX})
 
 set(CUBRID_ODBC_SOURCES
-  odbc_linux.c
-  odbc_debug.c
-  odbc_catalog.c
-  odbc_connection.c
-  odbc_descriptor.c
-  odbc_diag_record.c
-  odbc_env.c
-  odbc_interface.c
-  odbc_number.c
-  odbc_result.c
-  odbc_statement.c
-  odbc_type.c
-  odbc_util.c
+  src/odbc_linux.c
+  src/odbc_debug.c
+  src/odbc_catalog.c
+  src/odbc_connection.c
+  src/odbc_descriptor.c
+  src/odbc_diag_record.c
+  src/odbc_env.c
+  src/odbc_interface.c
+  src/odbc_number.c
+  src/odbc_result.c
+  src/odbc_statement.c
+  src/odbc_type.c
+  src/odbc_util.c
   )
-set(CUBRID_ODBC_UNICODE_SOURCES ${CUBRID_ODBC_SOURCES} unicode.c odbc_linux_unicode.c)
+set(CUBRID_ODBC_UNICODE_SOURCES ${CUBRID_ODBC_SOURCES} src/unicode.c src/odbc_linux_unicode.c)
 
-set(VERSION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/odbc_version.i")
+set(VERSION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/odbc_version.i")
 set(CCI_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/cci-src")
 set(CCI_COPYING "${CCI_SOURCE}/COPYING")
 set(CCI_LIBDIR "${CCI_SOURCE}/build_x86_64_release/cci")

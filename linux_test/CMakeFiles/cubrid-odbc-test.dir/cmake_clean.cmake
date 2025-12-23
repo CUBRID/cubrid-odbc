@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/cubrid-odbc-test.dir/odbc_debug.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/odbc_debug.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_connectw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_connectw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_describecolw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_describecolw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_execdirectw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_execdirectw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_foreignkeysw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_foreignkeysw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_getconnectattrw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_getconnectattrw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_getdescfieldw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_getdescfieldw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_getdescrecw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_getdescrecw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_getdiagfieldw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_getdiagfieldw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_nativesqlw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_nativesqlw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_primarykeysw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_primarykeysw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_setconnectattrw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_setconnectattrw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_specialcolumnsw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_specialcolumnsw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_statisticsw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_statisticsw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_tableprivilegesw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_tableprivilegesw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_tablesw.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/sql_tablesw.c.o.d"
+  "CMakeFiles/cubrid-odbc-test.dir/test_util.c.o"
+  "CMakeFiles/cubrid-odbc-test.dir/test_util.c.o.d"
+  "libcubrid-odbc-test.pdb"
+  "libcubrid-odbc-test.so"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang C)
+  include(CMakeFiles/cubrid-odbc-test.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()
