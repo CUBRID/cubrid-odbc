@@ -149,7 +149,7 @@ cmake CMakeLists.txt
 make
 
 echo "========== run link2u test =========="
-./odbc_test
+./odbc_test | tee $SHELL_DIR/test_result_linux.txt
 rm ./odbc_test
 cd $SHELL_DIR
 

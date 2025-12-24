@@ -20,3 +20,4 @@ UnitTest/UnitTest/bin/
 UnitTest/UnitTest/obj/
 UnitTest/TestResults/
 build/
+test_result_linux.txt
