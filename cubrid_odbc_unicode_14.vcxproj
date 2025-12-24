@@ -22,6 +22,7 @@
     <ProjectName>cubrid_odbc_unicode</ProjectName>
     <ProjectGuid>{0092BD82-BCE8-4E10-A9DB-D083FC5C9D67}</ProjectGuid>
     <RootNamespace>cubrid_odbc</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -102,7 +103,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\cci\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\cci\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_USE_32BIT_TIME_T;CUBRID_ODBC_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -119,13 +120,12 @@
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0412</Culture>
-      <AdditionalIncludeDirectories>..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ResourceOutputFileName>$(IntDir)cubrid_odbc.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_14.lib;libssl.lib;libcrypto.lib;Crypt32.lib;Ws2_32.lib;Msvcrt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
-      <AdditionalLibraryDirectories>..\cci\lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\cci\lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cubrid_odbc_unicode.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
@@ -144,7 +144,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\cci\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\cci\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;CUBRID_ODBC_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -161,13 +161,12 @@
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0412</Culture>
-      <AdditionalIncludeDirectories>..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ResourceOutputFileName>$(IntDir)cubrid_odbc.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_14.lib;libssl.lib;libcrypto.lib;Crypt32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
-      <AdditionalLibraryDirectories>..\cci\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\cci\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cubrid_odbc_unicode.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
@@ -186,7 +185,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\cci\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\cci\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;CUBRID_ODBC_EXPORTS;__DEBUG_LOG;_CRT_SECURE_NO_WARNINGS.;_USE_32BIT_TIME_T;CUBRID_ODBC_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -206,13 +205,12 @@
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0412</Culture>
-      <AdditionalIncludeDirectories>..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ResourceOutputFileName>$(IntDir)cubrid_odbc.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_d_14.lib;libssl.lib;libcrypto.lib;Crypt32.lib;Ws2_32.lib;msvcrtd.lib;msvcmrtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
-      <AdditionalLibraryDirectories>..\cci\lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\cci\lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cubrid_odbc_unicode.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
@@ -232,7 +230,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\cci\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\cci\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;CUBRID_ODBC_EXPORTS;__DEBUG_LOG;_CRT_SECURE_NO_WARNINGS;CUBRID_ODBC_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -251,13 +249,12 @@
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0412</Culture>
-      <AdditionalIncludeDirectories>..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ResourceOutputFileName>$(IntDir)cubrid_odbc.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;wsock32.lib;cas_cci_d_14.lib;libssl.lib;libcrypto.lib;Crypt32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
-      <AdditionalLibraryDirectories>..\cci\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)\cci\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>cubrid_odbc_unicode.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
@@ -269,36 +266,36 @@
     <None Include="cubrid_odbc_unicode.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\odbc.c" />
-    <ClCompile Include="..\src\odbc_catalog.c" />
-    <ClCompile Include="..\src\odbc_connection.c" />
-    <ClCompile Include="..\src\odbc_descriptor.c" />
-    <ClCompile Include="..\src\odbc_diag_record.c" />
-    <ClCompile Include="..\src\odbc_env.c" />
-    <ClCompile Include="..\src\odbc_interface.c" />
-    <ClCompile Include="..\src\odbc_number.c" />
-    <ClCompile Include="..\src\odbc_result.c" />
-    <ClCompile Include="..\src\odbc_statement.c" />
-    <ClCompile Include="..\src\odbc_type.c" />
-    <ClCompile Include="..\src\odbc_util.c" />
-    <ClCompile Include="..\src\unicode.c" />
+    <ClCompile Include="odbc.c" />
+    <ClCompile Include="odbc_catalog.c" />
+    <ClCompile Include="odbc_connection.c" />
+    <ClCompile Include="odbc_descriptor.c" />
+    <ClCompile Include="odbc_diag_record.c" />
+    <ClCompile Include="odbc_env.c" />
+    <ClCompile Include="odbc_interface.c" />
+    <ClCompile Include="odbc_number.c" />
+    <ClCompile Include="odbc_result.c" />
+    <ClCompile Include="odbc_statement.c" />
+    <ClCompile Include="odbc_type.c" />
+    <ClCompile Include="odbc_util.c" />
+    <ClCompile Include="unicode.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="cubrid_odbc.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\odbc_catalog.h" />
-    <ClInclude Include="..\src\odbc_connection.h" />
-    <ClInclude Include="..\src\odbc_descriptor.h" />
-    <ClInclude Include="..\src\odbc_diag_record.h" />
-    <ClInclude Include="..\src\odbc_env.h" />
-    <ClInclude Include="..\src\odbc_number.h" />
-    <ClInclude Include="..\src\odbc_portable.h" />
-    <ClInclude Include="..\src\odbc_resource.h" />
-    <ClInclude Include="..\src\odbc_result.h" />
-    <ClInclude Include="..\src\odbc_statement.h" />
-    <ClInclude Include="..\src\odbc_type.h" />
-    <ClInclude Include="..\src\odbc_util.h" />
+    <ClInclude Include="odbc_catalog.h" />
+    <ClInclude Include="odbc_connection.h" />
+    <ClInclude Include="odbc_descriptor.h" />
+    <ClInclude Include="odbc_diag_record.h" />
+    <ClInclude Include="odbc_env.h" />
+    <ClInclude Include="odbc_number.h" />
+    <ClInclude Include="odbc_portable.h" />
+    <ClInclude Include="odbc_resource.h" />
+    <ClInclude Include="odbc_result.h" />
+    <ClInclude Include="odbc_statement.h" />
+    <ClInclude Include="odbc_type.h" />
+    <ClInclude Include="odbc_util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

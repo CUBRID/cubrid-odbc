@@ -1,7 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TestRunConfiguration name="TestRunConfig" id="a977b503-d6d4-4589-b6a6-7740d7240704" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Description>This is a default test run configuration for a local test run.</Description>
-  <CodeCoverage enabled="false">
+  <CodeCoverage enabled="true">
+    <Regular>
+      <CodeCoverageItem binaryFile="F:\05SVN\CUBRID\cubridapis\odbc\branches\RB-9.3.0\build\Win32_Release\cubrid_odbc.dll" pdbFile="F:\05SVN\CUBRID\cubridapis\odbc\branches\RB-9.3.0\build\Win32_Release\cubrid_odbc.pdb" />
+    </Regular>
   </CodeCoverage>
   <TestTypeSpecific>
     <WebTestRunConfiguration testTypeId="4e7599fa-5ecb-43e9-a887-cd63cf72d207">

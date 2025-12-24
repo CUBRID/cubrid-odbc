@@ -86,7 +86,7 @@ $ vi ~/.odbc.ini
 [LINK2]
 Driver=CUBRID
 Description=CUBRID ODBC
-SERVER=192.168.0.2
+SERVER=192.168.2.39
 PORT=33000
 UID=cubrid
 PWD=1234
@@ -97,10 +97,10 @@ DB_NAME=demodb
 ```
 //UNICODE
 $ vi ~/.odbc.ini
-[LINK2U]
+[LINK2]
 Driver=CUBRID_UNICODE
 Description=CUBRID UNICODE ODBC
-SERVER=192.168.0.2
+SERVER=192.168.2.39
 PORT=33000
 UID=cubrid
 PWD=1234
@@ -117,7 +117,7 @@ $ vi ~/.odbc.ini
 [LINK2]
 Driver=/home/cubrid/cubrid-odbc/lib/libcubrid-odbc.so
 Description=CUBRID ODBC
-SERVER=192.168.0.2
+SERVER=192.168.2.39
 PORT=33000
 UID=cubrid
 PWD=1234
@@ -128,10 +128,10 @@ DB_NAME=demodb
 ```
 //Unicode
 $ vi ~/.odbc.ini
-[LINK2U]
+[LINK2]
 Driver=/home/cubrid/cubrid-odbc/lib/libcubrid-odbcw.so
 Description=CUBRID UNICODE ODBC
-SERVER=192.168.0.2
+SERVER=192.168.2.39
 PORT=33000
 UID=cubrid
 PWD=1234
@@ -143,7 +143,5 @@ DB_NAME=demodb
 # Test
 - Connection test to database demodb with DSN link2
 ```
-$ isql link2 
-or
-$ isql link2u
+$ isql link2
 ```

@@ -30,23 +30,23 @@ set(WITH_LIBUNIXODBC_URL "https://github.com/CUBRID/3rdparty/raw/develop/unixODB
 set(WITH_LIBUNIXODBC  ${WITH_EXTERNAL_PREFIX})
 
 set(CUBRID_ODBC_SOURCES
-  src/odbc_linux.c
-  src/odbc_debug.c
-  src/odbc_catalog.c
-  src/odbc_connection.c
-  src/odbc_descriptor.c
-  src/odbc_diag_record.c
-  src/odbc_env.c
-  src/odbc_interface.c
-  src/odbc_number.c
-  src/odbc_result.c
-  src/odbc_statement.c
-  src/odbc_type.c
-  src/odbc_util.c
+  odbc_linux.c
+  odbc_debug.c
+  odbc_catalog.c
+  odbc_connection.c
+  odbc_descriptor.c
+  odbc_diag_record.c
+  odbc_env.c
+  odbc_interface.c
+  odbc_number.c
+  odbc_result.c
+  odbc_statement.c
+  odbc_type.c
+  odbc_util.c
   )
-set(CUBRID_ODBC_UNICODE_SOURCES ${CUBRID_ODBC_SOURCES} src/unicode.c src/odbc_linux_unicode.c)
+set(CUBRID_ODBC_UNICODE_SOURCES ${CUBRID_ODBC_SOURCES} unicode.c odbc_linux_unicode.c)
 
-set(VERSION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/odbc_version.i")
+set(VERSION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/odbc_version.i")
 set(CCI_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/cci-src")
 set(CCI_COPYING "${CCI_SOURCE}/COPYING")
 set(CCI_LIBDIR "${CCI_SOURCE}/build_x86_64_release/cci")
@@ -76,13 +76,6 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/.git" AND GIT_FOUND)
 	OUTPUT_VARIABLE commit_count RESULT_VARIABLE git_result
 	ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif ()
-
-if (commit_count)
-  set(FULL_ODBC_VERSION "${CUBRID_ODBC_VERSION}.${commit_count}")
-else()
-  set(FULL_ODBC_VERSION "${CUBRID_ODBC_VERSION}")
-  set(commit_count "0000")
-endif()
 
 file(WRITE  ${VERSION_FILE} "#define MAJOR_VERSION ${CUBRID_ODBC_MAJOR_VERSION}\n")
 file(APPEND ${VERSION_FILE} "#define MINOR_VERSION ${CUBRID_ODBC_MINOR_VERSION}\n")
@@ -198,7 +191,7 @@ add_custom_target(package
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/${CCI_SO_REAL_FILE_NAME} ${CMAKE_BINARY_DIR}/package/lib/
   COMMAND ${CMAKE_COMMAND} -E create_symlink ${CCI_SO_REAL_FILE_NAME} ${CMAKE_BINARY_DIR}/package/lib/libcascci.so
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/README.txt ${CMAKE_BINARY_DIR}/package/README.txt
-  COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_BINARY_DIR}/package ${CMAKE_COMMAND} -E tar czvf ../CUBRID-ODBC-Linux-${CMAKE_SYSTEM_PROCESSOR}-${FULL_ODBC_VERSION}.tar.gz --format=gnutar lib README.txt
+  COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_BINARY_DIR}/package ${CMAKE_COMMAND} -E tar czvf ../CUBRID-ODBC-Linux-${CMAKE_SYSTEM_PROCESSOR}-${CUBRID_ODBC_VERSION}.tar.gz --format=gnutar lib README.txt
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-  COMMENT "Creating CUBRID-ODBC-Linux-${CMAKE_SYSTEM_PROCESSOR}-${FULL_ODBC_VERSION}.tar.gz"
+  COMMENT "Creating CUBRID-ODBC-Linux-${CMAKE_SYSTEM_PROCESSOR}-${CUBRID_ODBC_VERSION}.tar.gz"
 )
