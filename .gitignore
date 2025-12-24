@@ -21,3 +21,5 @@ UnitTest/UnitTest/obj/
 UnitTest/TestResults/
 build/
 test_result_linux.txt
+linux_test/libcubrid-odbc-test.so
+linux_test/CMakeFiles/
