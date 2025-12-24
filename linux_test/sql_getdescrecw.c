@@ -82,7 +82,7 @@ sql_getdescrecw (int case_num, char *dsn)
 	{
 	  if (retcode==SQL_NO_DATA)
 	    {
-	      printf ("\nNo %s records !\n");
+	      printf ("\nNo records !\n");
 	    }
 	  else
 	    {
