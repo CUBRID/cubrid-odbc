@@ -11,12 +11,13 @@
 
 int load_linux_odbc_testcases (void);
 int testcase_exists (char *);
-enum { TRUE = 1, FALSE = 0};
+enum
+{ TRUE = 1, FALSE = 0 };
 typedef struct
 {
-    char        name[PATHMAX];
-    char	arg1[PATHMAX];
-    char	arg2[PATHMAX];
+  char name[PATHMAX];
+  char arg1[PATHMAX];
+  char arg2[PATHMAX];
 
-    SQLRETURN   (*func)();
+    SQLRETURN (*func) ();
 } testcase_t;
