@@ -1,0 +1,28 @@
+1. build된 linux odbc를 $HOME/lib에 copy
+   $ mkdir $HOME/lib
+   $ cp libcubrid-odbc.so.11.4.0 $HOME/lib
+   $ cp libcubrid-odbcw.so.11.4.0 $HOME/lib
+   $ cp libcascci.so.11.2 $HOME/lib
+   $ cd $HOME/lib
+   $ ln -s libcubrid-odbc.so.11.4.0 libcubrid-odbc.so
+   $ ln -s libcubrid-odbcw.so.11.4.0 libcubrid-odbcw.so
+   $ ln -s libcascci.so.11.2 libcascci.so
+
+2. build ‘odbc_test’
+   $ cd ~/odbc_test
+   $ cmake CMakeLists.txt
+   $ make
+
+3. edit /usr/local/etc/odbcinst.ini $HOME/.odbc.ini
+  * 첨부된 odbc.ini, odbcinst.ini 참조
+
+4. edit dsn.txt
+  * dsn.txt에 테스트할 dsn의 이름을 입력한다.
+
+5. run test
+  * filename sql_xxxx.c로 된 file이 하나의 testcase이며
+  * build를 하면 libcubrid-odbc-test.so file을 만들고 
+  * ./odbc_test를 실행하면 sql_xxx로 된 모든 케이스를 실행함
+    $ export LD_LIBRARY_PATH=$HOME/lib:/usr/local/lib:$LD_LIBRARY_PATH
+    $ vi dsn.txt 
+    $ ./odbc_test
