@@ -2,16 +2,15 @@
 setlocal enabledelayedexpansion
 
 set WORKSPACE=%~dp0
-set SRC_DIR=%WORKSPACE%\src
-set PROJECT_DIR=%WORKSPACE%\project
-set INSTALL_DIRS=output
+set SRC_DIR=%WORKSPACE%src
+set PROJECT_DIR=%WORKSPACE%project
+set INSTALL_DIRS=%WORKSPACE%output
 
 set GIT_PATH=C:\Program Files\Git\bin\git.exe
 
 set VERSION=0
 set VERSION_FILE=BUILD_NUMBER
 set INCLUDE_VERSION_FILE=odbc_version.i
-set BUILD_NUMBER=0
 
 if "%VS2017COMNTOOLS%x" == "x" (
  echo "Please add 'VS2017COMNTOOLS' in the environment variable\n ex) C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools"
@@ -83,14 +82,15 @@ copy installer\installer.nsi %INSTALL_DIRS%\installer.nsi
 copy installer\license.txt %INSTALL_DIRS%\license.txt
 copy installer\README.txt %INSTALL_DIRS%\README.txt
 
-makensis %WORKSPACE%\%INSTALL_DIRS%\installer.nsi
-
-GOTO :EOF
+makensis %INSTALL_DIRS%\installer.nsi
 
 if %ERRORLEVEL% NEQ 0 (
   echo "Error: cannot find NSIS. Are system environment variables set?"
   GOTO :EOF
 )
+
+powershell -Command "Compress-Archive -Path '%INSTALL_DIRS%\cubrid-odbc.exe' -DestinationPath '%INSTALL_DIRS%\CUBRID_ODBC-%VERSION%-win32-x64.zip'"
+GOTO :EOF
 
 :FINDEXEC
 if EXIST %3 set %2=%~3
@@ -98,4 +98,3 @@ if NOT EXIST %3 for %%X in (%1) do set FOUNDINPATH=%%~$PATH:X
 if defined FOUNDINPATH set %2=%FOUNDINPATH:"=%
 if NOT defined FOUNDINPATH if NOT EXIST %3 echo Executable [%1] is not found & GOTO :EOF
 call echo Executable [%1] is found at [%%%2%%]
-GOTO :EOF
