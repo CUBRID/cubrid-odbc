@@ -11,7 +11,8 @@ int num_testcases = 0;
 int case_num = 1;
 static int find_dsn (char *dsn);
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
   int i;
   int loaded_cases = 0;
@@ -35,7 +36,7 @@ int main (int argc, char *argv[])
 
   odbc_testcases = (testcase_t *) calloc (sizeof (testcase_t), MAX_TEST_CASES);
   loaded_cases = load_linux_odbc_testcases ();
-  for  (i = 0; i < num_testcases; i++)
+  for (i = 0; i < num_testcases; i++)
     {
       name_len = strlen (odbc_testcases[i].name);
       if (run_all && strncmp (odbc_testcases[i].name, argv[1], name_len) != 0)
@@ -68,7 +69,7 @@ int main (int argc, char *argv[])
 
       for (j = 0; j < failed_count; j++)
 	{
-	  printf ("%d, %s\n", failed_cases[j], odbc_testcases[failed_cases[j]-1].name);
+	  printf ("%d, %s\n", failed_cases[j], odbc_testcases[failed_cases[j] - 1].name);
 	}
     }
   else
@@ -94,7 +95,7 @@ load_linux_odbc_testcases ()
     {
       return -1;
     }
- 
+
   snprintf (path, sizeof (path), "%s/%s", cwd, LINUXODBC_TESTLIB);
   if ((dh = dlopen (path, RTLD_LAZY)) == NULL)
     {
@@ -109,10 +110,10 @@ load_linux_odbc_testcases ()
 	}
 
       p = strchr (dp->d_name, '.');
-	if (p)
-	  {
-	    *p = '\0';
-	  }
+      if (p)
+	{
+	  *p = '\0';
+	}
 
       if (testcase_exists (dp->d_name))
 	{
@@ -149,7 +150,7 @@ static int
 find_dsn (char *dsn)
 {
   FILE *fp;
-  char buf [PATHMAX];
+  char buf[PATHMAX];
   char *p;
 
   if (dsn == NULL)
