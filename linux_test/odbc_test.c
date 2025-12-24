@@ -80,104 +80,104 @@ int main (int argc, char *argv[])
   return 0;
 }
 
-  int
-  load_linux_odbc_testcases ()
-  {
-    DIR *dirp;
-    char cwd[PATHMAX];
-    char path[PATHMAX];
-    char *p;
-    struct dirent *dp;
-    void *dh;
+int
+load_linux_odbc_testcases ()
+{
+  DIR *dirp;
+  char cwd[PATHMAX];
+  char path[PATHMAX];
+  char *p;
+  struct dirent *dp;
+  void *dh;
 
-    if (getcwd (cwd, PATHMAX) == NULL || (dirp = opendir (cwd)) == NULL)
-      {
-	return -1;
-      }
+  if (getcwd (cwd, PATHMAX) == NULL || (dirp = opendir (cwd)) == NULL)
+    {
+      return -1;
+    }
+ 
+  snprintf (path, sizeof (path), "%s/%s", cwd, LINUXODBC_TESTLIB);
+  if ((dh = dlopen (path, RTLD_LAZY)) == NULL)
+    {
+      return -1;
+    }
 
-    snprintf (path, sizeof (path), "%s/%s", cwd, LINUXODBC_TESTLIB);
-    if ((dh = dlopen (path, RTLD_LAZY)) == NULL)
-      {
-	return -1;
-      }
+  while ((dp = readdir (dirp)) != NULL)
+    {
+      if (strncmp (dp->d_name, CASE_PREFIX, strlen (CASE_PREFIX)) != 0)
+	{
+	  continue;
+	}
 
-    while ((dp = readdir (dirp)) != NULL)
-      {
-	if (strncmp (dp->d_name, CASE_PREFIX, strlen (CASE_PREFIX)) != 0)
-	  {
-	    continue;
-	  }
-
-	p = strchr (dp->d_name, '.');
+      p = strchr (dp->d_name, '.');
 	if (p)
 	  {
 	    *p = '\0';
 	  }
 
-	if (testcase_exists (dp->d_name))
-	  {
-	    continue;
-	  }
+      if (testcase_exists (dp->d_name))
+	{
+	  continue;
+	}
 
-	strcpy (odbc_testcases[num_testcases].name, dp->d_name);
-	odbc_testcases[num_testcases++].func = dlsym (dh, dp->d_name);
-      }
-  }
+      strcpy (odbc_testcases[num_testcases].name, dp->d_name);
+      odbc_testcases[num_testcases++].func = dlsym (dh, dp->d_name);
+    }
+}
 
-  int
-  testcase_exists (char *casename)
-  {
-    int i;
+int
+testcase_exists (char *casename)
+{
+  int i;
 
-    if (num_testcases == 0)
-      {
-	FALSE;
-      }
+  if (num_testcases == 0)
+    {
+      FALSE;
+    }
 
-    for (i = 0; i < num_testcases; i++)
-      {
-	if (strcmp (odbc_testcases[i].name, casename) == 0)
-	  {
-	    return TRUE;
-	  }
-      }
+  for (i = 0; i < num_testcases; i++)
+    {
+      if (strcmp (odbc_testcases[i].name, casename) == 0)
+	{
+	  return TRUE;
+	}
+    }
 
-    return FALSE;
-  }
+  return FALSE;
+}
 
-  static int
-  find_dsn (char *dsn)
-  {
-    FILE *fp;
-    char buf [PATHMAX];
-    char *p;
+static int
+find_dsn (char *dsn)
+{
+  FILE *fp;
+  char buf [PATHMAX];
+  char *p;
 
-    if (dsn == NULL)
-      {
-	return 1;
-      }
+  if (dsn == NULL)
+    {
+      return 1;
+    }
 
-    fp = fopen (DSNFILE, "r");
-    if (fp == NULL || fgets (buf, PATHMAX, fp) == NULL)
-      {
-	strcpy (dsn, DEFAULT_DSN);
-	if (fp)
-	  {
-	    fclose (fp);
-	  }
-	return 0;
-      }
+  fp = fopen (DSNFILE, "r");
+  if (fp == NULL || fgets (buf, PATHMAX, fp) == NULL)
+    {
+      strcpy (dsn, DEFAULT_DSN);
+      if (fp)
+	{
+	  fclose (fp);
+	}
+      return 0;
+    }
 
-    p = strchr (buf, '\n');
-    if (p)
-      {
-	*p = '\0';
-      }
-    strcpy (dsn, buf);
+  p = strchr (buf, '\n');
+  if (p)
+    {
+      *p = '\0';
+    }
 
-    printf ("DSN = %s\n", dsn);
+  strcpy (dsn, buf);
+  printf ("DSN = %s\n", dsn);
 
-    fclose (fp);
+  fclose (fp);
 
-    return 0;
-  }
+  return 0;
+}
