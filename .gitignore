@@ -23,3 +23,6 @@ build/
 test_result_linux.txt
 linux_test/libcubrid-odbc-test.so
 linux_test/CMakeFiles/
+linux_test/CMakeCache.txt
+linux_test/Makefile
+linux_test/cmake_install.cmake
