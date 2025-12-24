@@ -19,6 +19,7 @@ function show_usage ()
   echo "Usage: $0 [OPTIONS]"
   echo " OPTIONS"
   echo "  -t      Only test (default: false)"
+  echo "  -i      Install directory (default: $HOME/cubrid-odbc/lib)"
   echo "  -s      Test database server (default: "")"
   echo "  -? | -h Show this help message and exit"
   echo ""
@@ -30,6 +31,7 @@ function get_options ()
     case $opt in
       t ) ONLY_TEST=1;;
       s ) TEST_DB_SERVER="$OPTARG" ;;
+      i ) DRIVER_INSTALL_DIR="$OPTARG" ;;
       h|\?|* ) show_usage; exit 1;;
     esac
   done
