@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -28,6 +28,7 @@
  *
  */
 
+#include    <stdio.h>		/* _snprintf */
 #include    "odbc_portable.h"
 #include    "odbc_util.h"
 #include    "sqlext.h"

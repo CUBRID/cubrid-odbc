@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -197,7 +197,7 @@ SQLBindParameter (SQLHSTMT StatementHandle,
 
   if (StrLen_or_IndPtr && ValueType == SQL_WCHAR)
     {
-      if (is_odd_number (*StrLen_or_IndPtr))
+      if (is_odd_number ((int) *StrLen_or_IndPtr))
 	{
 	  odbc_set_diag (stmt_handle->diag, "HY090", 0, NULL);
 	  ODBC_RETURN (ODBC_ERROR, StatementHandle);
@@ -529,7 +529,7 @@ SQLDriverConnect (HDBC hdbc,
 
   if ((cbConnStrIn == SQL_NTS) && (szConnStrIn != NULL))
     {
-      cbConnStrIn = strlen (szConnStrIn);
+      cbConnStrIn = (SWORD) strlen (szConnStrIn);
     }
 
   if (szConnStrIn != NULL)
@@ -732,7 +732,7 @@ SQLDriverConnect (HDBC hdbc,
 
       if (pcbConnStrOut)
 	{
-	  *pcbConnStrOut = MIN (strlen (buf), (unsigned) cbConnStrOut);
+	  *pcbConnStrOut = (SQLSMALLINT) MIN (strlen (buf), (unsigned) cbConnStrOut);
 	}
     }
   else
@@ -828,7 +828,7 @@ SQLDriverConnect (HDBC hdbc,
 
       if (pcbConnStrOut)
 	{
-	  *pcbConnStrOut = MIN (strlen (buf), (unsigned) cbConnStrOut);
+	  *pcbConnStrOut = (SQLSMALLINT) MIN (strlen (buf), (unsigned) cbConnStrOut);
 	}
 
       // CHECK : return value
@@ -1987,12 +1987,11 @@ SQLColumnPrivileges (SQLHSTMT StatementHandle,
 }
 
 ODBC_INTERFACE RETCODE SQL_API
+/* SQLULEN on both sides: sqlext.h declares pcbParamDef as SQLULEN *, which is
+   8 bytes on x64.  Writing through a SQLUINTEGER * left the caller's upper four
+   bytes untouched. */
 SQLDescribeParam (SQLHSTMT StatementHandle, SQLUSMALLINT ParameterNumber, SQLSMALLINT *DataTypePtr,
-#if defined(_WINDOWS)
-		  SQLUINTEGER *ParameterSizePtr,
-#else
 		  SQLULEN *ParameterSizePtr,
-#endif
 		  SQLSMALLINT *DecimalDigitsPtr, SQLSMALLINT *NullablePtr)
 {
   RETCODE rc = SQL_SUCCESS;
@@ -2175,12 +2174,9 @@ SQLProcedures (SQLHSTMT StatementHandle,
 }
 
 ODBC_INTERFACE RETCODE SQL_API
-SQLParamOptions (SQLHSTMT StatementHandle,
-#if defined(_WINDOWS)
-		 SQLUINTEGER crow, SQLUINTEGER *pirow)
-#else
-		 SQLULEN crow, SQLULEN *pirow)
-#endif
+/* SQLULEN on both sides: sqlext.h declares crow/pirow as SQLULEN, which is
+   8 bytes on x64. */
+SQLParamOptions (SQLHSTMT StatementHandle, SQLULEN crow, SQLULEN *pirow)
 {
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;

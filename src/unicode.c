@@ -217,7 +217,7 @@ SQLGetInfoW (SQLHDBC ConnectionHandle,
 
       if (InfoValue != NULL)
 	{
-	  *StringLength = (SQLSMALLINT) decide_info_value_length (InfoType, BufferLength, info_value_size);
+	  *StringLength = (SQLSMALLINT) decide_info_value_length (InfoType, BufferLength, (int) info_value_size);
 
 	  if (rc == SQL_SUCCESS)
 	    {
@@ -229,7 +229,7 @@ SQLGetInfoW (SQLHDBC ConnectionHandle,
 		}
 	    }
 
-	  bytes_to_wide_char (InfoValue, tmp_StringLength, &wvalue, 0, NULL, charset);
+	  bytes_to_wide_char (InfoValue, (int) tmp_StringLength, &wvalue, 0, NULL, charset);
 
 	  if (wvalue != NULL)
 	    {

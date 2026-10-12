@@ -26,8 +26,10 @@ Below You will see the brief list of sections to guide You to easily get started
 - NSIS 3.08 or newer (Package)
 ```
 C:\> cd cubrid-odbc
-C:\> build_2017.bat         // Build and Package ANSI
-C:\> build_unicode_2017.bat // Package Unicode
+C:\> build.bat        // Build and Package both ANSI and Unicode
+C:\> build.bat -a     // ANSI only
+C:\> build.bat -u     // Unicode only
+C:\> build.bat -n     // Build only, skip the installer and the zip
 
 - Result File Directory
  -- ANSI : output

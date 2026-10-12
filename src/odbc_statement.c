@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -70,7 +70,7 @@ typedef struct __st_DescInfo
 {
   short type;
   long bind_type;
-  long long offset_size;
+  SQLLEN offset_size;		/* SQL_ATTR_ROW_BIND_OFFSET_PTR points at a SQLLEN */
   void *value_ptr;
   unsigned long length;
 #if defined (_WINDOWS)
@@ -363,11 +363,11 @@ odbc_set_stmt_attr (ODBC_STATEMENT *stmt, long attribute, void *valueptr, long s
       break;
 
     case SQL_ATTR_ASYNC_ENABLE:
-      switch ((unsigned long) valueptr)
+      switch ((SQLULEN) valueptr)
 	{
 	case SQL_ASYNC_ENABLE_OFF:
 	case SQL_ASYNC_ENABLE_ON:
-	  stmt->attr_async_enable = (unsigned long) valueptr;
+	  stmt->attr_async_enable = (unsigned long) (SQLULEN) valueptr;
 	  break;
 
 	default:
@@ -377,7 +377,7 @@ odbc_set_stmt_attr (ODBC_STATEMENT *stmt, long attribute, void *valueptr, long s
       break;
 
     case SQL_ATTR_CURSOR_SENSITIVITY:
-      switch ((unsigned long) valueptr)
+      switch ((SQLULEN) valueptr)
 	{
 	case SQL_INSENSITIVE:
 	  /* implicit setting */
@@ -393,15 +393,15 @@ odbc_set_stmt_attr (ODBC_STATEMENT *stmt, long attribute, void *valueptr, long s
 	  goto error;
 	}
 
-      stmt->attr_cursor_sensitivity = (unsigned long) valueptr;
+      stmt->attr_cursor_sensitivity = (unsigned long) (SQLULEN) valueptr;
       break;
 
     case SQL_ATTR_CURSOR_SCROLLABLE:
-      switch ((unsigned long) valueptr)
+      switch ((SQLULEN) valueptr)
 	{
 	case SQL_NONSCROLLABLE:
 	case SQL_SCROLLABLE:
-	  stmt->attr_cursor_scrollable = (unsigned long) valueptr;
+	  stmt->attr_cursor_scrollable = (unsigned long) (SQLULEN) valueptr;
 	  break;
 
 	default:
@@ -411,17 +411,17 @@ odbc_set_stmt_attr (ODBC_STATEMENT *stmt, long attribute, void *valueptr, long s
       break;
 
     case SQL_ATTR_CURSOR_TYPE:
-      switch ((unsigned long) valueptr)
+      switch ((SQLULEN) valueptr)
 	{
 	case SQL_CURSOR_FORWARD_ONLY:
-	  stmt->attr_cursor_type = (unsigned long) valueptr;
+	  stmt->attr_cursor_type = (unsigned long) (SQLULEN) valueptr;
 
 	  /* implicit setting */
 	  stmt->attr_cursor_scrollable = SQL_NONSCROLLABLE;
 	  break;
 
 	case SQL_CURSOR_STATIC:
-	  stmt->attr_cursor_type = (unsigned long) valueptr;
+	  stmt->attr_cursor_type = (unsigned long) (SQLULEN) valueptr;
 
 	  /* implicit setting */
 	  stmt->attr_cursor_scrollable = SQL_SCROLLABLE;
@@ -438,7 +438,7 @@ odbc_set_stmt_attr (ODBC_STATEMENT *stmt, long attribute, void *valueptr, long s
 
 	case SQL_CURSOR_KEYSET_DRIVEN:
 	case SQL_CURSOR_DYNAMIC:
-	  stmt->attr_cursor_type = (unsigned long) valueptr;
+	  stmt->attr_cursor_type = (unsigned long) (SQLULEN) valueptr;
 
 	  /* implicit setting */
 	  stmt->attr_cursor_scrollable = SQL_SCROLLABLE;
@@ -499,11 +499,11 @@ odbc_set_stmt_attr (ODBC_STATEMENT *stmt, long attribute, void *valueptr, long s
       break;
 
     case SQL_ATTR_METADATA_ID:
-      switch ((unsigned long) valueptr)
+      switch ((SQLULEN) valueptr)
 	{
 	case SQL_TRUE:
 	case SQL_FALSE:
-	  stmt->attr_metadata_id = (unsigned long) valueptr;
+	  stmt->attr_metadata_id = (unsigned long) (SQLULEN) valueptr;
 	  break;
 
 	default:
@@ -579,7 +579,7 @@ odbc_set_stmt_attr (ODBC_STATEMENT *stmt, long attribute, void *valueptr, long s
       goto error;
 
     case SQL_ATTR_USE_BOOKMARKS:
-      stmt->attr_use_bookmark = (unsigned long) valueptr;
+      stmt->attr_use_bookmark = (unsigned long) (SQLULEN) valueptr;
       break;
 
 
@@ -1067,7 +1067,7 @@ odbc_bind_parameter (ODBC_STATEMENT *stmt,
   ODBC_DESC *apd = NULL, *ipd = NULL;
   RETCODE rc;
   short odbc_type;
-  long size;
+  SQLLEN size;
   ODBC_RECORD *record;
   SQLLEN actual_size;
 
@@ -2195,7 +2195,7 @@ add_error:
 	    }
 	}
 
-      odbc_set_stmt_attr (stmt, SQL_ATTR_ROW_ARRAY_SIZE, (void *) row_array_size, 0, 1);
+      odbc_set_stmt_attr (stmt, SQL_ATTR_ROW_ARRAY_SIZE, (void *) (SQLLEN) row_array_size, 0, 1);
       break;
 
     default:
@@ -2235,7 +2235,7 @@ odbc_set_pos (ODBC_STATEMENT *stmt, SQLSETPOSIROW row_number, SQLUSMALLINT opera
   unsigned long row_array_size;
   SQLSETPOSIROW i;
   short max_col_num, j;
-  char error_flag;
+  char error_flag = 0;
 
   row_array_size = stmt->ard->array_size;
   max_col_num = stmt->ard->max_count;
@@ -2694,16 +2694,16 @@ recalculate_bind_pointer (DescInfo *desc_info_ptr,
 #else
 	  *value_addr =
 		  (UINT_PTR) desc_info_ptr->value_ptr + desc_info_ptr->offset_size +
-		  (row_index - 1) * (desc_info_ptr->length);
+		  (UINT_PTR) (row_index - 1) * (desc_info_ptr->length);
 
-	  *ind_addr = (UINT_PTR) desc_info_ptr->ind_ptr + desc_info_ptr->offset_size + (row_index - 1) * sizeof (long);
+	  *ind_addr = (UINT_PTR) desc_info_ptr->ind_ptr + desc_info_ptr->offset_size + (UINT_PTR) (row_index - 1) * sizeof (long);
 #endif
 	  if (octet_len_addr)
 	    {
 	      if (desc_info_ptr->octet_len_ptr)
 		*octet_len_addr =
 			(UINT_PTR) desc_info_ptr->octet_len_ptr +
-			desc_info_ptr->offset_size + (row_index - 1) * sizeof (long);
+			desc_info_ptr->offset_size + (UINT_PTR) (row_index - 1) * sizeof (long);
 	      else
 #if defined (_WINDOWS)
 		(long *) *octet_len_addr = NULL;
@@ -2716,13 +2716,13 @@ recalculate_bind_pointer (DescInfo *desc_info_ptr,
 	{
 	  element_size = desc_info_ptr->bind_type;
 	  *value_addr =
-		  (UINT_PTR) desc_info_ptr->value_ptr + desc_info_ptr->offset_size + (row_index - 1) * element_size;
-	  *ind_addr = (UINT_PTR) desc_info_ptr->ind_ptr + desc_info_ptr->offset_size + (row_index - 1) * element_size;
+		  (UINT_PTR) desc_info_ptr->value_ptr + desc_info_ptr->offset_size + (UINT_PTR) (row_index - 1) * element_size;
+	  *ind_addr = (UINT_PTR) desc_info_ptr->ind_ptr + desc_info_ptr->offset_size + (UINT_PTR) (row_index - 1) * element_size;
 	  if (octet_len_addr)
 	    {
 	      if (desc_info_ptr->octet_len_ptr)
 		*octet_len_addr = (UINT_PTR) desc_info_ptr->octet_len_ptr +
-				  desc_info_ptr->offset_size + (row_index - 1) * element_size;
+				  desc_info_ptr->offset_size + (UINT_PTR) (row_index - 1) * element_size;
 	      else
 #if defined(_WINDOWS)
 		(long *) *octet_len_addr = NULL;
@@ -2905,12 +2905,12 @@ create_bookmark_ird (ODBC_STATEMENT *stmt)
     }
   else
     {
-      odbc_set_desc_field (stmt->ird, 0, SQL_DESC_PRECISION, (SQLPOINTER) precision, 0, 1);
+      odbc_set_desc_field (stmt->ird, 0, SQL_DESC_PRECISION, (SQLPOINTER) (SQLLEN) precision, 0, 1);
     }
-  odbc_set_desc_field (stmt->ird, 0, SQL_DESC_LENGTH, (SQLPOINTER) display_size, 0, 1);
-  odbc_set_desc_field (stmt->ird, 0, SQL_DESC_OCTET_LENGTH, (SQLPOINTER) octet_length, 0, 1);
+  odbc_set_desc_field (stmt->ird, 0, SQL_DESC_LENGTH, (SQLPOINTER) (SQLLEN) display_size, 0, 1);
+  odbc_set_desc_field (stmt->ird, 0, SQL_DESC_OCTET_LENGTH, (SQLPOINTER) (SQLLEN) octet_length, 0, 1);
   odbc_set_desc_field (stmt->ird, 0, SQL_DESC_SCALE, (SQLPOINTER) scale, 0, 1);
-  odbc_set_desc_field (stmt->ird, 0, SQL_DESC_DISPLAY_SIZE, (SQLPOINTER) display_size, 0, 1);
+  odbc_set_desc_field (stmt->ird, 0, SQL_DESC_DISPLAY_SIZE, (SQLPOINTER) (SQLLEN) display_size, 0, 1);
   odbc_set_desc_field (stmt->ird, 0, SQL_DESC_UNSIGNED, (SQLPOINTER) SQL_TRUE, 0, 1);
 
 }

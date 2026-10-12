@@ -104,7 +104,7 @@ typedef struct st_odbc_desc
   unsigned long fetched_size;
 
   unsigned short *array_status_ptr;
-  long long *bind_offset_ptr;
+  SQLLEN *bind_offset_ptr;		/* SQL_ATTR_ROW_BIND_OFFSET_PTR: the application hands us a SQLLEN */
   long bind_type;
   short max_count;
   unsigned long long *rows_processed_ptr;

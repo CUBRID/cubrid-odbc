@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -95,7 +95,7 @@ odbc_bind_col (ODBC_STATEMENT *stmt,
   if (size > 0)
     {
       /* target_type is the fixed type */
-      rc = odbc_set_desc_field (ard, column_num, SQL_DESC_LENGTH, (void *) size, 0, 1);
+      rc = odbc_set_desc_field (ard, column_num, SQL_DESC_LENGTH, (void *) (SQLLEN) size, 0, 1);
       ERROR_GOTO (rc, error);
     }
 
@@ -653,9 +653,17 @@ odbc_get_data (ODBC_STATEMENT *stmt,
 		}
 	      else if (target_type == SQL_WCHAR || target_type == SQL_WVARCHAR || target_type == SQL_WLONGVARCHAR)
 		{
+		  /* the helper reports through an int *; handing it str_ind_ptr
+		     directly left the upper half of that SQLLEN untouched */
+		  int wide_len = 0;
+
 		  rc =
 			  get_wide_char_result (cci_value.str, strlen (cci_value.str), (wchar_t **) & bound_ptr,
-						(int) buffer_length, str_ind_ptr, stmt->conn->charset);
+						(int) buffer_length, &wide_len, stmt->conn->charset);
+		  if (str_ind_ptr != NULL)
+		    {
+		      *str_ind_ptr = wide_len;
+		    }
 		  if (rc == ODBC_SUCCESS_WITH_INFO)
 		    {
 		      if (buffer_length > 0)
@@ -863,9 +871,18 @@ odbc_get_data (ODBC_STATEMENT *stmt,
 	}
       else if (target_type == SQL_WCHAR || target_type == SQL_WVARCHAR || target_type == SQL_WLONGVARCHAR)
 	{
+	  /* the helper reports through an int *; handing it str_ind_ptr
+	     directly left the upper half of that SQLLEN untouched */
+	  int wide_len = 0;
+
 	  rc =
 		  bytes_to_wide_char (stmt->column_data.current_pt, strlen (stmt->column_data.current_pt),
-				      (wchar_t **) (&bound_ptr), buffer_length, str_ind_ptr, stmt->conn->charset);
+				      (wchar_t **) (&bound_ptr), (int) buffer_length, &wide_len,
+				      stmt->conn->charset);
+	  if (str_ind_ptr != NULL)
+	    {
+	      *str_ind_ptr = wide_len;
+	    }
 	  if (rc == ODBC_SUCCESS_WITH_INFO)
 	    {
 	      if (buffer_length > 0)
@@ -948,7 +965,7 @@ get_bind_info (ODBC_STATEMENT *stmt,
 	       short col_index, short *type, void **bound_ptr, long *buffer_length, SQLLEN **strlen_ind_ptr)
 {
   long element_size;
-  long long offset_size;
+  SQLLEN offset_size;
 
   element_size = stmt->ard->bind_type;	/* 0 means single or column wise, >0 means row wise */
   if (stmt->ard->bind_offset_ptr == NULL)

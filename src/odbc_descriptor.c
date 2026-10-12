@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -428,7 +428,7 @@ odbc_get_desc_field (ODBC_DESC *desc,
 	case SQL_DESC_BIND_OFFSET_PTR:
 	  if (value_ptr != NULL)
 	    {
-	      * (long long **) value_ptr = desc->bind_offset_ptr;
+	      * (SQLLEN **) value_ptr = desc->bind_offset_ptr;
 	    }
 
 	  if (string_length_ptr != NULL)
@@ -1010,7 +1010,7 @@ odbc_set_desc_field (ODBC_DESC *desc,
 	  break;
 	case SQL_DESC_ARRAY_SIZE:
 	  DEBUG_TIMESTAMP (SQL_DESC_ARRAY_SIZE);
-	  desc->array_size = (unsigned long) value_ptr;
+	  desc->array_size = (unsigned long) (SQLULEN) value_ptr;
 	  break;
 	case SQL_DESC_ARRAY_STATUS_PTR:
 	  desc->array_status_ptr = value_ptr;
@@ -1019,7 +1019,7 @@ odbc_set_desc_field (ODBC_DESC *desc,
 	  desc->bind_offset_ptr = value_ptr;
 	  break;
 	case SQL_DESC_BIND_TYPE:
-	  desc->bind_type = (long) value_ptr;
+	  desc->bind_type = (long) (SQLLEN) value_ptr;
 	  break;
 	case SQL_DESC_COUNT:
 	  if ((short) value_ptr < desc->max_count)
@@ -1070,11 +1070,11 @@ odbc_set_desc_field (ODBC_DESC *desc,
 	  break;
 
 	case SQL_DESC_CASE_SENSITIVE:
-	  record->case_sensitive = (long) value_ptr;
+	  record->case_sensitive = (long) (SQLLEN) value_ptr;
 	  break;
 
 	case SQL_DESC_DISPLAY_SIZE:
-	  record->display_size = (long) value_ptr;
+	  record->display_size = (long) (SQLLEN) value_ptr;
 	  break;
 	case SQL_DESC_FIXED_PREC_SCALE:
 	  record->fixed_prec_scale = (short) value_ptr;
@@ -1148,15 +1148,15 @@ odbc_set_desc_field (ODBC_DESC *desc,
 	  break;
 
 	case SQL_DESC_LENGTH:
-	  record->length = (unsigned long) value_ptr;
+	  record->length = (unsigned long) (SQLULEN) value_ptr;
 	  break;
 
 	case SQL_DESC_NUM_PREC_RADIX:
-	  record->num_prec_radix = (long) value_ptr;
+	  record->num_prec_radix = (long) (SQLLEN) value_ptr;
 	  break;
 
 	case SQL_DESC_OCTET_LENGTH:
-	  record->octet_length = (long) value_ptr;
+	  record->octet_length = (long) (SQLLEN) value_ptr;
 	  break;
 
 	case SQL_DESC_OCTET_LENGTH_PTR:
@@ -1488,21 +1488,21 @@ odbc_set_ird (ODBC_STATEMENT *stmt,
     }
   else
     {
-      odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_PRECISION, (SQLPOINTER) precision, 0, 1);
+      odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_PRECISION, (SQLPOINTER) (SQLLEN) precision, 0, 1);
     }
 
   if (type == SQL_NUMERIC)
     {
-      odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_LENGTH, (SQLPOINTER) precision, 0, 1);
+      odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_LENGTH, (SQLPOINTER) (SQLLEN) precision, 0, 1);
     }
   else
     {
-      odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_LENGTH, (SQLPOINTER) display_size, 0, 1);
+      odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_LENGTH, (SQLPOINTER) (SQLLEN) display_size, 0, 1);
     }
   //odbc_set_desc_field(stmt->ird, column_number, SQL_DESC_LENGTH, (SQLPOINTER)display_size, 0, 1);
-  odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_OCTET_LENGTH, (SQLPOINTER) octet_length, 0, 1);
+  odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_OCTET_LENGTH, (SQLPOINTER) (SQLLEN) octet_length, 0, 1);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_SCALE, (SQLPOINTER) scale, 0, 1);
-  odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_DISPLAY_SIZE, (SQLPOINTER) display_size, 0, 1);
+  odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_DISPLAY_SIZE, (SQLPOINTER) (SQLLEN) display_size, 0, 1);
   odbc_set_desc_field (stmt->ird, column_number, SQL_DESC_NULLABLE, (SQLPOINTER) nullable, 0, 1);
 
   searchable = odbc_type_searchable (type);

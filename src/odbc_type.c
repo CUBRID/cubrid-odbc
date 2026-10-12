@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -1677,7 +1677,7 @@ cci_value_to_odbc (void *c_value, short concise_type,
 	  str[pt2 - pt] = '\0';
 	  ++pt2;
 	  strcat (str, pt2);
-	  ((SQL_NUMERIC_STRUCT *) c_value)->scale = strlen (pt2);
+	  ((SQL_NUMERIC_STRUCT *) c_value)->scale = (SQLSCHAR) strlen (pt2);
 	  num_add_zero = ((SQL_NUMERIC_STRUCT *) c_value)->scale - strlen (pt2);
 	  if (num_add_zero < 0)
 	    {

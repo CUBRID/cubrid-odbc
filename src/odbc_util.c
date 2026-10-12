@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -240,7 +240,7 @@ ut_alloc_bstr (SQLLEN size)
 {
   WCHAR *new = NULL;
 
-  new = SysAllocStringLen (NULL, size);
+  new = SysAllocStringLen (NULL, (UINT) size);
 
 #ifdef _MEM_DEBUG
   if (new == NULL)
@@ -1153,13 +1153,19 @@ wchar_value_assign (const char *str, char *out_buf, SQLLEN out_buf_len, SQLLEN *
       str_len = strlen (str);
       if (out_buf != NULL && out_buf_len > 0)
 	{
-	  if (bytes_to_wide_char (str, str_len, (wchar_t **) (&out_buf), out_buf_len, &length, CODE_NAME_UNICODE) < 0)
+	  /* the helper works in int; length is a SQLLEN, so it is filled
+	     through a matching variable instead of half-written */
+	  int wide_len = 0;
+
+	  if (bytes_to_wide_char ((char *) str, str_len, (wchar_t **) (&out_buf), (int) out_buf_len, &wide_len,
+				  CODE_NAME_UNICODE) < 0)
 	    {
 	      rc = ODBC_ERROR;
 	    }
+	  length = wide_len;
 	}
 
-      if ((unsigned int) out_buf_len <= length)
+      if (out_buf_len <= length)
 	{
 	  rc = ODBC_SUCCESS_WITH_INFO;
 	}
@@ -1355,7 +1361,7 @@ tolower_str (char *dst, const char *src)
 PUBLIC char *
 assemble_conn_attr (const char *conn_str_in, const char *key, char *buffer)
 {
-  const char *value = element_value_by_key (conn_str_in, key);
+  char *value = (char *) element_value_by_key (conn_str_in, key);
   if (value != NULL)
     {
       tolower_str (buffer + strlen (buffer), key);
@@ -1906,9 +1912,9 @@ decide_info_value_length (SQLUSMALLINT info_type, int buffer_length, int info_va
     case SQL_TABLE_TERM:
     case SQL_USER_NAME:
     case SQL_XOPEN_CLI_YEAR:
-      if (info_value_length > buffer_length - sizeof (SQLWCHAR))
+      if (info_value_length > buffer_length - (int) sizeof (SQLWCHAR))
 	{
-	  info_value_length = buffer_length - sizeof (SQLWCHAR);
+	  info_value_length = buffer_length - (int) sizeof (SQLWCHAR);
 	}
 
       break;
