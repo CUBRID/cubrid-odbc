@@ -51,7 +51,7 @@ on:
         required: false
         default: 'latest'
       use_release:
-        description: 'Take the published release of that line instead of a nightly. Needs <major>.<minor>, e.g. 11.4'
+        description: 'Take the published release instead of a nightly. Needs a line (11.4) or a patch level (11.4.6, 11.4.2); the version published there wins.'
         type: boolean
         required: false
         default: false
@@ -71,7 +71,7 @@ env:
   # a push run always takes the newest build the nightly archive carries, so
   # that the driver is tested against what the engine looks like today
   DEFAULT_CUBRID_VERSION: latest
-  FTP_ENGINE_ROOT: http://ftp.cubrid.org/CUBRID_Engine
+  FTP_ENGINE_ROOT: https://ftp.cubrid.org/CUBRID_Engine
   # the same base image cubrid-docker builds FROM
   ROOTFS_URL: https://dl.rockylinux.org/pub/rocky/8/images/x86_64/Rocky-8-Container-Base.latest.x86_64.tar.xz
   WSL_DISTRO: cubrid
@@ -111,10 +111,17 @@ jobs:
             throw "invalid CUBRID version '$tag'. Expected latest | 11.5 | 11.4.6 | 11.4.6.1963 | 11.4.6.1963-0e7d3c1"
           }
 
+          # .Content comes back as Byte[], not a string, whenever the response
+          # carries no text/* type - hash.md5 is served that way
+          function Get-Text([string] $uri) {
+            $c = (Invoke-WebRequest -Uri $uri -UseBasicParsing -TimeoutSec 60).Content
+            if ($c -is [byte[]]) { [System.Text.Encoding]::UTF8.GetString($c) } else { $c }
+          }
+
           # every build in the nightly archive has its own directory, named
           # <version>-<hash>
           $index = "$env:FTP_ENGINE_ROOT/nightly/daily_build/"
-          $html = (Invoke-WebRequest -Uri $index -UseBasicParsing).Content
+          $html = Get-Text $index
           $all = @([regex]::Matches($html, 'href="(\d+(?:\.\d+){1,3}-[0-9a-fA-F]+)/"') |
             ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
           if ($all.Count -eq 0) { throw "no build directory found under $index" }
@@ -125,14 +132,28 @@ jobs:
           Write-Host ("nightly lines available: " + ($lines -join ', '))
 
           if ($useRelease) {
-            # ftp.cubrid.org publishes one _latest per <major>.<minor>, so a tag
-            # any more precise than that cannot be honoured
-            if ($tag -notmatch '^\d+\.\d+$') {
-              $suggest = if ($tag -eq 'latest') { $lines[-1] } else { ($tag -split '\.')[0..1] -join '.' }
-              throw "use_release needs a <major>.<minor> version, got '$tag'. Try $suggest"
+            # a release lives in its own <line> or <line>.<patch> directory and
+            # carries the version in the file name, unlike <line>_latest
+            if ($tag -notmatch '^\d+\.\d+(\.\d+)?$') {
+              $parts = $tag -split '[.-]'
+              $suggest = if ($tag -eq 'latest') { $lines[-1] } else { ($parts[0..([math]::Min(2, $parts.Count - 1))]) -join '.' }
+              throw "use_release needs <major>.<minor> or <major>.<minor>.<patch>, got '$tag'. Try $suggest"
             }
-            $full = "$tag-latest"
-            $url = "$env:FTP_ENGINE_ROOT/${tag}_latest/CUBRID-$full-Linux.x86_64.tar.gz"
+            $dir = "$env:FTP_ENGINE_ROOT/$tag/"
+            try {
+              $page = Get-Text $dir
+            }
+            catch {
+              throw "no published release at $dir`n$($_.Exception.Message)"
+            }
+            $rel = @([regex]::Matches($page, 'href="CUBRID-(\d+(?:\.\d+){1,3}-[0-9a-fA-F]+)-Linux\.x86_64\.tar\.gz"') |
+              ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+            if ($rel.Count -eq 0) { throw "$dir carries no Linux release package" }
+            $full = $rel |
+              Sort-Object { [version] ($_ -replace '-[0-9a-fA-F]+$', '') } |
+              Select-Object -Last 1
+            $url = $dir + "CUBRID-$full-Linux.x86_64.tar.gz"
+            $hashUrl = $dir + "md5sum-$full.txt"
           }
           elseif ($tag -eq 'latest') {
             # the newest build in the archive, whatever line it belongs to
@@ -141,6 +162,7 @@ jobs:
               Select-Object -Last 1
             Write-Host "latest of $($all.Count) builds in the archive"
             $url = "$index$full/drop/CUBRID-$full-Linux.x86_64.tar.gz"
+            $hashUrl = "$index$full/drop/hash.md5"
           }
           else {
             # a tag matches the directory it names outright, or one it is a
@@ -161,7 +183,7 @@ jobs:
                 "no nightly build of $line at all; lines available: " + ($lines -join ', ')
               }
               throw "no nightly build matching '$tag' under $index`n$hint`n" +
-                    "For the published release of a line, re-run with use_release and <major>.<minor>."
+                    "For a published release, re-run with use_release and a line or patch level."
             }
 
             # sort on the version, not the string: '11.5.0.999' must not win
@@ -173,6 +195,7 @@ jobs:
               Write-Host "$($dirs.Count) builds match '$tag'; taking the newest"
             }
             $url = "$index$full/drop/CUBRID-$full-Linux.x86_64.tar.gz"
+            $hashUrl = "$index$full/drop/hash.md5"
           }
 
           # a tarball that is not there should fail now, not mid install
@@ -189,10 +212,29 @@ jobs:
           $len = @($head.Headers['Content-Length'])[0]
           $sizeText = if ($len) { "$([math]::Round([int64] $len / 1MB, 1)) MB" } else { 'size unknown' }
 
+          $file = $url -replace '^.*/', ''
+          try {
+            $hashes = Get-Text $hashUrl
+          }
+          catch {
+            throw "cannot read the checksum file of the build: $hashUrl`n$($_.Exception.Message)"
+          }
+
+          $md5 = ''
+          foreach ($h in ($hashes -split "`r?`n")) {
+            if ($h -match "^([0-9a-fA-F]{32})\s+\*?$([regex]::Escape($file))\s*$") {
+              $md5 = $Matches[1].ToLower()
+              break
+            }
+          }
+          if (-not $md5) { throw "$hashUrl carries no entry for $file" }
+
           "url=$url"   | Out-File $env:GITHUB_OUTPUT -Append
+          "md5=$md5"   | Out-File $env:GITHUB_OUTPUT -Append
           "full=$full" | Out-File $env:GITHUB_OUTPUT -Append
           Write-Host "CUBRID $full  ($sizeText)"
           Write-Host "  $url"
+          Write-Host "  md5 $md5"
 
           "## CUBRID $full"                          | Out-File $env:GITHUB_STEP_SUMMARY -Append
           ""                                         | Out-File $env:GITHUB_STEP_SUMMARY -Append
@@ -202,6 +244,7 @@ jobs:
           "| resolved | ``$full`` |"                 | Out-File $env:GITHUB_STEP_SUMMARY -Append
           "| source | $(if ($useRelease) { 'published release' } else { 'nightly' }) |" | Out-File $env:GITHUB_STEP_SUMMARY -Append
           "| package | $sizeText |"                   | Out-File $env:GITHUB_STEP_SUMMARY -Append
+          "| md5 | ``$md5`` |"                     | Out-File $env:GITHUB_STEP_SUMMARY -Append
           ""                                         | Out-File $env:GITHUB_STEP_SUMMARY -Append
 
       - name: Import the WSL2 distribution
@@ -228,6 +271,7 @@ jobs:
         shell: pwsh
         env:
           ENGINE_URL: ${{ steps.engine.outputs.url }}
+          ENGINE_MD5: ${{ steps.engine.outputs.md5 }}
         run: |
           # .gitattributes keeps the script LF, but a checkout made before it
           # existed still carries the CRLF that Git for Windows writes, and
@@ -245,7 +289,7 @@ jobs:
             throw "the distribution cannot read $wslScript - is $(Split-Path -Qualifier $script) mounted in WSL?"
           }
 
-          wsl -d $env:WSL_DISTRO -u root -- bash $wslScript $env:ENGINE_URL $env:TEST_DB_NAME
+          wsl -d $env:WSL_DISTRO -u root -- bash $wslScript $env:ENGINE_URL $env:TEST_DB_NAME $env:ENGINE_MD5
           if ($LASTEXITCODE -ne 0) { throw 'cannot install CUBRID into WSL' }
 
       - name: Point the test host name at the CUBRID server

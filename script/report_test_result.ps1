@@ -9,16 +9,22 @@
 # report is appended to the job summary, with the captured test output of each
 # failed test folded into a <details> block.
 #
-# Exits 1 when a test failed or when no test ran at all, so the caller can use
-# it as the verdict of the run.
+# Exits 1 when a test failed, when a run named by -Expect left no TRX file
+# behind, or when such a run executed no test at all.  A summed total is not
+# enough on its own: one suite that never ran would otherwise hide behind the
+# tests of the other one.
 #
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File script\report_test_result.ps1
 #   powershell -ExecutionPolicy Bypass -File script\report_test_result.ps1 -Path C:\logs
+#   powershell -ExecutionPolicy Bypass -File script\report_test_result.ps1 -Expect unit_test
 #
 [CmdletBinding()]
 param(
     [string] $Path = '',
+    # the TRX files test.bat has to leave behind, by base name; each of them
+    # must exist and must have executed at least one test
+    [string[]] $Expect = @('unit_test', 'unit_test_cpp'),
     # how much of the captured output of a failed test to keep in the summary
     [int] $OutputLimit = 4000
 )
@@ -57,13 +63,20 @@ function Get-TestRun
         }
     }
 
+    # a run whose tests were all skipped, or that listed none at all, has not
+    # tested anything; 'executed' says so directly where the TRX carries it
+    $passed = [int] $counters.passed
+    $failedCount = [int] $counters.failed + [int] $counters.error + [int] $counters.aborted
+    $executed = if ($null -ne $counters.executed) { [int] $counters.executed } else { $passed + $failedCount }
+
     return [pscustomobject]@{
-        Name    = $File.BaseName
-        Total   = [int] $counters.total
-        Passed  = [int] $counters.passed
-        Failed  = [int] $counters.failed + [int] $counters.error + [int] $counters.aborted
-        Skipped = [int] $counters.notExecuted
-        Results = $failed
+        Name     = $File.BaseName
+        Total    = [int] $counters.total
+        Executed = $executed
+        Passed   = $passed
+        Failed   = $failedCount
+        Skipped  = [int] $counters.notExecuted
+        Results  = $failed
     }
 }
 
@@ -88,7 +101,6 @@ Write-Host '=========================== TEST SUMMARY ===========================
 
 if ($files.Count -eq 0) {
     Write-Host "No TRX file is found in $Path, the tests did not run."
-    exit 1
 }
 
 $runs = @()
@@ -96,8 +108,24 @@ foreach ($f in $files) {
     $runs += Get-TestRun $f
 }
 
-$totalFailed = ($runs | Measure-Object -Property Failed -Sum).Sum
-$totalRun = ($runs | Measure-Object -Property Total -Sum).Sum
+# [int] because Measure-Object over no run at all gives $null, and $null is
+# not equal to 0
+$totalFailed = [int] ($runs | Measure-Object -Property Failed -Sum).Sum
+$totalRun = [int] ($runs | Measure-Object -Property Total -Sum).Sum
+
+# Every expected run is checked on its own. Summing the counters would let a
+# suite that never started pass on the tests of the other one.
+$missing = @()
+$emptyRun = @()
+foreach ($want in $Expect) {
+    $run = $runs | Where-Object { $_.Name -eq $want } | Select-Object -First 1
+    if ($null -eq $run) {
+        $missing += $want
+    }
+    elseif ($run.Executed -eq 0) {
+        $emptyRun += $want
+    }
+}
 
 foreach ($run in $runs) {
     Write-Host ''
@@ -113,14 +141,27 @@ foreach ($run in $runs) {
 }
 
 Write-Host ''
+foreach ($m in $missing) {
+    Write-Host ("  MISSING  {0}.trx was never written - that suite did not run." -f $m)
+}
+foreach ($m in $emptyRun) {
+    Write-Host ("  EMPTY    {0}.trx executed no test." -f $m)
+}
+if ($missing.Count -gt 0 -or $emptyRun.Count -gt 0) {
+    Write-Host ''
+}
+
 if ($totalRun -eq 0) {
     Write-Host 'No test ran.'
 }
-elseif ($totalFailed -eq 0) {
-    Write-Host ("All {0} test(s) passed." -f $totalRun)
+elseif ($totalFailed -gt 0) {
+    Write-Host ("{0} of {1} test(s) failed." -f $totalFailed, $totalRun)
+}
+elseif ($missing.Count -gt 0 -or $emptyRun.Count -gt 0) {
+    Write-Host ("{0} test(s) passed, but a suite above did not run." -f $totalRun)
 }
 else {
-    Write-Host ("{0} of {1} test(s) failed." -f $totalFailed, $totalRun)
+    Write-Host ("All {0} test(s) passed." -f $totalRun)
 }
 Write-Host '===================================================================='
 
@@ -131,16 +172,34 @@ if (-not [string]::IsNullOrEmpty($env:GITHUB_STEP_SUMMARY)) {
 
     $md.Add('## CUBRID Windows ODBC test')
     $md.Add('')
-    $md.Add('| run | total | passed | failed | skipped |')
-    $md.Add('|---|---:|---:|---:|---:|')
+    $md.Add('| run | total | executed | passed | failed | skipped |')
+    $md.Add('|---|---:|---:|---:|---:|---:|')
     foreach ($run in $runs) {
-        $md.Add(('| {0} | {1} | {2} | {3} | {4} |' -f
-            $run.Name, $run.Total, $run.Passed, $run.Failed, $run.Skipped))
+        $md.Add(('| {0} | {1} | {2} | {3} | {4} | {5} |' -f
+            $run.Name, $run.Total, $run.Executed, $run.Passed, $run.Failed, $run.Skipped))
+    }
+    foreach ($m in $missing) {
+        $md.Add(('| {0} | *no TRX file* | | | | |' -f $m))
     }
     $md.Add('')
 
-    if ($totalFailed -eq 0) {
+    if ($missing.Count -gt 0 -or $emptyRun.Count -gt 0) {
+        $md.Add('### a suite did not run')
+        $md.Add('')
+        foreach ($m in $missing) {
+            $md.Add(('- `{0}.trx` was never written - that suite did not run.' -f $m))
+        }
+        foreach ($m in $emptyRun) {
+            $md.Add(('- `{0}.trx` executed no test.' -f $m))
+        }
+        $md.Add('')
+    }
+
+    if ($totalFailed -eq 0 -and $missing.Count -eq 0 -and $emptyRun.Count -eq 0) {
         $md.Add(('All {0} test(s) passed.' -f $totalRun))
+    }
+    elseif ($totalFailed -eq 0) {
+        $md.Add(('{0} test(s) passed, but a suite above did not run.' -f $totalRun))
     }
     else {
         $md.Add(('### {0} of {1} test(s) failed' -f $totalFailed, $totalRun))
@@ -182,7 +241,8 @@ if (-not [string]::IsNullOrEmpty($env:GITHUB_STEP_SUMMARY)) {
     [System.IO.File]::AppendAllText($env:GITHUB_STEP_SUMMARY, (($md -join "`n") + "`n"), $utf8)
 }
 
-if ($totalFailed -gt 0 -or $totalRun -eq 0) {
+if ($totalFailed -gt 0 -or $totalRun -eq 0 -or
+    $missing.Count -gt 0 -or $emptyRun.Count -gt 0) {
     exit 1
 }
 exit 0

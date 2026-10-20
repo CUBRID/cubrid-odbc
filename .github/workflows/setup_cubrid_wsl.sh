@@ -18,7 +18,7 @@
 # that windows-odbc-test.yml has the same Linux server the Linux workflow
 # runs against.  Runs as root inside the distribution:
 #
-#   wsl -d <distro> -u root -- bash <this script> <engine tarball url> [db]
+#   wsl -d <distro> -u root -- bash <this script> <engine tarball url> [db] [md5]
 #
 # The distribution is a plain Rocky Linux 8 container rootfs, the same base
 # the cubrid-docker images are built FROM, and the steps below are the ones
@@ -29,6 +29,7 @@ set -eux
 
 CUBRID_URL="$1"
 DB_NAME="${2:-demodb}"
+CUBRID_MD5="${3:--}"
 
 echo "========== packages =========="
 # the engine needs ncurses and libnsl; the rest is what the steps below use
@@ -44,6 +45,15 @@ chmod 1777 /tmp
 
 echo "========== download $CUBRID_URL =========="
 curl -fsSL -o /tmp/cubrid.tar.gz "$CUBRID_URL"
+
+if [ "$CUBRID_MD5" != "-" ]; then
+    echo "========== verify md5 =========="
+    command -v md5sum >/dev/null || dnf -y install --setopt=install_weak_deps=False coreutils-single 2>&1 | tail -5
+    echo "$CUBRID_MD5  /tmp/cubrid.tar.gz" | md5sum -c -
+else
+    echo "========== no md5 published for this package, skipping =========="
+fi
+
 tar -xzf /tmp/cubrid.tar.gz -C /home/cubrid
 rm -f /tmp/cubrid.tar.gz
 

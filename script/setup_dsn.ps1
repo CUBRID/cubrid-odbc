@@ -45,7 +45,9 @@ param(
     # through a DRIVER= connection string instead of a DSN
     [switch] $DriverOnly,
     # write what this run is about to change into this file, so that a test run
-    # can hand the machine back the way it found it
+    # can hand the machine back the way it found it.  It holds every value of
+    # every DSN as it stands now, the password among them, so it belongs
+    # somewhere temporary; -Restore deletes it once it has been put back
     [string] $Backup = '',
     # put such a file back and do nothing else
     [string] $Restore = ''
@@ -139,6 +141,76 @@ function Test-RegKey
     return $true
 }
 
+function Get-RegValueMap
+{
+    param([Microsoft.Win32.RegistryKey] $Base, [string] $Path)
+
+    $map = [ordered]@{}
+    $key = $Base.OpenSubKey($Path)
+    if ($null -eq $key) { return $map }
+    try {
+        foreach ($n in $key.GetValueNames()) {
+            $map[$n] = [ordered]@{
+                Kind = [string] $key.GetValueKind($n)
+                Data = $key.GetValue($n)
+            }
+        }
+    }
+    finally { $key.Close() }
+    return $map
+}
+
+# JSON gives every value back as a string, so put it in the type the key held
+function Convert-RegData
+{
+    param([string] $Kind, $Data)
+
+    switch ($Kind) {
+        'DWord'       { return [int] $Data }
+        'QWord'       { return [long] $Data }
+        'Binary'      { return [byte[]] @($Data) }
+        'MultiString' { return [string[]] @($Data) }
+        default       { return [string] $Data }
+    }
+}
+
+# put a key back exactly as it was: every saved value restored, and anything
+# this run added on top of them removed
+function Restore-RegValueMap
+{
+    param([Microsoft.Win32.RegistryKey] $Base, [string] $Path, $Saved)
+
+    if ($null -eq $Saved) { return 0 }
+
+    $changed = 0
+    $wanted = @{}
+
+    foreach ($v in $Saved.PSObject.Properties) {
+        $wanted[$v.Name] = $true
+        $want = Convert-RegData $v.Value.Kind $v.Value.Data
+        $cur = Get-RegValue $Base $Path $v.Name
+        if ($null -eq $cur -or [string] $cur -ne [string] $want) {
+            Set-RegValue $Base $Path $v.Name $want ([Microsoft.Win32.RegistryValueKind] $v.Value.Kind)
+            $changed++
+        }
+    }
+
+    $key = $Base.OpenSubKey($Path, $true)
+    if ($null -ne $key) {
+        try {
+            foreach ($n in @($key.GetValueNames())) {
+                if (-not $wanted.ContainsKey($n)) {
+                    $key.DeleteValue($n, $false)
+                    $changed++
+                }
+            }
+        }
+        finally { $key.Close() }
+    }
+
+    return $changed
+}
+
 # ----------------------------------------------------------- saved state
 #
 # -Backup records what a run is about to change and -Restore puts it back, so
@@ -156,9 +228,18 @@ function Save-OdbcState
     if (-not $DriverOnly) {
         foreach ($d in $DSN_LIST) {
             $path = "$ODBCINI_PATH\$($d.Name)"
+            $indexed = Get-RegValue $base $SOURCES_KEY $d.Name
             $dsn[$d.Name] = [ordered]@{
                 Existed = (Test-RegKey $base $path)
-                Driver  = [string] (Get-RegValue $base $path 'Driver')
+                # -Force rewrites the server, the user, the password and the
+                # rest, so the whole key is kept, not just the driver path
+                Values  = (Get-RegValueMap $base $path)
+                # the index entry is repaired on every run, even for a DSN that
+                # is otherwise left alone, so it has to come back too
+                Indexed = [ordered]@{
+                    Existed = ($null -ne $indexed)
+                    Data    = [string] $indexed
+                }
             }
         }
     }
@@ -174,7 +255,7 @@ function Save-OdbcState
         Dsn        = $dsn
     }
 
-    $state | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $File -Encoding utf8
+    $state | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $File -Encoding utf8
     Write-Host "[backup]  previous ODBC registration saved to $File"
 }
 
@@ -221,15 +302,24 @@ function Restore-OdbcState
             $path = "$ODBCINI_PATH\$name"
 
             if ($saved.Existed) {
-                if ((Get-RegValue $dsnBase $path 'Driver') -ne $saved.Driver) {
-                    Set-RegValue $dsnBase $path 'Driver' $saved.Driver
-                    Write-Host ("[restore] DSN {0} driver -> {1}" -f $name, $saved.Driver)
+                $n = Restore-RegValueMap $dsnBase $path $saved.Values
+                if ($n -gt 0) {
+                    Write-Host ("[restore] DSN {0} : {1} value(s) put back" -f $name, $n)
                 }
             }
             elseif (Test-RegKey $dsnBase $path) {
                 Remove-RegKeyIfAny $dsnBase $path
-                Remove-RegValueIfAny $dsnBase $SOURCES_KEY $name
                 Write-Host ("[restore] DSN {0} removed again" -f $name)
+            }
+
+            if ($saved.Indexed.Existed) {
+                if ((Get-RegValue $dsnBase $SOURCES_KEY $name) -ne $saved.Indexed.Data) {
+                    Set-RegValue $dsnBase $SOURCES_KEY $name $saved.Indexed.Data
+                    Write-Host ("[restore] DSN {0} listed under '{1}' again" -f $name, $saved.Indexed.Data)
+                }
+            }
+            else {
+                Remove-RegValueIfAny $dsnBase $SOURCES_KEY $name
             }
         }
     }
@@ -396,7 +486,13 @@ try {
                 $cur = Get-RegValue $base $path $k
                 if ($null -eq $cur) { $cur = '' }
                 if ([string]$cur -ne [string]$values[$k]) {
-                    $diff += ("{0}='{1}' (expected '{2}')" -f $k, $cur, $values[$k])
+                    if ($k -eq 'PWD') {
+                        # a password has no business on the console or in a CI log
+                        $diff += 'PWD differs'
+                    }
+                    else {
+                        $diff += ("{0}='{1}' (expected '{2}')" -f $k, $cur, $values[$k])
+                    }
                 }
             }
             if ($diff.Count -gt 0) {
