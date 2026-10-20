@@ -1,0 +1,395 @@
+#
+#
+#  Copyright 2016 CUBRID Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+# Build the Windows ODBC driver and run test.bat against a Linux CUBRID
+# server, the Windows counterpart of linux-odbc-test.yml.
+#
+# The Linux workflow runs the server in a docker container.  A Windows runner
+# cannot: its docker engine only runs Windows containers, and Linux images
+# would need the Hyper-V isolation docker dropped.  WSL2 is the Linux host
+# instead - it ships enabled on the windows-2025 image - and the server is
+# installed into it the way cubrid-wsl-installer does after `wsl --import`,
+# onto the same Rocky Linux 8 rootfs the cubrid-docker images are built FROM.
+# That also lifts the 11.3 ceiling of the native Windows packages: 11.4 and
+# the 11.5 nightlies are Linux only.
+name: windows-odbc-test
+on:
+  pull_request:
+    branches:
+      - develop
+    # a push touching only these files cannot change the test result
+    paths-ignore:
+      - '**.md'
+      - 'README.txt'
+      - 'LICENSE'
+      - 'installer/**'
+      - 'linux_test/**'
+      - 'build.sh'
+      - 'test.sh'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
+      - '.github/workflows/check.yml'
+      - '.github/workflows/codestyle.sh'
+      - '.github/workflows/cppcheck-spr-list'
+      - '.github/workflows/linux-odbc-test.yml'
+  workflow_dispatch:
+    inputs:
+      cubrid_version:
+        description: 'Build to test, from nightly/daily_build. "latest" is the newest build in the archive whatever line it belongs to. Otherwise a line (11.5, 11.4), a patch level (11.4.6), a build (11.4.6.1963) or one exact directory (11.4.6.1963-0e7d3c1); the newest build under it wins.'
+        required: false
+        default: 'latest'
+      use_release:
+        description: 'Take the published release instead of a nightly. Needs a line (11.4) or a patch level (11.4.6, 11.4.2); the version published there wins.'
+        type: boolean
+        required: false
+        default: false
+      verbose:
+        description: 'Print the full test log in the job log, not only the failed testcases'
+        type: boolean
+        required: false
+        default: false
+
+# a new commit cancels the run of the previous one, the driver is built from
+# scratch on every run
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  # a push run always takes the newest build the nightly archive carries, so
+  # that the driver is tested against what the engine looks like today
+  DEFAULT_CUBRID_VERSION: latest
+  FTP_ENGINE_ROOT: https://ftp.cubrid.org/CUBRID_Engine
+  # the same base image cubrid-docker builds FROM
+  ROOTFS_URL: https://dl.rockylinux.org/pub/rocky/8/images/x86_64/Rocky-8-Container-Base.latest.x86_64.tar.xz
+  WSL_DISTRO: cubrid
+  # wsl.exe writes its own messages as UTF-16 otherwise, which no step here
+  # could read back
+  WSL_UTF8: 1
+  TEST_DB_NAME: demodb
+  TEST_DB_USER: dba
+  # the DSNs and the connection strings of the testcases name this host, so it
+  # is mapped to the CUBRID server in the hosts file instead of being edited in
+  TEST_DB_HOST: test-db-server
+  TEST_DB_PORT: 33000
+  # the projects ask for the v141 toolset, which no hosted Windows image
+  # carries any more; test.bat passes this on to msbuild
+  MSBUILD_OPT: /p:PlatformToolset=v143
+
+jobs:
+  windows-test:
+    name: windows-test
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          # the driver version is built from the number of commits
+          fetch-depth: 0
+
+      - name: Resolve the CUBRID engine package
+        id: engine
+        shell: pwsh
+        run: |
+          $tag = '${{ github.event.inputs.cubrid_version }}'
+          if ([string]::IsNullOrEmpty($tag)) { $tag = $env:DEFAULT_CUBRID_VERSION }
+          $useRelease = '${{ github.event.inputs.use_release }}' -eq 'true'
+
+          if ($tag -ne 'latest' -and $tag -notmatch '^\d+(\.\d+){1,3}(-[0-9a-fA-F]+)?$') {
+            throw "invalid CUBRID version '$tag'. Expected latest | 11.5 | 11.4.6 | 11.4.6.1963 | 11.4.6.1963-0e7d3c1"
+          }
+
+          # .Content comes back as Byte[], not a string, whenever the response
+          # carries no text/* type - hash.md5 is served that way
+          function Get-Text([string] $uri) {
+            $c = (Invoke-WebRequest -Uri $uri -UseBasicParsing -TimeoutSec 60).Content
+            if ($c -is [byte[]]) { [System.Text.Encoding]::UTF8.GetString($c) } else { $c }
+          }
+
+          # every build in the nightly archive has its own directory, named
+          # <version>-<hash>
+          $index = "$env:FTP_ENGINE_ROOT/nightly/daily_build/"
+          $html = Get-Text $index
+          $all = @([regex]::Matches($html, 'href="(\d+(?:\.\d+){1,3}-[0-9a-fA-F]+)/"') |
+            ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+          if ($all.Count -eq 0) { throw "no build directory found under $index" }
+
+          # what lines the archive carries, for the messages below
+          $lines = $all | ForEach-Object { ($_ -split '\.')[0..1] -join '.' } |
+            Select-Object -Unique | Sort-Object { [version] $_ }
+          Write-Host ("nightly lines available: " + ($lines -join ', '))
+
+          if ($useRelease) {
+            # a release lives in its own <line> or <line>.<patch> directory and
+            # carries the version in the file name, unlike <line>_latest
+            if ($tag -notmatch '^\d+\.\d+(\.\d+)?$') {
+              $parts = $tag -split '[.-]'
+              $suggest = if ($tag -eq 'latest') { $lines[-1] } else { ($parts[0..([math]::Min(2, $parts.Count - 1))]) -join '.' }
+              throw "use_release needs <major>.<minor> or <major>.<minor>.<patch>, got '$tag'. Try $suggest"
+            }
+            $dir = "$env:FTP_ENGINE_ROOT/$tag/"
+            try {
+              $page = Get-Text $dir
+            }
+            catch {
+              throw "no published release at $dir`n$($_.Exception.Message)"
+            }
+            $rel = @([regex]::Matches($page, 'href="CUBRID-(\d+(?:\.\d+){1,3}-[0-9a-fA-F]+)-Linux\.x86_64\.tar\.gz"') |
+              ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+            if ($rel.Count -eq 0) { throw "$dir carries no Linux release package" }
+            $full = $rel |
+              Sort-Object { [version] ($_ -replace '-[0-9a-fA-F]+$', '') } |
+              Select-Object -Last 1
+            $url = $dir + "CUBRID-$full-Linux.x86_64.tar.gz"
+            $hashUrl = $dir + "md5sum-$full.txt"
+          }
+          elseif ($tag -eq 'latest') {
+            # the newest build in the archive, whatever line it belongs to
+            $full = $all |
+              Sort-Object { [version] ($_ -replace '-[0-9a-fA-F]+$', '') } |
+              Select-Object -Last 1
+            Write-Host "latest of $($all.Count) builds in the archive"
+            $url = "$index$full/drop/CUBRID-$full-Linux.x86_64.tar.gz"
+            $hashUrl = "$index$full/drop/hash.md5"
+          }
+          else {
+            # a tag matches the directory it names outright, or one it is a
+            # prefix of.  The separator keeps '11.4' off '11.40.*'
+            $dirs = @($all | Where-Object {
+              $_ -eq $tag -or $_.StartsWith("$tag.") -or $_.StartsWith("$tag-") })
+
+            if ($dirs.Count -eq 0) {
+              # saying so here beats a confusing 404 three steps later
+              $line = ($tag -split '\.')[0..1] -join '.'
+              $near = @($all | Where-Object { $_.StartsWith("$line.") } |
+                Sort-Object { [version] ($_ -replace '-[0-9a-fA-F]+$', '') } |
+                Select-Object -Last 10)
+              $hint = if ($near.Count -gt 0) {
+                "newest builds of ${line}:`n  " + (($near | Sort-Object -Descending) -join "`n  ")
+              }
+              else {
+                "no nightly build of $line at all; lines available: " + ($lines -join ', ')
+              }
+              throw "no nightly build matching '$tag' under $index`n$hint`n" +
+                    "For a published release, re-run with use_release and a line or patch level."
+            }
+
+            # sort on the version, not the string: '11.5.0.999' must not win
+            # over '11.5.0.2660'
+            $full = $dirs |
+              Sort-Object { [version] ($_ -replace '-[0-9a-fA-F]+$', '') } |
+              Select-Object -Last 1
+            if ($dirs.Count -gt 1) {
+              Write-Host "$($dirs.Count) builds match '$tag'; taking the newest"
+            }
+            $url = "$index$full/drop/CUBRID-$full-Linux.x86_64.tar.gz"
+            $hashUrl = "$index$full/drop/hash.md5"
+          }
+
+          # a tarball that is not there should fail now, not mid install
+          try {
+            $head = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing -TimeoutSec 60
+          }
+          catch {
+            throw "the engine package is not downloadable: $url`n$($_.Exception.Message)"
+          }
+
+          # pwsh hands header values back as string[], Windows PowerShell as a
+          # string, and a server need not send Content-Length at all.  Reading
+          # it must not be able to fail the step.
+          $len = @($head.Headers['Content-Length'])[0]
+          $sizeText = if ($len) { "$([math]::Round([int64] $len / 1MB, 1)) MB" } else { 'size unknown' }
+
+          $file = $url -replace '^.*/', ''
+          try {
+            $hashes = Get-Text $hashUrl
+          }
+          catch {
+            throw "cannot read the checksum file of the build: $hashUrl`n$($_.Exception.Message)"
+          }
+
+          $md5 = ''
+          foreach ($h in ($hashes -split "`r?`n")) {
+            if ($h -match "^([0-9a-fA-F]{32})\s+\*?$([regex]::Escape($file))\s*$") {
+              $md5 = $Matches[1].ToLower()
+              break
+            }
+          }
+          if (-not $md5) { throw "$hashUrl carries no entry for $file" }
+
+          "url=$url"   | Out-File $env:GITHUB_OUTPUT -Append
+          "md5=$md5"   | Out-File $env:GITHUB_OUTPUT -Append
+          "full=$full" | Out-File $env:GITHUB_OUTPUT -Append
+          Write-Host "CUBRID $full  ($sizeText)"
+          Write-Host "  $url"
+          Write-Host "  md5 $md5"
+
+          "## CUBRID $full"                          | Out-File $env:GITHUB_STEP_SUMMARY -Append
+          ""                                         | Out-File $env:GITHUB_STEP_SUMMARY -Append
+          "| | |"                                    | Out-File $env:GITHUB_STEP_SUMMARY -Append
+          "|---|---|"                                | Out-File $env:GITHUB_STEP_SUMMARY -Append
+          "| requested | ``$tag`` |"                 | Out-File $env:GITHUB_STEP_SUMMARY -Append
+          "| resolved | ``$full`` |"                 | Out-File $env:GITHUB_STEP_SUMMARY -Append
+          "| source | $(if ($useRelease) { 'published release' } else { 'nightly' }) |" | Out-File $env:GITHUB_STEP_SUMMARY -Append
+          "| package | $sizeText |"                   | Out-File $env:GITHUB_STEP_SUMMARY -Append
+          "| md5 | ``$md5`` |"                     | Out-File $env:GITHUB_STEP_SUMMARY -Append
+          ""                                         | Out-File $env:GITHUB_STEP_SUMMARY -Append
+
+      - name: Import the WSL2 distribution
+        shell: pwsh
+        run: |
+          # keep the VM up for the whole job: CUBRID runs inside it and a
+          # shut down VM takes the server with it
+          Set-Content -LiteralPath "$env:USERPROFILE\.wslconfig" -Value "[wsl2]`nvmIdleTimeout=-1"
+
+          wsl --set-default-version 2
+          Invoke-WebRequest -Uri $env:ROOTFS_URL -OutFile "$env:RUNNER_TEMP\rootfs.tar.xz"
+
+          wsl --import $env:WSL_DISTRO "$env:RUNNER_TEMP\wsl" "$env:RUNNER_TEMP\rootfs.tar.xz" --version 2
+          if ($LASTEXITCODE -ne 0) { throw 'wsl --import failed' }
+
+          # a distribution with no process left in it is shut down, so hold
+          # one open for the rest of the job
+          Start-Process -FilePath 'wsl.exe' `
+            -ArgumentList '-d', $env:WSL_DISTRO, '--', 'sleep', 'infinity' -WindowStyle Hidden
+
+          wsl --list --verbose
+
+      - name: Install CUBRID and create demodb
+        shell: pwsh
+        env:
+          ENGINE_URL: ${{ steps.engine.outputs.url }}
+          ENGINE_MD5: ${{ steps.engine.outputs.md5 }}
+        run: |
+          # .gitattributes keeps the script LF, but a checkout made before it
+          # existed still carries the CRLF that Git for Windows writes, and
+          # bash refuses to run that; strip it either way
+          $src = (Resolve-Path '.github\workflows\setup_cubrid_wsl.sh').Path
+          $body = [System.IO.File]::ReadAllText($src) -replace "`r", ''
+          $script = Join-Path $env:RUNNER_TEMP 'setup_cubrid_wsl.sh'
+          [System.IO.File]::WriteAllText($script, $body, (New-Object System.Text.UTF8Encoding($false)))
+
+          # wslpath only keeps the backslashes of a Windows path when they are
+          # quoted on the way in
+          $wslScript = (wsl -d $env:WSL_DISTRO -- wslpath -a "'$script'")
+          wsl -d $env:WSL_DISTRO -- test -r $wslScript
+          if ($LASTEXITCODE -ne 0) {
+            throw "the distribution cannot read $wslScript - is $(Split-Path -Qualifier $script) mounted in WSL?"
+          }
+
+          wsl -d $env:WSL_DISTRO -u root -- bash $wslScript $env:ENGINE_URL $env:TEST_DB_NAME $env:ENGINE_MD5
+          if ($LASTEXITCODE -ne 0) { throw 'cannot install CUBRID into WSL' }
+
+      - name: Point the test host name at the CUBRID server
+        shell: pwsh
+        run: |
+          # WSL forwards the Windows side of localhost into the VM, which is
+          # how a Windows process reaches a port the distribution listens on;
+          # the VM address itself is not reachable from the host
+          Add-Content -LiteralPath "$env:SystemRoot\System32\drivers\etc\hosts" `
+            -Value "`n127.0.0.1 $env:TEST_DB_HOST"
+
+          $ready = $false
+          foreach ($i in 1..60) {
+            $c = New-Object System.Net.Sockets.TcpClient
+            try {
+              $c.Connect($env:TEST_DB_HOST, [int] $env:TEST_DB_PORT)
+              $ready = $true
+              Write-Host "the broker is reachable on ${env:TEST_DB_HOST}:$env:TEST_DB_PORT"
+              break
+            }
+            catch { Start-Sleep -Seconds 1 }
+            finally { $c.Close() }
+          }
+          if (-not $ready) { throw "the broker is not reachable on port $env:TEST_DB_PORT" }
+
+      - name: Build the ODBC driver
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $msbuild = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild `
+            -find MSBuild\**\Bin\MSBuild.exe | Select-Object -First 1
+          if (-not $msbuild) { throw 'cannot find MSBuild on this runner' }
+          Write-Host "msbuild: $msbuild"
+
+          foreach ($proj in @('project\cubrid_odbc_14.vcxproj', 'project\cubrid_odbc_unicode_14.vcxproj')) {
+            & $msbuild $proj /t:Rebuild /p:Configuration=Release /p:Platform=x64 /v:minimal $env:MSBUILD_OPT
+            if ($LASTEXITCODE -ne 0) { throw "cannot build $proj" }
+          }
+
+          # the layout build_unicode_2017.bat produces, which setup_dsn.ps1
+          # and the installer both expect
+          New-Item -ItemType Directory -Force -Path output, output_unicode | Out-Null
+          Copy-Item project\build\x64_Release\cubrid_odbc.dll output\cubrid_odbc64.dll -Force
+          Copy-Item project\build\x64_Release_Unicode\cubrid_odbc_unicode.dll output_unicode\cubrid_odbc64.dll -Force
+          Get-ChildItem output, output_unicode
+
+      - name: Register the ODBC drivers and the DSNs
+        shell: pwsh
+        run: |
+          # the ANSI driver is reached through DRIVER= connection strings only,
+          # the Unicode driver also carries the four DSNs the testcases connect to
+          .\script\setup_dsn.ps1 -DriverOnly `
+            -DriverName 'CUBRID Driver' -DriverDll "$PWD\output\cubrid_odbc64.dll"
+          if ($LASTEXITCODE -ne 0) { throw 'cannot register the ANSI driver' }
+
+          .\script\setup_dsn.ps1 -Scope User `
+            -DriverName 'CUBRID Driver Unicode' -DriverDll "$PWD\output_unicode\cubrid_odbc64.dll" `
+            -Server $env:TEST_DB_HOST -Port $env:TEST_DB_PORT `
+            -DbName $env:TEST_DB_NAME -User $env:TEST_DB_USER
+          if ($LASTEXITCODE -ne 0) { throw 'cannot register the Unicode driver and the DSNs' }
+
+      # test.bat ends with script\report_test_result.ps1, which writes the
+      # failures-only report into the job summary and fails the step when a
+      # test failed or when no test ran at all
+      - name: Run the Windows ODBC test
+        shell: cmd
+        run: call test.bat -p
+
+      - name: Print the full test log
+        if: ${{ always() && github.event.inputs.verbose == 'true' }}
+        shell: pwsh
+        run: |
+          Get-ChildItem unit_test*.result -ErrorAction SilentlyContinue | ForEach-Object {
+            Write-Host "========== $($_.Name) =========="
+            Get-Content $_.FullName
+          }
+
+      - name: Upload the test log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-odbc-test-log
+          path: |
+            unit_test*.result
+            unit_test*.trx
+          if-no-files-found: warn
+
+      - name: Show the CUBRID log and stop the server
+        if: always()
+        shell: pwsh
+        run: |
+          if (-not ((wsl --list --quiet) -match "^$env:WSL_DISTRO\s*$")) {
+            Write-Host 'the WSL distribution was never imported, nothing to show'
+            exit 0
+          }
+
+          if ('${{ job.status }}' -ne 'success') {
+            wsl -d $env:WSL_DISTRO -u cubrid -- bash -lc 'tail -50 $CUBRID/log/broker/*.err $CUBRID/log/server/*.err 2>/dev/null'
+          }
+
+          wsl -d $env:WSL_DISTRO -u cubrid -- bash -lc 'cubrid service stop' 2>&1 | Out-Null
+          wsl --terminate $env:WSL_DISTRO
+          exit 0

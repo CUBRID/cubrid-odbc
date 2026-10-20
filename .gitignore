@@ -27,3 +27,7 @@ linux_test/CMakeCache.txt
 linux_test/Makefile
 linux_test/cmake_install.cmake
 linux_test/build/
+unit_test*.result
+unit_test*.trx
+
+odbc_state_*.json

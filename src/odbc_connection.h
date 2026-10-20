@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
 *
 * Redistribution and use in source and binary forms, with or without modification,
@@ -162,47 +162,47 @@ typedef struct st_odbc_connection
 } ODBC_CONNECTION;
 
 PUBLIC RETCODE odbc_alloc_connection (ODBC_ENV *env,
-              ODBC_CONNECTION **connptr);
+				      ODBC_CONNECTION **connptr);
 PUBLIC RETCODE odbc_free_connection (ODBC_CONNECTION *conn);
 PUBLIC RETCODE odbc_connect_new (ODBC_CONNECTION *conn,
-         const char *data_source,
-         const char *db_name,
-         const char *user,
-         const char *password,
-         const char *server,
-         int port, int fetch_size,
-         const char *charset,
-         const char *autocommit,
-         const char *omit_schema,
-         const char *conn_str_in);
+				 const char *data_source,
+				 const char *db_name,
+				 const char *user,
+				 const char *password,
+				 const char *server,
+				 int port, int fetch_size,
+				 const char *charset,
+				 const char *autocommit,
+				 const char *omit_schema,
+				 const char *conn_str_in);
 PUBLIC RETCODE odbc_disconnect (ODBC_CONNECTION *conn);
 PUBLIC RETCODE odbc_set_connect_attr (ODBC_CONNECTION *conn,
-              long attribute,
-              void *valueptr, long stringlength);
+				      long attribute,
+				      void *valueptr, long stringlength);
 PUBLIC RETCODE odbc_get_connect_attr (ODBC_CONNECTION *conn,
-              SQLINTEGER attribute,
-              SQLPOINTER value_ptr,
-              SQLINTEGER buffer_length,
-              SQLINTEGER *string_length_ptr);
+				      SQLINTEGER attribute,
+				      SQLPOINTER value_ptr,
+				      SQLINTEGER buffer_length,
+				      SQLINTEGER *string_length_ptr);
 PUBLIC RETCODE odbc_auto_commit (ODBC_CONNECTION *conn);
 PUBLIC RETCODE odbc_native_sql (ODBC_CONNECTION *conn,
-        SQLCHAR *in_stmt_text,
-        SQLCHAR *out_stmt_text,
-        SQLINTEGER buffer_length,
-        SQLINTEGER *out_stmt_length);
+				SQLCHAR *in_stmt_text,
+				SQLCHAR *out_stmt_text,
+				SQLINTEGER buffer_length,
+				SQLINTEGER *out_stmt_length);
 PUBLIC RETCODE odbc_get_functions (ODBC_CONNECTION *conn,
-           unsigned short function_id,
-           unsigned short *supported_ptr);
+				   unsigned short function_id,
+				   unsigned short *supported_ptr);
 PUBLIC RETCODE odbc_get_info (ODBC_CONNECTION *conn, SQLUSMALLINT info_type,
-            SQLPOINTER info_value_ptr,
-            SQLSMALLINT buffer_length,
-            SQLLEN *string_length_ptr);
+			      SQLPOINTER info_value_ptr,
+			      SQLSMALLINT buffer_length,
+			      SQLLEN *string_length_ptr);
 PUBLIC int get_dsn_info (const char *dsn, char *db_name, int db_name_len,
-       char *user, int user_len, char *pwd, int pwd_len,
-       char *server, int server_len, int *port,
-       int *fetch_size,
-       char *charset, int charset_len,
-       char *autocommit, int autocommit_len,
-       char *omit_schema, int omit_schema_len);
+			 char *user, int user_len, char *pwd, int pwd_len,
+			 char *server, int server_len, int *port,
+			 int *fetch_size,
+			 char *charset, int charset_len,
+			 char *autocommit, int autocommit_len,
+			 char *omit_schema, int omit_schema_len);
 
 #endif /* ! __ODBC_CONN_HEADER */

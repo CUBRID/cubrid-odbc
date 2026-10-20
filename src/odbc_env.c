@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -179,11 +179,11 @@ odbc_set_env_attr (ODBC_ENV *env, long attribute, void *valueptr, long stringlen
       break;
 
     case SQL_ATTR_ODBC_VERSION:
-      switch ((long) valueptr)
+      switch ((SQLLEN) valueptr)
 	{
 	case SQL_OV_ODBC3:
 	case SQL_OV_ODBC2:
-	  env->attr_odbc_version = (long) valueptr;
+	  env->attr_odbc_version = (long) (SQLLEN) valueptr;
 	  break;
 	default:
 	  odbc_set_diag (env->diag, "HY024", 0, NULL);
@@ -194,10 +194,10 @@ odbc_set_env_attr (ODBC_ENV *env, long attribute, void *valueptr, long stringlen
       break;
 
     case SQL_ATTR_OUTPUT_NTS:
-      switch ((long) valueptr)
+      switch ((SQLLEN) valueptr)
 	{
 	case SQL_TRUE:
-	  env->attr_output_nts = (unsigned long) valueptr;
+	  env->attr_output_nts = (unsigned long) (SQLULEN) valueptr;
 	  break;
 
 	case SQL_FALSE:

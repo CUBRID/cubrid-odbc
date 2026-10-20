@@ -167,6 +167,11 @@ int scale_min;
 	      return -1;
 	    }
 	  sum->n_sign = n1->n_sign;
+	  break;
+	default:
+	  /* _do_compare only ever answers -1, 0 or 1; anything else would
+	     leave sum unset and store a garbage pointer into *result. */
+	  return -1;
 	}
     }
 
@@ -234,6 +239,8 @@ int scale_min;
 	    }
 	  diff->n_sign = n1->n_sign;
 	  break;
+	default:
+	  return -1;
 	}
     }
 
@@ -571,7 +578,7 @@ bc_divmod (num1, num2, quot, rem, scale)
 bc_num num1, num2, *quot, *rem;
 int scale;
 {
-  bc_num quotient;
+  bc_num quotient = NULL;
   bc_num temp;
   int rscale;
 

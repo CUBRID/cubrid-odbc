@@ -1,0 +1,6 @@
+# Keep shell scripts LF whatever core.autocrlf the checkout runs with.  Git
+# for Windows defaults it to true, so without this a Windows checkout - a CI
+# runner, for instance - hands bash a CRLF script, which it refuses to run:
+#   set: -\r: invalid option
+#   $'\r': command not found
+*.sh text eol=lf

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -2871,7 +2871,7 @@ make_sp_column_result_set (ODBC_STATEMENT *stmt, int req_handle, char *table_nam
   long current_tpl_pos = 0, cur_tpl_pos = 0;
   ODBC_SP_COLUMN_VALUE *special_columns_node = NULL;
 
-  int cci_u_type, precision, scale;
+  int cci_u_type = 0, precision = 0, scale = 0;
   short odbc_type;
 
   while (1)
