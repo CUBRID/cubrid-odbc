@@ -107,9 +107,9 @@ public:
       SQLFreeStmt (stmt, SQL_CLOSE);
 
       retcode = SQLExecDirect (stmt, L"CREATE TABLE " TABLE L" ("
-				L"c_string STRING, c_vc20000 VARCHAR(20000), c_vc100 VARCHAR(100),"
-				L"c_char CHAR(10), c_bitvar BIT VARYING(64), c_int INTEGER,"
-				L"c_bit BIT(8), c_set SET(INTEGER), c_clob CLOB, c_blob BLOB)", SQL_NTS);
+			       L"c_string STRING, c_vc20000 VARCHAR(20000), c_vc100 VARCHAR(100),"
+			       L"c_char CHAR(10), c_bitvar BIT VARYING(64), c_int INTEGER,"
+			       L"c_bit BIT(8), c_set SET(INTEGER), c_clob CLOB, c_blob BLOB)", SQL_NTS);
       Assert::AreNotEqual ((int)retcode, SQL_ERROR);
       SQLFreeStmt (stmt, SQL_CLOSE);
 
