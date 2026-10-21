@@ -25,6 +25,9 @@
 #include  <errno.h>
 #include  <stdarg.h>
 #include  <string.h>
+#include  <sys/types.h>
+#include  <sys/stat.h>
+
 #include  "odbc_portable.h"
 #include  "odbcinst.h"
 #include  "odbc_resource.h"
@@ -78,7 +81,6 @@ SQLGetPrivateProfileString (LPCSTR lpszSection,
 			    LPCSTR lpszDefault, LPSTR lpszRetBuffer, int cbRetBuffer, LPCSTR lpszFilename)
 {
   int rc = SQL_SUCCESS;
-  char *envp;
   HINI hIni;
   char szFileName [512];
   struct stat sb;
@@ -104,7 +106,7 @@ SQLGetPrivateProfileString (LPCSTR lpszSection,
 	}
     }
 
-  if (iniPropertySeek (hIni, lpszSection, lpszEntry, "") == INI_SUCCESS)
+  if (iniPropertySeek (hIni, (char *) lpszSection, (char *) lpszEntry, "") == INI_SUCCESS)
     {
       found = 1;
     }
@@ -138,13 +140,13 @@ PUBLIC INT_PTR CALLBACK
 ConfigDSNDlgProc (HWND hwndParent, UINT message, WPARAM wParam, LPARAM lParam)
 {
   OutputDebugString ("ConfigDSNDlgProc called\n");
-  return NULL;
+  return 0;
 }
 
 INT_PTR
 DialogBoxParam (HINSTANCE hInst, LPCSTR tmpNaae, HWND hWndP, INT_PTR CALLBACK lpDialogFunc, LPARAM dwInit)
 {
-  return NULL;
+  return 0;
 }
 
 void
@@ -222,7 +224,8 @@ itoa (int value, char *string, int radix)
 char *
 find_key (char *string, char *key)
 {
-  char *value_p, *buf, *ptr;
+  const char *value_p;
+  char *buf, *ptr;
   size_t len;
 
   value_p = element_value_by_key (string, key);
@@ -317,13 +320,12 @@ ODBCINI_DSN_LOOKUP_RESULT
 ini_fileopen (const char *dsn, HINI *hInip)
 {
   char szIniName[_MAX_PATH];
-  int rc = ODBCINI_DSN_NOT_FOUND;
 
   if (_odbcinst_UserINI (szIniName, FALSE))
     {
       if (iniOpen (hInip, szIniName, "#;", '[', ']', '=', TRUE) == INI_SUCCESS)
 	{
-	  if (iniPropertySeek ((HINI) *hInip, dsn, "", "") == INI_SUCCESS)
+	  if (iniPropertySeek ((HINI) *hInip, (char *) dsn, "", "") == INI_SUCCESS)
 	    {
 	      return ODBCINI_DSN_FOUND_USER;
 	    }
@@ -336,7 +338,7 @@ ini_fileopen (const char *dsn, HINI *hInip)
     {
       if (iniOpen (hInip, szIniName, "#;", '[', ']', '=', TRUE) == INI_SUCCESS)
 	{
-	  if (iniPropertySeek ((HINI) *hInip, dsn, "", "") == INI_SUCCESS)
+	  if (iniPropertySeek ((HINI) *hInip, (char *) dsn, "", "") == INI_SUCCESS)
 	    {
 	      return ODBCINI_DSN_FOUND_SYSTEM;
 	    }

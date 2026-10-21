@@ -39,7 +39,10 @@ typedef long sqlc_long_t;
 typedef int sqlc_long_t;
 #include <wchar.h>
 #include <stdint.h>
+#include <strings.h>		/* strcasecmp, strncasecmp used by the macros below */
 #endif
+
+#include <string.h>
 
 #include "sqlext.h"
 
@@ -72,8 +75,9 @@ typedef int sqlc_long_t;
 
 #if defined (CUBRID_LINUX_ODBC)
 typedef int64_t __int64;
-typedef int INT_PTR;
-typedef unsigned int *UINT_PTR;
+/* pointer-sized integers, as on Windows; the code casts pointers through them */
+typedef intptr_t INT_PTR;
+typedef uintptr_t UINT_PTR;
 typedef const char *LPCTSTR;
 typedef long LONG_PTR;
 typedef LONG_PTR LPARAM;
@@ -98,6 +102,10 @@ typedef WCHAR OLECHAR;
 #if !defined (TRUE)
 enum { TRUE = 1, FALSE = 0 };
 #endif
+
+/* on Windows these come from windows.h */
+extern void OutputDebugString (const char *str, ...);
+extern char *itoa (int value, char *string, int radix);
 
 #endif
 

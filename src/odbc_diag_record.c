@@ -734,7 +734,16 @@ odbc_get_diag_rec (SQLSMALLINT handle_type,
 
   if (sqlstate != NULL)
     {
-      strcpy (sqlstate, record->sql_state);
+      /* the caller's buffer is SQL_SQLSTATE_SIZE + 1 bytes, no more */
+      if (record->sql_state != NULL)
+	{
+	  strncpy ((char *) sqlstate, record->sql_state, SQL_SQLSTATE_SIZE);
+	  sqlstate[SQL_SQLSTATE_SIZE] = '\0';
+	}
+      else
+	{
+	  sqlstate[0] = '\0';
+	}
     }
   if (native_error_ptr != NULL)
     {
@@ -751,7 +760,7 @@ odbc_get_diag_rec (SQLSMALLINT handle_type,
   mesg = UT_MAKE_STRING (diag_prefix, -1);
   mesg = UT_APPEND_STRING (mesg, pt, -1);
 
-  rc = str_value_assign (mesg, message_text, buffer_length, text_length_ptr);
+  rc = str_value_assign (mesg, (char *) message_text, buffer_length, text_length_ptr);
   if (rc == ODBC_SUCCESS_WITH_INFO)
     {
       status = rc;

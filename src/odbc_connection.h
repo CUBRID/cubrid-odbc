@@ -115,7 +115,7 @@ typedef struct st_odbc_connection
   struct st_odbc_desc *descriptors; /* external descriptor */
 
   char *data_source;    /* data source name */
-  unsigned char *server;  /* odbc server address */
+  char *server;     /* odbc server address */
   long port;      /* odbc server port number */
   char *db_name;    /* CUBRID db name */
   char *user;     /* CUBRID db user */

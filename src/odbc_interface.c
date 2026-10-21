@@ -58,7 +58,9 @@ typedef struct __st_DriverConnectInfo
   char pwd[ITEMBUFLEN];
 } DriverConnectInfo;
 
+#if defined (_WINDOWS)
 PRIVATE INT_PTR CALLBACK ConnectDlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+#endif
 
 PUBLIC HINSTANCE hInstance;
 
@@ -316,19 +318,19 @@ SQLColumns (SQLHSTMT StatementHandle,
   RETCODE rc = SQL_SUCCESS;
   ODBC_STATEMENT *stmt_handle;
 
-  SQLCHAR *stCatalogName = NULL;
-  SQLCHAR *stSchemaName = NULL;
-  SQLCHAR *stTableName = NULL;
-  SQLCHAR *stColumnName = NULL;
+  char *stCatalogName = NULL;
+  char *stSchemaName = NULL;
+  char *stTableName = NULL;
+  char *stColumnName = NULL;
 
   OutputDebugString ("SQLColumns called\n");
 
   DEBUG_TIMESTAMP (START_SQLColumns);
 
-  stCatalogName = UT_MAKE_STRING (CatalogName, NameLength1);
-  stSchemaName = UT_MAKE_STRING (SchemaName, NameLength2);
-  stTableName = UT_MAKE_STRING (TableName, NameLength3);
-  stColumnName = UT_MAKE_STRING (ColumnName, NameLength4);
+  stCatalogName = UT_MAKE_STRING ((char *) CatalogName, NameLength1);
+  stSchemaName = UT_MAKE_STRING ((char *) SchemaName, NameLength2);
+  stTableName = UT_MAKE_STRING ((char *) TableName, NameLength3);
+  stColumnName = UT_MAKE_STRING ((char *) ColumnName, NameLength4);
 
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
@@ -353,25 +355,25 @@ SQLConnect (SQLHDBC ConnectionHandle,
 	    SQLCHAR *UserName, SQLSMALLINT NameLength2, SQLCHAR *Authentication, SQLSMALLINT NameLength3)
 {
   RETCODE rc = SQL_SUCCESS;
-  SQLCHAR *stDataSource = NULL;
-  SQLCHAR *stUserName = NULL;
-  SQLCHAR *stAuthentication = NULL;
-  SQLCHAR stDBName[ITEMBUFLEN];
-  SQLCHAR stServerName[ITEMBUFLEN];
+  char *stDataSource = NULL;
+  char *stUserName = NULL;
+  char *stAuthentication = NULL;
+  char stDBName[ITEMBUFLEN];
+  char stServerName[ITEMBUFLEN];
   SQLINTEGER Port, FetchSize;
-  SQLCHAR stCharSet[ITEMBUFLEN];
-  SQLCHAR stAutocommit[ITEMBUFLEN];
-  SQLCHAR stOmitSchema[ITEMBUFLEN];
-  SQLCHAR *user = NULL, *pass = NULL;
+  char stCharSet[ITEMBUFLEN];
+  char stAutocommit[ITEMBUFLEN];
+  char stOmitSchema[ITEMBUFLEN];
+  char *user = NULL, *pass = NULL;
 
 
   OutputDebugString ("SQLConnect called\n");
 
   DEBUG_TIMESTAMP (START_SQLConnect);
 
-  stDataSource = UT_MAKE_STRING (DataSource, NameLength1);
-  stUserName = UT_MAKE_STRING (UserName, NameLength2);
-  stAuthentication = UT_MAKE_STRING (Authentication, NameLength3);
+  stDataSource = UT_MAKE_STRING ((char *) DataSource, NameLength1);
+  stUserName = UT_MAKE_STRING ((char *) UserName, NameLength2);
+  stAuthentication = UT_MAKE_STRING ((char *) Authentication, NameLength3);
 
   odbc_free_diag (((ODBC_CONNECTION *) ConnectionHandle)->diag, RESET);
 
@@ -487,7 +489,9 @@ SQLDriverConnect (HDBC hdbc,
 {
   RETCODE rc = ODBC_SUCCESS;
 
+#if defined (_WINDOWS)
   INT_PTR dlgrc;
+#endif
   char *pt;
 
   DriverConnectInfo dci;
@@ -529,12 +533,12 @@ SQLDriverConnect (HDBC hdbc,
 
   if ((cbConnStrIn == SQL_NTS) && (szConnStrIn != NULL))
     {
-      cbConnStrIn = (SWORD) strlen (szConnStrIn);
+      cbConnStrIn = (SWORD) strlen ((char *) szConnStrIn);
     }
 
   if (szConnStrIn != NULL)
     {
-      strncpy (ConnStrIn, szConnStrIn, cbConnStrIn);
+      strncpy (ConnStrIn, (char *) szConnStrIn, cbConnStrIn);
     }
 
   ConnStrIn[cbConnStrIn] = '\0';	// for end of list, if cbConnStrIn isn't end
@@ -579,13 +583,13 @@ SQLDriverConnect (HDBC hdbc,
 	    }
 	  if (ptUser == NULL || ptUser[0] == '\0')
 	    {
-	      sprintf (dci.user, "%s", user);
-	      sprintf (dci.pwd, "%s", pwd);
+	      snprintf (dci.user, sizeof (dci.user), "%.*s", (int) sizeof (dci.user) - 1, user);
+	      snprintf (dci.pwd, sizeof (dci.pwd), "%s", pwd);
 	    }
 	  else
 	    {
-	      sprintf (dci.user, "%s", ptUser);
-	      sprintf (dci.pwd, "");
+	      snprintf (dci.user, sizeof (dci.user), "%.*s", (int) sizeof (dci.user) - 1, ptUser);
+	      dci.pwd[0] = '\0';
 	    }
 
 #if defined (_WINDOWS)
@@ -726,7 +730,7 @@ SQLDriverConnect (HDBC hdbc,
 
       if ((szConnStrOut) && cbConnStrOut > 0)
 	{
-	  strncpy (szConnStrOut, buf, MIN (strlen (buf), (unsigned) cbConnStrOut));
+	  strncpy ((char *) szConnStrOut, buf, MIN (strlen (buf), (unsigned) cbConnStrOut));
 	  szConnStrOut[MIN (strlen (buf), (unsigned) cbConnStrOut)] = '\0';
 	}
 
@@ -822,7 +826,7 @@ SQLDriverConnect (HDBC hdbc,
 
       if ((szConnStrOut) && cbConnStrOut > 0)
 	{
-	  strncpy (szConnStrOut, buf, MIN (strlen (buf), (unsigned) cbConnStrOut));
+	  strncpy ((char *) szConnStrOut, buf, MIN (strlen (buf), (unsigned) cbConnStrOut));
 	  szConnStrOut[MIN (strlen (buf), (unsigned) cbConnStrOut)] = '\0';
 	}
 
@@ -865,7 +869,7 @@ ODBC_INTERFACE RETCODE SQL_API
 SQLExecDirect (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER TextLength)
 {
   RETCODE rc = SQL_SUCCESS;
-  SQLCHAR *stStatementText = NULL;
+  char *stStatementText = NULL;
   ODBC_STATEMENT *stmt_handle;
 
   OutputDebugString ("SQLExecDirect called\n");
@@ -875,15 +879,15 @@ SQLExecDirect (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER Text
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  stStatementText = UT_MAKE_STRING (StatementText, TextLength);
+  stStatementText = UT_MAKE_STRING ((char *) StatementText, TextLength);
 
-  if (stricmp (StatementText, "@QP@") == 0)
+  if (stricmp ((char *) StatementText, "@QP@") == 0)
     {
       stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN;
       return ODBC_SUCCESS;
     }
 
-  if (stricmp (StatementText, "@QE@") == 0)
+  if (stricmp ((char *) StatementText, "@QE@") == 0)
     {
       stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN | CCI_EXEC_QUERY_ALL;
       return ODBC_SUCCESS;
@@ -1397,7 +1401,7 @@ SQLNativeSql (SQLHDBC ConnectionHandle,
 	      SQLINTEGER TextLength1, SQLCHAR *OutStatementText, SQLINTEGER BufferLength, SQLINTEGER *TextLength2Ptr)
 {
   RETCODE rc = SQL_SUCCESS;
-  SQLCHAR *stInStatementText = NULL;
+  char *stInStatementText = NULL;
 
   OutputDebugString ("SQLNativeSql called\n");
 
@@ -1411,11 +1415,11 @@ SQLNativeSql (SQLHDBC ConnectionHandle,
       return ODBC_ERROR;
     }
 
-  stInStatementText = UT_MAKE_STRING (InStatementText, TextLength1);
+  stInStatementText = UT_MAKE_STRING ((char *) InStatementText, TextLength1);
 
 
   rc =
-	  odbc_native_sql ((ODBC_CONNECTION *) ConnectionHandle, stInStatementText,
+	  odbc_native_sql ((ODBC_CONNECTION *) ConnectionHandle, (SQLCHAR *) stInStatementText,
 			   OutStatementText, BufferLength, TextLength2Ptr);
 
   DEBUG_TIMESTAMP (END_SQLNativeSql);
@@ -1494,7 +1498,7 @@ ODBC_INTERFACE RETCODE SQL_API
 SQLPrepare (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER TextLength)
 {
   RETCODE rc = SQL_SUCCESS;
-  SQLCHAR *stStatementText = NULL;
+  char *stStatementText = NULL;
   ODBC_STATEMENT *stmt_handle;
 
   OutputDebugString ("SQLPrepare called\n");
@@ -1504,18 +1508,18 @@ SQLPrepare (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER TextLen
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  stStatementText = UT_MAKE_STRING (StatementText, TextLength);
+  stStatementText = UT_MAKE_STRING ((char *) StatementText, TextLength);
 
-  if (stricmp (StatementText, "@QP@") == 0)
+  if (stricmp ((char *) StatementText, "@QP@") == 0)
     {
-      stmt_handle->sql_text = UT_MAKE_STRING (StatementText, TextLength);
+      stmt_handle->sql_text = UT_MAKE_STRING ((char *) StatementText, TextLength);
       stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN;
       return ODBC_SUCCESS;
     }
 
-  if (stricmp (StatementText, "@QE@") == 0)
+  if (stricmp ((char *) StatementText, "@QE@") == 0)
     {
-      stmt_handle->sql_text = UT_MAKE_STRING (StatementText, TextLength);
+      stmt_handle->sql_text = UT_MAKE_STRING ((char *) StatementText, TextLength);
       stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN | CCI_EXEC_QUERY_ALL;
       return ODBC_SUCCESS;
     }
@@ -1606,7 +1610,7 @@ SQLSetCursorName (SQLHSTMT StatementHandle, SQLCHAR *CursorName, SQLSMALLINT Nam
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  rc = odbc_set_cursor_name (stmt_handle, CursorName, NameLength);
+  rc = odbc_set_cursor_name (stmt_handle, (char *) CursorName, NameLength);
 
   DEBUG_TIMESTAMP (END_SQLSetCursorName);
 
@@ -1735,9 +1739,9 @@ SQLSpecialColumns (SQLHSTMT StatementHandle,
 {
   RETCODE rc = SQL_SUCCESS;
 
-  SQLCHAR *stCatalogName = NULL;
-  SQLCHAR *stSchemaName = NULL;
-  SQLCHAR *stTableName = NULL;
+  char *stCatalogName = NULL;
+  char *stSchemaName = NULL;
+  char *stTableName = NULL;
   ODBC_STATEMENT *stmt_handle;
 
   OutputDebugString ("SQLSpecialColumns called\n");
@@ -1747,9 +1751,9 @@ SQLSpecialColumns (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  stCatalogName = UT_MAKE_STRING (CatalogName, NameLength1);
-  stSchemaName = UT_MAKE_STRING (SchemaName, NameLength2);
-  stTableName = UT_MAKE_STRING (TableName, NameLength3);
+  stCatalogName = UT_MAKE_STRING ((char *) CatalogName, NameLength1);
+  stSchemaName = UT_MAKE_STRING ((char *) SchemaName, NameLength2);
+  stTableName = UT_MAKE_STRING ((char *) TableName, NameLength3);
 
   rc = odbc_special_columns (stmt_handle, IdentifierType, stCatalogName, stSchemaName, stTableName, Scope, Nullable);
 
@@ -1772,9 +1776,9 @@ SQLStatistics (SQLHSTMT StatementHandle,
 	       SQLCHAR *TableName, SQLSMALLINT NameLength3, SQLUSMALLINT Unique, SQLUSMALLINT Reserved)
 {
   RETCODE rc = SQL_SUCCESS;
-  SQLCHAR *stCatalogName = NULL;
-  SQLCHAR *stSchemaName = NULL;
-  SQLCHAR *stTableName = NULL;
+  char *stCatalogName = NULL;
+  char *stSchemaName = NULL;
+  char *stTableName = NULL;
   ODBC_STATEMENT *stmt_handle;
 
   OutputDebugString ("SQLStatistics called\n");
@@ -1784,9 +1788,9 @@ SQLStatistics (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  stCatalogName = UT_MAKE_STRING (CatalogName, NameLength1);
-  stSchemaName = UT_MAKE_STRING (SchemaName, NameLength2);
-  stTableName = UT_MAKE_STRING (TableName, NameLength3);
+  stCatalogName = UT_MAKE_STRING ((char *) CatalogName, NameLength1);
+  stSchemaName = UT_MAKE_STRING ((char *) SchemaName, NameLength2);
+  stTableName = UT_MAKE_STRING ((char *) TableName, NameLength3);
 
   rc = odbc_statistics (stmt_handle, stCatalogName, stSchemaName, stTableName, Unique, Reserved);
 
@@ -1807,9 +1811,9 @@ SQLTablePrivileges (SQLHSTMT StatementHandle,
 {
   RETCODE odbc_retval = SQL_SUCCESS;
 
-  SQLCHAR *stCatalogName = NULL;
-  SQLCHAR *stSchemaName = NULL;
-  SQLCHAR *stTableName = NULL;
+  char *stCatalogName = NULL;
+  char *stSchemaName = NULL;
+  char *stTableName = NULL;
 
   ODBC_STATEMENT *stmt_handle;
 
@@ -1819,9 +1823,9 @@ SQLTablePrivileges (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  stCatalogName = UT_MAKE_STRING (CatalogName, NameLength1);
-  stSchemaName = UT_MAKE_STRING (SchemaName, NameLength2);
-  stTableName = UT_MAKE_STRING (TableName, NameLength3);
+  stCatalogName = UT_MAKE_STRING ((char *) CatalogName, NameLength1);
+  stSchemaName = UT_MAKE_STRING ((char *) SchemaName, NameLength2);
+  stTableName = UT_MAKE_STRING ((char *) TableName, NameLength3);
 
   odbc_retval = odbc_table_privileges (stmt_handle, stCatalogName, stSchemaName, stTableName);
 
@@ -1843,10 +1847,10 @@ SQLTables (SQLHSTMT StatementHandle,
 	   SQLCHAR *TableName, SQLSMALLINT NameLength3, SQLCHAR *TableType, SQLSMALLINT NameLength4)
 {
   RETCODE rc = SQL_SUCCESS;
-  SQLCHAR *stCatalogName = NULL;
-  SQLCHAR *stSchemaName = NULL;
-  SQLCHAR *stTableName = NULL;
-  SQLCHAR *stTableType = NULL;
+  char *stCatalogName = NULL;
+  char *stSchemaName = NULL;
+  char *stTableName = NULL;
+  char *stTableType = NULL;
   ODBC_STATEMENT *stmt_handle;
 
   OutputDebugString ("SQLTables called\n");
@@ -1856,10 +1860,10 @@ SQLTables (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  stCatalogName = UT_MAKE_STRING (CatalogName, NameLength1);
-  stSchemaName = UT_MAKE_STRING (SchemaName, NameLength2);
-  stTableName = UT_MAKE_STRING (TableName, NameLength3);
-  stTableType = UT_MAKE_STRING (TableType, NameLength4);
+  stCatalogName = UT_MAKE_STRING ((char *) CatalogName, NameLength1);
+  stSchemaName = UT_MAKE_STRING ((char *) SchemaName, NameLength2);
+  stTableName = UT_MAKE_STRING ((char *) TableName, NameLength3);
+  stTableType = UT_MAKE_STRING ((char *) TableType, NameLength4);
 
   rc = odbc_tables (stmt_handle, stCatalogName, stSchemaName, stTableName, stTableType);
 
@@ -2027,9 +2031,9 @@ SQLPrimaryKeys (SQLHSTMT StatementHandle,
 {
   RETCODE odbc_retval = SQL_SUCCESS;
 
-  SQLCHAR *stCatalogName = NULL;
-  SQLCHAR *stSchemaName = NULL;
-  SQLCHAR *stTableName = NULL;
+  char *stCatalogName = NULL;
+  char *stSchemaName = NULL;
+  char *stTableName = NULL;
 
   ODBC_STATEMENT *stmt_handle;
 
@@ -2039,9 +2043,9 @@ SQLPrimaryKeys (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  stCatalogName = UT_MAKE_STRING (CatalogName, NameLength1);
-  stSchemaName = UT_MAKE_STRING (SchemaName, NameLength2);
-  stTableName = UT_MAKE_STRING (TableName, NameLength3);
+  stCatalogName = UT_MAKE_STRING ((char *) CatalogName, NameLength1);
+  stSchemaName = UT_MAKE_STRING ((char *) SchemaName, NameLength2);
+  stTableName = UT_MAKE_STRING ((char *) TableName, NameLength3);
 
   odbc_retval = odbc_primary_keys (stmt_handle, stCatalogName, stSchemaName, stTableName);
 
@@ -2070,8 +2074,8 @@ SQLForeignKeys (SQLHSTMT StatementHandle,
 {
   RETCODE odbc_retval = SQL_SUCCESS;
 
-  SQLCHAR *stPKTableName = NULL;
-  SQLCHAR *stFKTableName = NULL;
+  char *stPKTableName = NULL;
+  char *stFKTableName = NULL;
 
   ODBC_STATEMENT *stmt_handle;
 
@@ -2081,8 +2085,8 @@ SQLForeignKeys (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  stPKTableName = UT_MAKE_STRING (PKTableName, NameLength3);
-  stFKTableName = UT_MAKE_STRING (FKTableName, NameLength6);
+  stPKTableName = UT_MAKE_STRING ((char *) PKTableName, NameLength3);
+  stFKTableName = UT_MAKE_STRING ((char *) FKTableName, NameLength6);
 
   odbc_retval = odbc_foreign_keys (stmt_handle, stPKTableName, stFKTableName);
 
@@ -2108,20 +2112,20 @@ SQLProcedureColumns (SQLHSTMT StatementHandle,
 {
   RETCODE odbc_retval = SQL_SUCCESS;
 
-  SQLCHAR *stCatalogName = NULL;
-  SQLCHAR *stSchemaName = NULL;
-  SQLCHAR *stProcName = NULL;
-  SQLCHAR *stColumnName = NULL;
+  char *stCatalogName = NULL;
+  char *stSchemaName = NULL;
+  char *stProcName = NULL;
+  char *stColumnName = NULL;
 
   ODBC_STATEMENT *stmt_handle;
 
   OutputDebugString ("SQLProcedureColumns called\n");
   DEBUG_TIMESTAMP (START_SQLProcedureColumns);
 
-  stCatalogName = UT_MAKE_STRING (CatalogName, NameLength1);
-  stSchemaName = UT_MAKE_STRING (SchemaName, NameLength2);
-  stProcName = UT_MAKE_STRING (ProcName, NameLength3);
-  stColumnName = UT_MAKE_STRING (ColumnName, NameLength4);
+  stCatalogName = UT_MAKE_STRING ((char *) CatalogName, NameLength1);
+  stSchemaName = UT_MAKE_STRING ((char *) SchemaName, NameLength2);
+  stProcName = UT_MAKE_STRING ((char *) ProcName, NameLength3);
+  stColumnName = UT_MAKE_STRING ((char *) ColumnName, NameLength4);
 
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
@@ -2146,9 +2150,9 @@ SQLProcedures (SQLHSTMT StatementHandle,
 {
   RETCODE odbc_retval = SQL_SUCCESS;
 
-  SQLCHAR *stCatalogName = NULL;
-  SQLCHAR *stSchemaName = NULL;
-  SQLCHAR *stProcName = NULL;
+  char *stCatalogName = NULL;
+  char *stSchemaName = NULL;
+  char *stProcName = NULL;
 
   ODBC_STATEMENT *stmt_handle;
 
@@ -2158,9 +2162,9 @@ SQLProcedures (SQLHSTMT StatementHandle,
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  stCatalogName = UT_MAKE_STRING (CatalogName, NameLength1);
-  stSchemaName = UT_MAKE_STRING (SchemaName, NameLength2);
-  stProcName = UT_MAKE_STRING (ProcName, NameLength3);
+  stCatalogName = UT_MAKE_STRING ((char *) CatalogName, NameLength1);
+  stSchemaName = UT_MAKE_STRING ((char *) SchemaName, NameLength2);
+  stProcName = UT_MAKE_STRING ((char *) ProcName, NameLength3);
 
   odbc_retval = odbc_procedures (stmt_handle, stCatalogName, stSchemaName, stProcName);
 

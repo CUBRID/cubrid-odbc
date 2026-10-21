@@ -42,7 +42,6 @@ PRIVATE void get_bind_info (ODBC_STATEMENT *stmt,
 			    short col_index,
 			    short *type, void **bound_ptr, long *buffer_length, SQLLEN **strlen_ind_ptr);
 PRIVATE RETCODE move_catalog_rs (ODBC_STATEMENT *stmt, unsigned long *current_tpl_pos);
-PRIVATE RETCODE get_catalog_data (ODBC_STATEMENT *stmt, short row_index, short col_index);
 PRIVATE RETCODE c_value_to_bound_ptr (void *bound_ptr, SQLLEN buffer_length, VALUE_CONTAINER *c_value);
 
 /************************************************************************
@@ -73,19 +72,19 @@ odbc_bind_col (ODBC_STATEMENT *stmt,
       odbc_alloc_record (ard, NULL, column_num);
     }
 
-  rc = odbc_set_desc_field (ard, column_num, SQL_DESC_CONCISE_TYPE, (void *) target_type, 0, 1);
+  rc = odbc_set_desc_field (ard, column_num, SQL_DESC_CONCISE_TYPE, (SQLPOINTER) (SQLLEN) target_type, 0, 1);
   ERROR_GOTO (rc, error);
 
   /* setting verbose type */
   odbc_type = odbc_concise_to_verbose_type (target_type);
-  rc = odbc_set_desc_field (ard, column_num, SQL_DESC_TYPE, (void *) odbc_type, 0, 1);
+  rc = odbc_set_desc_field (ard, column_num, SQL_DESC_TYPE, (SQLPOINTER) (SQLLEN) odbc_type, 0, 1);
   ERROR_GOTO (rc, error);
 
   /* setting subcode */
   if (odbc_type == SQL_DATETIME)
     {
       odbc_subcode = odbc_subcode_type (target_type);
-      rc = odbc_set_desc_field (ard, column_num, SQL_DESC_DATETIME_INTERVAL_CODE, (void *) odbc_subcode, 0, 1);
+      rc = odbc_set_desc_field (ard, column_num, SQL_DESC_DATETIME_INTERVAL_CODE, (SQLPOINTER) (SQLLEN) odbc_subcode, 0, 1);
       ERROR_GOTO (rc, error);
     }
 
@@ -132,7 +131,6 @@ odbc_describe_col (ODBC_STATEMENT *stmt,
 		   SQLULEN *column_size_ptr, SQLSMALLINT *decimal_digits_ptr, SQLSMALLINT *nullable_ptr)
 {
   ODBC_DESC *ird = NULL;
-  ODBC_RECORD *record = NULL;
   short scale;
   SQLLEN int_name_length;
   RETCODE rc;
@@ -283,8 +281,6 @@ error:
 PUBLIC RETCODE
 odbc_row_count (ODBC_STATEMENT *stmt, SQLLEN *row_count)
 {
-  ODBC_DESC *ipd = NULL;
-
   if (row_count != NULL)
     {
       *row_count = stmt->tpl_number;
@@ -371,7 +367,7 @@ odbc_fetch (ODBC_STATEMENT *stmt,
 
   else if (stmt->result_type == QUERY)
     {
-      rc = move_advanced_cursor (stmt, &stmt->current_tpl_pos, fetch_orientation, (long) fetch_offset);
+      rc = move_advanced_cursor (stmt, (long *) &stmt->current_tpl_pos, fetch_orientation, (long) fetch_offset);
     }
   else
     {
@@ -1025,7 +1021,6 @@ get_bind_info (ODBC_STATEMENT *stmt,
 PUBLIC RETCODE
 move_advanced_cursor (ODBC_STATEMENT *stmt, long *current_tpl_pos, short fetch_orientation, long fetch_offset)
 {
-  RETCODE rc = ODBC_SUCCESS;
   int cci_rc;
   T_CCI_ERROR cci_err_buf;
   int tpl_pos;
@@ -1055,8 +1050,8 @@ move_advanced_cursor (ODBC_STATEMENT *stmt, long *current_tpl_pos, short fetch_o
 	}
       break;
     case SQL_FETCH_PRIOR:
-      if (*current_tpl_pos > 1 && *current_tpl_pos <= row_set_size ||
-	  *current_tpl_pos == -1 && result_set_size < row_set_size)
+      if ((*current_tpl_pos > 1 && *current_tpl_pos <= row_set_size) ||
+	  (*current_tpl_pos == -1 && result_set_size < row_set_size))
 	{
 	  cci_rc = cci_cursor (stmt->stmthd, 1, CCI_CURSOR_FIRST, &cci_err_buf);
 	  tpl_pos = 1;

@@ -420,16 +420,6 @@ PRIVATE DATETIME_TYPE_INFO datetime_internal_type_info_set[] =
   ,
 };
 
-PRIVATE DATETIME_TYPE_BACKWARD datetime_sql_type_backward_set[] =
-{
-  {SQL_TYPE_DATE, SQL_DATE}
-  ,
-  {SQL_TYPE_TIME, SQL_TIME}
-  ,
-  {SQL_TYPE_TIMESTAMP, SQL_TIMESTAMP}
-  ,
-};
-
 PRIVATE DATETIME_TYPE_BACKWARD datetime_c_type_backward_set[] =
 {
   {SQL_C_TYPE_DATE, SQL_C_DATE}
@@ -641,7 +631,7 @@ odbc_concise_to_verbose_type (short type)
 	}
     }
 
-  for (i = 0; i < date_set_size; i++)
+  for (i = 0; i < internal_set_size; i++)
     {
       if (datetime_internal_type_info_set[i].concise_sql_type == type)
 	{
@@ -686,7 +676,7 @@ odbc_subcode_type (short type)
 	}
     }
 
-  for (i = 0; i < date_set_size; i++)
+  for (i = 0; i < internal_set_size; i++)
     {
       if (datetime_internal_type_info_set[i].concise_sql_type == type)
 	{
@@ -1240,7 +1230,7 @@ odbc_value_to_cci (void *c_value, short c_type, long c_length, short c_precision
       if (c_scale > 0)
 	{
 	  value = UT_REALLOC (value, strlen (value) + 2);	// for period
-	  pt = value;
+	  pt = (unsigned char *) value;
 //                              pt += c_precision - c_scale;  // OR pt += strlen(value) - scale;
 	  pt += strlen (value) - c_scale;
 	  memmove (pt + 1, pt, c_scale + 1);
@@ -1441,7 +1431,7 @@ odbc_value_to_cci2 (void *sql_value_root, int index, void *c_value,
       if (c_scale > 0)
 	{
 	  value = UT_REALLOC (value, strlen (value) + 2);	// for period
-	  pt = value;
+	  pt = (unsigned char *) value;
 	  pt += c_precision - c_scale;	// OR pt += strlen(value) - scale;
 	  memmove (pt + 1, pt, c_scale + 1);
 	  *pt = '.';
@@ -1648,7 +1638,7 @@ cci_value_to_odbc (void *c_value, short concise_type,
      *--------------------------------------------------------------*/
     case SQL_C_NUMERIC:
     {
-      bc_num num1 = NULL, num2 = NULL, quot = NULL, rem = NULL, res_tmp = NULL;
+      bc_num num1 = NULL, num2 = NULL, quot = NULL, rem = NULL;
       char *pt, *pt2, *tmp_str_num = NULL;
       char str[64];		// numeric value that is removed a period. cf) The max precision of numeric is 38 in CUBRID
       short i;

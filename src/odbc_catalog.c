@@ -2282,7 +2282,7 @@ make_table_result_set (ODBC_STATEMENT *stmt, int req_handle, int type_option)
   int cci_rc;
   UNI_CCI_A_TYPE cci_value;
 
-  long current_tpl_pos = 0;
+  unsigned long current_tpl_pos = 0;
   ODBC_TABLE_VALUE *table_node = NULL;
   int class_type;
   char *tablename = NULL;
@@ -2450,7 +2450,7 @@ make_column_result_set (ODBC_STATEMENT *stmt, int req_handle)
   int precision, scale;
   short cci_type;
 
-  long current_tpl_pos;
+  unsigned long current_tpl_pos;
   ODBC_COLUMN_VALUE *column_node = NULL;
 
   current_tpl_pos = 0;
@@ -2691,7 +2691,7 @@ make_stat_result_set (ODBC_STATEMENT *stmt, int req_handle, char *table_name, un
   int cci_retval;
   UNI_CCI_A_TYPE cci_value;
 
-  long current_tpl_pos = 0;
+  unsigned long current_tpl_pos = 0;
   ODBC_STAT_VALUE *stat_node = NULL;
 
   while (1)
@@ -2867,8 +2867,8 @@ make_sp_column_result_set (ODBC_STATEMENT *stmt, int req_handle, char *table_nam
   int cci_ind;
   UNI_CCI_A_TYPE cci_value;
 
-  long param_num = 0;
-  long current_tpl_pos = 0, cur_tpl_pos = 0;
+  unsigned long current_tpl_pos = 0;
+  unsigned long cur_tpl_pos = 0;
   ODBC_SP_COLUMN_VALUE *special_columns_node = NULL;
 
   int cci_u_type = 0, precision = 0, scale = 0;
@@ -3044,7 +3044,7 @@ make_primary_keys_result_set (ODBC_STATEMENT *stmt, int req_handle)
   int cci_retval;
   UNI_CCI_A_TYPE cci_value;
 
-  long current_tpl_pos = 0;
+  unsigned long current_tpl_pos = 0;
   ODBC_PRIMARY_KEYS_VALUE *primary_keys_node = NULL;
 
   while (1)
@@ -3164,7 +3164,7 @@ make_foreign_keys_result_set (ODBC_STATEMENT *stmt, int req_handle)
   int cci_retval;
   UNI_CCI_A_TYPE cci_value;
 
-  long current_tpl_pos = 0;
+  unsigned long current_tpl_pos = 0;
   ODBC_FOREIGN_KEYS_VALUE *foreign_keys_node = NULL;
 
   while (1)
@@ -3319,7 +3319,7 @@ make_table_privileges_result_set (ODBC_STATEMENT *stmt, int req_handle)
   int cci_retval;
   UNI_CCI_A_TYPE cci_value;
 
-  long current_tpl_pos = 0;
+  unsigned long current_tpl_pos = 0;
   ODBC_TABLE_PRIVILEGES_VALUE *table_privileges_node = NULL;
 
   while (1)
@@ -3441,7 +3441,7 @@ make_procedures_result_set (ODBC_STATEMENT *stmt, int req_handle)
   int cci_retval;
   UNI_CCI_A_TYPE cci_value;
 
-  long current_tpl_pos = 0;
+  unsigned long current_tpl_pos = 0;
   ODBC_PROCEDURES_VALUE *procedures_node = NULL;
 
   while (1)
@@ -3560,7 +3560,7 @@ make_procedure_columns_result_set (ODBC_STATEMENT *stmt, int req_handle)
   UNI_CCI_A_TYPE cci_value;
 
   long param_num = 0;
-  long current_tpl_pos = 0;
+  unsigned long current_tpl_pos = 0;
   ODBC_PROCEDURE_COLUMNS_VALUE *procedure_columns_node = NULL;
   ODBC_DATA_TYPE_INFO param_type_info;
 

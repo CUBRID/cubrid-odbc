@@ -230,8 +230,9 @@ odbc_set_env_attr (ODBC_ENV *env, long attribute, void *valueptr, long stringlen
 * description:
 * NOTE:
 ************************************************************************/
-PUBLIC
-odbc_get_env_attr (ODBC_ENV *env, long attribute, void *value_ptr, long buffer_length, long *string_length_ptr)
+PUBLIC RETCODE
+odbc_get_env_attr (ODBC_ENV *env, long attribute, void *value_ptr, long buffer_length,
+		   SQLINTEGER *string_length_ptr)
 {
   switch (attribute)
     {

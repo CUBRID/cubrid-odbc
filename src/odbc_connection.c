@@ -139,7 +139,6 @@ static ODBC_FUNCTIONS_SUPPORT_INFO functions_support_info_set[] =
   {SQL_API_SQLDESCRIBEPARAM, SQL_TRUE},
 };
 
-PRIVATE int get_server_setting (ODBC_CONNECTION *conn);
 PRIVATE RETCODE set_isolation_level (ODBC_CONNECTION *conn);
 PRIVATE RETCODE get_db_version (ODBC_CONNECTION *conn);
 
@@ -836,7 +835,7 @@ odbc_connect_new (ODBC_CONNECTION *conn,
   RETCODE rc;
   int cci_rc;
   T_CCI_ERROR cci_err_buf;
-  char *pt;
+  const char *pt;
   char connect_url[BUF_SIZE * 4] = { 0 };
   char connect_url_attr[BUF_SIZE * 4] = { 0 };
 
@@ -1061,7 +1060,7 @@ odbc_native_sql (ODBC_CONNECTION *conn,
   RETCODE rc = ODBC_SUCCESS;
   SQLLEN tmp_length;
 
-  rc = str_value_assign (in_stmt_text, out_stmt_text, buffer_length, &tmp_length);
+  rc = str_value_assign ((const char *) in_stmt_text, (char *) out_stmt_text, buffer_length, &tmp_length);
   *out_stmt_length = (SQLINTEGER) tmp_length;
 
   if (rc == ODBC_SUCCESS_WITH_INFO)
@@ -3216,76 +3215,6 @@ get_dsn_info (const char *dsn,
 
   return 0;
 }
-
-/************************************************************************
-* name: get_server_setting
-* arguments:
-* returns/side-effects:
-* description:
-*   DSN(registry)에서 ip address, port num, db name을 얻어온다.
-* NOTE:
-*   SQLSetConfigMode(ODBC_BOTH_DSN)에 의해서 ODBC_USER_DSN에
-*   먼저 접근하게 된다.
-************************************************************************/
-
-PRIVATE int
-get_server_setting (ODBC_CONNECTION *conn)
-{
-  char buf[256];
-  int rcn;			// return char number
-
-  if (conn->data_source == NULL)
-    {
-      return -1;
-    }
-
-  SQLSetConfigMode (ODBC_BOTH_DSN);
-
-  // Get server entry
-  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_SERVER, "", buf, sizeof (buf), "ODBC.INI");
-  if (rcn == 0)
-    {
-      buf[0] = '\0';
-    }
-  conn->server = UT_MAKE_STRING (buf, -1);
-
-  // Get port entry
-  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_PORT, "", buf, sizeof (buf), "ODBC.INI");
-  if (rcn == 0)
-    {
-      buf[0] = '\0';
-    }
-  conn->port = atoi (buf);
-
-  // Get DB name entry
-  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_DBNAME, "", buf, sizeof (buf), "ODBC.INI");
-  if (rcn == 0)
-    {
-      buf[0] = '\0';
-    }
-  conn->db_name = UT_MAKE_STRING (buf, -1);
-
-  // Get fetch size entry
-  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_FETCH_SIZE, "", buf, sizeof (buf), "ODBC.INI");
-  if (rcn == 0)
-    {
-      buf[0] = '\0';
-    }
-  conn->fetch_size = atoi (buf);
-
-
-  // Get fetch charset
-  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_CHARSET, "", buf, sizeof (buf), "ODBC.INI");
-  if (rcn == 0)
-    {
-      buf[0] = '\0';
-    }
-  conn->charset = UT_MAKE_STRING (buf, -1);
-
-  return 0;
-}
-
-
 
 /************************************************************************
  * name:  set_isloation_level

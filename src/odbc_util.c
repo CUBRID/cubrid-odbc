@@ -31,6 +31,7 @@
 #include    <stdio.h>
 #include    <stdlib.h>
 #include    <string.h>
+#include    <ctype.h>
 
 #if !defined (_WINDOWS)
 #include <iconv.h>
@@ -48,9 +49,9 @@
 #define CP_EUC_KR 51949
 #endif
 
-static int is_korean (unsigned char ch);
-
+#if defined (_WINDOWS)
 #pragma comment(lib, "legacy_stdio_definitions.lib")
+#endif
 
 
 
@@ -730,13 +731,6 @@ NodeAssign (ST_LIST *node, void *key, void *value)
 
   return 0;
 }
-
-PRIVATE int
-is_korean (unsigned char ch)
-{
-  return (ch >= 0xb0 && ch <= 0xc8) || (ch >= 0xa1 && ch <= 0xfe);
-}
-
 
 /*-----------------------------------------------------------------------
  *            Connection string
@@ -1540,7 +1534,6 @@ wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length,
   size_t bytes_required;
   size_t out_bytes_left;
   int rc;
-  int alloc = 0;
   int num_wchars;
 
   if (str == NULL)
@@ -1558,7 +1551,7 @@ wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length,
       return ODBC_SUCCESS;
     }
 
-  num_wchars = num_chars > 0 ? num_chars : sqlwcharlen (str);
+  num_wchars = num_chars > 0 ? num_chars : sqlwcharlen ((const WCHAR *) str);
   wbuf_len = (num_wchars) * WCHAR_LENGTH;
   mbuf_len = num_wchars * LENGTH_RATIO_WCHAR_TO_MULTIBYTE + 1;
 
@@ -1722,7 +1715,7 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
   if (buffer_length == 0 || buffer_length > (bytes_required + 1))
     {
       * ((wchar_t *) wbuf) = L'\0';
-      *buffer = wbuf_orig;
+      *buffer = (wchar_t *) wbuf_orig;
     }
 
 ret:
@@ -1788,14 +1781,12 @@ get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, 
 int
 get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, int *out_length, char *characterset)
 {
-  int rc = ODBC_SUCCESS;
-
   if (str == NULL || buffer == NULL)
     {
       return ODBC_SUCCESS;
     }
 
-  rc = bytes_to_wide_char ((char *) str, size, (wchar_t **) buffer, buffer_length, out_length, "UCS2");
+  bytes_to_wide_char ((char *) str, size, (wchar_t **) buffer, buffer_length, out_length, "UCS2");
 
   return ODBC_SUCCESS;
 }
