@@ -156,6 +156,7 @@
     </ClCompile>
     <ClCompile Include="UnitTest.cpp" />
     <ClCompile Include="OtherTest.cpp" />
+    <ClCompile Include="DiagRecTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\cubrid-odbc.git\cubrid_odbc_14.vcxproj">

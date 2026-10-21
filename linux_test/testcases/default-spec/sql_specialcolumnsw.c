@@ -61,8 +61,8 @@ sql_specialcolumnsw (int case_num, char *dsn)
 
   while (SQLFetch (hstmt) == SQL_SUCCESS)
     {
-      wide_char_to_bytes (columname, SQL_NTS, &m_columname, NULL, "UCS2");
-      wide_char_to_bytes (typename, SQL_NTS, &m_typename, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) columname, SQL_NTS, (char **) &m_columname, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) typename, SQL_NTS, (char **) &m_typename, NULL, "UCS2");
       printf ("Table name = %s, scope = %d, column = %s, type = %s, pseudo_column = %d\n", table, scope, m_columname,
 	      m_typename, pseudo_column);
     }

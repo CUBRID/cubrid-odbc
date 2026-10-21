@@ -44,7 +44,7 @@ sql_tablesw (int case_num, char *dsn)
 
   while ((retcode = SQLFetch (stmt)) == SQL_SUCCESS)
     {
-      wide_char_to_bytes (table_name, SQL_NTS, &buf, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) table_name, SQL_NTS, (char **) &buf, NULL, "UCS2");
       printf ("\ttable [%d]: |%s|\n", i++, buf);
       UT_FREE (buf);
     }

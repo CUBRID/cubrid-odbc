@@ -57,6 +57,9 @@ static int caseno=1;
     while (0)
 
 int bytes_to_wide_char (char *str, int size, wchar_t **buf, int buf_len, int *out_len, char *charset);
+int wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_len, char *charset);
+/* counts UCS-2 units, which is what the wchar_t * buffers above really hold */
+int sqlwcharlen (const wchar_t *wstr);
 #define LENGTH_RATIO_WCHAR_TO_MULTIBYTE 3
 
 #if !defined (UT_REALLOC)

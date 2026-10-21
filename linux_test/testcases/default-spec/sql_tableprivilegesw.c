@@ -77,10 +77,10 @@ sql_tableprivilegesw (int case_num, char *dsn)
 
   while (SQLFetch (hstmt) == SQL_SUCCESS)
     {
-      wide_char_to_bytes (GRANTOR, SQL_NTS, &m_grantor, NULL, "UCS2");
-      wide_char_to_bytes (GRANTEE, SQL_NTS, &m_grantee, NULL, "UCS2");
-      wide_char_to_bytes (PRIVILEGE, SQL_NTS, &m_privilege, NULL, "UCS2");
-      wide_char_to_bytes (IS_GRANTABLE, SQL_NTS, &m_is_grantable, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) GRANTOR, SQL_NTS, (char **) &m_grantor, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) GRANTEE, SQL_NTS, (char **) &m_grantee, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) PRIVILEGE, SQL_NTS, (char **) &m_privilege, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) IS_GRANTABLE, SQL_NTS, (char **) &m_is_grantable, NULL, "UCS2");
       printf ("\tTable name = %s, GRANTOR = %s, GRANTEE = %s, PRIVILEGE = %s, IS_GRANTABLE = %s\n", table, m_grantor,
 	      m_grantee, m_privilege, m_is_grantable);
     }

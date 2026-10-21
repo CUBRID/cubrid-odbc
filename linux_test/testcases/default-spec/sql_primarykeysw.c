@@ -55,8 +55,8 @@ sql_primarykeysw (int case_num, char *dsn)
 
   while (SQLFetch (hstmt) == SQL_SUCCESS)
     {
-      wide_char_to_bytes (szTableName, SQL_NTS, &pk_table_name, NULL, "UCS2");
-      wide_char_to_bytes (szColumnName, SQL_NTS, &column, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) szTableName, SQL_NTS, (char **) &pk_table_name, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) szColumnName, SQL_NTS, (char **) &column, NULL, "UCS2");
       printf ("Table name = %s, pk column = (%s)\n", pk_table_name, column);
     }
 

@@ -57,9 +57,9 @@ sql_foreignkeysw (int case_num, char *dsn)
 
   while (SQLFetch (hstmt) == SQL_SUCCESS)
     {
-      wide_char_to_bytes (szForeignKeyTable, SQL_NTS, &fk_table_name, NULL, "UCS2");
-      wide_char_to_bytes (szForeignKeyColumn, SQL_NTS, &column, NULL, "UCS2");
-      wide_char_to_bytes (szForeignKey, SQL_NTS, &fk, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) szForeignKeyTable, SQL_NTS, (char **) &fk_table_name, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) szForeignKeyColumn, SQL_NTS, (char **) &column, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) szForeignKey, SQL_NTS, (char **) &fk, NULL, "UCS2");
       printf ("\tTable name = %s, fk = %s (%s)\n", fk_table_name, fk, column);
     }
 

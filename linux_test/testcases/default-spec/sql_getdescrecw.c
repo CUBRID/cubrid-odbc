@@ -92,7 +92,7 @@ sql_getdescrecw (int case_num, char *dsn)
 	}
       else
 	{
-	  wide_char_to_bytes (Name, SQL_NTS, &m_name, NULL, "UCS2");
+	  wide_char_to_bytes ((wchar_t *) Name, SQL_NTS, (char **) &m_name, NULL, "UCS2");
 	  printf ("\tName %s, ",      m_name);
 	  printf ("\tType %i, ",        (int)Type);
 	  printf ("\tSubType %i, ",     (int)SubType);

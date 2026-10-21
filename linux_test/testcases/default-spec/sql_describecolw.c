@@ -76,7 +76,7 @@ sql_describecolw (int case_num, char *dsn)
 			&ColumnDataNullable);  // Whether column nullable
       AreNotEqual (retcode, SQL_ERROR);
 
-      wide_char_to_bytes (ColumnName, SQL_NTS, &buf, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) ColumnName, SQL_NTS, (char **) &buf, NULL, "UCS2");
       printf ("Column [%d] = %s (name_len = %d), type = %s, size = %d, num_digit = %d, nullable = %d\n",
 	      i + 1, buf, (int) ColumnNameLen, sqltype_name (ColumnDataType), ColumnDataSize, ColumnDataDigits, ColumnDataNullable);
     }

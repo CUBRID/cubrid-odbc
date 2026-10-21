@@ -72,8 +72,8 @@ sql_statisticsw (int case_num, char *dsn)
 
   while (SQLFetch (hstmt) == SQL_SUCCESS)
     {
-      wide_char_to_bytes (szIndexName, SQL_NTS, &index, NULL, "UCS2");
-      wide_char_to_bytes (szColumnName, SQL_NTS, &column, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) szIndexName, SQL_NTS, (char **) &index, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) szColumnName, SQL_NTS, (char **) &column, NULL, "UCS2");
       printf ("\tindex name: %s, col = %s (%s), cardinality = %d\n", index, table, column, sCardinality);
     }
 

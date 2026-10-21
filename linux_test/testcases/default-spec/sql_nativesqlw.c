@@ -40,7 +40,7 @@ sql_nativesqlw (int case_num, char *dsn)
   retcode = SQLNativeSqlW (hDbc, query_buf, SQL_NTS, OutStatementText, sizeof (OutStatementText), &TextLength2Ptr);
   AreNotEqual (retcode, SQL_ERROR);
 
-  wide_char_to_bytes (OutStatementText, SQL_NTS, &m_query, NULL, "UCS2");
+  wide_char_to_bytes ((wchar_t *) OutStatementText, SQL_NTS, (char **) &m_query, NULL, "UCS2");
   printf ("\tconverted query (%d) = |%s|\n", TextLength2Ptr, m_query);
 
   retcode = SQLDisconnect (hDbc);

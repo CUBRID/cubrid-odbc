@@ -36,7 +36,9 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
   wbuf = (char *) *buffer;
   if (buffer_length == 0)
     {
-      wbuf_len = num_chars * WCHAR_LENGTH + sizeof (wchar_t);
+      /* iconv to "UCS2" emits a byte order mark ahead of the text, and the
+	 terminator written below is a whole wchar_t wide */
+      wbuf_len = num_chars * WCHAR_LENGTH + WCHAR_LENGTH + sizeof (wchar_t);
       wbuf = (char *) UT_ALLOC (wbuf_len);
       if (wbuf == NULL)
 	{
@@ -139,9 +141,10 @@ wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length,
 
   if (target)
     {
-      if (mbuf_len > bytes_required)
+      if (mbuf_len > bytes_required + 1)
 	{
-	  *target = UT_REALLOC (mbuf_orig, bytes_required);
+	  /* keep the byte calloc() zeroed for us, so *target stays a C string */
+	  *target = UT_REALLOC (mbuf_orig, bytes_required + 1);
 	}
       else
 	{
