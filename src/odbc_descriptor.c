@@ -1332,11 +1332,13 @@ odbc_set_desc_rec (ODBC_DESC *desc,
 
   if (subtype == SQL_DATETIME || subtype == SQL_INTERVAL)
     {
-      odbc_set_desc_field (desc, rec_number, SQL_DESC_DATETIME_INTERVAL_CODE, (SQLPOINTER) (SQLLEN) subtype, sizeof (subtype), 1);
+      odbc_set_desc_field (desc, rec_number, SQL_DESC_DATETIME_INTERVAL_CODE, (SQLPOINTER) (SQLLEN) subtype, sizeof (subtype),
+			   1);
     }
 
   concise_type = odbc_verbose_to_concise_type (type, subtype);
-  odbc_set_desc_field (desc, rec_number, SQL_DESC_CONCISE_TYPE, (SQLPOINTER) (SQLLEN) concise_type, sizeof (concise_type), 1);
+  odbc_set_desc_field (desc, rec_number, SQL_DESC_CONCISE_TYPE, (SQLPOINTER) (SQLLEN) concise_type, sizeof (concise_type),
+		       1);
 
   odbc_set_desc_field (desc, rec_number, SQL_DESC_OCTET_LENGTH, (void *) length, sizeof (length), 1);
 
