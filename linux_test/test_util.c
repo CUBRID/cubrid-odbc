@@ -37,7 +37,7 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
   if (buffer_length == 0)
     {
       /* iconv to "UCS2" emits a byte order mark ahead of the text, and the
-	 terminator written below is a whole wchar_t wide */
+       terminator written below is a whole wchar_t wide */
       wbuf_len = num_chars * WCHAR_LENGTH + WCHAR_LENGTH + sizeof (wchar_t);
       wbuf = (char *) UT_ALLOC (wbuf_len);
       if (wbuf == NULL)

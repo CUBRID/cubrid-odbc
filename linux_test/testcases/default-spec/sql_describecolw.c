@@ -51,7 +51,7 @@ sql_describecolw (int case_num, char *dsn)
 
   retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hstmt);
 
-  retcode = bytes_to_wide_char (qry, strlen(qry), &query_buf, 0, NULL, "UCS2");
+  retcode = bytes_to_wide_char (qry, strlen (qry), &query_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLExecDirectW (hstmt, query_buf, SQL_NTS);

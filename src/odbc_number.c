@@ -945,37 +945,37 @@ int ignore_last;
   if (n1->n_scale != n2->n_scale)
     {
       if (n1->n_scale > n2->n_scale)
-      {
-	for (count = n1->n_scale - n2->n_scale; count > 0; count--)
-	  if (*n1ptr++ != 0)
-	    {
-	      /* Magnitude of n1 > n2. */
-	      if (!use_sign || n1->n_sign == PLUS)
-		{
-		  return (1);
-		}
-	      else
-		{
-		  return (-1);
-		}
-	    }
-      }
-    else
-      {
-	for (count = n2->n_scale - n1->n_scale; count > 0; count--)
-	  if (*n2ptr++ != 0)
-	    {
-	      /* Magnitude of n1 < n2. */
-	      if (!use_sign || n1->n_sign == PLUS)
-		{
-		  return (-1);
-		}
-	      else
-		{
-		  return (1);
-		}
-	    }
-      }
+	{
+	  for (count = n1->n_scale - n2->n_scale; count > 0; count--)
+	    if (*n1ptr++ != 0)
+	      {
+		/* Magnitude of n1 > n2. */
+		if (!use_sign || n1->n_sign == PLUS)
+		  {
+		    return (1);
+		  }
+		else
+		  {
+		    return (-1);
+		  }
+	      }
+	}
+      else
+	{
+	  for (count = n2->n_scale - n1->n_scale; count > 0; count--)
+	    if (*n2ptr++ != 0)
+	      {
+		/* Magnitude of n1 < n2. */
+		if (!use_sign || n1->n_sign == PLUS)
+		  {
+		    return (-1);
+		  }
+		else
+		  {
+		    return (1);
+		  }
+	      }
+	}
     }
 
   /* They must be equal! */

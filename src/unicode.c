@@ -90,7 +90,7 @@ SQLDriverConnectW (SQLHDBC hdbc, SQLHWND hwnd,
 #endif
   if (out)
     {
-          bytes_to_wide_char ((char *) pt_out, strlen ((char *) pt_out), (wchar_t **) &out,
+      bytes_to_wide_char ((char *) pt_out, strlen ((char *) pt_out), (wchar_t **) &out,
 			  out_max, &temp_out_len, conn->charset);
     }
   if (out_len)
@@ -483,7 +483,8 @@ SQLColumnsW (SQLHSTMT hstmt,
   ODBC_STATEMENT *stmt_handle = (ODBC_STATEMENT *) hstmt;
   OutputDebugString ("SQLColumnsW called.\n");
 
-  wide_char_to_bytes ((wchar_t *) catalog, catalog_len, (char **) &cb_catalog, &cb_catalog_len, stmt_handle->conn->charset);
+  wide_char_to_bytes ((wchar_t *) catalog, catalog_len, (char **) &cb_catalog, &cb_catalog_len,
+		      stmt_handle->conn->charset);
   wide_char_to_bytes ((wchar_t *) schema, schema_len, (char **) &cb_schema, &cb_schema_len, stmt_handle->conn->charset);
   wide_char_to_bytes ((wchar_t *) table, table_len, (char **) &cb_table, &cb_table_len, stmt_handle->conn->charset);
   wide_char_to_bytes ((wchar_t *) column, column_len, (char **) &cb_column, &cb_column_len, stmt_handle->conn->charset);
@@ -520,7 +521,8 @@ SQLColumnsW (SQLHSTMT hstmt,
 
   if (catalog_len != 0)
     {
-      wide_char_to_bytes ((wchar_t *) catalog, catalog_len, (char **) &cb_catalog, &cb_catalog_len, stmt_handle->conn->charset);
+      wide_char_to_bytes ((wchar_t *) catalog, catalog_len, (char **) &cb_catalog, &cb_catalog_len,
+			  stmt_handle->conn->charset);
     }
 
   if (schema_len != 0)
@@ -587,7 +589,8 @@ SQLDescribeColW (SQLHSTMT hstmt, SQLUSMALLINT column,
       return ret;
     }
 
-  bytes_to_wide_char ((char *) name_buffer, name_buffer_len, (wchar_t **) &name, name_max, &out_length, stmt_handle->conn->charset);
+  bytes_to_wide_char ((char *) name_buffer, name_buffer_len, (wchar_t **) &name, name_max, &out_length,
+		      stmt_handle->conn->charset);
 
   if (name_len)
     {
@@ -629,11 +632,15 @@ SQLForeignKeysW (SQLHSTMT hstmt,
   ODBC_STATEMENT *stmt = (ODBC_STATEMENT *) hstmt;
 
   OutputDebugString ("SQLForeignKeysW called.\n");
-  wide_char_to_bytes ((wchar_t *) pk_catalog, pk_catalog_len, (char **) &cb_pk_catalog, &cb_pk_catalog_len, stmt->conn->charset);
-  wide_char_to_bytes ((wchar_t *) pk_schema, pk_schema_len, (char **) &cb_pk_schema, &cb_pk_schema_len, stmt->conn->charset);
+  wide_char_to_bytes ((wchar_t *) pk_catalog, pk_catalog_len, (char **) &cb_pk_catalog, &cb_pk_catalog_len,
+		      stmt->conn->charset);
+  wide_char_to_bytes ((wchar_t *) pk_schema, pk_schema_len, (char **) &cb_pk_schema, &cb_pk_schema_len,
+		      stmt->conn->charset);
   wide_char_to_bytes ((wchar_t *) pk_table, pk_table_len, (char **) &cb_pk_table, &cb_pk_table_len, stmt->conn->charset);
-  wide_char_to_bytes ((wchar_t *) fk_catalog, fk_catalog_len, (char **) &cb_fk_catalog, &cb_fk_catalog_len, stmt->conn->charset);
-  wide_char_to_bytes ((wchar_t *) fk_schema, fk_schema_len, (char **) &cb_fk_schema, &cb_fk_schema_len, stmt->conn->charset);
+  wide_char_to_bytes ((wchar_t *) fk_catalog, fk_catalog_len, (char **) &cb_fk_catalog, &cb_fk_catalog_len,
+		      stmt->conn->charset);
+  wide_char_to_bytes ((wchar_t *) fk_schema, fk_schema_len, (char **) &cb_fk_schema, &cb_fk_schema_len,
+		      stmt->conn->charset);
   wide_char_to_bytes ((wchar_t *) fk_table, fk_table_len, (char **) &cb_fk_table, &cb_fk_table_len, stmt->conn->charset);
 
   if (cb_pk_table_len == 0)
@@ -715,7 +722,8 @@ SQLGetCursorNameW (SQLHSTMT hstmt, SQLWCHAR *cursor, SQLSMALLINT cursor_max, SQL
       return ret;
     }
 
-  bytes_to_wide_char ((char *) cursor_name, cursor_name_len, (wchar_t **) &cursor, cursor_max, &out_length, stmt_handle->conn->charset);
+  bytes_to_wide_char ((char *) cursor_name, cursor_name_len, (wchar_t **) &cursor, cursor_max, &out_length,
+		      stmt_handle->conn->charset);
 
   if (cursor_len)
     {
@@ -752,7 +760,8 @@ SQLGetCursorNameW (SQLHSTMT hstmt, SQLWCHAR *cursor, SQLSMALLINT cursor_max, SQL
       return ret;
     }
 
-  bytes_to_wide_char ((char *) cursor_name, cursor_name_len, (wchar_t **) &cursor, cursor_max, &out_length, stmt->conn->charset);
+  bytes_to_wide_char ((char *) cursor_name, cursor_name_len, (wchar_t **) &cursor, cursor_max, &out_length,
+		      stmt->conn->charset);
   if (cursor_len)
     {
       *cursor_len = (SQLSMALLINT) out_length;
@@ -1185,7 +1194,8 @@ SQLGetDescRecW (SQLHDESC hdesc, SQLSMALLINT record, SQLWCHAR *name,
       return ret;
     }
 
-  bytes_to_wide_char ((char *) name_buffer, name_buffer_len, (wchar_t **) &name, name_max, &out_length, desc_handle->conn->charset);
+  bytes_to_wide_char ((char *) name_buffer, name_buffer_len, (wchar_t **) &name, name_max, &out_length,
+		      desc_handle->conn->charset);
 
   if (name_len)
     {
@@ -1588,7 +1598,8 @@ SQLColAttributeW (SQLHSTMT StatementHandle,
 
       if (CharacterAttribute && StringLength)
 	{
-	  bytes_to_wide_char ((char *) CharacterAttribute, *StringLength / WCHAR_LENGTH, (wchar_t **) &wvalue, 0, NULL, stmt->conn->charset);
+	  bytes_to_wide_char ((char *) CharacterAttribute, *StringLength / WCHAR_LENGTH, (wchar_t **) &wvalue, 0, NULL,
+			      stmt->conn->charset);
 	  if (wvalue != NULL)
 	    {
 	      (void) memcpy ((char *) CharacterAttribute, (const char *) wvalue, *StringLength);

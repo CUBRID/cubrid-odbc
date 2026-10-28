@@ -49,16 +49,16 @@ sql_statisticsw (int case_num, char *dsn)
 
   retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hstmt);
 
-  bytes_to_wide_char((char *)drop_tbl, SQL_NTS, &query_buf, 0, NULL, "UCS2");
-  SQLExecDirectW(hstmt, query_buf, SQL_NTS);
+  bytes_to_wide_char ((char *)drop_tbl, SQL_NTS, &query_buf, 0, NULL, "UCS2");
+  SQLExecDirectW (hstmt, query_buf, SQL_NTS);
 
-  bytes_to_wide_char((char *)create_tbl, SQL_NTS, &query_buf, 0, NULL, "UCS2");
-  retcode = SQLExecDirectW(hstmt, query_buf, SQL_NTS);
-  AreNotEqual(retcode, SQL_ERROR);
+  bytes_to_wide_char ((char *)create_tbl, SQL_NTS, &query_buf, 0, NULL, "UCS2");
+  retcode = SQLExecDirectW (hstmt, query_buf, SQL_NTS);
+  AreNotEqual (retcode, SQL_ERROR);
 
-  bytes_to_wide_char((char *)create_idx, SQL_NTS, &query_buf, 0, NULL, "UCS2");
-  retcode = SQLExecDirectW(hstmt, query_buf, SQL_NTS);
-  AreNotEqual(retcode, SQL_ERROR);
+  bytes_to_wide_char ((char *)create_idx, SQL_NTS, &query_buf, 0, NULL, "UCS2");
+  retcode = SQLExecDirectW (hstmt, query_buf, SQL_NTS);
+  AreNotEqual (retcode, SQL_ERROR);
 
   retcode = bytes_to_wide_char (table, SQL_NTS, &table_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
@@ -78,9 +78,9 @@ sql_statisticsw (int case_num, char *dsn)
     }
 
 
-  bytes_to_wide_char((char *)drop_tbl, SQL_NTS, &query_buf, 0, NULL, "UCS2");
-  SQLExecDirectW(hstmt, query_buf, SQL_NTS);
-  AreNotEqual(retcode, SQL_ERROR);
+  bytes_to_wide_char ((char *)drop_tbl, SQL_NTS, &query_buf, 0, NULL, "UCS2");
+  SQLExecDirectW (hstmt, query_buf, SQL_NTS);
+  AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLDisconnect (hDbc);
   AreNotEqual (retcode, SQL_ERROR);
