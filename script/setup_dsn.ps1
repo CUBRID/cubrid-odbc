@@ -141,23 +141,29 @@ function Test-RegKey
     return $true
 }
 
-function Get-RegValueMap
+# every value of a key as a list rather than a map: the unnamed default value
+# has an empty name, which ConvertFrom-Json in Windows PowerShell rejects as a
+# property name
+function Get-RegValueList
 {
     param([Microsoft.Win32.RegistryKey] $Base, [string] $Path)
 
-    $map = [ordered]@{}
+    $list = @()
     $key = $Base.OpenSubKey($Path)
-    if ($null -eq $key) { return $map }
+    if ($null -eq $key) { return ,$list }
     try {
         foreach ($n in $key.GetValueNames()) {
-            $map[$n] = [ordered]@{
+            $list += [ordered]@{
+                Name = $n
                 Kind = [string] $key.GetValueKind($n)
-                Data = $key.GetValue($n)
+                # keep %VAR% of an ExpandString as written, not as expanded now
+                Data = $key.GetValue($n, $null,
+                    [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
             }
         }
     }
     finally { $key.Close() }
-    return $map
+    return ,$list
 }
 
 # JSON gives every value back as a string, so put it in the type the key held
@@ -176,21 +182,31 @@ function Convert-RegData
 
 # put a key back exactly as it was: every saved value restored, and anything
 # this run added on top of them removed
-function Restore-RegValueMap
+function Restore-RegValueList
 {
     param([Microsoft.Win32.RegistryKey] $Base, [string] $Path, $Saved)
 
-    if ($null -eq $Saved) { return 0 }
+    # a key that had no values comes back from JSON as an empty array or as
+    # $null; either way whatever this run wrote into it still has to go
+    $items = if ($null -eq $Saved) { @() } else { @($Saved) }
 
     $changed = 0
     $wanted = @{}
 
-    foreach ($v in $Saved.PSObject.Properties) {
+    foreach ($v in $items) {
         $wanted[$v.Name] = $true
-        $want = Convert-RegData $v.Value.Kind $v.Value.Data
-        $cur = Get-RegValue $Base $Path $v.Name
+        $want = Convert-RegData $v.Kind $v.Data
+        $cur = $null
+        $key = $Base.OpenSubKey($Path)
+        if ($null -ne $key) {
+            try {
+                $cur = $key.GetValue($v.Name, $null,
+                    [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+            }
+            finally { $key.Close() }
+        }
         if ($null -eq $cur -or [string] $cur -ne [string] $want) {
-            Set-RegValue $Base $Path $v.Name $want ([Microsoft.Win32.RegistryValueKind] $v.Value.Kind)
+            Set-RegValue $Base $Path $v.Name $want ([Microsoft.Win32.RegistryValueKind] $v.Kind)
             $changed++
         }
     }
@@ -233,7 +249,7 @@ function Save-OdbcState
                 Existed = (Test-RegKey $base $path)
                 # -Force rewrites the server, the user, the password and the
                 # rest, so the whole key is kept, not just the driver path
-                Values  = (Get-RegValueMap $base $path)
+                Values  = (Get-RegValueList $base $path)
                 # the index entry is repaired on every run, even for a DSN that
                 # is otherwise left alone, so it has to come back too
                 Indexed = [ordered]@{
@@ -302,7 +318,7 @@ function Restore-OdbcState
             $path = "$ODBCINI_PATH\$name"
 
             if ($saved.Existed) {
-                $n = Restore-RegValueMap $dsnBase $path $saved.Values
+                $n = Restore-RegValueList $dsnBase $path $saved.Values
                 if ($n -gt 0) {
                     Write-Host ("[restore] DSN {0} : {1} value(s) put back" -f $name, $n)
                 }
