@@ -23,14 +23,13 @@ sql_tableprivilegesw (int case_num, char *dsn)
   SQLHDBC           hDbc;
   SQLHSTMT  hstmt;
   wchar_t *dsn_buf;
-  SQLCHAR *table = "privilegetest";
+  char *table = "privilegetest";
   SQLWCHAR *table_buf;
-  SQLSMALLINT num_columns;
 
   SQLWCHAR *query_buf;
-  SQLCHAR *drop_tbl   = "DROP TABLE privilegetest";
-  SQLCHAR *create_tbl = "CREATE TABLE privilegetest (id INT PRIMARY KEY, name VARCHAR(20))";
-  SQLCHAR *grant_priv = "GRANT SELECT ON privilegetest TO public";
+  char *drop_tbl   = "DROP TABLE privilegetest";
+  char *create_tbl = "CREATE TABLE privilegetest (id INT PRIMARY KEY, name VARCHAR(20))";
+  char *grant_priv = "GRANT SELECT ON privilegetest TO public";
 
   SQLWCHAR	 GRANTOR [MAX_COL_NAME_LEN];
   SQLWCHAR	 GRANTEE [MAX_COL_NAME_LEN];
@@ -38,9 +37,6 @@ sql_tableprivilegesw (int case_num, char *dsn)
   SQLWCHAR	 IS_GRANTABLE [MAX_COL_NAME_LEN];
 
   SQLCHAR		*m_grantor, *m_grantee, *m_privilege, *m_is_grantable;
-  SQLCHAR		*fk_table_name, *column, *fk;
-
-  int id, i = 1;
 
   retcode = SQLAllocEnv (&hEnv);
   retcode = SQLSetEnvAttr (hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
@@ -48,23 +44,23 @@ sql_tableprivilegesw (int case_num, char *dsn)
   AreNotEqual (retcode, SQL_ERROR);
 
   bytes_to_wide_char (dsn, SQL_NTS, &dsn_buf, 0, NULL, "UCS2");
-  retcode = SQLConnectW (hDbc, dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
+  retcode = SQLConnectW (hDbc, (SQLWCHAR *) dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hstmt);
 
-  bytes_to_wide_char ((char *) drop_tbl, SQL_NTS, &query_buf, 0, NULL, "UCS2");
+  bytes_to_wide_char (drop_tbl, SQL_NTS, (wchar_t **) &query_buf, 0, NULL, "UCS2");
   SQLExecDirectW (hstmt, query_buf, SQL_NTS);
 
-  bytes_to_wide_char ((char *) create_tbl, SQL_NTS, &query_buf, 0, NULL, "UCS2");
+  bytes_to_wide_char (create_tbl, SQL_NTS, (wchar_t **) &query_buf, 0, NULL, "UCS2");
   retcode = SQLExecDirectW (hstmt, query_buf, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
-  bytes_to_wide_char ((char *) grant_priv, SQL_NTS, &query_buf, 0, NULL, "UCS2");
+  bytes_to_wide_char (grant_priv, SQL_NTS, (wchar_t **) &query_buf, 0, NULL, "UCS2");
   retcode = SQLExecDirectW (hstmt, query_buf, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
-  retcode = bytes_to_wide_char (table, SQL_NTS, &table_buf, 0, NULL, "UCS2");
+  retcode = bytes_to_wide_char (table, SQL_NTS, (wchar_t **) &table_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
 
   SQLBindCol (hstmt, 4, SQL_C_WCHAR, GRANTOR, sizeof (GRANTOR), NULL);
@@ -85,7 +81,7 @@ sql_tableprivilegesw (int case_num, char *dsn)
 	      m_grantee, m_privilege, m_is_grantable);
     }
 
-  bytes_to_wide_char ((char *) drop_tbl, SQL_NTS, &query_buf, 0, NULL, "UCS2");
+  bytes_to_wide_char (drop_tbl, SQL_NTS, (wchar_t **) &query_buf, 0, NULL, "UCS2");
   SQLExecDirectW (hstmt, query_buf, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 

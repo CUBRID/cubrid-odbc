@@ -90,7 +90,6 @@ wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length,
   size_t bytes_required;
   size_t out_bytes_left;
   int rc;
-  int alloc = 0;
   int num_wchars;
 
   if (str == NULL)

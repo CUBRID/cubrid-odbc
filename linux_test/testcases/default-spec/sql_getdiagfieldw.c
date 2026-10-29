@@ -19,7 +19,7 @@ sql_getdiagfieldw (int case_num, char *dsn)
   SQLHDBC           hDbc;
   SQLHSTMT  hstmt;
   wchar_t *dsn_buf;
-  SQLCHAR *qry = "SELECT * from db_user";
+  char *qry = "SELECT * from db_user";
   SQLWCHAR *query_buf;
   int id, i = 1;
   SQLLEN	status;
@@ -31,12 +31,12 @@ sql_getdiagfieldw (int case_num, char *dsn)
   AreNotEqual (retcode, SQL_ERROR);
 
   bytes_to_wide_char (dsn, SQL_NTS, &dsn_buf, 0, NULL, "UCS2");
-  retcode = SQLConnectW (hDbc, dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
+  retcode = SQLConnectW (hDbc, (SQLWCHAR *) dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hstmt);
 
-  retcode = bytes_to_wide_char (qry, strlen (qry), &query_buf, 0, NULL, "UCS2");
+  retcode = bytes_to_wide_char (qry, strlen (qry), (wchar_t **) &query_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLExecDirectW (hstmt, query_buf, SQL_NTS);
@@ -51,7 +51,7 @@ sql_getdiagfieldw (int case_num, char *dsn)
       retcode = SQLGetData (hstmt, 1, SQL_C_LONG, &id, 0, NULL);
       printf ("1st col [%d] = %d\n", i++, id);
       retcode = SQLGetDiagFieldW (SQL_HANDLE_STMT, hstmt, 1, 4, &status, SQL_INTEGER, &statuslen);
-      printf ("SQLGetDiagFieldW: ret = %d, status = %d, status_len = %d\n", retcode, status, statuslen);
+      printf ("SQLGetDiagFieldW: ret = %d, status = %ld, status_len = %d\n", retcode, (long) status, statuslen);
     }
 
   retcode = SQLDisconnect (hDbc);

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <sql.h>
 #include <sqlext.h>
 

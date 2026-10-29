@@ -17,7 +17,6 @@ sql_getconnectattrw (int case_num, char *dsn)
   RETCODE retcode;
   SQLHENV           henv;
   SQLHDBC           hdbc;
-  SQLHSTMT  hstmt;
   wchar_t *dsn_buf;
   SQLINTEGER autocommit_mode, login_timeout, login_timeoutval = 125;
 
@@ -28,7 +27,7 @@ sql_getconnectattrw (int case_num, char *dsn)
 
   retcode = SQLGetConnectAttrW (hdbc, SQL_LOGIN_TIMEOUT, &login_timeout, sizeof (SQLINTEGER), NULL);
   printf ("\tlogin timeout-1 = %d\n", login_timeout);
-  retcode = SQLSetConnectAttrW (hdbc, SQL_ATTR_LOGIN_TIMEOUT, login_timeoutval, 0);
+  retcode = SQLSetConnectAttrW (hdbc, SQL_ATTR_LOGIN_TIMEOUT, (SQLPOINTER) (SQLLEN) login_timeoutval, 0);
 
   retcode = SQLGetConnectAttrW (hdbc, SQL_LOGIN_TIMEOUT, &login_timeout, sizeof (SQLINTEGER), NULL);
   printf ("\tlogin timeout-2 = %d\n", login_timeout);
@@ -40,11 +39,11 @@ sql_getconnectattrw (int case_num, char *dsn)
 	  autocommit_mode == SQL_AUTOCOMMIT_ON ? "autocommit" : "noautocommit");
 
   autocommit_mode = SQL_AUTOCOMMIT_OFF;
-  retcode = SQLSetConnectAttrW (hdbc, SQL_ATTR_AUTOCOMMIT, autocommit_mode, 0);
+  retcode = SQLSetConnectAttrW (hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER) (SQLLEN) autocommit_mode, 0);
   AreNotEqual (retcode, SQL_ERROR);
 
   bytes_to_wide_char (dsn, SQL_NTS, &dsn_buf, 0, NULL, "UCS2");
-  retcode = SQLConnectW (hdbc, dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
+  retcode = SQLConnectW (hdbc, (SQLWCHAR *) dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
   autocommit_mode = -1;

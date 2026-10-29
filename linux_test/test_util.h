@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
-static int caseno=1;
+/* not every testcase reports through the macros below */
+static int caseno __attribute__ ((unused)) = 1;
 
 #define AreNotEqual(v,expect)		\
     do {				\

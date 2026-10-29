@@ -22,7 +22,7 @@ sql_describecolw (int case_num, char *dsn)
   SQLHDBC           hDbc;
   SQLHSTMT  hstmt;
   wchar_t *dsn_buf;
-  SQLCHAR *qry = "SELECT * from event";
+  char *qry = "SELECT * from event";
   SQLWCHAR *query_buf;
   SQLSMALLINT num_columns;
 
@@ -32,8 +32,6 @@ sql_describecolw (int case_num, char *dsn)
   SQLULEN		ColumnDataSize;
   SQLSMALLINT	ColumnDataDigits;
   SQLSMALLINT	ColumnDataNullable;
-  SQLCHAR		*ColumnData;
-  SQLLEN		ColumnDataLen;
   SQLCHAR		*buf;
 
   int id, i = 1;
@@ -46,12 +44,12 @@ sql_describecolw (int case_num, char *dsn)
   AreNotEqual (retcode, SQL_ERROR);
 
   bytes_to_wide_char (dsn, strlen (dsn), &dsn_buf, 0, NULL, "UCS2");
-  retcode = SQLConnectW (hDbc, dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
+  retcode = SQLConnectW (hDbc, (SQLWCHAR *) dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hstmt);
 
-  retcode = bytes_to_wide_char (qry, strlen (qry), &query_buf, 0, NULL, "UCS2");
+  retcode = bytes_to_wide_char (qry, strlen (qry), (wchar_t **) &query_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLExecDirectW (hstmt, query_buf, SQL_NTS);
@@ -77,8 +75,9 @@ sql_describecolw (int case_num, char *dsn)
       AreNotEqual (retcode, SQL_ERROR);
 
       wide_char_to_bytes ((wchar_t *) ColumnName, SQL_NTS, (char **) &buf, NULL, "UCS2");
-      printf ("Column [%d] = %s (name_len = %d), type = %s, size = %d, num_digit = %d, nullable = %d\n",
-	      i + 1, buf, (int) ColumnNameLen, sqltype_name (ColumnDataType), ColumnDataSize, ColumnDataDigits, ColumnDataNullable);
+      printf ("Column [%d] = %s (name_len = %d), type = %s, size = %lu, num_digit = %d, nullable = %d\n",
+	      i + 1, buf, (int) ColumnNameLen, sqltype_name (ColumnDataType), (unsigned long) ColumnDataSize, ColumnDataDigits,
+	      ColumnDataNullable);
     }
 
 #endif

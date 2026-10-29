@@ -21,22 +21,18 @@ sql_statisticsw (int case_num, char *dsn)
   SQLHDBC           hDbc;
   SQLHSTMT  hstmt;
   wchar_t *dsn_buf;
-  SQLCHAR *table = "statistictest";
+  char *table = "statistictest";
   SQLWCHAR *table_buf;
-  SQLSMALLINT num_columns;
 
   SQLWCHAR *query_buf;
-  SQLCHAR  *drop_tbl   = "DROP TABLE statistictest";
-  SQLCHAR  *create_tbl = "CREATE TABLE statistictest (id INT PRIMARY KEY, name VARCHAR(20))";
-  SQLCHAR  *create_idx = "CREATE INDEX idx_stat_name ON statistictest(name)";
+  char  *drop_tbl   = "DROP TABLE statistictest";
+  char  *create_tbl = "CREATE TABLE statistictest (id INT PRIMARY KEY, name VARCHAR(20))";
+  char  *create_idx = "CREATE INDEX idx_stat_name ON statistictest(name)";
 
   SQLWCHAR	szColumnName[MAX_COL_NAME_LEN];
   SQLWCHAR	szIndexName[MAX_COL_NAME_LEN];
-  SQLUSMALLINT uIndexQualifier, sType;
-  SQLLEN sColumnSize, sCardinality;
+  SQLLEN sCardinality;
   SQLCHAR		*index, *column;
-
-  int id, i = 1;
 
   retcode = SQLAllocEnv (&hEnv);
   retcode = SQLSetEnvAttr (hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
@@ -44,23 +40,23 @@ sql_statisticsw (int case_num, char *dsn)
   AreNotEqual (retcode, SQL_ERROR);
 
   bytes_to_wide_char (dsn, SQL_NTS, &dsn_buf, 0, NULL, "UCS2");
-  retcode = SQLConnectW (hDbc, dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
+  retcode = SQLConnectW (hDbc, (SQLWCHAR *) dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hstmt);
 
-  bytes_to_wide_char ((char *)drop_tbl, SQL_NTS, &query_buf, 0, NULL, "UCS2");
+  bytes_to_wide_char (drop_tbl, SQL_NTS, (wchar_t **) &query_buf, 0, NULL, "UCS2");
   SQLExecDirectW (hstmt, query_buf, SQL_NTS);
 
-  bytes_to_wide_char ((char *)create_tbl, SQL_NTS, &query_buf, 0, NULL, "UCS2");
+  bytes_to_wide_char (create_tbl, SQL_NTS, (wchar_t **) &query_buf, 0, NULL, "UCS2");
   retcode = SQLExecDirectW (hstmt, query_buf, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
-  bytes_to_wide_char ((char *)create_idx, SQL_NTS, &query_buf, 0, NULL, "UCS2");
+  bytes_to_wide_char (create_idx, SQL_NTS, (wchar_t **) &query_buf, 0, NULL, "UCS2");
   retcode = SQLExecDirectW (hstmt, query_buf, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
-  retcode = bytes_to_wide_char (table, SQL_NTS, &table_buf, 0, NULL, "UCS2");
+  retcode = bytes_to_wide_char (table, SQL_NTS, (wchar_t **) &table_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLStatisticsW (hstmt, NULL, 0, NULL, 0, table_buf, SQL_NTS, SQL_INDEX_ALL, SQL_QUICK);
@@ -74,11 +70,11 @@ sql_statisticsw (int case_num, char *dsn)
     {
       wide_char_to_bytes ((wchar_t *) szIndexName, SQL_NTS, (char **) &index, NULL, "UCS2");
       wide_char_to_bytes ((wchar_t *) szColumnName, SQL_NTS, (char **) &column, NULL, "UCS2");
-      printf ("\tindex name: %s, col = %s (%s), cardinality = %d\n", index, table, column, sCardinality);
+      printf ("\tindex name: %s, col = %s (%s), cardinality = %ld\n", index, table, column, (long) sCardinality);
     }
 
 
-  bytes_to_wide_char ((char *)drop_tbl, SQL_NTS, &query_buf, 0, NULL, "UCS2");
+  bytes_to_wide_char (drop_tbl, SQL_NTS, (wchar_t **) &query_buf, 0, NULL, "UCS2");
   SQLExecDirectW (hstmt, query_buf, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
