@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -31,6 +31,7 @@
 #include    <stdio.h>
 #include    <stdlib.h>
 #include    <string.h>
+#include    <ctype.h>
 
 #if !defined (_WINDOWS)
 #include <iconv.h>
@@ -48,9 +49,9 @@
 #define CP_EUC_KR 51949
 #endif
 
-static int is_korean (unsigned char ch);
-
+#if defined (_WINDOWS)
 #pragma comment(lib, "legacy_stdio_definitions.lib")
+#endif
 
 
 
@@ -240,7 +241,7 @@ ut_alloc_bstr (SQLLEN size)
 {
   WCHAR *new = NULL;
 
-  new = SysAllocStringLen (NULL, size);
+  new = SysAllocStringLen (NULL, (UINT) size);
 
 #ifdef _MEM_DEBUG
   if (new == NULL)
@@ -731,13 +732,6 @@ NodeAssign (ST_LIST *node, void *key, void *value)
   return 0;
 }
 
-PRIVATE int
-is_korean (unsigned char ch)
-{
-  return (ch >= 0xb0 && ch <= 0xc8) || (ch >= 0xa1 && ch <= 0xfe);
-}
-
-
 /*-----------------------------------------------------------------------
  *            Connection string
  *----------------------------------------------------------------------*/
@@ -1153,13 +1147,19 @@ wchar_value_assign (const char *str, char *out_buf, SQLLEN out_buf_len, SQLLEN *
       str_len = strlen (str);
       if (out_buf != NULL && out_buf_len > 0)
 	{
-	  if (bytes_to_wide_char (str, str_len, (wchar_t **) (&out_buf), out_buf_len, &length, CODE_NAME_UNICODE) < 0)
+	  /* the helper works in int; length is a SQLLEN, so it is filled
+	     through a matching variable instead of half-written */
+	  int wide_len = 0;
+
+	  if (bytes_to_wide_char ((char *) str, str_len, (wchar_t **) (&out_buf), (int) out_buf_len, &wide_len,
+				  CODE_NAME_UNICODE) < 0)
 	    {
 	      rc = ODBC_ERROR;
 	    }
+	  length = wide_len;
 	}
 
-      if ((unsigned int) out_buf_len <= length)
+      if (out_buf_len <= length)
 	{
 	  rc = ODBC_SUCCESS_WITH_INFO;
 	}
@@ -1355,7 +1355,7 @@ tolower_str (char *dst, const char *src)
 PUBLIC char *
 assemble_conn_attr (const char *conn_str_in, const char *key, char *buffer)
 {
-  const char *value = element_value_by_key (conn_str_in, key);
+  char *value = (char *) element_value_by_key (conn_str_in, key);
   if (value != NULL)
     {
       tolower_str (buffer + strlen (buffer), key);
@@ -1534,7 +1534,6 @@ wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length,
   size_t bytes_required;
   size_t out_bytes_left;
   int rc;
-  int alloc = 0;
   int num_wchars;
 
   if (str == NULL)
@@ -1552,7 +1551,7 @@ wide_char_to_bytes (wchar_t *str, int num_chars, char **target, int *out_length,
       return ODBC_SUCCESS;
     }
 
-  num_wchars = num_chars > 0 ? num_chars : sqlwcharlen (str);
+  num_wchars = num_chars > 0 ? num_chars : sqlwcharlen ((const WCHAR *) str);
   wbuf_len = (num_wchars) * WCHAR_LENGTH;
   mbuf_len = num_wchars * LENGTH_RATIO_WCHAR_TO_MULTIBYTE + 1;
 
@@ -1716,7 +1715,7 @@ bytes_to_wide_char (char *str, int size, wchar_t **buffer, int buffer_length, in
   if (buffer_length == 0 || buffer_length > (bytes_required + 1))
     {
       * ((wchar_t *) wbuf) = L'\0';
-      *buffer = wbuf_orig;
+      *buffer = (wchar_t *) wbuf_orig;
     }
 
 ret:
@@ -1782,14 +1781,12 @@ get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, 
 int
 get_wide_char_result (char *str, int size, wchar_t **buffer, int buffer_length, int *out_length, char *characterset)
 {
-  int rc = ODBC_SUCCESS;
-
   if (str == NULL || buffer == NULL)
     {
       return ODBC_SUCCESS;
     }
 
-  rc = bytes_to_wide_char ((char *) str, size, (wchar_t **) buffer, buffer_length, out_length, "UCS2");
+  bytes_to_wide_char ((char *) str, size, (wchar_t **) buffer, buffer_length, out_length, "UCS2");
 
   return ODBC_SUCCESS;
 }
@@ -1906,9 +1903,9 @@ decide_info_value_length (SQLUSMALLINT info_type, int buffer_length, int info_va
     case SQL_TABLE_TERM:
     case SQL_USER_NAME:
     case SQL_XOPEN_CLI_YEAR:
-      if (info_value_length > buffer_length - sizeof (SQLWCHAR))
+      if (info_value_length > buffer_length - (int) sizeof (SQLWCHAR))
 	{
-	  info_value_length = buffer_length - sizeof (SQLWCHAR);
+	  info_value_length = buffer_length - (int) sizeof (SQLWCHAR);
 	}
 
       break;

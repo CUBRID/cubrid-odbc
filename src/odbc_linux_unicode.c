@@ -29,6 +29,7 @@
 #include  "odbcinst.h"
 #include  "odbc_resource.h"
 #include  "odbc_connection.h"
+#include  "odbc_result.h"
 #include  "odbc_linux.h"
 
 /*
@@ -49,7 +50,7 @@ SQLDriverConnectLinux (HDBC hdbc,
 {
   HINI    hIni;
   RETCODE rc = ODBC_SUCCESS;
-  const char *ptDSN;
+  char *ptDSN;
   int port, fetch_size;
   CUBRIDDSNItem dsn;
   char connstr_buf[1024] = "";
@@ -61,10 +62,10 @@ SQLDriverConnectLinux (HDBC hdbc,
   size_t connstr_len;
   ODBCINI_DSN_LOOKUP_RESULT retcode;
 
-  connstr_len = cbConnStrIn > 0 ? cbConnStrIn : strlen (szConnStrIn);
+  connstr_len = cbConnStrIn > 0 ? cbConnStrIn : strlen ((char *) szConnStrIn);
   if (szConnStrIn != NULL)
     {
-      strncpy (ConnStrIn, szConnStrIn, connstr_len);
+      strncpy (ConnStrIn, (char *) szConnStrIn, connstr_len);
     }
 
   for (pt = ConnStrIn; *pt != '\0'; ++pt)
@@ -118,7 +119,7 @@ SQLDriverConnectLinux (HDBC hdbc,
 
   if ((szConnStrOut) && cbConnStrOut > 0)
     {
-      snprintf (szConnStrOut, MIN (strlen (connstr_buf), (unsigned) cbConnStrOut), "%s", connstr_buf);
+      snprintf ((char *) szConnStrOut, MIN (strlen (connstr_buf), (unsigned) cbConnStrOut), "%s", connstr_buf);
     }
 
   if (pcbConnStrOut)
@@ -136,16 +137,16 @@ SQLConnectLinux (SQLHDBC ConnectionHandle,
 		 SQLCHAR *UserName, SQLSMALLINT NameLength2, SQLCHAR *Authentication, SQLSMALLINT NameLength3)
 {
   RETCODE rc = SQL_SUCCESS;
-  SQLCHAR *stDataSource = NULL;
-  SQLCHAR *stUserName = NULL;
-  SQLCHAR *stAuthentication = NULL;
-  SQLCHAR stDBName[ITEMBUFLEN];
-  SQLCHAR stServerName[ITEMBUFLEN];
+  char *stDataSource = NULL;
+  char *stUserName = NULL;
+  char *stAuthentication = NULL;
+  char stDBName[ITEMBUFLEN];
+  char stServerName[ITEMBUFLEN];
   SQLINTEGER Port, FetchSize;
-  SQLCHAR stCharSet[ITEMBUFLEN];
-  SQLCHAR stAutocommit[ITEMBUFLEN];
-  SQLCHAR stOmitSchema[ITEMBUFLEN];
-  SQLCHAR *user = NULL, *pass = NULL;
+  char stCharSet[ITEMBUFLEN];
+  char stAutocommit[ITEMBUFLEN];
+  char stOmitSchema[ITEMBUFLEN];
+  char *user = NULL, *pass = NULL;
 
   if (UserName == NULL || NameLength2 <= 0)
     {
@@ -156,11 +157,11 @@ SQLConnectLinux (SQLHDBC ConnectionHandle,
     }
   else
     {
-      stUserName = UT_MAKE_STRING (UserName, NameLength2);
-      stAuthentication = UT_MAKE_STRING (Authentication, NameLength3);
+      stUserName = UT_MAKE_STRING ((char *) UserName, NameLength2);
+      stAuthentication = UT_MAKE_STRING ((char *) Authentication, NameLength3);
     }
 
-  get_dsn_info (DataSource, stDBName, sizeof (stDBName), user, NameLength2, pass, NameLength3,
+  get_dsn_info ((char *) DataSource, stDBName, sizeof (stDBName), user, NameLength2, pass, NameLength3,
 		stServerName, sizeof (stServerName), &Port, &FetchSize,
 		stCharSet, sizeof (stCharSet), stAutocommit, sizeof (stAutocommit),
 		stOmitSchema, sizeof (stOmitSchema));
@@ -184,13 +185,13 @@ SQLExecDirectLinux (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER
   stmt_handle = (ODBC_STATEMENT *) StatementHandle;
   odbc_free_diag (stmt_handle->diag, RESET);
 
-  if (strcasecmp (StatementText, "@QP@") == 0)
+  if (strcasecmp ((char *) StatementText, "@QP@") == 0)
     {
       stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN;
       return ODBC_SUCCESS;
     }
 
-  if (strcasecmp (StatementText, "@QE@") == 0)
+  if (strcasecmp ((char *) StatementText, "@QE@") == 0)
     {
       stmt_handle->query_plan = CCI_EXEC_ONLY_QUERY_PLAN | CCI_EXEC_QUERY_ALL;
       return ODBC_SUCCESS;
@@ -198,7 +199,7 @@ SQLExecDirectLinux (SQLHSTMT StatementHandle, SQLCHAR *StatementText, SQLINTEGER
 
   stmt_handle->is_prepared = _FALSE_;
 
-  rc = odbc_prepare (stmt_handle, StatementText);
+  rc = odbc_prepare (stmt_handle, (char *) StatementText);
   ERROR_GOTO (rc, error);
 
   rc = odbc_execute (stmt_handle);

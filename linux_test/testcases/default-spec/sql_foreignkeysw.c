@@ -23,16 +23,13 @@ sql_foreignkeysw (int case_num, char *dsn)
   SQLHDBC           hDbc;
   SQLHSTMT  hstmt;
   wchar_t *dsn_buf;
-  SQLCHAR *table = "event";
+  char *table = "event";
   SQLWCHAR *table_buf;
-  SQLSMALLINT num_columns;
 
   SQLWCHAR	szForeignKeyTable[MAX_COL_NAME_LEN];
   SQLWCHAR	szForeignKeyColumn[MAX_COL_NAME_LEN];
   SQLWCHAR	szForeignKey[MAX_COL_NAME_LEN];
   SQLCHAR		*fk_table_name, *column, *fk;
-
-  int id, i = 1;
 
   retcode = SQLAllocEnv (&hEnv);
   retcode = SQLSetEnvAttr (hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
@@ -40,12 +37,12 @@ sql_foreignkeysw (int case_num, char *dsn)
   AreNotEqual (retcode, SQL_ERROR);
 
   bytes_to_wide_char (dsn, strlen (dsn), &dsn_buf, 0, NULL, "UCS2");
-  retcode = SQLConnectW (hDbc, dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
+  retcode = SQLConnectW (hDbc, (SQLWCHAR *) dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hstmt);
 
-  retcode = bytes_to_wide_char (table, SQL_NTS, &table_buf, 0, NULL, "UCS2");
+  retcode = bytes_to_wide_char (table, SQL_NTS, (wchar_t **) &table_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
 
   SQLBindCol (hstmt, 7, SQL_C_WCHAR, szForeignKeyTable, sizeof (szForeignKeyTable), NULL);
@@ -57,9 +54,9 @@ sql_foreignkeysw (int case_num, char *dsn)
 
   while (SQLFetch (hstmt) == SQL_SUCCESS)
     {
-      wide_char_to_bytes (szForeignKeyTable, SQL_NTS, &fk_table_name, NULL, "UCS2");
-      wide_char_to_bytes (szForeignKeyColumn, SQL_NTS, &column, NULL, "UCS2");
-      wide_char_to_bytes (szForeignKey, SQL_NTS, &fk, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) szForeignKeyTable, SQL_NTS, (char **) &fk_table_name, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) szForeignKeyColumn, SQL_NTS, (char **) &column, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) szForeignKey, SQL_NTS, (char **) &fk, NULL, "UCS2");
       printf ("\tTable name = %s, fk = %s (%s)\n", fk_table_name, fk, column);
     }
 

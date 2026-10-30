@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -42,7 +42,6 @@ PRIVATE void get_bind_info (ODBC_STATEMENT *stmt,
 			    short col_index,
 			    short *type, void **bound_ptr, long *buffer_length, SQLLEN **strlen_ind_ptr);
 PRIVATE RETCODE move_catalog_rs (ODBC_STATEMENT *stmt, unsigned long *current_tpl_pos);
-PRIVATE RETCODE get_catalog_data (ODBC_STATEMENT *stmt, short row_index, short col_index);
 PRIVATE RETCODE c_value_to_bound_ptr (void *bound_ptr, SQLLEN buffer_length, VALUE_CONTAINER *c_value);
 
 /************************************************************************
@@ -73,19 +72,19 @@ odbc_bind_col (ODBC_STATEMENT *stmt,
       odbc_alloc_record (ard, NULL, column_num);
     }
 
-  rc = odbc_set_desc_field (ard, column_num, SQL_DESC_CONCISE_TYPE, (void *) target_type, 0, 1);
+  rc = odbc_set_desc_field (ard, column_num, SQL_DESC_CONCISE_TYPE, (SQLPOINTER) (SQLLEN) target_type, 0, 1);
   ERROR_GOTO (rc, error);
 
   /* setting verbose type */
   odbc_type = odbc_concise_to_verbose_type (target_type);
-  rc = odbc_set_desc_field (ard, column_num, SQL_DESC_TYPE, (void *) odbc_type, 0, 1);
+  rc = odbc_set_desc_field (ard, column_num, SQL_DESC_TYPE, (SQLPOINTER) (SQLLEN) odbc_type, 0, 1);
   ERROR_GOTO (rc, error);
 
   /* setting subcode */
   if (odbc_type == SQL_DATETIME)
     {
       odbc_subcode = odbc_subcode_type (target_type);
-      rc = odbc_set_desc_field (ard, column_num, SQL_DESC_DATETIME_INTERVAL_CODE, (void *) odbc_subcode, 0, 1);
+      rc = odbc_set_desc_field (ard, column_num, SQL_DESC_DATETIME_INTERVAL_CODE, (SQLPOINTER) (SQLLEN) odbc_subcode, 0, 1);
       ERROR_GOTO (rc, error);
     }
 
@@ -95,7 +94,7 @@ odbc_bind_col (ODBC_STATEMENT *stmt,
   if (size > 0)
     {
       /* target_type is the fixed type */
-      rc = odbc_set_desc_field (ard, column_num, SQL_DESC_LENGTH, (void *) size, 0, 1);
+      rc = odbc_set_desc_field (ard, column_num, SQL_DESC_LENGTH, (void *) (SQLLEN) size, 0, 1);
       ERROR_GOTO (rc, error);
     }
 
@@ -132,7 +131,6 @@ odbc_describe_col (ODBC_STATEMENT *stmt,
 		   SQLULEN *column_size_ptr, SQLSMALLINT *decimal_digits_ptr, SQLSMALLINT *nullable_ptr)
 {
   ODBC_DESC *ird = NULL;
-  ODBC_RECORD *record = NULL;
   short scale;
   SQLLEN int_name_length;
   RETCODE rc;
@@ -283,8 +281,6 @@ error:
 PUBLIC RETCODE
 odbc_row_count (ODBC_STATEMENT *stmt, SQLLEN *row_count)
 {
-  ODBC_DESC *ipd = NULL;
-
   if (row_count != NULL)
     {
       *row_count = stmt->tpl_number;
@@ -371,7 +367,7 @@ odbc_fetch (ODBC_STATEMENT *stmt,
 
   else if (stmt->result_type == QUERY)
     {
-      rc = move_advanced_cursor (stmt, &stmt->current_tpl_pos, fetch_orientation, (long) fetch_offset);
+      rc = move_advanced_cursor (stmt, (long *) &stmt->current_tpl_pos, fetch_orientation, (long) fetch_offset);
     }
   else
     {
@@ -653,9 +649,17 @@ odbc_get_data (ODBC_STATEMENT *stmt,
 		}
 	      else if (target_type == SQL_WCHAR || target_type == SQL_WVARCHAR || target_type == SQL_WLONGVARCHAR)
 		{
+		  /* the helper reports through an int *; handing it str_ind_ptr
+		     directly left the upper half of that SQLLEN untouched */
+		  int wide_len = 0;
+
 		  rc =
 			  get_wide_char_result (cci_value.str, strlen (cci_value.str), (wchar_t **) & bound_ptr,
-						(int) buffer_length, str_ind_ptr, stmt->conn->charset);
+						(int) buffer_length, &wide_len, stmt->conn->charset);
+		  if (str_ind_ptr != NULL)
+		    {
+		      *str_ind_ptr = wide_len;
+		    }
 		  if (rc == ODBC_SUCCESS_WITH_INFO)
 		    {
 		      if (buffer_length > 0)
@@ -863,9 +867,18 @@ odbc_get_data (ODBC_STATEMENT *stmt,
 	}
       else if (target_type == SQL_WCHAR || target_type == SQL_WVARCHAR || target_type == SQL_WLONGVARCHAR)
 	{
+	  /* the helper reports through an int *; handing it str_ind_ptr
+	     directly left the upper half of that SQLLEN untouched */
+	  int wide_len = 0;
+
 	  rc =
 		  bytes_to_wide_char (stmt->column_data.current_pt, strlen (stmt->column_data.current_pt),
-				      (wchar_t **) (&bound_ptr), buffer_length, str_ind_ptr, stmt->conn->charset);
+				      (wchar_t **) (&bound_ptr), (int) buffer_length, &wide_len,
+				      stmt->conn->charset);
+	  if (str_ind_ptr != NULL)
+	    {
+	      *str_ind_ptr = wide_len;
+	    }
 	  if (rc == ODBC_SUCCESS_WITH_INFO)
 	    {
 	      if (buffer_length > 0)
@@ -948,7 +961,7 @@ get_bind_info (ODBC_STATEMENT *stmt,
 	       short col_index, short *type, void **bound_ptr, long *buffer_length, SQLLEN **strlen_ind_ptr)
 {
   long element_size;
-  long long offset_size;
+  SQLLEN offset_size;
 
   element_size = stmt->ard->bind_type;	/* 0 means single or column wise, >0 means row wise */
   if (stmt->ard->bind_offset_ptr == NULL)
@@ -1008,7 +1021,6 @@ get_bind_info (ODBC_STATEMENT *stmt,
 PUBLIC RETCODE
 move_advanced_cursor (ODBC_STATEMENT *stmt, long *current_tpl_pos, short fetch_orientation, long fetch_offset)
 {
-  RETCODE rc = ODBC_SUCCESS;
   int cci_rc;
   T_CCI_ERROR cci_err_buf;
   int tpl_pos;
@@ -1038,8 +1050,8 @@ move_advanced_cursor (ODBC_STATEMENT *stmt, long *current_tpl_pos, short fetch_o
 	}
       break;
     case SQL_FETCH_PRIOR:
-      if (*current_tpl_pos > 1 && *current_tpl_pos <= row_set_size ||
-	  *current_tpl_pos == -1 && result_set_size < row_set_size)
+      if ((*current_tpl_pos > 1 && *current_tpl_pos <= row_set_size) ||
+	  (*current_tpl_pos == -1 && result_set_size < row_set_size))
 	{
 	  cci_rc = cci_cursor (stmt->stmthd, 1, CCI_CURSOR_FIRST, &cci_err_buf);
 	  tpl_pos = 1;

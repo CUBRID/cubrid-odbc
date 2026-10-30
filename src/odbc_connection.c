@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2008 Search Solution Corporation. All rights reserved by Search Solution.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -139,7 +139,6 @@ static ODBC_FUNCTIONS_SUPPORT_INFO functions_support_info_set[] =
   {SQL_API_SQLDESCRIBEPARAM, SQL_TRUE},
 };
 
-PRIVATE int get_server_setting (ODBC_CONNECTION *conn);
 PRIVATE RETCODE set_isolation_level (ODBC_CONNECTION *conn);
 PRIVATE RETCODE get_db_version (ODBC_CONNECTION *conn);
 
@@ -289,10 +288,10 @@ odbc_set_connect_attr (ODBC_CONNECTION *conn, long attribute, void *valueptr, lo
   switch (attribute)
     {
     case SQL_ATTR_ACCESS_MODE:
-      switch ((unsigned long) valueptr)
+      switch ((SQLULEN) valueptr)
 	{
 	case SQL_MODE_READ_WRITE:
-	  conn->attr_access_mode = (unsigned long) valueptr;
+	  conn->attr_access_mode = (unsigned long) (SQLULEN) valueptr;
 	  conn->attr_txn_isolation = conn->old_txn_isolation;
 	  if (set_isolation_level (conn) < 0)
 	    {
@@ -300,7 +299,7 @@ odbc_set_connect_attr (ODBC_CONNECTION *conn, long attribute, void *valueptr, lo
 	    }
 	  break;
 	case SQL_MODE_READ_ONLY:
-	  conn->attr_access_mode = (unsigned long) valueptr;
+	  conn->attr_access_mode = (unsigned long) (SQLULEN) valueptr;
 	  conn->old_txn_isolation = conn->attr_txn_isolation;
 	  conn->attr_txn_isolation = SQL_TXN_READ_COMMITTED;
 	  if (set_isolation_level (conn) < 0)
@@ -317,11 +316,11 @@ odbc_set_connect_attr (ODBC_CONNECTION *conn, long attribute, void *valueptr, lo
       break;
 
     case SQL_ATTR_ASYNC_ENABLE:
-      switch ((unsigned long) valueptr)
+      switch ((SQLULEN) valueptr)
 	{
 	case SQL_ASYNC_ENABLE_OFF:
 	case SQL_ASYNC_ENABLE_ON:
-	  conn->attr_async_enable = (unsigned long) valueptr;
+	  conn->attr_async_enable = (unsigned long) (SQLULEN) valueptr;
 	  break;
 
 	default:
@@ -339,11 +338,11 @@ odbc_set_connect_attr (ODBC_CONNECTION *conn, long attribute, void *valueptr, lo
       break;
 
     case SQL_ATTR_AUTOCOMMIT:
-      switch ((unsigned long) valueptr)
+      switch ((SQLULEN) valueptr)
 	{
 	case SQL_AUTOCOMMIT_OFF:
 	case SQL_AUTOCOMMIT_ON:
-	  conn->attr_autocommit = (unsigned long) valueptr;
+	  conn->attr_autocommit = (unsigned long) (SQLULEN) valueptr;
 	  break;
 	default:
 	  /* HY024 - invalid value */
@@ -360,12 +359,12 @@ odbc_set_connect_attr (ODBC_CONNECTION *conn, long attribute, void *valueptr, lo
       break;
 
     case SQL_ATTR_CONNECTION_TIMEOUT:
-      if ((unsigned long) valueptr < 0)
+      if ((SQLLEN) valueptr < 0)
 	{
 	  odbc_set_diag (conn->diag, "HY024", 0, NULL);
 	  goto error;
 	}
-      conn->attr_connection_timeout = (unsigned long) valueptr;
+      conn->attr_connection_timeout = (unsigned long) (SQLULEN) valueptr;
       break;
 
     case SQL_ATTR_CURRENT_CATALOG:
@@ -374,22 +373,22 @@ odbc_set_connect_attr (ODBC_CONNECTION *conn, long attribute, void *valueptr, lo
       break;
 
     case SQL_ATTR_LOGIN_TIMEOUT:
-      if ((unsigned long) valueptr < 0)
+      if ((SQLLEN) valueptr < 0)
 	{
 	  /* HY024 - invalid value */
 	  odbc_set_diag (conn->diag, "HY024", 0, NULL);
 	  goto error;
 	}
 
-      conn->attr_login_timeout = (unsigned long) valueptr;
+      conn->attr_login_timeout = (unsigned long) (SQLULEN) valueptr;
       break;
 
     case SQL_ATTR_METADATA_ID:
-      switch ((unsigned long) valueptr)
+      switch ((SQLULEN) valueptr)
 	{
 	case SQL_TRUE:
 	case SQL_FALSE:
-	  conn->attr_metadata_id = (unsigned long) valueptr;
+	  conn->attr_metadata_id = (unsigned long) (SQLULEN) valueptr;
 	  break;
 	default:
 	  /* HY024 - invalid value */
@@ -400,12 +399,10 @@ odbc_set_connect_attr (ODBC_CONNECTION *conn, long attribute, void *valueptr, lo
       break;
 
     case SQL_ATTR_ODBC_CURSORS:
-      switch ((unsigned long) valueptr)
+      switch ((SQLULEN) valueptr)
 	{
-	case SQL_CUR_USE_IF_NEEDED:
-	case SQL_CUR_USE_ODBC:
 	case SQL_CUR_USE_DRIVER:
-	  conn->attr_odbc_cursors = (unsigned long) valueptr;
+	  conn->attr_odbc_cursors = (unsigned long) (SQLULEN) valueptr;
 	  break;
 	default:
 	  odbc_set_diag (conn->diag, "HY024", 0, NULL);
@@ -415,12 +412,12 @@ odbc_set_connect_attr (ODBC_CONNECTION *conn, long attribute, void *valueptr, lo
       break;
 
     case SQL_ATTR_PACKET_SIZE:
-      if ((unsigned long) valueptr < 0)
+      if ((SQLLEN) valueptr < 0)
 	{
 	  odbc_set_diag (conn->diag, "HY024", 0, NULL);
 	  goto error;
 	}
-      conn->attr_packet_size = (unsigned long) valueptr;
+      conn->attr_packet_size = (unsigned long) (SQLULEN) valueptr;
       break;
 
     case SQL_ATTR_QUIET_MODE:
@@ -428,11 +425,11 @@ odbc_set_connect_attr (ODBC_CONNECTION *conn, long attribute, void *valueptr, lo
       break;
 
     case SQL_ATTR_TRACE:
-      switch ((unsigned long) valueptr)
+      switch ((SQLULEN) valueptr)
 	{
 	case SQL_OPT_TRACE_OFF:
 	case SQL_OPT_TRACE_ON:
-	  conn->attr_trace = (unsigned long) valueptr;
+	  conn->attr_trace = (unsigned long) (SQLULEN) valueptr;
 	  break;
 	default:
 	  /* HY024 - invalid value */
@@ -466,7 +463,7 @@ odbc_set_connect_attr (ODBC_CONNECTION *conn, long attribute, void *valueptr, lo
       break;
 
     case SQL_ATTR_TXN_ISOLATION:
-      conn->attr_txn_isolation = (unsigned long) valueptr;
+      conn->attr_txn_isolation = (unsigned long) (SQLULEN) valueptr;
       if (set_isolation_level (conn) < 0)
 	{
 	  goto error;
@@ -475,11 +472,11 @@ odbc_set_connect_attr (ODBC_CONNECTION *conn, long attribute, void *valueptr, lo
 
     // stmt attributes
     case SQL_ATTR_MAX_ROWS:
-      conn->attr_max_rows = (unsigned long) valueptr;
+      conn->attr_max_rows = (unsigned long) (SQLULEN) valueptr;
       break;
 
     case SQL_ATTR_QUERY_TIMEOUT:
-      conn->attr_query_timeout = (unsigned long) valueptr;
+      conn->attr_query_timeout = (unsigned long) (SQLULEN) valueptr;
       break;
 
     default:
@@ -838,7 +835,7 @@ odbc_connect_new (ODBC_CONNECTION *conn,
   RETCODE rc;
   int cci_rc;
   T_CCI_ERROR cci_err_buf;
-  char *pt;
+  const char *pt;
   char connect_url[BUF_SIZE * 4] = { 0 };
   char connect_url_attr[BUF_SIZE * 4] = { 0 };
 
@@ -1063,7 +1060,7 @@ odbc_native_sql (ODBC_CONNECTION *conn,
   RETCODE rc = ODBC_SUCCESS;
   SQLLEN tmp_length;
 
-  rc = str_value_assign (in_stmt_text, out_stmt_text, buffer_length, &tmp_length);
+  rc = str_value_assign ((const char *) in_stmt_text, (char *) out_stmt_text, buffer_length, &tmp_length);
   *out_stmt_length = (SQLINTEGER) tmp_length;
 
   if (rc == ODBC_SUCCESS_WITH_INFO)
@@ -3218,76 +3215,6 @@ get_dsn_info (const char *dsn,
 
   return 0;
 }
-
-/************************************************************************
-* name: get_server_setting
-* arguments:
-* returns/side-effects:
-* description:
-*   DSN(registry)에서 ip address, port num, db name을 얻어온다.
-* NOTE:
-*   SQLSetConfigMode(ODBC_BOTH_DSN)에 의해서 ODBC_USER_DSN에
-*   먼저 접근하게 된다.
-************************************************************************/
-
-PRIVATE int
-get_server_setting (ODBC_CONNECTION *conn)
-{
-  char buf[256];
-  int rcn;			// return char number
-
-  if (conn->data_source == NULL)
-    {
-      return -1;
-    }
-
-  SQLSetConfigMode (ODBC_BOTH_DSN);
-
-  // Get server entry
-  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_SERVER, "", buf, sizeof (buf), "ODBC.INI");
-  if (rcn == 0)
-    {
-      buf[0] = '\0';
-    }
-  conn->server = UT_MAKE_STRING (buf, -1);
-
-  // Get port entry
-  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_PORT, "", buf, sizeof (buf), "ODBC.INI");
-  if (rcn == 0)
-    {
-      buf[0] = '\0';
-    }
-  conn->port = atoi (buf);
-
-  // Get DB name entry
-  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_DBNAME, "", buf, sizeof (buf), "ODBC.INI");
-  if (rcn == 0)
-    {
-      buf[0] = '\0';
-    }
-  conn->db_name = UT_MAKE_STRING (buf, -1);
-
-  // Get fetch size entry
-  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_FETCH_SIZE, "", buf, sizeof (buf), "ODBC.INI");
-  if (rcn == 0)
-    {
-      buf[0] = '\0';
-    }
-  conn->fetch_size = atoi (buf);
-
-
-  // Get fetch charset
-  rcn = SQLGetPrivateProfileString ("CUBRID", KEYWORD_CHARSET, "", buf, sizeof (buf), "ODBC.INI");
-  if (rcn == 0)
-    {
-      buf[0] = '\0';
-    }
-  conn->charset = (char *) atoi (buf);
-
-  return 0;
-}
-
-
 
 /************************************************************************
  * name:  set_isloation_level

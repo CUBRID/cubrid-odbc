@@ -22,7 +22,7 @@ sql_specialcolumnsw (int case_num, char *dsn)
   SQLHDBC           hDbc;
   SQLHSTMT  hstmt;
   wchar_t *dsn_buf;
-  SQLCHAR *table = "db_class";
+  char *table = "db_class";
   SQLWCHAR *table_buf;
 
   SQLSMALLINT scope;
@@ -34,20 +34,18 @@ sql_specialcolumnsw (int case_num, char *dsn)
 
   SQLLEN len_scope, len_columname, len_typename, len_pseudo_column;
 
-  int id, i = 1;
-
   retcode = SQLAllocEnv (&hEnv);
   retcode = SQLSetEnvAttr (hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
   retcode = SQLAllocConnect (hEnv, &hDbc);
   AreNotEqual (retcode, SQL_ERROR);
 
   bytes_to_wide_char (dsn, SQL_NTS, &dsn_buf, 0, NULL, "UCS2");
-  retcode = SQLConnectW (hDbc, dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
+  retcode = SQLConnectW (hDbc, (SQLWCHAR *) dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hstmt);
 
-  retcode = bytes_to_wide_char (table, SQL_NTS, &table_buf, 0, NULL, "UCS2");
+  retcode = bytes_to_wide_char (table, SQL_NTS, (wchar_t **) &table_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
 
   SQLBindCol (hstmt, 1, SQL_C_SHORT, &scope, sizeof (scope), &len_scope);
@@ -61,8 +59,8 @@ sql_specialcolumnsw (int case_num, char *dsn)
 
   while (SQLFetch (hstmt) == SQL_SUCCESS)
     {
-      wide_char_to_bytes (columname, SQL_NTS, &m_columname, NULL, "UCS2");
-      wide_char_to_bytes (typename, SQL_NTS, &m_typename, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) columname, SQL_NTS, (char **) &m_columname, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) typename, SQL_NTS, (char **) &m_typename, NULL, "UCS2");
       printf ("Table name = %s, scope = %d, column = %s, type = %s, pseudo_column = %d\n", table, scope, m_columname,
 	      m_typename, pseudo_column);
     }

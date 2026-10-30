@@ -157,7 +157,7 @@
       FILE        *fp = NULL;                     \
       fp = fopen(DEBUG_FILE_KEY, "a+");           \
       _ftime(&now);                       \
-      fprintf(fp, "### [%d] %ld.%07ld %s  %d\n", value, now.time, now.millitm, __FILE__, __LINE__);                           \
+      fprintf(fp, "### [%d] %lld.%07u %s  %d\n", value, (long long) now.time, (unsigned) now.millitm, __FILE__, __LINE__);                           \
       fclose(fp);                         \
     } while (0)
 
@@ -169,7 +169,7 @@
                             FILE        *fp = NULL;                     \
                             fp = fopen(DEBUG_FILE_KEY, "a+");           \
                             _ftime(&now);                       \
-                            fprintf(fp,#value " %ld.%07ld %s  %d\n", now.time, now.millitm, __FILE__, __LINE__);                           \
+                            fprintf(fp,#value " %lld.%07u %s  %d\n", (long long) now.time, (unsigned) now.millitm, __FILE__, __LINE__);                           \
                             fclose(fp);                         \
                         } while(0)
 #endif
@@ -262,6 +262,9 @@ PUBLIC RETCODE bin_value_assign (const void *in_value,
 				 SQLLEN in_val_len,
 				 char *out_buf,
 				 SQLLEN out_buf_len, SQLLEN *val_len_ptr);
+PUBLIC RETCODE wchar_value_assign (const char *str,
+				   char *out_buf,
+				   SQLLEN out_buf_len, SQLLEN *str_len_ptr);
 
 PUBLIC short is_oidstr (char *str);
 PUBLIC short is_oidstr_array (char **array, int size);
@@ -269,6 +272,7 @@ PUBLIC int replace_oid (char *sql_text, char **org_param_pos_pt,
 			char **oid_param_pos_pt, char **oid_param_val_pt);
 
 PUBLIC char *remove_owner_name (char *tablename);
+PUBLIC int connected_db_ver (const char *version_string);
 
 extern ERR_CODE ListTailAdd (ST_LIST *head, void *key, void *val,
 			     ERR_CODE (*assignFunc) (ST_LIST *, void *,
@@ -292,10 +296,9 @@ PUBLIC const char *next_element (const char *element_list);
 PUBLIC const char *element_value (const char *element);
 PUBLIC const char *element_value_by_key (const char *element_list,
     const char *key);
-#if defined (WINDOWS)
+struct st_odbc_connection_attr;
 PUBLIC void get_connect_attr (struct st_odbc_connection_attr *attr,
 			      const char *ConnStrIn, char *buffer);
-#endif
 PUBLIC int wide_char_to_bytes (wchar_t *str,
 			       int size,
 			       char **target,

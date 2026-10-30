@@ -23,14 +23,11 @@ sql_primarykeysw (int case_num, char *dsn)
   SQLHDBC           hDbc;
   SQLHSTMT  hstmt;
   wchar_t *dsn_buf;
-  SQLCHAR *table = "game";
+  char *table = "game";
   SQLWCHAR *table_buf;
-  SQLSMALLINT num_columns;
 
   SQLWCHAR	szColumnName[MAX_COL_NAME_LEN];
   SQLWCHAR	szTableName[MAX_COL_NAME_LEN];
-  SQLUSMALLINT uIndexQualifier, sType;
-  SQLLEN sColumnSize, sCardinality;
   SQLCHAR		*pk_table_name, *column;
 
   retcode = SQLAllocEnv (&hEnv);
@@ -39,12 +36,12 @@ sql_primarykeysw (int case_num, char *dsn)
   AreNotEqual (retcode, SQL_ERROR);
 
   bytes_to_wide_char (dsn, SQL_NTS, &dsn_buf, 0, NULL, "UCS2");
-  retcode = SQLConnectW (hDbc, dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
+  retcode = SQLConnectW (hDbc, (SQLWCHAR *) dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hstmt);
 
-  retcode = bytes_to_wide_char (table, SQL_NTS, &table_buf, 0, NULL, "UCS2");
+  retcode = bytes_to_wide_char (table, SQL_NTS, (wchar_t **) &table_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
 
   SQLBindCol (hstmt, 3, SQL_C_WCHAR, szTableName, sizeof (szTableName), NULL); // INDEX_NAME
@@ -55,8 +52,8 @@ sql_primarykeysw (int case_num, char *dsn)
 
   while (SQLFetch (hstmt) == SQL_SUCCESS)
     {
-      wide_char_to_bytes (szTableName, SQL_NTS, &pk_table_name, NULL, "UCS2");
-      wide_char_to_bytes (szColumnName, SQL_NTS, &column, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) szTableName, SQL_NTS, (char **) &pk_table_name, NULL, "UCS2");
+      wide_char_to_bytes ((wchar_t *) szColumnName, SQL_NTS, (char **) &column, NULL, "UCS2");
       printf ("Table name = %s, pk column = (%s)\n", pk_table_name, column);
     }
 

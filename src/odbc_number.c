@@ -59,10 +59,7 @@
 static bc_num new_num (int length, int scale);
 static bc_num copy_num (bc_num num);
 static void init_num (bc_num *num);
-static int bc_compare (bc_num n1, bc_num n2);
 static char is_zero (bc_num num);
-static char is_neg (bc_num num);
-static int bc_modulo (bc_num num1, bc_num num2, bc_num *result, int scale);
 
 static int _do_compare (bc_num n1, bc_num n2, int use_sign, int ignore_last);
 static void _rm_leading_zeros (bc_num num);
@@ -167,6 +164,11 @@ int scale_min;
 	      return -1;
 	    }
 	  sum->n_sign = n1->n_sign;
+	  break;
+	default:
+	  /* _do_compare only ever answers -1, 0 or 1; anything else would
+	     leave sum unset and store a garbage pointer into *result. */
+	  return -1;
 	}
     }
 
@@ -234,6 +236,8 @@ int scale_min;
 	    }
 	  diff->n_sign = n1->n_sign;
 	  break;
+	default:
+	  return -1;
 	}
     }
 
@@ -571,7 +575,7 @@ bc_divmod (num1, num2, quot, rem, scale)
 bc_num num1, num2, *quot, *rem;
 int scale;
 {
-  bc_num quotient;
+  bc_num quotient = NULL;
   bc_num temp;
   int rscale;
 
@@ -939,51 +943,43 @@ int ignore_last;
 
   /* They are equal up to the last part of the equal part of the fraction. */
   if (n1->n_scale != n2->n_scale)
-    if (n1->n_scale > n2->n_scale)
-      {
-	for (count = n1->n_scale - n2->n_scale; count > 0; count--)
-	  if (*n1ptr++ != 0)
-	    {
-	      /* Magnitude of n1 > n2. */
-	      if (!use_sign || n1->n_sign == PLUS)
-		{
-		  return (1);
-		}
-	      else
-		{
-		  return (-1);
-		}
-	    }
-      }
-    else
-      {
-	for (count = n2->n_scale - n1->n_scale; count > 0; count--)
-	  if (*n2ptr++ != 0)
-	    {
-	      /* Magnitude of n1 < n2. */
-	      if (!use_sign || n1->n_sign == PLUS)
-		{
-		  return (-1);
-		}
-	      else
-		{
-		  return (1);
-		}
-	    }
-      }
+    {
+      if (n1->n_scale > n2->n_scale)
+	{
+	  for (count = n1->n_scale - n2->n_scale; count > 0; count--)
+	    if (*n1ptr++ != 0)
+	      {
+		/* Magnitude of n1 > n2. */
+		if (!use_sign || n1->n_sign == PLUS)
+		  {
+		    return (1);
+		  }
+		else
+		  {
+		    return (-1);
+		  }
+	      }
+	}
+      else
+	{
+	  for (count = n2->n_scale - n1->n_scale; count > 0; count--)
+	    if (*n2ptr++ != 0)
+	      {
+		/* Magnitude of n1 < n2. */
+		if (!use_sign || n1->n_sign == PLUS)
+		  {
+		    return (-1);
+		  }
+		else
+		  {
+		    return (1);
+		  }
+	      }
+	}
+    }
 
   /* They must be equal! */
   return (0);
-}
-
-
-/* This is the "user callable" routine to compare numbers N1 and N2. */
-
-static int
-bc_compare (n1, n2)
-bc_num n1, n2;
-{
-  return _do_compare (n1, n2, TRUE, FALSE);
 }
 
 
@@ -1020,16 +1016,6 @@ bc_num num;
     {
       return TRUE;
     }
-}
-
-
-/* In some places we need to check if the number is negative. */
-
-static char
-is_neg (num)
-bc_num num;
-{
-  return num->n_sign == MINUS;
 }
 
 
@@ -1341,48 +1327,6 @@ unsigned char *result;
     }
 }
 
-
-/* Modulo for numbers.  This computes NUM1 % NUM2  and puts the
-   result in RESULT.   */
-
-static int
-bc_modulo (num1, num2, result, scale)
-bc_num num1, num2, *result;
-int scale;
-{
-  return bc_divmod (num1, num2, NULL, result, scale);
-}
-
-
-/* In some places we need to check if the number NUM is zero. */
-
-static char
-is_near_zero (num, scale)
-bc_num num;
-int scale;
-{
-  int count;
-  char *nptr;
-
-  /* Initialize */
-  count = num->n_len + scale;
-  nptr = num->n_value;
-
-  /* The check */
-  while ((count > 0) && (*nptr++ == 0))
-    {
-      count--;
-    }
-
-  if (count != 0 && (count != 1 || *--nptr != 1))
-    {
-      return FALSE;
-    }
-  else
-    {
-      return TRUE;
-    }
-}
 
 /* The following routines provide output for bcd numbers package
    using the rules of POSIX bc for output. */

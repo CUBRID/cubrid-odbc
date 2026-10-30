@@ -23,7 +23,7 @@ sql_getdescfieldw (int case_num, char *dsn)
   wchar_t *dsn_buf;
   SQLHDESC hIrd;
 
-  SQLCHAR *qry = "SELECT * from db_user";
+  char *qry = "SELECT * from db_user";
   SQLWCHAR *query_buf;
 
   SQLSMALLINT desc_count = -1;
@@ -34,12 +34,12 @@ sql_getdescfieldw (int case_num, char *dsn)
   AreNotEqual (retcode, SQL_ERROR);
 
   bytes_to_wide_char (dsn, SQL_NTS, &dsn_buf, 0, NULL, "UCS2");
-  retcode = SQLConnectW (hDbc, dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
+  retcode = SQLConnectW (hDbc, (SQLWCHAR *) dsn_buf, SQL_NTS, NULL, SQL_NTS, NULL, SQL_NTS);
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hstmt);
 
-  retcode = bytes_to_wide_char (qry, strlen (qry), &query_buf, 0, NULL, "UCS2");
+  retcode = bytes_to_wide_char (qry, strlen (qry), (wchar_t **) &query_buf, 0, NULL, "UCS2");
   AreNotEqual (retcode, SQL_ERROR);
 
   retcode = SQLExecDirectW (hstmt, query_buf, SQL_NTS);

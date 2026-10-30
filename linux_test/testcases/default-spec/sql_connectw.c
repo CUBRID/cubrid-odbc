@@ -17,7 +17,6 @@ sql_connectw (int case_num, char *dsn)
   RETCODE retcode;
   SQLHENV           hEnv;
   SQLHDBC           hDbc;
-  SQLHSTMT  hStmt;
   wchar_t *dsn_buf;
 
   retcode = SQLAllocEnv (&hEnv);
