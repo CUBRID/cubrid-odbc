@@ -928,6 +928,49 @@ error:
 }
 
 /************************************************************************
+* name: odbc_get_desc_field_num
+* arguments:
+* returns/side-effects:
+* description:
+*   Reads a numeric field and widens it to SQLLEN.
+* NOTE:
+*   For callers whose own contract is a single width (SQLColAttribute always
+*   answers in SQLLEN).  Reading a short field through a wider pointer leaves
+*   the upper bytes untouched, so SQL_LONGVARCHAR (-1) would arrive as 65535.
+************************************************************************/
+PUBLIC RETCODE
+odbc_get_desc_field_num (ODBC_DESC *desc, SQLSMALLINT rec_number, SQLSMALLINT field_id, SQLLEN *value_ptr)
+{
+  /* sl keeps the union SQLLEN-wide: SQL_DESC_LENGTH stores a SQLULEN, which is
+   * wider than long on Win64. */
+  union
+  {
+    short s16;
+    long s32;
+    SQLLEN sl;
+  } raw;
+  SQLLEN field_size = 0;
+  RETCODE rc;
+
+  raw.sl = 0;
+  rc = odbc_get_desc_field (desc, rec_number, field_id, &raw, 0, &field_size);
+  if (field_size == sizeof (short))
+    {
+      *value_ptr = (SQLLEN) raw.s16;
+    }
+  else if (field_size == sizeof (long))
+    {
+      *value_ptr = (SQLLEN) raw.s32;
+    }
+  else
+    {
+      *value_ptr = raw.sl;
+    }
+
+  return rc;
+}
+
+/************************************************************************
 * name: odbc_get_desc_rec
 * arguments:
 * returns/side-effects:
@@ -1416,6 +1459,11 @@ odbc_set_ird (ODBC_STATEMENT *stmt,
   long octet_length;
   ODBC_RECORD *record;
   short searchable;
+
+  if (type == SQL_VARCHAR && precision > 8000)
+    {
+      type = SQL_LONGVARCHAR;
+    }
 
   verbose_type = odbc_concise_to_verbose_type (type);
   display_size = odbc_display_size (type, precision);
