@@ -1403,6 +1403,94 @@ public:
       retcode = SQLFreeHandle (SQL_HANDLE_ENV, hEnv);
     }
 
+    /*
+     * APIS-1117 - SQLDescribeCol must return the full precision of a NUMERIC
+     * column as ColumnSize.
+     *
+     * SQL_DESC_PRECISION is stored as short.  The old code wrote it into the
+     * first 2 bytes of the caller's SQLULEN and then cleared the rest through
+     * an unsigned long *, which is only 4 bytes on Win64, so the upper 4 bytes
+     * kept whatever the application had there.  ColumnSize is pre-filled with
+     * all bits set to make that visible: it came back as 0xFFFFFFFF0000000F
+     * instead of 15.
+     *
+     * DecimalDigits must be the column's scale.  The type table had 0 instead
+     * of -1 (= use the scale) for DECIMAL/NUMERIC, so SQLDescribeCol always
+     * returned 0 while SQLColAttribute(SQL_DESC_SCALE) returned the real
+     * scale.  Both calls are compared against each other as well.
+     */
+    TEST_METHOD (APIS_1117_SQLDescribeCol_Numeric)
+    {
+      SQLHENV		hEnv;
+      SQLHDBC		hDbc;
+      SQLHSTMT	hStmt;
+
+      RETCODE retcode (0);
+
+      retcode = SQLAllocHandle (SQL_HANDLE_ENV, SQL_NULL_HANDLE, &hEnv);
+      retcode = SQLSetEnvAttr (hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+      retcode = SQLAllocHandle (SQL_HANDLE_DBC, hEnv, &hDbc);
+      retcode = SQLDriverConnect (hDbc, NULL,
+				  L"DRIVER=CUBRID Driver Unicode;DB_NAME=demodb;SERVER=test-db-server;PORT=33000;UID=dba;PWD=;CHARSET=MS949",
+				  SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
+      retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hStmt);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
+      SQLExecDirect (hStmt, L"DROP TABLE IF EXISTS apis1117", SQL_NTS);
+      retcode = SQLExecDirect (hStmt, L"CREATE TABLE apis1117 (c_num NUMERIC(15,2), c_num38 NUMERIC(38,10))", SQL_NTS);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+      SQLFreeStmt (hStmt, SQL_CLOSE);
+
+      retcode = SQLExecDirect (hStmt, L"SELECT * FROM apis1117", SQL_NTS);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
+      static const struct
+      {
+	SQLULEN precision;
+	SQLSMALLINT scale;
+      } expected[] = { {15, 2}, {38, 10} };
+
+      for (SQLUSMALLINT i = 1; i <= 2; i++)
+	{
+	  SQLWCHAR col_name[256] = {0,};
+	  SQLSMALLINT name_len = 0;
+	  SQLSMALLINT data_type = 0;
+	  SQLULEN col_size = (SQLULEN) -1;
+	  SQLSMALLINT decimal_digits = 0;
+	  SQLSMALLINT nullable = 0;
+	  wchar_t msg[MAXBUFLEN];
+
+	  retcode = SQLDescribeCol (hStmt, i, col_name, sizeof (col_name) / sizeof (SQLWCHAR), &name_len, &data_type,
+				    &col_size, &decimal_digits, &nullable);
+	  Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
+	  swprintf (msg, MAXBUFLEN, L"column %d: ColumnSize %llu, expected %llu", (int)i,
+		    (unsigned long long)col_size, (unsigned long long)expected[i - 1].precision);
+	  Logger::WriteMessage (msg);
+
+	  Assert::AreEqual ((int)data_type, SQL_NUMERIC);
+	  Assert::IsTrue (col_size == expected[i - 1].precision, msg);
+	  Assert::AreEqual ((int)decimal_digits, (int)expected[i - 1].scale);
+
+	  SQLLEN attr = 0;
+	  SQLColAttribute (hStmt, i, SQL_DESC_PRECISION, NULL, 0, NULL, &attr);
+	  Assert::IsTrue ((SQLULEN)attr == col_size, L"SQLColAttribute PRECISION != SQLDescribeCol ColumnSize");
+
+	  attr = 0;
+	  SQLColAttribute (hStmt, i, SQL_DESC_SCALE, NULL, 0, NULL, &attr);
+	  Assert::AreEqual ((int)attr, (int)decimal_digits);
+	}
+
+      SQLFreeStmt (hStmt, SQL_CLOSE);
+      SQLExecDirect (hStmt, L"DROP TABLE apis1117", SQL_NTS);
+      SQLFreeStmt (hStmt, SQL_DROP);
+      retcode = SQLDisconnect (hDbc);
+      retcode = SQLFreeHandle (SQL_HANDLE_DBC, hDbc);
+      retcode = SQLFreeHandle (SQL_HANDLE_ENV, hEnv);
+    }
+
     TEST_METHOD (APIS_1055_SQLMoreResults_Bind_Issue)
     {
       SQLHENV		hEnv;
