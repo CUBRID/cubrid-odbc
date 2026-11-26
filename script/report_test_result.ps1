@@ -47,6 +47,37 @@ function Get-TestRun
     $counters = $xml.TestRun.ResultSummary.Counters
     $results = @($xml.TestRun.Results.UnitTestResult)
 
+    # A result carries the test name only; the test class it belongs to is in
+    # its definition. 'UnitTestCPP.OtherTest' is reported as 'OtherTest'.
+    $classOf = @{}
+    foreach ($d in @($xml.TestRun.TestDefinitions.UnitTest)) {
+        if ($null -eq $d) {
+            continue
+        }
+        $cls = [string] $d.TestMethod.className
+        $classOf[[string] $d.id] = if ($cls) { ($cls -split '[.:]+')[-1] } else { '(unknown)' }
+    }
+
+    $classes = [ordered]@{}
+    foreach ($r in $results) {
+        if ($null -eq $r) {
+            continue
+        }
+        $cls = $classOf[[string] $r.testId]
+        if (-not $cls) { $cls = '(unknown)' }
+        if (-not $classes.Contains($cls)) {
+            $classes[$cls] = [pscustomobject]@{ Name = $cls; Total = 0; Passed = 0; Failed = 0; Skipped = 0; Tests = @() }
+        }
+        $c = $classes[$cls]
+        $c.Total++
+        switch ($r.outcome) {
+            'Passed' { $c.Passed++ }
+            { $_ -in 'NotExecuted', 'Inconclusive', 'Skipped' } { $c.Skipped++ }
+            default { $c.Failed++ }
+        }
+        $c.Tests += [pscustomobject]@{ Name = [string] $r.testName; Outcome = [string] $r.outcome }
+    }
+
     $failed = @()
     foreach ($r in $results) {
         if ($null -eq $r -or $r.outcome -eq 'Passed') {
@@ -77,6 +108,7 @@ function Get-TestRun
         Failed   = $failedCount
         Skipped  = [int] $counters.notExecuted
         Results  = $failed
+        Classes  = @($classes.Values | Sort-Object Name)
     }
 }
 
@@ -132,6 +164,13 @@ foreach ($run in $runs) {
     Write-Host ("{0}: total {1}, passed {2}, failed {3}, skipped {4}" -f
         $run.Name, $run.Total, $run.Passed, $run.Failed, $run.Skipped)
 
+    # one line per test class, so that a class that never ran is visible
+    # instead of hiding inside the total of its suite
+    foreach ($c in $run.Classes) {
+        Write-Host ("  {0,-24} total {1}, passed {2}, failed {3}, skipped {4}" -f
+            $c.Name, $c.Total, $c.Passed, $c.Failed, $c.Skipped)
+    }
+
     foreach ($r in $run.Results) {
         Write-Host ''
         Write-Host ("  {0}  {1} ({2})" -f $r.Outcome.ToUpper(), $r.Name, $r.Duration)
@@ -182,6 +221,32 @@ if (-not [string]::IsNullOrEmpty($env:GITHUB_STEP_SUMMARY)) {
         $md.Add(('| {0} | *no TRX file* | | | | |' -f $m))
     }
     $md.Add('')
+
+    # the same counters per test class, and every test that ran folded below
+    # them, so that a class that is not run at all shows up by its absence
+    $md.Add('| run | class | total | passed | failed | skipped |')
+    $md.Add('|---|---|---:|---:|---:|---:|')
+    foreach ($run in $runs) {
+        foreach ($c in $run.Classes) {
+            $md.Add(('| {0} | {1} | {2} | {3} | {4} | {5} |' -f
+                $run.Name, $c.Name, $c.Total, $c.Passed, $c.Failed, $c.Skipped))
+        }
+    }
+    $md.Add('')
+
+    foreach ($run in $runs) {
+        foreach ($c in $run.Classes) {
+            $md.Add(('<details><summary>{0} / {1} ({2})</summary>' -f $run.Name, $c.Name, $c.Total))
+            $md.Add('')
+            foreach ($t in ($c.Tests | Sort-Object Name)) {
+                $mark = if ($t.Outcome -eq 'Passed') { 'passed' } else { "**$($t.Outcome)**" }
+                $md.Add(('- `{0}` {1}' -f $t.Name, $mark))
+            }
+            $md.Add('')
+            $md.Add('</details>')
+            $md.Add('')
+        }
+    }
 
     if ($missing.Count -gt 0 -or $emptyRun.Count -gt 0) {
         $md.Add('### a suite did not run')
