@@ -1491,6 +1491,98 @@ public:
       retcode = SQLFreeHandle (SQL_HANDLE_ENV, hEnv);
     }
 
+    /*
+     * APIS-1117 - SQLDescribeCol ColumnSize must agree with SQLColAttribute
+     * for the columns whose size comes from SQL_DESC_LENGTH (every type but
+     * NUMERIC, which APIS_1117_SQLDescribeCol_Numeric covers).
+     *
+     * odbc_get_desc_field() writes SQL_DESC_LENGTH as SQLULEN for
+     * SQL_CHAR/SQL_VARCHAR only and as unsigned long (4 bytes on Win64) for
+     * every other type.  SQLDescribeCol read it straight into the caller's
+     * SQLULEN, so the upper 4 bytes kept whatever the application had there:
+     * with ColumnSize pre-filled with all bits set, STRING came back as
+     * 0xFFFFFFFF3FFFFFFF.  GET_STAT/METHOD results (SQL_LONGVARCHAR) take the
+     * same path.
+     */
+    TEST_METHOD (APIS_1117_SQLDescribeCol_ColumnSize)
+    {
+      SQLHENV		hEnv;
+      SQLHDBC		hDbc;
+      SQLHSTMT	hStmt;
+
+      RETCODE retcode (0);
+
+      retcode = SQLAllocHandle (SQL_HANDLE_ENV, SQL_NULL_HANDLE, &hEnv);
+      retcode = SQLSetEnvAttr (hEnv, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+      retcode = SQLAllocHandle (SQL_HANDLE_DBC, hEnv, &hDbc);
+      retcode = SQLDriverConnect (hDbc, NULL,
+				  L"DRIVER=CUBRID Driver Unicode;DB_NAME=demodb;SERVER=test-db-server;PORT=33000;UID=dba;PWD=;CHARSET=MS949",
+				  SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
+      retcode = SQLAllocHandle (SQL_HANDLE_STMT, hDbc, &hStmt);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
+      SQLExecDirect (hStmt, L"DROP TABLE IF EXISTS apis1117_size", SQL_NTS);
+      retcode = SQLExecDirect (hStmt, L"CREATE TABLE apis1117_size (c_char CHAR(10), c_vc VARCHAR(100), c_int INTEGER,"
+			       L" c_str STRING, c_clob CLOB, c_blob BLOB)", SQL_NTS);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+      SQLFreeStmt (hStmt, SQL_CLOSE);
+
+      retcode = SQLExecDirect (hStmt, L"SELECT * FROM apis1117_size", SQL_NTS);
+      Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
+      static const struct
+      {
+	SQLSMALLINT type;
+	SQLULEN size;		/* 0: only compared with SQLColAttribute */
+      } expected[] =
+      {
+	{SQL_CHAR, 10},
+	{SQL_VARCHAR, 100},
+	{SQL_INTEGER, 0},
+	{SQL_LONGVARCHAR, 0},
+	{SQL_LONGVARCHAR, 0},
+	{SQL_LONGVARBINARY, 0}
+      };
+
+      for (SQLUSMALLINT i = 1; i <= sizeof (expected) / sizeof (expected[0]); i++)
+	{
+	  SQLWCHAR col_name[256] = {0,};
+	  SQLSMALLINT name_len = 0;
+	  SQLSMALLINT data_type = 0;
+	  SQLULEN col_size = (SQLULEN) -1;
+	  SQLSMALLINT decimal_digits = 0;
+	  SQLSMALLINT nullable = 0;
+	  SQLLEN attr = 0;
+	  wchar_t msg[MAXBUFLEN];
+
+	  retcode = SQLDescribeCol (hStmt, i, col_name, sizeof (col_name) / sizeof (SQLWCHAR), &name_len, &data_type,
+				    &col_size, &decimal_digits, &nullable);
+	  Assert::AreNotEqual ((int)retcode, SQL_ERROR);
+
+	  SQLColAttribute (hStmt, i, SQL_DESC_LENGTH, NULL, 0, NULL, &attr);
+
+	  swprintf (msg, MAXBUFLEN, L"column %d: ColumnSize %llu, ColAttribute LENGTH %lld, expected %llu", (int)i,
+		    (unsigned long long)col_size, (long long)attr, (unsigned long long)expected[i - 1].size);
+	  Logger::WriteMessage (msg);
+
+	  Assert::AreEqual ((int)data_type, (int)expected[i - 1].type);
+	  if (expected[i - 1].size != 0)
+	    {
+	      Assert::IsTrue (col_size == expected[i - 1].size, msg);
+	    }
+	  Assert::IsTrue (col_size == (SQLULEN)attr, msg);
+	}
+
+      SQLFreeStmt (hStmt, SQL_CLOSE);
+      SQLExecDirect (hStmt, L"DROP TABLE apis1117_size", SQL_NTS);
+      SQLFreeStmt (hStmt, SQL_DROP);
+      retcode = SQLDisconnect (hDbc);
+      retcode = SQLFreeHandle (SQL_HANDLE_DBC, hDbc);
+      retcode = SQLFreeHandle (SQL_HANDLE_ENV, hEnv);
+    }
+
     TEST_METHOD (APIS_1055_SQLMoreResults_Bind_Issue)
     {
       SQLHENV		hEnv;

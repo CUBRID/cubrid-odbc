@@ -153,18 +153,14 @@ odbc_describe_col (ODBC_STATEMENT *stmt,
 
   if (column_size_ptr != NULL)
     {
-      if (*data_type_ptr == SQL_NUMERIC)
-	{
-	  SQLLEN precision = 0;
+      SQLLEN column_size = 0;
 
-	  odbc_get_desc_field_num (ird, column_number, SQL_DESC_PRECISION, &precision);
-	  *column_size_ptr = (SQLULEN) precision;
-	}
-      else
-	{
-	  odbc_get_desc_field (ird, column_number, SQL_DESC_LENGTH, column_size_ptr, 0, NULL);
-	}
-      //odbc_get_desc_field(ird, column_number, SQL_DESC_LENGTH, column_size_ptr, 0, NULL);
+      /* SQL_DESC_LENGTH is written as unsigned long for types other than
+       * SQL_CHAR/SQL_VARCHAR, which is only 4 bytes on Win64; read it through
+       * odbc_get_desc_field_num() so the whole SQLULEN is assigned. */
+      odbc_get_desc_field_num (ird, column_number,
+			       (*data_type_ptr == SQL_NUMERIC) ? SQL_DESC_PRECISION : SQL_DESC_LENGTH, &column_size);
+      *column_size_ptr = (SQLULEN) column_size;
     }
 
   if (decimal_digits_ptr != NULL)
