@@ -153,16 +153,14 @@ odbc_describe_col (ODBC_STATEMENT *stmt,
 
   if (column_size_ptr != NULL)
     {
-      if (*data_type_ptr == SQL_NUMERIC)
-	{
-	  odbc_get_desc_field (ird, column_number, SQL_DESC_PRECISION, column_size_ptr, 0, NULL);
-	  * (unsigned long *) column_size_ptr = * (unsigned short *) column_size_ptr;
-	}
-      else
-	{
-	  odbc_get_desc_field (ird, column_number, SQL_DESC_LENGTH, column_size_ptr, 0, NULL);
-	}
-      //odbc_get_desc_field(ird, column_number, SQL_DESC_LENGTH, column_size_ptr, 0, NULL);
+      SQLLEN column_size = 0;
+
+      /* SQL_DESC_LENGTH is written as unsigned long for types other than
+       * SQL_CHAR/SQL_VARCHAR, which is only 4 bytes on Win64; read it through
+       * odbc_get_desc_field_num() so the whole SQLULEN is assigned. */
+      odbc_get_desc_field_num (ird, column_number,
+			       (*data_type_ptr == SQL_NUMERIC) ? SQL_DESC_PRECISION : SQL_DESC_LENGTH, &column_size);
+      *column_size_ptr = (SQLULEN) column_size;
     }
 
   if (decimal_digits_ptr != NULL)
@@ -196,7 +194,7 @@ odbc_col_attribute (ODBC_STATEMENT *stmt,
   SQLLEN int_length;
   ODBC_DESC *ird;
   RETCODE rc;
-  long temp_value = 0;
+  SQLLEN temp_value = 0;
 
 
   ird = stmt->ird;
@@ -226,17 +224,17 @@ odbc_col_attribute (ODBC_STATEMENT *stmt,
     case SQL_DESC_UPDATABLE:
       if (field_identifier == SQL_COLUMN_LENGTH)
 	{
-	  rc = odbc_get_desc_field (ird, column_number, SQL_DESC_DISPLAY_SIZE, &temp_value, 0, NULL);
+	  rc = odbc_get_desc_field_num (ird, column_number, SQL_DESC_DISPLAY_SIZE, &temp_value);
 	}
       else
 	{
-	  rc = odbc_get_desc_field (ird, column_number, field_identifier, &temp_value, 0, NULL);
+	  rc = odbc_get_desc_field_num (ird, column_number, field_identifier, &temp_value);
 	}
 
-      * (long *) num_value_ptr = temp_value;
+      * (SQLLEN *) num_value_ptr = temp_value;
       if (string_length_ptr != NULL)
 	{
-	  *string_length_ptr = sizeof (long);
+	  *string_length_ptr = sizeof (SQLLEN);
 	}
       ERROR_GOTO (rc, error);
       break;

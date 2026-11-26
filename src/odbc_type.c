@@ -132,7 +132,8 @@ PRIVATE DATA_TYPE_INFO odbc_data_type_info_set[] =
   {
     "DECIMAL", SQL_DECIMAL, SQL_C_DOUBLE, 0, 15, sizeof (SQL_NUMERIC_STRUCT),
     16,
-    0, -1, column_size_decimal, sizeof (SQL_NUMERIC_STRUCT), NULL, -1,
+    /* decimal_digits -1: report the column's own scale */
+    -1, -1, column_size_decimal, sizeof (SQL_NUMERIC_STRUCT), NULL, -1,
     display_size_decimal
   }
   ,
@@ -140,7 +141,8 @@ PRIVATE DATA_TYPE_INFO odbc_data_type_info_set[] =
   {
     "NUMERIC", SQL_NUMERIC, SQL_C_DOUBLE, 0, 15, sizeof (SQL_NUMERIC_STRUCT),
     16,
-    0, -1, column_size_decimal, sizeof (SQL_NUMERIC_STRUCT), NULL, -1,
+    /* decimal_digits -1: report the column's own scale */
+    -1, -1, column_size_decimal, sizeof (SQL_NUMERIC_STRUCT), NULL, -1,
     display_size_decimal
   }
   ,

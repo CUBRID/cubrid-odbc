@@ -126,6 +126,10 @@ PUBLIC RETCODE odbc_get_desc_field (ODBC_DESC *desc,
 				    SQLPOINTER value_ptr,
 				    SQLLEN buffer_length,
 				    SQLLEN *string_length_ptr);
+PUBLIC RETCODE odbc_get_desc_field_num (ODBC_DESC *desc,
+					SQLSMALLINT rec_number,
+					SQLSMALLINT field_id,
+					SQLLEN *value_ptr);
 PUBLIC RETCODE odbc_get_desc_rec (ODBC_DESC *desc,
 				  SQLSMALLINT rec_number,
 				  SQLCHAR *name,

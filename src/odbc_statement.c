@@ -2402,7 +2402,7 @@ create_ird (ODBC_STATEMENT *stmt, T_CCI_COL_INFO *cci_col_info, int column_numbe
 
       if (GET_STAT_STMT_TYPE (stmt->stmt_type))
 	{
-	  col_type = SQL_VARCHAR;
+	  col_type = SQL_LONGVARCHAR;
 	  col_precision = MAX_CUBRID_CHAR_LEN;
 	  col_scale = 0;
 	  col_nullable = SQL_NULLABLE_UNKNOWN;
@@ -2412,7 +2412,7 @@ create_ird (ODBC_STATEMENT *stmt, T_CCI_COL_INFO *cci_col_info, int column_numbe
 	}
       else if (METHOD_STMT_TYPE (stmt->stmt_type))
 	{
-	  col_type = SQL_VARCHAR;
+	  col_type = SQL_LONGVARCHAR;
 	  col_precision = MAX_CUBRID_CHAR_LEN;
 	  col_scale = 0;
 	  col_nullable = SQL_NULLABLE_UNKNOWN;
