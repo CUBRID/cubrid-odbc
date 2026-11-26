@@ -36,7 +36,8 @@ sql_describecol_size (int case_num, char *dsn)
     const char *name;
     SQLSMALLINT type;
     SQLULEN size;		/* 0: only compared with SQLColAttribute */
-  } expected[] = {
+  } expected[] =
+  {
     {"c_char", SQL_CHAR, 10},
     {"c_vc", SQL_VARCHAR, 100},
     {"c_int", SQL_INTEGER, 0},
